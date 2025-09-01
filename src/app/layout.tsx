@@ -19,12 +19,26 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Doon Coding Academy",
     description:
-      process.NEXT_PUBLIC_SITE_DESCRIPTION ||
+      process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
       "Leading coding institute in Dehradun — Full Stack with Gen AI, Data Science, Python, Java.",
     url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
     siteName: "Doon Coding Academy",
     type: "website",
     locale: "en_IN",
+    images: [
+      {
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/images/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "Doon Coding Academy Open Graph Image",
+      },
+    ],
+  },
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+    types: {
+      "application/rss+xml": `${process.env.NEXT_PUBLIC_SITE_URL}/rss.xml`,
+    },
   },
 };
 

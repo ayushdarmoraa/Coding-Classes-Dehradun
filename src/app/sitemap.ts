@@ -23,7 +23,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  const blogPages: MetadataRoute.Sitemap = getAllBlogPosts().map((post) => ({
+  const blogPages: MetadataRoute.Sitemap = getAllBlogPosts()
+    .filter(post => !post.slug.startsWith(".")) // Filter out files like .gitkeep
+    .map((post) => ({
     url: `${base}/blog/${post.slug}`,
     lastModified: new Date(post.date),
     changeFrequency: "monthly",

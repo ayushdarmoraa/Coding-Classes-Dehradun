@@ -1,7 +1,7 @@
-// src/app/courses/[slug]/page.tsx
 import type { Metadata } from "next";
 import Script from "next/script";
 import { getCourseBySlug } from "@/lib/courses";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 type Props = { params: { slug: string } };
 
@@ -56,8 +56,15 @@ export default function CoursePage({ params }: Props) {
     url: `${SITE_URL}/courses/${course.slug}`,
   };
 
+  const breadcrumbs = [
+    { label: "Home", href: "/" },
+    { label: "Courses", href: "/courses" },
+    { label: course.title, href: `/courses/${course.slug}` },
+  ];
+
   return (
     <main className="container mx-auto py-8">
+      <Breadcrumbs items={breadcrumbs} />
       <h1 className="text-3xl font-bold mb-4">{course.title}</h1>
       <p className="mb-3">{course.description}</p>
 
@@ -104,3 +111,5 @@ export default function CoursePage({ params }: Props) {
     </main>
   );
 }
+
+

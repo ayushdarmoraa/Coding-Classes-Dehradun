@@ -1,8 +1,6 @@
 /** @type {import("next").NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
+
   images: {
     formats: ["image/webp", "image/avif"],
     minimumCacheTTL: 31536000, // 1 year

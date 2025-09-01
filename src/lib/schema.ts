@@ -1,4 +1,5 @@
 import { Course } from "./courses";
+import { Testimonial } from "./testimonials"; // Import Testimonial interface
 
 export function generateOrganizationSchema(siteUrl: string, businessName: string) {
   return {
@@ -79,7 +80,7 @@ export function generateFAQPageSchema(faqs: { question: string; answer: string }
   };
 }
 
-export function generateTestimonialSchema(testimonials: { author: string; text: string; rating?: number }[]) {
+export function generateTestimonialSchema(testimonials: Testimonial[]) {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -87,10 +88,13 @@ export function generateTestimonialSchema(testimonials: { author: string; text: 
       "@type": "ListItem",
       position: index + 1,
       item: {
+        "@context": "https://schema.org",
         "@type": "Review",
-        reviewRating: testimonial.rating ? { "@type": "Rating", ratingValue: testimonial.rating } : undefined,
         author: { "@type": "Person", name: testimonial.author },
+        datePublished: testimonial.datePublished || new Date().toISOString().split("T")[0], // Use provided date or current date
         reviewBody: testimonial.text,
+        name: testimonial.course || "Student Testimonial", // Use course name or generic
+        reviewRating: testimonial.rating ? { "@type": "Rating", ratingValue: testimonial.rating, bestRating: 5 } : undefined,
       },
     })),
   };

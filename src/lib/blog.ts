@@ -18,7 +18,9 @@ const postsDirectory = path.join(process.cwd(), 'src/content/blog');
 export function getAllBlogPosts(): BlogPost[] {
   const filenames = fs.readdirSync(postsDirectory);
   
-  const posts = filenames.map((name) => {
+  const posts = filenames
+    .filter(name => name.endsWith('.mdx')) // Filter for .mdx files only
+    .map((name) => {
     const filePath = path.join(postsDirectory, name);
     const fileContents = fs.readFileSync(filePath, 'utf8');
     const { data, content } = matter(fileContents);

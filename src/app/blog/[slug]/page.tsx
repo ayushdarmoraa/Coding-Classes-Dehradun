@@ -1,6 +1,7 @@
 import { getPostBySlug, getAllBlogPosts } from "@/lib/blog";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export async function generateStaticParams() {
   const posts = getAllBlogPosts();
@@ -38,8 +39,15 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
     notFound();
   }
 
+  const breadcrumbs = [
+    { label: "Home", href: "/" },
+    { label: "Blog", href: "/blog" },
+    { label: post.title, href: `/blog/${post.slug}` },
+  ];
+
   return (
     <div className="container mx-auto p-4">
+      <Breadcrumbs items={breadcrumbs} />
       <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
       <p className="text-gray-600 text-sm mb-6">Published on {new Date(post.date).toLocaleDateString()} | Category: {post.category}</p>
       <div className="prose lg:prose-xl max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
