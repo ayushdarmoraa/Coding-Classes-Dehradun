@@ -7,9 +7,8 @@ export default function Header() {
   return (
     <header className="bg-blue-600 text-white p-4 shadow-md">
       <nav className="container mx-auto flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold flex items-center">
-          <img src="/images/dca_logo.png" alt="Doon Coding Academy Logo" className="h-8 mr-2" />
-          Doon Coding Academy
+        <Link href="/" className="text-2xl font-bold">
+          &lt;DCA/&gt;
         </Link>
         {/* Assuming no hamburger menu for now, as it's not explicitly in the current design. */}
         {/* If a hamburger menu is added later, ensure it has aria-label="Toggle navigation" */}
