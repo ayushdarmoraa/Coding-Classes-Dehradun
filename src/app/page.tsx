@@ -1,3 +1,21 @@
+import type { Metadata } from "next";
+
+const SITE_DESC =
+  process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
+  "Leading coding institute in Dehradun — Full Stack with Gen AI, Data Science, Python, Java.";
+
+export const metadata: Metadata = {
+  title: "Doon Coding Academy — Best Coding Courses in Dehradun",
+  description: SITE_DESC,
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Doon Coding Academy",
+    description: SITE_DESC,
+    url: "/",
+    siteName: "Doon Coding Academy",
+    type: "website",
+  },
+};
 export default function HomePage() {
   return (
     <section className="flex flex-col items-center text-center py-10 space-y-6">
