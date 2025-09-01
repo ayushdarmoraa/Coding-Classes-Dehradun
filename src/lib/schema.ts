@@ -94,7 +94,7 @@ export function generateTestimonialSchema(testimonials: Testimonial[]) {
         datePublished: testimonial.datePublished || new Date().toISOString().split("T")[0], // Use provided date or current date
         reviewBody: testimonial.text,
         name: testimonial.course || "Student Testimonial", // Use course name or generic
-        reviewRating: testimonial.rating ? { "@type": "Rating", ratingValue: testimonial.rating, bestRating: 5 } : undefined,
+        reviewRating: testimonial.rating ? { "@type": "Rating", ratingValue: String(testimonial.rating), bestRating: "5" } : undefined,
       },
     })),
   };

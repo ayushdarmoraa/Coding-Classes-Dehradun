@@ -6,6 +6,7 @@ export interface Testimonial {
   course?: string; // Added course field
   image?: string; // Added image field for photo
   altText?: string; // Added altText for image
+  datePublished?: string; // Added datePublished field
 }
 
 export const testimonials: Testimonial[] = [
@@ -17,6 +18,7 @@ export const testimonials: Testimonial[] = [
     course: "Full-Stack with Gen AI",
     image: "/images/testimonials/priya_sharma.jpg",
     altText: "Priya Sharma, a student of Full-Stack with Gen AI course",
+    datePublished: "2025-08-15",
   },
   {
     author: "Rahul Singh",
@@ -26,6 +28,7 @@ export const testimonials: Testimonial[] = [
     course: "Data Science & AI",
     image: "/images/testimonials/rahul_singh.jpg",
     altText: "Rahul Singh, a student of Data Science & AI course",
+    datePublished: "2025-07-20",
   },
   {
     author: "Anjali Verma",
@@ -35,6 +38,7 @@ export const testimonials: Testimonial[] = [
     course: "Python Programming",
     image: "/images/testimonials/anjali_verma.jpg",
     altText: "Anjali Verma, a student of Python Programming course",
+    datePublished: "2025-06-10",
   },
   {
     author: "Vikram Kumar",
@@ -44,15 +48,17 @@ export const testimonials: Testimonial[] = [
     course: "Java Programming",
     image: "/images/testimonials/vikram_kumar.jpg",
     altText: "Vikram Kumar, a student of Java Programming course",
+    datePublished: "2025-05-01",
   },
   {
     author: "Sneha Gupta",
-    text: "The academy's focus on practical skills and real-world applications is commendable. The Full-Stack course prepared me thoroughly for my developer role.",
+    text: "The academy\'s focus on practical skills and real-world applications is commendable. The Full-Stack course prepared me thoroughly for my developer role.",
     rating: 5,
     source: "Google Reviews",
     course: "Full-Stack Development (MERN + Gen AI)",
     image: "/images/testimonials/sneha_gupta.jpg",
     altText: "Sneha Gupta, a student of Full-Stack Development course",
+    datePublished: "2025-04-25",
   },
 ];
 
