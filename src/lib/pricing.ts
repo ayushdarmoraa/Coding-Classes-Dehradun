@@ -9,3 +9,30 @@ export const PRICES = {
   PYTHON: "TBD",
   JAVA: "TBD",
 } as const;
+
+// Pricing display utilities
+export interface PricingInfo {
+  oneTime: number;
+  monthly: number;
+  duration: string;
+  currency: string;
+}
+
+export function parsePricing(priceString: string, duration: string): PricingInfo {
+  const match = priceString.match(/₹([\d,]+)\s*\(₹([\d,]+)\/month\)/);
+  if (match) {
+    return {
+      oneTime: parseInt(match[1].replace(/,/g, '')),
+      monthly: parseInt(match[2].replace(/,/g, '')),
+      duration,
+      currency: '₹'
+    };
+  }
+  return {
+    oneTime: 0,
+    monthly: 0,
+    duration,
+    currency: '₹'
+  };
+}
+

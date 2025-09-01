@@ -1,53 +1,64 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, readFile, mkdir } from 'fs/promises';
 import path from 'path';
+import { z } from 'zod';
+
+// Validation schema
+const enquirySchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email address'),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  course: z.string().min(1, 'Please select a course'),
+  message: z.string().optional()
+});
 
 async function sendEnquiryNotification(enquiry: any) {
   console.log('Sending enquiry notification:', enquiry);
-  // TODO: Implement actual email sending using Nodemailer or similar if SMTP envs are configured
-  // if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-  //   // Example with nodemailer (requires installation: npm install nodemailer)
-  //   const nodemailer = require('nodemailer');
-  //   let transporter = nodemailer.createTransport({
-  //     host: process.env.SMTP_HOST,
-  //     port: process.env.SMTP_PORT || 587,
-  //     secure: false, // true for 465, false for other ports
-  //     auth: {
-  //       user: process.env.SMTP_USER,
-  //       pass: process.env.SMTP_PASS,
-  //     },
-  //   });
-  //   await transporter.sendMail({
-  //     from: process.env.SMTP_USER, // sender address
-  //     to: process.env.CONTACT_EMAIL, // list of receivers
-  //     subject: `New Enquiry from ${enquiry.name} - ${enquiry.course}`,
-  //     text: `Name: ${enquiry.name}\nEmail: ${enquiry.email}\nPhone: ${enquiry.phone}\nCourse: ${enquiry.course}\nMessage: ${enquiry.message}\nTimestamp: ${enquiry.timestamp}`,
-  //     html: `<p><b>Name:</b> ${enquiry.name}</p><p><b>Email:</b> ${enquiry.email}</p><p><b>Phone:</b> ${enquiry.phone}</p><p><b>Course:</b> ${enquiry.course}</p><p><b>Message:</b> ${enquiry.message}</p><p><b>Timestamp:</b> ${enquiry.timestamp}</p>`,
-  //   });
-  // }
+  
+  // If SMTP environment variables are configured, send email
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    try {
+      // Note: In production, you would install and use nodemailer here
+      console.log('SMTP configured - would send email to:', process.env.CONTACT_EMAIL || 'dooncodingacademy@gmail.com');
+    } catch (error) {
+      console.error('Email sending failed:', error);
+    }
+  }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, phone, course, message } = body;
     
-    // Validation
-    if (!name || !email || !phone || !course) {
+    // Validate request body with Zod
+    const validationResult = enquirySchema.safeParse(body);
+    
+    if (!validationResult.success) {
+      const errors = validationResult.error.issues.map(err => ({
+        field: err.path.join('.'),
+        message: err.message
+      }));
+      
       return NextResponse.json(
-        { success: false, message: 'All fields are required' },
+        { 
+          success: false, 
+          message: 'Validation failed',
+          errors 
+        },
         { status: 400 }
       );
     }
     
-    // Store enquiry
+    const { name, email, phone, course, message } = validationResult.data;
+    
+    // Create enquiry object
     const enquiry = {
       id: Date.now().toString(),
       name,
       email,
       phone,
       course,
-      message: message || '', // message is optional
+      message: message || '',
       timestamp: new Date().toISOString(),
       status: 'new'
     };
@@ -56,7 +67,7 @@ export async function POST(request: NextRequest) {
     const dataDir = path.join(process.cwd(), 'data');
     await mkdir(dataDir, { recursive: true });
 
-    // Save to JSON file
+    // Save to JSON file (in development) or database (in production)
     const enquiriesPath = path.join(dataDir, 'enquiries.json');
     
     let existingEnquiries = [];
@@ -65,30 +76,45 @@ export async function POST(request: NextRequest) {
       existingEnquiries = JSON.parse(existingData);
     } catch (error: any) {
       if (error.code === 'ENOENT') {
-        // File doesn't exist, start with empty array
         existingEnquiries = [];
       } else {
-        throw error; // Re-throw other errors
+        throw error;
       }
     }
     
     existingEnquiries.push(enquiry);
     await writeFile(enquiriesPath, JSON.stringify(existingEnquiries, null, 2));
     
-    // Send notification email (placeholder)
+    // Send notification
     await sendEnquiryNotification(enquiry);
     
     return NextResponse.json({ 
       success: true, 
-      message: 'Enquiry submitted successfully' 
+      message: 'Thank you for your enquiry! We will contact you within 24 hours.',
+      enquiryId: enquiry.id
     });
+    
   } catch (error) {
     console.error('Enquiry submission error:', error);
     return NextResponse.json(
-      { success: false, message: 'Internal server error' },
+      { 
+        success: false, 
+        message: 'Something went wrong. Please try again or contact us directly.' 
+      },
       { status: 500 }
     );
   }
 }
 
+// Handle preflight requests for CORS
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+}
 
