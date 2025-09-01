@@ -1,7 +1,11 @@
-// src/app/layout.tsx
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
+import { generateOrganizationSchema, generateLocalBusinessSchema } from "@/lib/schema";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
@@ -15,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Doon Coding Academy",
     description:
-      process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
+      process.NEXT_PUBLIC_SITE_DESCRIPTION ||
       "Leading coding institute in Dehradun — Full Stack with Gen AI, Data Science, Python, Java.",
     url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
     siteName: "Doon Coding Academy",
@@ -31,39 +35,32 @@ export default function RootLayout({
 }) {
   const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
   const BUSINESS_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy";
+  const PHONE = process.env.NEXT_PUBLIC_PHONE || "+91 7037905464";
+  const ADDRESS_STREET = process.env.NEXT_PUBLIC_ADDRESS_STREET || "Near DR School, Herbertpur";
+  const ADDRESS_LOCALITY = process.env.NEXT_PUBLIC_ADDRESS_LOCALITY || "Dehradun";
+  const ADDRESS_REGION = process.env.NEXT_PUBLIC_ADDRESS_REGION || "Uttarakhand";
+  const POSTAL_CODE = process.env.NEXT_PUBLIC_POSTAL_CODE || "248142";
 
-  const ORG_JSONLD = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: BUSINESS_NAME,
-    url: SITE_URL,
-    logo: `${SITE_URL}/favicon.ico`,
-    sameAs: [
-      // add social links when available
-    ],
-  };
+  const ORG_JSONLD = generateOrganizationSchema(SITE_URL, BUSINESS_NAME);
+  // Add social links to ORG_JSONLD when ready
+  // ORG_JSONLD.sameAs = ["https://facebook.com/dooncodingacademy", "https://instagram.com/dooncodingacademy"];
 
-  const LOCAL_JSONLD = {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    name: BUSINESS_NAME,
-    url: SITE_URL,
-    telephone: process.env.NEXT_PUBLIC_PHONE || "+91 7037905464",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: process.env.NEXT_PUBLIC_ADDRESS_STREET || "Near DR School, Herbertpur",
-      addressLocality: process.env.NEXT_PUBLIC_ADDRESS_LOCALITY || "Dehradun",
-      addressRegion: process.env.NEXT_PUBLIC_ADDRESS_REGION || "Uttarakhand",
-      postalCode: process.env.NEXT_PUBLIC_POSTAL_CODE || "248142",
-      addressCountry: "IN",
-    },
-    image: [`${SITE_URL}/favicon.ico`],
-  };
+  const LOCAL_JSONLD = generateLocalBusinessSchema(
+    SITE_URL,
+    BUSINESS_NAME,
+    PHONE,
+    ADDRESS_STREET,
+    ADDRESS_LOCALITY,
+    ADDRESS_REGION,
+    POSTAL_CODE
+  );
 
   return (
     <html lang="en">
       <body>
+        <Header />
         {children}
+        <Footer />
 
         <Script
           id="org-jsonld"
@@ -77,7 +74,11 @@ export default function RootLayout({
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(LOCAL_JSONLD) }}
         />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
 }
+
+
