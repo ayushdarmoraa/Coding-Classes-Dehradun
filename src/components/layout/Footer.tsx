@@ -1,36 +1,45 @@
-import Link from "next/link";
-
+/* eslint-disable @next/next/no-html-link-for-pages */
 export default function Footer() {
-  const BUSINESS_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy";
-  const PHONE = process.env.NEXT_PUBLIC_PHONE || "+91 7037905464";
-  const ADDRESS_STREET = process.env.NEXT_PUBLIC_ADDRESS_STREET || "Near DR School, Herbertpur";
-  const ADDRESS_LOCALITY = process.env.NEXT_PUBLIC_ADDRESS_LOCALITY || "Dehradun";
-  const ADDRESS_REGION = process.env.NEXT_PUBLIC_ADDRESS_REGION || "Uttarakhand";
-  const POSTAL_CODE = process.env.NEXT_PUBLIC_POSTAL_CODE || "248142";
-
   return (
-    <footer className="bg-gray-800 text-white p-8 mt-8">
-      <div className="container mx-auto text-center">
-        <h3 className="text-xl font-bold mb-2">{BUSINESS_NAME}</h3>
-        <p className="text-sm mb-1">
-          {ADDRESS_STREET}, {ADDRESS_LOCALITY}, {ADDRESS_REGION} {POSTAL_CODE}, India
-        </p>
-        <p className="text-sm mb-4">Phone: {PHONE}</p>
-        <p className="text-sm mb-4">
-          <Link href="/rss.xml" className="hover:underline" target="_blank" rel="noopener noreferrer">
-            RSS Feed
-          </Link>
-        </p>
-        {/* Assuming social media links will be added here. Example: */}
-        {/* <div className="flex justify-center space-x-4 mt-4">
-          <a href="https://facebook.com/dooncodingacademy" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-            <img src="/images/social/facebook.svg" alt="Facebook" className="h-6 w-6" />
-          </a>
-          <a href="https://instagram.com/dooncodingacademy" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-            <img src="/images/social/instagram.svg" alt="Instagram" className="h-6 w-6" />
-          </a>
-        </div> */}
-        <p className="text-xs">&copy; {new Date().getFullYear()} {BUSINESS_NAME}. All rights reserved.</p>
+    <footer className="bg-gray-900 text-gray-300 py-10 mt-10">
+      <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        {/* Brand + Address */}
+        <div>
+          <h3 className="text-xl font-bold text-white mb-2">&lt;DCA/&gt; Doon Coding Academy</h3>
+          <p className="text-sm">
+            Near DR School, Herbertpur<br />
+            Dehradun, Uttarakhand 248142, India
+          </p>
+          <p className="mt-2 text-sm">📞 +91 7037905464</p>
+          <p className="text-sm">✉️ dooncodingacademy@gmail.com</p>
+        </div>
+
+        {/* Quick Links */}
+        <div>
+          <h4 className="text-lg font-semibold text-white mb-2">Quick Links</h4>
+          <ul className="space-y-2 text-sm">
+            <li><a href="/about" className="hover:text-white">About</a></li>
+            <li><a href="/courses" className="hover:text-white">Courses</a></li>
+            <li><a href="/blog" className="hover:text-white">Blog</a></li>
+            <li><a href="/contact" className="hover:text-white">Contact</a></li>
+          </ul>
+        </div>
+
+        {/* Socials */}
+        <div>
+          <h4 className="text-lg font-semibold text-white mb-2">Connect With Us</h4>
+          <ul className="space-y-2 text-sm">
+            <li><a href="https://wa.me/917037905464" target="_blank" className="hover:text-white" rel="noreferrer">WhatsApp</a></li>
+            <li><a href="https://facebook.com" target="_blank" className="hover:text-white" rel="noreferrer">Facebook</a></li>
+            <li><a href="https://instagram.com" target="_blank" className="hover:text-white" rel="noreferrer">Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Bottom */}
+      <div className="mt-8 border-t border-gray-700 pt-4 text-center text-sm text-gray-400">
+        © {new Date().getFullYear()} Doon Coding Academy. All rights reserved.
       </div>
     </footer>
   );

@@ -118,13 +118,13 @@ const EnquiryForm: React.FC = () => {
         // Handle validation errors from server
         if (result.errors) {
           const serverErrors: FormErrors = {};
-          result.errors.forEach((error: any) => {
+          result.errors.forEach((error: { field: string; message: string }) => {
             serverErrors[error.field] = error.message;
           });
           setErrors(serverErrors);
         }
       }
-    } catch (error) {
+    } catch {
       setSubmitStatus('error');
       setSubmitMessage('Network error. Please check your connection and try again.');
     } finally {
@@ -139,7 +139,7 @@ const EnquiryForm: React.FC = () => {
           Get in Touch
         </h3>
         <p className="text-gray-600">
-          Ready to start your coding journey? Fill out the form below and we'll get back to you within 24 hours.
+          Ready to start your coding journey? Fill out the form below and we&#39;ll get back to you within 24 hours.
         </p>
       </div>
 

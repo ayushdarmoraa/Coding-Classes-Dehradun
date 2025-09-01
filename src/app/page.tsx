@@ -60,13 +60,13 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white py-20">
+  <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white pt-10 pb-20">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <Badge variant="success" className="mb-6 bg-green-500 text-white">
             🚀 Now with Gen AI Integration
           </Badge>
           
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
             Code Your Future.<br />
             <span className="text-blue-200">Launch Your Career</span><br />
             <span className="text-yellow-300">with AI-Powered Courses</span>
@@ -82,15 +82,14 @@ export default function HomePage() {
               href="/courses" 
               variant="primary"
               size="lg"
-              className="bg-white text-blue-600 hover:bg-gray-100"
+              className="bg-yellow-400 text-blue-900 font-semibold hover:bg-yellow-500"
             >
               Explore Courses
             </Button>
             <Button 
               href="https://wa.me/917037905464?text=Hi, I want to know more about your courses"
-              variant="secondary"
               size="lg"
-              className="border-white text-white hover:bg-white hover:text-blue-600"
+              className="bg-transparent border-2 border-white text-white font-semibold hover:bg-white hover:text-blue-600 transition"
             >
               Chat on WhatsApp
             </Button>
@@ -226,21 +225,19 @@ export default function HomePage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              href="/contact"
-              variant="primary"
+            <Button
+              href="/courses"
               size="lg"
-              className="bg-white text-blue-600 hover:bg-gray-100"
+              className="bg-yellow-400 text-blue-900 font-semibold hover:bg-yellow-500 transition"
             >
-              Book Free Consultation
+              Explore Courses
             </Button>
-            <Button 
-              href="https://wa.me/917037905464?text=Hi, I want to enroll in a course"
-              variant="secondary"
+            <Button
+              href="https://wa.me/917037905464?text=Hi, I want to know more about your courses"
               size="lg"
-              className="border-white text-white hover:bg-white hover:text-blue-600"
+              className="!bg-transparent border-2 border-white text-white font-semibold hover:bg-white hover:text-blue-600 transition"
             >
-              Enroll Now via WhatsApp
+              Chat on WhatsApp
             </Button>
           </div>
         </div>

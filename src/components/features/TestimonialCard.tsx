@@ -13,13 +13,12 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
   name, 
   role, 
   company, 
-  quote, 
-  image 
+  quote 
 }) => {
   return (
     <Card className="p-6 h-full flex flex-col">
       <div className="flex-1 mb-4">
-        <div className="text-blue-600 text-4xl mb-3">"</div>
+        <div className="text-blue-600 text-4xl mb-3">&quot;</div>
         <p className="text-gray-700 leading-relaxed italic">
           {quote}
         </p>

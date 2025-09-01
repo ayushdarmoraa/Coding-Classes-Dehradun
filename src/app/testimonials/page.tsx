@@ -14,7 +14,7 @@ export default function TestimonialsPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Student Testimonials</h1>
+  <h1 className="text-3xl font-bold mb-6">Student Testimonials</h1>
       <div className="space-y-4">
         {testimonials.map((testimonial, index) => (
           <div key={index} className="border rounded-lg p-4 shadow-sm flex items-start space-x-4">
@@ -28,7 +28,7 @@ export default function TestimonialsPage() {
               />
             )}
             <div className="flex-grow">
-              <p className="text-gray-700 italic">\"{testimonial.text}\"</p>
+              <p className="text-gray-700 italic">&quot;{testimonial.text}&quot;</p>
               <p className="text-right font-semibold mt-2">- {testimonial.author}</p>
               {testimonial.rating && (
                 <div className="flex justify-end mt-1">

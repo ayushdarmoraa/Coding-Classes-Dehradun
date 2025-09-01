@@ -1,5 +1,5 @@
 import React from 'react';
-import { parsePricing, type PricingInfo } from '@/lib/pricing';
+import { parsePricing } from '@/lib/pricing';
 
 interface PricingDisplayProps {
   priceString: string;

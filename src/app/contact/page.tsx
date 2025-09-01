@@ -46,7 +46,7 @@ export default function ContactPage() {
             Get in Touch
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Ready to start your coding journey? We're here to help you choose the right course 
+            Ready to start your coding journey? We&#39;re here to help you choose the right course 
             and answer all your questions about our programs.
           </p>
         </div>
@@ -178,7 +178,7 @@ export default function ContactPage() {
                   What if I miss a class?
                 </h3>
                 <p className="text-gray-600 text-sm mb-4">
-                  We provide recorded sessions and makeup classes to ensure you don't miss any important content.
+                  We provide recorded sessions and makeup classes to ensure you don&#39;t miss any important content.
                 </p>
               </div>
             </div>

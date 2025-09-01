@@ -12,7 +12,15 @@ const enquirySchema = z.object({
   message: z.string().optional()
 });
 
-async function sendEnquiryNotification(enquiry: any) {
+type EnquiryPayload = {
+  name: string;
+  email: string;
+  phone: string;
+  course: string;
+  message?: string;
+};
+
+async function sendEnquiryNotification(enquiry: EnquiryPayload & { id: string; timestamp: string; status: string }) {
   console.log('Sending enquiry notification:', enquiry);
   
   // If SMTP environment variables are configured, send email
@@ -28,7 +36,7 @@ async function sendEnquiryNotification(enquiry: any) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+  const body = (await request.json()) as EnquiryPayload;
     
     // Validate request body with Zod
     const validationResult = enquirySchema.safeParse(body);
@@ -70,12 +78,12 @@ export async function POST(request: NextRequest) {
     // Save to JSON file (in development) or database (in production)
     const enquiriesPath = path.join(dataDir, 'enquiries.json');
     
-    let existingEnquiries = [];
+    let existingEnquiries: Array<EnquiryPayload & { id: string; timestamp: string; status: string }> = [];
     try {
       const existingData = await readFile(enquiriesPath, 'utf8');
-      existingEnquiries = JSON.parse(existingData);
-    } catch (error: any) {
-      if (error.code === 'ENOENT') {
+      existingEnquiries = JSON.parse(existingData) as Array<EnquiryPayload & { id: string; timestamp: string; status: string }>;
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'code' in error && (error as { code?: string }).code === 'ENOENT') {
         existingEnquiries = [];
       } else {
         throw error;
@@ -94,12 +102,13 @@ export async function POST(request: NextRequest) {
       enquiryId: enquiry.id
     });
     
-  } catch (error) {
-    console.error('Enquiry submission error:', error);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    console.error('Enquiry submission error:', err);
     return NextResponse.json(
       { 
         success: false, 
-        message: 'Something went wrong. Please try again or contact us directly.' 
+        message: msg || 'Something went wrong. Please try again or contact us directly.' 
       },
       { status: 500 }
     );
@@ -107,7 +116,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Handle preflight requests for CORS
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,
     headers: {

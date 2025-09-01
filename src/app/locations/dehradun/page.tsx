@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -70,8 +69,8 @@ export default function DehradunLocationPage() {
             </h1>
             
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
-              Transform your career with industry-focused coding education right here in Uttarakhand's capital. 
-              Join Dehradun's premier coding academy with proven placement success.
+              Transform your career with industry-focused coding education right here in Uttarakhand&#39;s capital. 
+              Join Dehradun&#39;s premier coding academy with proven placement success.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -276,7 +275,7 @@ export default function DehradunLocationPage() {
               Coding Courses Available in Dehradun
             </h2>
             <p className="text-xl text-gray-600">
-              Industry-focused curriculum designed for Dehradun's growing tech market
+              Industry-focused curriculum designed for Dehradun&#39;s growing tech market
             </p>
           </div>
           
@@ -350,9 +349,9 @@ export default function DehradunLocationPage() {
                 </div>
               </div>
               <p className="text-gray-700 italic">
-                "Being a local student, I was looking for quality coding education without leaving Dehradun. 
+                &quot;Being a local student, I was looking for quality coding education without leaving Dehradun. 
                 Doon Coding Academy provided exactly that. The instructors understand the local job market 
-                and prepared me well for interviews with Dehradun-based companies."
+                and prepared me well for interviews with Dehradun-based companies.&quot;
               </p>
             </Card>
             
@@ -368,9 +367,9 @@ export default function DehradunLocationPage() {
                 </div>
               </div>
               <p className="text-gray-700 italic">
-                "The Data Science course helped me transition from a non-tech background to a rewarding 
+                &quot;The Data Science course helped me transition from a non-tech background to a rewarding 
                 career in analytics. The small batch size meant I got personal attention, and the 
-                placement support was excellent for finding opportunities in Dehradun."
+                placement support was excellent for finding opportunities in Dehradun.&quot;
               </p>
             </Card>
           </div>
@@ -384,7 +383,7 @@ export default function DehradunLocationPage() {
             Start Your Tech Career in Dehradun
           </h2>
           <p className="text-xl mb-8 text-blue-100">
-            Join Dehradun's leading coding academy and become part of Uttarakhand's growing tech ecosystem. 
+            Join Dehradun&#39;s leading coding academy and become part of Uttarakhand&#39;s growing tech ecosystem. 
             Next batch starts soon at our Herbertpur campus!
           </p>
           
