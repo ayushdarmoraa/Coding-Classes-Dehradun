@@ -1,266 +1,333 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
+// src/app/courses/page.tsx
 import type { Metadata } from "next";
 import { getCourses } from "@/lib/courses";
 import CourseCard from "@/components/features/CourseCard";
-import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 
 export const metadata: Metadata = {
   title: "Coding Courses in Dehradun - Full Stack, Data Science, Python, Java",
-  description: "Explore our comprehensive coding courses in Dehradun. Learn Full-Stack Development with Gen AI, Data Science, Python, and Java programming with industry experts.",
+  description:
+    "Explore our comprehensive coding courses in Dehradun. Learn Full-Stack Development with Gen AI, Data Science, Python, and Java programming with industry experts.",
   alternates: { canonical: "/courses" },
   openGraph: {
     title: "Coding Courses in Dehradun - Doon Coding Academy",
-    description: "Explore our comprehensive coding courses in Dehradun. Learn Full-Stack Development with Gen AI, Data Science, Python, and Java programming with industry experts.",
+    description:
+      "Explore our comprehensive coding courses in Dehradun. Learn Full-Stack Development with Gen AI, Data Science, Python, and Java programming with industry experts.",
     url: "/courses",
     type: "website",
   },
 };
 
-const features = [
-  {
-    icon: "👨‍🏫",
-    title: "Expert Instructors",
-    description: "Learn from industry professionals with 6+ years of experience"
-  },
-  {
-    icon: "🏗️",
-    title: "Project-Based Learning",
-    description: "Build real-world projects that showcase your skills to employers"
-  },
-  {
-    icon: "🎯",
-    title: "Job-Ready Skills",
-    description: "Curriculum designed to match current industry requirements"
-  },
-  {
-    icon: "🤝",
-    title: "Placement Support",
-    description: "Resume building, interview prep, and job referrals included"
-  }
-];
-
 export default function CoursesPage() {
   const courses = getCourses();
-  const featuredCourses = courses.filter(course => 
-    ['full-stack', 'data-science'].includes(course.slug)
-  );
-  const otherCourses = courses.filter(course => 
-    !['full-stack', 'data-science'].includes(course.slug)
-  );
+
+  // Feature a couple up top
+  const featuredSlugs = new Set(["full-stack", "data-science"]);
+  const featured = courses.filter((c) => featuredSlugs.has(c.slug));
+  const others = courses.filter((c) => !featuredSlugs.has(c.slug));
+
+  // Clientless "filters" via anchor sections: map slugs to levels
+  const beginnerSlugs = new Set(["python", "java"]);
+  const intermediateSlugs = new Set(["data-science"]);
+  const advancedSlugs = new Set(["full-stack"]);
+
+  const beginner = courses.filter((c) => beginnerSlugs.has(c.slug));
+  const intermediate = courses.filter((c) => intermediateSlugs.has(c.slug));
+  const advanced = courses.filter((c) => advancedSlugs.has(c.slug));
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white py-16">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <Badge variant="success" className="mb-6 bg-green-500 text-white">
-            🎓 Industry-Focused Curriculum
-          </Badge>
-          
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            Master Coding Skills in Dehradun
-          </h1>
-          
-          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
-            Choose from our carefully crafted programs designed to transform you into a job-ready developer. 
-            Small batches, hands-on projects, and placement assistance included.
+    <div className="min-h-screen bg-gray-50" id="top">
+      {/* Compact header */}
+      <section className="bg-white border-b">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <nav aria-label="Breadcrumb" className="mb-3 text-sm">
+            <ol className="flex items-center gap-2 text-gray-600">
+              <li>
+                <a href="/" className="hover:underline text-blue-700 font-semibold">Home</a>
+              </li>
+              <li aria-hidden="true">/</li>
+              <li className="text-gray-800 font-semibold">Courses</li>
+            </ol>
+          </nav>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl md:text-4xl font-extrabold">Our Courses</h1>
+            <Badge variant="success" className="bg-green-500 text-white">Industry-Focused</Badge>
+          </div>
+          <p className="mt-2 max-w-2xl text-gray-700">
+            Pick a program that fits your goals. Small batches, hands-on projects, and support included.
           </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              href="#courses" 
-              variant="primary"
-              size="lg"
-              className="bg-white text-blue-600 hover:bg-gray-100"
-            >
-              Browse Courses
-            </Button>
-            <Button 
-              href="/contact"
-              variant="secondary"
-              size="lg"
-              className="border-white text-white hover:bg-white hover:text-blue-600"
-            >
-              Get Free Consultation
-            </Button>
-          </div>
-        </div>
-      </section>
 
-      {/* Features */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Why Choose Our Courses?
-            </h2>
-            <p className="text-xl text-gray-600">
-              We focus on practical skills and real-world experience
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <div key={index} className="text-center">
-                <div className="text-4xl mb-4">{feature.icon}</div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  {feature.description}
-                </p>
+          {/* Filters / Sort (anchor-only) */}
+          <div className="mt-6">
+            <div className="rounded-2xl bg-gray-50 ring-1 ring-gray-200 p-3 md:p-4">
+              <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                <span className="text-sm font-semibold text-gray-700">Quick filters:</span>
+                <a href="#beginner" className="inline-flex items-center rounded-xl border border-blue-700/30 bg-white px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-700/5">Beginner</a>
+                <a href="#intermediate" className="inline-flex items-center rounded-xl border border-blue-700/30 bg-white px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-700/5">Intermediate</a>
+                <a href="#advanced" className="inline-flex items-center rounded-xl border border-blue-700/30 bg-white px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-700/5">Advanced</a>
+
+                <span className="mx-2 h-5 w-px bg-gray-300" aria-hidden="true" />
+
+                <span className="text-sm font-semibold text-gray-700">Sort by (scan table):</span>
+                <a href="#comparison" className="inline-flex items-center rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100">Shortest duration</a>
+                <a href="#comparison" className="inline-flex items-center rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100">Lowest fees</a>
+
+                <span className="mx-2 h-5 w-px bg-gray-300" aria-hidden="true" />
+
+                <a href="#faqs" className="inline-flex items-center rounded-xl bg-blue-700 px-3 py-1.5 text-sm font-semibold text-white hover:opacity-95">FAQs</a>
+                <a href="#contact-cta" className="inline-flex items-center rounded-xl border border-blue-700 px-3 py-1.5 text-sm font-semibold text-blue-700 hover:bg-blue-700/5">Talk to us</a>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Courses */}
-      <section id="courses" className="py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Featured Courses
-            </h2>
-            <p className="text-xl text-gray-600">
-              Our most popular programs with highest placement rates
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {featuredCourses.map((course, index) => (
-              <CourseCard 
-                key={course.id} 
-                course={course} 
-                featured={index === 0}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Other Courses */}
-      {otherCourses.length > 0 && (
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Foundation Courses
-              </h2>
-              <p className="text-xl text-gray-600">
-                Perfect for beginners starting their coding journey
-              </p>
             </div>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              {otherCourses.map((course) => (
-                <CourseCard key={course.id} course={course} />
+          </div>
+        </div>
+      </section>
+
+      {/* Featured */}
+      {featured.length > 0 && (
+        <section className="py-10 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <h2 className="text-2xl md:text-3xl font-bold">Featured Programs</h2>
+            <p className="mt-1 text-gray-600">Popular, career-oriented tracks with strong outcomes.</p>
+            <div className="mt-6 grid md:grid-cols-2 gap-8">
+              {featured.map((course, idx) => (
+                <CourseCard key={course.id} course={course} featured={idx === 0} />
               ))}
             </div>
           </div>
         </section>
       )}
 
-      {/* Course Comparison */}
-      <section className="py-16 bg-white">
+      {/* All Courses */}
+      <section className="py-10" id="all">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Course Comparison
-            </h2>
-            <p className="text-xl text-gray-600">
-              Find the perfect course for your career goals
-            </p>
+          <h2 className="text-2xl md:text-3xl font-bold">All Courses</h2>
+          <p className="mt-1 text-gray-600">Foundation and specialization options for every level.</p>
+          <div className="mt-6 grid md:grid-cols-2 gap-8">
+            {(others.length ? others : courses).map((course) => (
+              <CourseCard key={course.id} course={course} />
+            ))}
           </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full bg-white rounded-lg shadow-md overflow-hidden">
+        </div>
+      </section>
+
+      {/* Anchor-filtered mini sections */}
+      {!!beginner.length && (
+        <section className="py-6 pt-0" id="beginner" aria-label="Beginner courses">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex items-center gap-2">
+              <h3 className="text-xl md:text-2xl font-bold">Beginner-Friendly</h3>
+              <Badge variant="primary">Start here</Badge>
+            </div>
+            <p className="mt-1 text-gray-600">Great if you’re new to coding or want a solid base.</p>
+            <div className="mt-5 grid md:grid-cols-2 gap-8">
+              {beginner.map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+            <div className="mt-4">
+              <a href="#top" className="text-sm text-blue-700 hover:underline">Back to top</a>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {!!intermediate.length && (
+        <section className="py-6" id="intermediate" aria-label="Intermediate courses">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex items-center gap-2">
+              <h3 className="text-xl md:text-2xl font-bold">Intermediate</h3>
+              <Badge variant="info">Some fundamentals helpful</Badge>
+            </div>
+            <p className="mt-1 text-gray-600">Ideal if you’re comfortable with basics and want to specialize.</p>
+            <div className="mt-5 grid md:grid-cols-2 gap-8">
+              {intermediate.map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+            <div className="mt-4">
+              <a href="#top" className="text-sm text-blue-700 hover:underline">Back to top</a>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {!!advanced.length && (
+        <section className="py-6" id="advanced" aria-label="Advanced courses">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex items-center gap-2">
+              <h3 className="text-xl md:text-2xl font-bold">Advanced</h3>
+              <Badge variant="success">Career track</Badge>
+            </div>
+            <p className="mt-1 text-gray-600">Go end-to-end on modern stacks and ship real projects.</p>
+            <div className="mt-5 grid md:grid-cols-2 gap-8">
+              {advanced.map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+            <div className="mt-4">
+              <a href="#top" className="text-sm text-blue-700 hover:underline">Back to top</a>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Benefits grid */}
+      <section className="py-12 bg-white border-t" id="benefits">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold">Why Learn with Doon Coding Academy?</h2>
+          <p className="mt-1 text-gray-600">Designed for Dehradun learners—beginner-friendly, outcomes-first.</p>
+
+          <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: "👨‍🏫", title: "Expert Mentors", text: "Instructors with 6+ years of industry experience." },
+              { icon: "🧱", title: "Project-First", text: "Portfolio projects in every track—learn by building." },
+              { icon: "🎯", title: "Job-Ready Skills", text: "Modern stack + interview prep and guidance." },
+              { icon: "🤝", title: "Local Support", text: "Small batches, personalized feedback, community." },
+            ].map((f) => (
+              <div key={f.title} className="rounded-2xl bg-gray-50 p-5 ring-1 ring-gray-200">
+                <div className="text-3xl">{f.icon}</div>
+                <h3 className="mt-3 font-semibold">{f.title}</h3>
+                <p className="mt-1 text-sm text-gray-700">{f.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Course Comparison */}
+      <section className="py-12 bg-white" id="comparison">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold">Course Comparison</h2>
+          <p className="mt-1 text-gray-600">Glance at duration, pricing, and typical outcomes.</p>
+
+          <div className="mt-6 overflow-x-auto">
+            <table className="w-full bg-white rounded-lg shadow-sm overflow-hidden">
               <thead className="bg-blue-600 text-white">
                 <tr>
                   <th className="px-6 py-4 text-left">Course</th>
                   <th className="px-6 py-4 text-center">Duration</th>
                   <th className="px-6 py-4 text-center">Price</th>
                   <th className="px-6 py-4 text-center">Level</th>
-                  <th className="px-6 py-4 text-center">Job Roles</th>
+                  <th className="px-6 py-4 text-center">Typical Roles</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                <tr className="hover:bg-gray-50">
+                <tr className="hover:bg-gray-50" id="advanced-row">
                   <td className="px-6 py-4">
                     <div className="font-semibold text-gray-900">Full-Stack Development (MERN + Gen AI)</div>
                     <div className="text-sm text-gray-600">Complete web development with AI integration</div>
                   </td>
                   <td className="px-6 py-4 text-center">6 months</td>
                   <td className="px-6 py-4 text-center">₹25,000</td>
-                  <td className="px-6 py-4 text-center">
-                    <Badge variant="success">Beginner to Advanced</Badge>
-                  </td>
-                  <td className="px-6 py-4 text-center text-sm">
-                    Full-Stack Developer, Frontend Developer, Backend Developer
-                  </td>
+                  <td className="px-6 py-4 text-center"><Badge variant="success">Beginner→Advanced</Badge></td>
+                  <td className="px-6 py-4 text-center text-sm">Full-Stack / Frontend / Backend Developer</td>
                 </tr>
-                <tr className="hover:bg-gray-50">
+                <tr className="hover:bg-gray-50" id="intermediate-row">
                   <td className="px-6 py-4">
                     <div className="font-semibold text-gray-900">Data Science & AI</div>
-                    <div className="text-sm text-gray-600">Python, ML, statistics, and AI workflows</div>
+                    <div className="text-sm text-gray-600">Python, ML, statistics, visualization</div>
                   </td>
                   <td className="px-6 py-4 text-center">6 months</td>
                   <td className="px-6 py-4 text-center">₹30,000</td>
-                  <td className="px-6 py-4 text-center">
-                    <Badge variant="info">Intermediate</Badge>
-                  </td>
-                  <td className="px-6 py-4 text-center text-sm">
-                    Data Scientist, Data Analyst, ML Engineer
-                  </td>
+                  <td className="px-6 py-4 text-center"><Badge variant="info">Intermediate</Badge></td>
+                  <td className="px-6 py-4 text-center text-sm">Data Scientist / Analyst / ML Engineer</td>
                 </tr>
-                <tr className="hover:bg-gray-50">
+                <tr className="hover:bg-gray-50" id="beginner-row-1">
                   <td className="px-6 py-4">
                     <div className="font-semibold text-gray-900">Python Programming</div>
                     <div className="text-sm text-gray-600">Foundation programming with Python</div>
                   </td>
-                  <td className="px-6 py-4 text-center">2-3 months</td>
+                  <td className="px-6 py-4 text-center">2–3 months</td>
                   <td className="px-6 py-4 text-center">TBD</td>
-                  <td className="px-6 py-4 text-center">
-                    <Badge variant="primary">Beginner</Badge>
+                  <td className="px-6 py-4 text-center"><Badge variant="primary">Beginner</Badge></td>
+                  <td className="px-6 py-4 text-center text-sm">Python Developer / Automation</td>
+                </tr>
+                <tr className="hover:bg-gray-50" id="beginner-row-2">
+                  <td className="px-6 py-4">
+                    <div className="font-semibold text-gray-900">Java Programming</div>
+                    <div className="text-sm text-gray-600">OOP, collections, basic backend</div>
                   </td>
-                  <td className="px-6 py-4 text-center text-sm">
-                    Python Developer, Automation Engineer
-                  </td>
+                  <td className="px-6 py-4 text-center">2–3 months</td>
+                  <td className="px-6 py-4 text-center">TBD</td>
+                  <td className="px-6 py-4 text-center"><Badge variant="primary">Beginner</Badge></td>
+                  <td className="px-6 py-4 text-center text-sm">Java Developer / QA Automation</td>
                 </tr>
               </tbody>
             </table>
           </div>
+
+          <p className="mt-3 text-sm text-gray-600">
+            Tip: For shortest duration, check the 2–3 month tracks. For lowest fees, compare prices across rows.
+          </p>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Start Your Coding Journey?
-          </h2>
-          <p className="text-xl mb-8 text-blue-100">
-            Join our next batch and transform your career with industry-relevant skills.
-            Limited seats available!
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              href="/contact"
-              variant="primary"
-              size="lg"
-              className="bg-white text-blue-600 hover:bg-gray-100"
-            >
-              Enroll Now
-            </Button>
-            <Button 
-              href="https://wa.me/917037905464?text=Hi, I want to know more about course schedules and batches"
-              variant="secondary"
-              size="lg"
-              className="border-white text-white hover:bg-white hover:text-blue-600"
-            >
-              Ask About Batches
-            </Button>
+      {/* Outcomes strip */}
+      <section className="py-8 bg-blue-600/5 border-y border-blue-700/10">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-xl md:text-2xl font-bold">What you’ll walk away with</h2>
+          <ul className="mt-3 grid md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm text-gray-800">
+            <li className="rounded-xl bg-white p-3 ring-1 ring-gray-200">Portfolio projects on GitHub</li>
+            <li className="rounded-xl bg-white p-3 ring-1 ring-gray-200">Solid fundamentals + modern stack</li>
+            <li className="rounded-xl bg-white p-3 ring-1 ring-gray-200">Interview prep & guidance</li>
+            <li className="rounded-xl bg-white p-3 ring-1 ring-gray-200">Local mentor support in Dehradun</li>
+          </ul>
+        </div>
+      </section>
+
+      {/* Course FAQs (mini) */}
+      <section className="py-12 bg-white" id="faqs">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold">Course FAQs</h2>
+          <p className="mt-1 text-gray-600">Quick answers before you pick a track.</p>
+
+          <div className="mt-6 space-y-4">
+            {[
+              {
+                q: "Do I need prior coding experience?",
+                a: "No—beginner-friendly options are available. If you have experience, we help you pace faster.",
+              },
+              {
+                q: "Are payment plans available?",
+                a: "Yes, both monthly and one-time plans are available.",
+              },
+              {
+                q: "Will I build real projects?",
+                a: "Yes. Our approach is project-first; every course includes portfolio-ready work.",
+              },
+              {
+                q: "How do I decide which course is right for me?",
+                a: "Message us on WhatsApp or request a free consultation and we’ll guide you.",
+              },
+            ].map((item) => (
+              <details key={item.q} className="group rounded-2xl bg-gray-50 ring-1 ring-gray-200 open:ring-blue-700/30">
+                <summary className="cursor-pointer list-none select-none p-5 font-semibold text-lg">
+                  {item.q}
+                </summary>
+                <div className="px-5 pb-5 pt-0 text-gray-700">{item.a}</div>
+              </details>
+            ))}
+          </div>
+
+          {/* Contact CTA */}
+          <div className="mt-8 rounded-2xl border border-blue-700/20 bg-blue-600/5 p-5" id="contact-cta">
+            <p className="font-semibold text-blue-700">Need help choosing the right course?</p>
+            <div className="mt-3 flex flex-wrap gap-3">
+              <a
+                href="/contact"
+                className="inline-flex items-center rounded-xl bg-blue-700 px-4 py-2 text-white text-sm font-semibold shadow-sm hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-blue-700/30"
+              >
+                Get a free consultation
+              </a>
+              <a
+                href="https://wa.me/917037905464?text=Hi%2C%20I%20need%20help%20choosing%20a%20course"
+                className="inline-flex items-center rounded-xl border border-blue-700 px-4 py-2 text-blue-700 text-sm font-semibold hover:bg-blue-700/5 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
+              >
+                Chat on WhatsApp
+              </a>
+            </div>
           </div>
         </div>
       </section>

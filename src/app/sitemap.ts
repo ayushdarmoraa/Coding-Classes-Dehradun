@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getCourses } from "@/lib/courses";
-import { getAllBlogPosts } from "@/lib/blog";
+import { getAllBlogPosts, getPostLastModified, listCategories, listTags, listSeries, listAuthors } from "@/lib/blog";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base =
@@ -12,7 +12,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/courses`,    lastModified: new Date(), changeFrequency: "weekly",  priority: 0.9 },
     { url: `${base}/contact`,    lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
     { url: `${base}/testimonials`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
-    { url: `${base}/blog`, lastModified: new Date(), changeFrequency: "daily", priority: 0.7 },
+  { url: `${base}/blog`, lastModified: new Date(), changeFrequency: "daily", priority: 0.7 },
+  { url: `${base}/blog/pinned`, lastModified: new Date(), changeFrequency: "daily", priority: 0.6 },
+    { url: `${base}/blog/how-to`, lastModified: new Date(), changeFrequency: "daily", priority: 0.6 },
+    { url: `${base}/blog/series`, lastModified: new Date(), changeFrequency: "daily", priority: 0.6 },
+    { url: `${base}/blog/archive`, lastModified: new Date(), changeFrequency: "daily", priority: 0.6 },
     { url: `${base}/faq`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
   ];
 
@@ -24,15 +28,46 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   const blogPages: MetadataRoute.Sitemap = getAllBlogPosts()
-    .filter(post => !post.slug.startsWith(".")) // Filter out files like .gitkeep
-    .map((post) => ({
-    url: `${base}/blog/${post.slug}`,
-    lastModified: new Date(post.date),
-    changeFrequency: "monthly",
+    .filter(post => !post.slug.startsWith(".") && !post.noindex)
+    .map((post) => {
+      const lm = getPostLastModified(post.slug);
+      return {
+        url: `${base}/blog/${post.slug}`,
+        lastModified: lm ? new Date(lm) : new Date(post.date),
+        changeFrequency: "monthly",
+        priority: 0.6,
+      };
+    });
+
+  const categoryPages: MetadataRoute.Sitemap = listCategories().map((c) => ({
+    url: `${base}/blog/category/${encodeURIComponent(c)}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
     priority: 0.6,
   }));
 
-  return [...staticPages, ...coursePages, ...blogPages];
+  const tagPages: MetadataRoute.Sitemap = listTags().map((t) => ({
+    url: `${base}/blog/tag/${encodeURIComponent(t)}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.5,
+  }));
+
+  const seriesPages: MetadataRoute.Sitemap = listSeries().map((s) => ({
+    url: `${base}/blog/series/${encodeURIComponent(s)}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.55,
+  }));
+
+  const authorPages: MetadataRoute.Sitemap = listAuthors().map((a) => ({
+    url: `${base}/blog/author/${encodeURIComponent(a)}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.5,
+  }));
+
+  return [...staticPages, ...coursePages, ...blogPages, ...categoryPages, ...tagPages, ...seriesPages, ...authorPages];
 }
 
 

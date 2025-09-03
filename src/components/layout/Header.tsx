@@ -21,6 +21,11 @@ export default function Header() {
         {/* Nav links */}
         <ul className="flex items-center space-x-6">
           <li>
+            <Link href="/" className="transition-colors duration-200 hover:text-yellow-300">
+              Home
+            </Link>
+          </li>
+          <li>
             <Link href="/about" className="transition-colors duration-200 hover:text-yellow-300">
               About
             </Link>
