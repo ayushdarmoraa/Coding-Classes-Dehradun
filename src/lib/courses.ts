@@ -7,6 +7,7 @@ export interface Course {
   description: string;
   price: string;
   duration: string;
+  level?: string;
   curriculum: string[];
   prerequisites: string[];
   outcomes: string[];
@@ -66,8 +67,9 @@ const courses: Course[] = [
     title: "Python Programming",
     description:
       "Start-to-pro Python: syntax, data structures, OOP, file/JSON work, and small projects.",
-    price: PRICES.PYTHON,
-    duration: "2–3 months",
+  price: "₹6,000 (or ₹2,000/month)",
+  duration: "4 months",
+  level: "Intermediate",
     curriculum: [
       "Python basics & data types",
       "Control flow, functions, modules",
@@ -88,8 +90,9 @@ const courses: Course[] = [
     title: "Java Programming",
     description:
       "Core Java foundations: syntax, OOP, collections, exceptions, and intro to Spring basics.",
-    price: PRICES.JAVA,
-    duration: "3–4 months",
+  price: "₹6,000 (or ₹2,000/month)",
+  duration: "4 months",
+  level: "Intermediate",
     curriculum: [
       "Java syntax & tooling",
       "OOP, interfaces, packages",

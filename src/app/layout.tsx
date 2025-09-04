@@ -18,7 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <Header />
+  <Header />
         {children}
         <Footer />
         <Script
@@ -71,6 +71,38 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 availableLanguage: ["en", "hi"],
               },
             }),
+          }}
+        />
+
+        {/* Close mobile menu after navigation / interactions */}
+        <Script
+          id="close-mobile-menu"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function () {
+      function closeMenu() {
+        var cb = document.getElementById('nav-toggle');
+        if (cb && cb.checked) cb.checked = false;
+      }
+
+      // Close when any header/mobile-menu link is clicked
+      document.addEventListener('click', function (e) {
+        var el = e.target;
+        if (!(el instanceof Element)) return;
+        var anchor = el.closest('a');
+        if (!anchor) return;
+        if (anchor.closest('header') || anchor.closest('#mobile-menu')) closeMenu();
+      }, true);
+
+      // Close on back/forward, and hash changes
+      window.addEventListener('popstate', closeMenu);
+      window.addEventListener('hashchange', closeMenu);
+
+      // Close on Escape
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeMenu();
+      });
+    })();`,
           }}
         />
       </body>
