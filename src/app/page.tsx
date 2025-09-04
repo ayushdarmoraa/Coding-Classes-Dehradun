@@ -11,15 +11,24 @@ const SITE_DESC =
   "Leading coding institute in Dehradun — Full Stack with Gen AI, Data Science, Python, Java.";
 
 export const metadata: Metadata = {
-  title: "Doon Coding Academy — Best Coding Courses in Dehradun",
-  description: SITE_DESC,
-  alternates: { canonical: "/" },
+  // Home page SEO
+  title: "Coding Classes in Dehradun (2025) – Full Stack, Data Science, Python, Java",
+  description:
+    "Top coding classes in Dehradun (Herbertpur): Full-Stack with Gen AI, Data Science, Python & Java. Small batches (max 15), affordable fees, career-focused training.",
+  // Let layout.tsx metadataBase handle the canonical; no need to set alternates here
   openGraph: {
-    title: "Doon Coding Academy",
-    description: SITE_DESC,
-    url: "/",
+    title: "Coding Classes in Dehradun – Doon Coding Academy",
+    description:
+      "Learn Full-Stack with Gen AI, Data Science, Python & Java in Dehradun. Small batches, practical projects, and career-focused training.",
+    url: "/", // inherits https://www.dooncodingacademy.in via metadataBase
     siteName: "Doon Coding Academy",
     type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Coding Classes in Dehradun – Doon Coding Academy",
+    description:
+      "Full-Stack (Gen AI), Data Science, Python & Java. Small batches, practical projects, career-focused training in Dehradun.",
   },
 };
 
