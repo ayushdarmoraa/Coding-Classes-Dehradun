@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 // src/app/courses/page.tsx
 import type { Metadata } from "next";
-import { getCourses } from "@/lib/courses";
+import { getCourses, getCourseBySlug } from "@/lib/courses";
 import CourseCard from "@/components/features/CourseCard";
 import Badge from "@/components/ui/Badge";
 
@@ -21,6 +21,8 @@ export const metadata: Metadata = {
 
 export default function CoursesPage() {
   const courses = getCourses();
+  const python = getCourseBySlug("python");
+  const java = getCourseBySlug("java");
 
   // Feature a couple up top
   const featuredSlugs = new Set(["full-stack", "data-science"]);
@@ -239,9 +241,11 @@ export default function CoursesPage() {
                     <div className="font-semibold text-gray-900">Python Programming</div>
                     <div className="text-sm text-gray-600">Foundation programming with Python</div>
                   </td>
-                  <td className="px-6 py-4 text-center">2–3 months</td>
-                  <td className="px-6 py-4 text-center">TBD</td>
-                  <td className="px-6 py-4 text-center"><Badge variant="primary">Beginner</Badge></td>
+                  <td className="px-6 py-4 text-center">{python?.duration}</td>
+                  <td className="px-6 py-4 text-center">{python?.price}</td>
+                  <td className="px-6 py-4 text-center">
+                    <Badge variant="primary">{python?.level ?? "Intermediate"}</Badge>
+                  </td>
                   <td className="px-6 py-4 text-center text-sm">Python Developer / Automation</td>
                 </tr>
                 <tr className="hover:bg-gray-50" id="beginner-row-2">
@@ -249,9 +253,11 @@ export default function CoursesPage() {
                     <div className="font-semibold text-gray-900">Java Programming</div>
                     <div className="text-sm text-gray-600">OOP, collections, basic backend</div>
                   </td>
-                  <td className="px-6 py-4 text-center">2–3 months</td>
-                  <td className="px-6 py-4 text-center">TBD</td>
-                  <td className="px-6 py-4 text-center"><Badge variant="primary">Beginner</Badge></td>
+                  <td className="px-6 py-4 text-center">{java?.duration}</td>
+                  <td className="px-6 py-4 text-center">{java?.price}</td>
+                  <td className="px-6 py-4 text-center">
+                    <Badge variant="primary">{java?.level ?? "Intermediate"}</Badge>
+                  </td>
                   <td className="px-6 py-4 text-center text-sm">Java Developer / QA Automation</td>
                 </tr>
               </tbody>
