@@ -4,14 +4,22 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Script from "next/script";
 
+// Build a single, normalized site URL we can reuse everywhere
+const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+const siteUrl = rawBase.replace(/^http:\/\//, "https://");
+
 export const metadata: Metadata = {
+  // Global canonical base for all routes
+  metadataBase: new URL(siteUrl),
+
   title: { default: "Doon Coding Academy", template: "%s | Doon Coding Academy" },
   description:
     process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
     "Leading coding institute in Dehradun — Full Stack with Gen AI, Data Science, Python, Java.",
-  alternates: {
-    canonical: "/",
-  },
+
+  // IMPORTANT: do NOT set a root-level canonical here,
+  // or every page will canonicalize to "/".
+  // Page-level files can define their own `alternates.canonical` if needed.
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -21,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   <Header />
         {children}
         <Footer />
+        {/* WebSite + SearchAction */}
         <Script
           id="website-searchaction"
           type="application/ld+json"
@@ -30,15 +39,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@context": "https://schema.org",
               "@type": "WebSite",
               name: process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy",
-              url: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
+              url: siteUrl,
               potentialAction: {
                 "@type": "SearchAction",
-                target: `${(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "")}/blog?q={search_term_string}`,
+                target: `${siteUrl}/blog?q={search_term_string}`,
                 "query-input": "required name=search_term_string",
               },
             }),
           }}
         />
+        {/* Organization / EducationalOrganization */}
         <Script
           id="org-schema"
           type="application/ld+json"
@@ -48,7 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@context": "https://schema.org",
               "@type": "EducationalOrganization",
               name: process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy",
-              url: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
+              url: siteUrl,
               sameAs: [
                 process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,
                 process.env.NEXT_PUBLIC_INSTAGRAM_URL || undefined,
