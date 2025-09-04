@@ -3,8 +3,8 @@ import { getCourses } from "@/lib/courses";
 import { getAllBlogPosts, getPostLastModified, listCategories, listTags, listSeries, listAuthors } from "@/lib/blog";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base =
-    (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const raw = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = raw.replace(/^http:\/\//, "https://"); // normalize to https
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${base}/`,           lastModified: new Date(), changeFrequency: "weekly",  priority: 1 },
