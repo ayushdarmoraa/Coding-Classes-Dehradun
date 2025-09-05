@@ -38,29 +38,26 @@ export async function generateMetadata({
     description:
       "In-depth guides for Dehradun students: Full-Stack (Gen AI), Data Science, Python & Java—fees, syllabus, placements, roadmaps, and tutorials.",
     robots,
-  // Canonical: /blog (search) OR /blog?page=n (pagination) OR /blog (page 1)
-  alternates: { canonical },
+    // Canonical: /blog (search) OR /blog?page=n (pagination) OR /blog (page 1)
+    alternates: { canonical },
     openGraph: {
       title: "Blog – Coding & Career Guides (Dehradun)",
       description:
         "Guides on Full-Stack (Gen AI), Data Science, Python & Java: fees, syllabus, placements, roadmaps, tutorials.",
-  url: canonical,
+      url: canonical,
       type: "website",
-      siteName: "Doon Coding Academy",
+      siteName: "Doon Coding Academy"
     },
     twitter: {
       card: "summary",
       title: "Blog – Coding & Career Guides (Dehradun)",
       description:
-        "Full-Stack (Gen AI), Data Science, Python & Java guides: fees, syllabus, placements, roadmaps, tutorials.",
-    },
-  };
-}
-export default function BlogPage({
-  searchParams,
-}: {
-  searchParams?: { category?: string; q?: string; page?: string };
-}) {
+        "Full-Stack (Gen AI), Data Science, Python & Java guides: fees, syllabus, placements, roadmaps, tutorials."
+    }
+  }
+  }
+  export default function BlogPage({ searchParams }: { searchParams?: { category?: string; q?: string; page?: string } }) {
+
   const category = searchParams?.category || "";
   const q = searchParams?.q || "";
   const page = Number(searchParams?.page || "1");
@@ -104,6 +101,25 @@ export default function BlogPage({
     })),
   };
 
+  // Breadcrumb JSON-LD for SEO
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "@id": `${base}/blog#breadcrumb`,
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        item: { "@type": "WebPage", "@id": `${base}/`, name: "Home" },
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        item: { "@type": "WebPage", "@id": `${base}/blog`, name: "Blog" },
+      },
+    ],
+  } as const;
+
   return (
     <div className="container mx-auto p-4">
       <FeedLinks />
@@ -130,35 +146,17 @@ export default function BlogPage({
       {/* Featured strip (only on default view + if we have featured) */}
       {isDefaultView && featured.length > 0 && (
         <section aria-label="Featured posts" className="mb-8">
-    const breadcrumbJsonLd = {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "@id": `${base}/blog#breadcrumb`,
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          item: { "@type": "WebPage", "@id": `${base}/`, name: "Home" },
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          item: { "@type": "WebPage", "@id": `${base}/blog`, name: "Blog" },
-        },
-      ],
-    } as const;
           <div className="mb-2 flex items-center gap-2">
             <h2 className="text-xl font-semibold">Featured</h2>
             <span className="text-xs text-gray-500">Editor’s picks</span>
-        {/* eslint-disable-next-line react/no-danger */}
-        <Script
-          id="blog-breadcrumb"
-          type="application/ld+json"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-        />
+            {/* eslint-disable-next-line react/no-danger */}
+            <Script
+              id="blog-breadcrumb"
+              type="application/ld+json"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+            />
           </div>
-
           <div className="-mx-4 px-4 overflow-x-auto">
             <ul className="flex gap-4 min-w-full snap-x">
               {featured.slice(0, 6).map((p) => {
