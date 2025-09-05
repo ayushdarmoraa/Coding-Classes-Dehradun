@@ -4,18 +4,26 @@ import type { Metadata } from "next";
 import { getCourses, getCourseBySlug } from "@/lib/courses";
 import CourseCard from "@/components/features/CourseCard";
 import Badge from "@/components/ui/Badge";
+import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Coding Courses in Dehradun - Full Stack, Data Science, Python, Java",
+  // Courses index SEO
+  title: "Coding Courses in Dehradun (2025) – Full Stack, Data Science, Python, Java",
   description:
-    "Explore our comprehensive coding courses in Dehradun. Learn Full-Stack Development with Gen AI, Data Science, Python, and Java programming with industry experts.",
-  alternates: { canonical: "/courses" },
+    "Compare coding courses in Dehradun (Herbertpur): Full-Stack with Gen AI, Data Science, Python & Java. Fees, syllabus, duration, and placement support. Small batches (max 15).",
+  // Let layout.tsx metadataBase provide canonical; no need to hard-set here
   openGraph: {
-    title: "Coding Courses in Dehradun - Doon Coding Academy",
+    title: "Coding Courses in Dehradun – Doon Coding Academy",
     description:
-      "Explore our comprehensive coding courses in Dehradun. Learn Full-Stack Development with Gen AI, Data Science, Python, and Java programming with industry experts.",
+      "Full-Stack (Gen AI), Data Science, Python & Java courses in Dehradun. See fees, syllabus, duration, and placement support.",
     url: "/courses",
     type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Coding Courses in Dehradun – Doon Coding Academy",
+    description:
+      "Compare Full-Stack (Gen AI), Data Science, Python & Java courses: fees, syllabus, duration & placements.",
   },
 };
 
@@ -38,8 +46,36 @@ export default function CoursesPage() {
   const intermediate = courses.filter((c) => intermediateSlugs.has(c.slug));
   const advanced = courses.filter((c) => advancedSlugs.has(c.slug));
 
+  const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000")
+    .replace(/\/$/, "")
+    .replace(/^http:\/\//, "https://");
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "@id": `${SITE_URL}/courses#breadcrumb`,
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        item: { "@type": "WebPage", "@id": `${SITE_URL}/`, name: "Home" },
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        item: { "@type": "WebPage", "@id": `${SITE_URL}/courses`, name: "Courses" },
+      },
+    ],
+  } as const;
+
   return (
     <div className="min-h-screen bg-gray-50" id="top">
+      {/* eslint-disable-next-line react/no-danger */}
+      <Script
+        id="courses-breadcrumb"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Compact header */}
       <section className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-8">

@@ -48,6 +48,34 @@ export interface BlogPost {
 
 const postsDirectory = path.join(process.cwd(), "src/content/blog");
 
+// --- Taxonomy Normalizers (minimal, centralized) -----------------------------
+const CATEGORY_MAP: Record<string, "Full-Stack" | "Data Science" | "Python" | "Java"> = {
+  "full-stack": "Full-Stack",
+  "full stack": "Full-Stack",
+  "fullstack": "Full-Stack",
+  "mern": "Full-Stack",
+  "data science": "Data Science",
+  "datascience": "Data Science",
+  "python": "Python",
+  "java": "Java",
+};
+
+function normalizeCategory(input?: string | null): "Full-Stack" | "Data Science" | "Python" | "Java" | undefined {
+  if (!input) return undefined;
+  const key = String(input).trim().toLowerCase();
+  return CATEGORY_MAP[key as keyof typeof CATEGORY_MAP];
+}
+
+// We won't change how tags/keywords are displayed across the site;
+// we only use this to dedupe consistently when listing tags.
+function normalizeTagKey(tag: string): string {
+  return String(tag)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-+/g, "-");
+}
+
 function readOne(name: string): BlogPost {
   const filePath = path.join(postsDirectory, name);
   const fileContents = fs.readFileSync(filePath, "utf8");
@@ -149,30 +177,29 @@ export async function getPostHtmlBySlug(
 // Helpers for listing/filtering/pagination
 
 export function listCategories(): string[] {
-  const set = new Set(getAllBlogPosts().map((p) => p.category).filter(Boolean));
+  const posts = getAllBlogPosts();
+  const set = new Set<string>();
+  for (const p of posts) {
+    const canon = normalizeCategory(p.category);
+    if (canon) set.add(canon);
+  }
   return Array.from(set).sort();
 }
 
-export function filterPosts({
-  category,
-  q,
-}: { category?: string; q?: string }): BlogPost[] {
-  let items = getAllBlogPosts();
-  if (category) {
-    items = items.filter(
-      (p) => p.category.toLowerCase() === category.toLowerCase()
-    );
-  }
-  if (q) {
-    const needle = q.toLowerCase();
-    items = items.filter(
-      (p) =>
-        p.title.toLowerCase().includes(needle) ||
-        p.description.toLowerCase().includes(needle) ||
-        p.keywords?.some((k) => k.toLowerCase().includes(needle))
-    );
-  }
-  return items;
+export function filterPosts({ category, q }: { category?: string; q?: string }): BlogPost[] {
+  const qLower = q?.toLowerCase();
+  const wantCat = normalizeCategory(category);
+  return getAllBlogPosts().filter((p) => {
+    if (wantCat) {
+      const pCat = normalizeCategory(p.category);
+      if (pCat !== wantCat) return false;
+    }
+    if (qLower) {
+      const blob = `${p.title} ${p.description} ${(p.keywords || []).join(" ")}`.toLowerCase();
+      if (!blob.includes(qLower)) return false;
+    }
+    return !p.draft;
+  });
 }
 
 export function paginate<T>(items: T[], page = 1, perPage = 6) {
@@ -202,23 +229,31 @@ export function relatedPosts(slug: string, limit = 3): BlogPost[] {
 
     // top up with category-based suggestions
     const pool = all.filter((p) => p.slug !== slug && !explicit.some((e) => e.slug === p.slug));
-    const sameCat = pool.filter((p) => p.category === me.category);
-    const rest = pool.filter((p) => p.category !== me.category);
+    const sameCat = pool.filter((p) => normalizeCategory(p.category) === normalizeCategory(me.category));
+    const rest = pool.filter((p) => normalizeCategory(p.category) !== normalizeCategory(me.category));
     return [...explicit, ...sameCat, ...rest].slice(0, limit);
   }
 
   // 2) Otherwise, fall back to category proximity
   const pool = all.filter((p) => p.slug !== slug);
-  const sameCat = pool.filter((p) => p.category === me.category);
-  const rest = pool.filter((p) => p.category !== me.category);
+  const sameCat = pool.filter((p) => normalizeCategory(p.category) === normalizeCategory(me.category));
+  const rest = pool.filter((p) => normalizeCategory(p.category) !== normalizeCategory(me.category));
   return [...sameCat, ...rest].slice(0, limit);
 }
 
 // Unique list of tags (keywords)
 export function listTags(): string[] {
-  const set = new Set<string>();
-  getAllBlogPosts().forEach((p) => (p.keywords || []).forEach((k) => set.add(k)));
-  return Array.from(set).sort((a, b) => a.localeCompare(b));
+  const posts = getAllBlogPosts();
+  // Deduplicate by a normalized key, but preserve the first-seen original label for display.
+  const map = new Map<string, string>(); // key = normalized, value = original display
+  for (const p of posts) {
+    if (!Array.isArray(p.keywords)) continue;
+    for (const k of p.keywords) {
+      const key = normalizeTagKey(k);
+      if (!map.has(key)) map.set(key, k); // keep first original label
+    }
+  }
+  return Array.from(map.values()).sort();
 }
 
 // --- Author helpers ---

@@ -30,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <Footer />
         {/* WebSite + SearchAction */}
+        {/* eslint-disable-next-line react/no-danger */}
         <Script
           id="website-searchaction"
           type="application/ld+json"
@@ -38,17 +39,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
+              "@id": `${siteUrl.replace(/\/$/, "")}/#website`,
               name: process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy",
               url: siteUrl,
               potentialAction: {
                 "@type": "SearchAction",
-                target: `${siteUrl}/blog?q={search_term_string}`,
+                target: `${siteUrl.replace(/\/$/, "")}/blog?q={search_term_string}`,
                 "query-input": "required name=search_term_string",
               },
             }),
           }}
         />
         {/* Organization / EducationalOrganization */}
+        {/* eslint-disable-next-line react/no-danger */}
         <Script
           id="org-schema"
           type="application/ld+json"
@@ -67,11 +70,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               ].filter(Boolean),
               address: {
                 "@type": "PostalAddress",
-                streetAddress: process.env.NEXT_PUBLIC_ADDRESS_LINE1 || undefined,
+                streetAddress: "Near DR School, Herbertpur",
                 addressLocality: process.env.NEXT_PUBLIC_ADDRESS_CITY || "Dehradun",
                 addressRegion: process.env.NEXT_PUBLIC_ADDRESS_STATE || "Uttarakhand",
-                postalCode: process.env.NEXT_PUBLIC_ADDRESS_ZIP || undefined,
-                addressCountry: process.env.NEXT_PUBLIC_ADDRESS_COUNTRY || "IN",
+                postalCode: "248142",
               },
               contactPoint: {
                 "@type": "ContactPoint",
@@ -115,6 +117,52 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     })();`,
           }}
         />
+      {/* LocalBusiness JSON-LD for Local SEO */}
+      {/* eslint-disable-next-line react/no-danger */}
+      <script
+        id="localbusiness-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify((() => {
+            const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.dooncodingacademy.in").replace(/\/$/, "");
+            return {
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              "@id": `${base}/#localbusiness`,
+              "name": "Doon Coding Academy",
+              "url": base,
+              "priceRange": "₹2000–₹30000",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Near DR School, Herbertpur",
+                "addressLocality": "Dehradun",
+                "addressRegion": "Uttarakhand",
+                "postalCode": "248142",
+                "addressCountry": "IN"
+              },
+              "areaServed": [{ "@type": "City", "name": "Dehradun" }],
+              "knowsAbout": [
+                "Full-Stack Development",
+                "Gen AI",
+                "Data Science",
+                "Python",
+                "Java",
+                "Coding Classes in Dehradun"
+              ],
+              "openingHoursSpecification": [
+                {
+                  "@type": "OpeningHoursSpecification",
+                  "dayOfWeek": [
+                    "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"
+                  ],
+                  "opens": "09:00",
+                  "closes": "19:00"
+                }
+              ]
+            };
+          })())
+        }}
+      />
       </body>
     </html>
   );

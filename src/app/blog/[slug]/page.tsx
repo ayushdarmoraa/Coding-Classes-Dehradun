@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
+import Image from "next/image";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import {
   getAllBlogPosts,
@@ -128,18 +129,20 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     : { "@type": "Organization", name: "Doon Coding Academy", url: base };
 
   const blogPostingJsonLd = {
+  // Stable org id for cross-entity linking (matches layout.tsx @id)
+  // Example: https://dooncodingacademy.in/#organization
+  // (base has no trailing slash)
+  // NOTE: used below in publisher
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ORG_ID: `${base}/#organization`,
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
     description: post.description,
     datePublished: new Date(post.date).toISOString(),
     dateModified: post.lastModified ?? new Date(post.date).toISOString(),
-    author: authorNode,
-    publisher: {
-      "@type": "Organization",
-      name: "Doon Coding Academy",
-      url: base,
-    },
+  author: authorNode,
+  publisher: { "@id": `${base}/#organization` },
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     url,
     keywords: post.keywords,
@@ -150,10 +153,23 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
+    "@id": `${url}#breadcrumb`,
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `${base}/` },
-      { "@type": "ListItem", position: 2, name: "Blog", item: `${base}/blog` },
-      { "@type": "ListItem", position: 3, name: post.title, item: url },
+      {
+        "@type": "ListItem",
+        position: 1,
+        item: { "@type": "WebPage", "@id": `${base}/`, name: "Home" }
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        item: { "@type": "WebPage", "@id": `${base}/blog`, name: "Blog" }
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        item: { "@type": "WebPage", "@id": url, name: post.title }
+      }
     ],
   };
   const faqJsonLd = post.faqs && post.faqs.length > 0
@@ -195,6 +211,20 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     <div className="container mx-auto p-4">
       <Breadcrumbs items={crumbs} />
       <h1 className="text-4xl font-bold mb-2">{post.title}</h1>
+      {/* Optional hero image (renders only if post.image is provided) */}
+      {post.image ? (
+        <div className="relative my-6 overflow-hidden rounded-2xl">
+          <Image
+            src={post.image}
+            alt={post.imageAlt || post.title}
+            width={1200}
+            height={630}
+            priority
+            sizes="(max-width: 768px) 100vw, 960px"
+            className="h-auto w-full object-cover"
+          />
+        </div>
+      ) : null}
       <p className="text-gray-600 text-sm mb-6">
         Originally published on {publishedDate.toLocaleDateString()}
         {showUpdated ? (
@@ -260,6 +290,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8">
           <div className="dca-prose">
+            {/* eslint-disable-next-line react/no-danger */}
             <article className="prose lg:prose-xl max-w-none" dangerouslySetInnerHTML={{ __html: post.html }} />
           </div>
         </div>
@@ -286,13 +317,16 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       <section className="mt-10 rounded-2xl border border-blue-700/20 bg-blue-600/5 p-5">
         {(() => {
           const cta = pickCourseCTA(post);
+          const utm = `utm_source=blog&utm_medium=cta&utm_campaign=blog_to_course&utm_content=${encodeURIComponent(post.slug)}`;
+          const primaryHref = `${cta.href}${cta.href.includes("?") ? "&" : "?"}${utm}`;
+          const allCoursesHref = `/courses?${utm}`;
           return (
             <>
               <h2 className="text-xl font-semibold mb-2">Ready to go deeper? {cta.title}</h2>
               <p className="text-gray-700 mb-3">{cta.blurb}</p>
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href={cta.href}
+                  href={primaryHref}
                   className="inline-flex items-center rounded-xl bg-blue-700 px-4 py-2 text-white text-sm font-semibold shadow-sm hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-blue-700/30"
                 >
                   View course
@@ -302,6 +336,12 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                   className="inline-flex items-center rounded-xl border border-blue-700 px-4 py-2 text-blue-700 text-sm font-semibold hover:bg-blue-700/5 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
                 >
                   Get a free consultation
+                </Link>
+                <Link
+                  href={allCoursesHref}
+                  className="inline-flex items-center rounded-xl border border-blue-700 px-4 py-2 text-blue-700 text-sm font-semibold hover:bg-blue-700/5 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
+                >
+                  Explore all courses
                 </Link>
                 <a
                   href="https://wa.me/917037905464?text=Hi%2C%20I%27m%20interested%20after%20reading%20your%20blog%20post"

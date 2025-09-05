@@ -4,6 +4,8 @@ import { getCourseBySlug, getCourses } from "@/lib/courses";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Badge from "@/components/ui/Badge";
 import CourseCard from "@/components/features/CourseCard";
+import Link from "next/link";
+import { getAllBlogPosts } from "@/lib/blog";
 
 type Props = { params: { slug: string } };
 
@@ -11,9 +13,105 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const course = getCourseBySlug(params.slug);
   if (!course) return { title: "Course Not Found | Doon Coding Academy" };
 
-  const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  const url = `${base.replace(/\/$/, "")}/courses/${course.slug}`;
+  // normalize base + build canonical
+  const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = rawBase.replace(/^http:\/\//, "https://");
+  const url = `${base}/courses/${course.slug}`;
 
+  // SEO-optimized metadata per flagship course
+  if (course.slug === "full-stack") {
+    return {
+      title: "Best Full Stack Development Course in Dehradun (2025) | Doon Coding Academy",
+      description:
+        "Join Dehradun’s top Full Stack (MERN + Gen AI) course. Affordable fees, 6-month duration, job-ready projects, career guidance & placement support.",
+      alternates: { canonical: url },
+      openGraph: {
+        title: "Full Stack Development Course in Dehradun (2025)",
+        description:
+          "Hands-on MERN + Gen AI training: MongoDB, Express, React, Node.js, AI tools, real projects, interview prep.",
+        url,
+        type: "article",
+        siteName: "Doon Coding Academy",
+      },
+      twitter: {
+        card: "summary",
+        title: "Full Stack Course in Dehradun (MERN + Gen AI)",
+        description:
+          "Project-first MERN + Gen AI course with affordable fees & placement support.",
+      },
+    };
+  }
+
+  if (course.slug === "data-science") {
+    return {
+      title: "Data Science Course in Dehradun (2025) | Python, ML, AI | Doon Coding Academy",
+      description:
+        "Practical Data Science course in Dehradun: Python, Pandas, ML, SQL, Visualization & Gen AI. Real datasets, capstone projects, placement support.",
+      alternates: { canonical: url },
+      openGraph: {
+        title: "Data Science Training in Dehradun (Python • ML • AI)",
+        description:
+          "Learn Python, Pandas, Scikit-learn, SQL, dashboards & Gen AI. Work on real datasets and career-oriented projects.",
+        url,
+        type: "article",
+        siteName: "Doon Coding Academy",
+      },
+      twitter: {
+        card: "summary",
+        title: "Data Science Course in Dehradun (Python • ML • AI)",
+        description:
+          "Hands-on projects, affordable fees & placement support.",
+      },
+    };
+  }
+
+  if (course.slug === "python") {
+    return {
+      title: "Python Course in Dehradun (2025) | Beginner to Advanced | Doon Coding Academy",
+      description:
+        "Best Python course in Dehradun: fundamentals to OOP, libraries, mini-projects & career guidance. Small batches (max 15), affordable fees.",
+      alternates: { canonical: url },
+      openGraph: {
+        title: "Python Programming Classes in Dehradun",
+        description:
+          "Learn Python step-by-step with projects and mentorship. Ideal for beginners switching to tech.",
+        url,
+        type: "article",
+        siteName: "Doon Coding Academy",
+      },
+      twitter: {
+        card: "summary",
+        title: "Python Course in Dehradun (Beginner → Advanced)",
+        description:
+          "Project-based learning, small batches & mentoring.",
+      },
+    };
+  }
+
+  if (course.slug === "java") {
+    return {
+      title: "Java Course in Dehradun (2025) | Core Java & Spring Boot | Doon Coding Academy",
+      description:
+        "Industry-focused Java course in Dehradun: Core Java, OOP, Collections, JDBC & Spring Boot basics. Projects, interview prep & placement support.",
+      alternates: { canonical: url },
+      openGraph: {
+        title: "Java Classes in Dehradun (Core Java + Spring Boot)",
+        description:
+          "Master Java fundamentals with hands-on projects and career coaching.",
+        url,
+        type: "article",
+        siteName: "Doon Coding Academy",
+      },
+      twitter: {
+        card: "summary",
+        title: "Java Course in Dehradun (Core Java + Spring Boot)",
+        description:
+          "Practical curriculum, affordable fees & placement support.",
+      },
+    };
+  }
+
+  // default (other slugs, if any)
   return {
     title: `${course.title} | Doon Coding Academy`,
     description: course.description,
@@ -44,29 +142,39 @@ export default function CoursePage({ params }: Props) {
   const courseUrl = `${SITE_URL}/courses/${course.slug}`;
 
   // JSON-LD: Course
+  const ORG_ID = `${SITE_URL.replace(/\/$/, "")}/#organization`;
   const courseJsonLd = {
     "@context": "https://schema.org",
     "@type": "Course",
     name: course.title,
     description: course.description,
-    provider: {
-      "@type": "Organization",
-      name: SITE_NAME,
-      sameAs: SITE_URL,
-    },
+    provider: { "@id": ORG_ID },
     url: courseUrl,
   };
 
-  // JSON-LD: BreadcrumbList
+  // JSON-LD: BreadcrumbList (stable @id, WebPage nodes)
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
+    "@id": `${courseUrl}#breadcrumb`,
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
-      { "@type": "ListItem", position: 2, name: "Courses", item: `${SITE_URL}/courses` },
-      { "@type": "ListItem", position: 3, name: course.title, item: courseUrl },
+      {
+        "@type": "ListItem",
+        position: 1,
+        item: { "@type": "WebPage", "@id": `${SITE_URL}/`, name: "Home" },
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        item: { "@type": "WebPage", "@id": `${SITE_URL}/courses`, name: "Courses" },
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        item: { "@type": "WebPage", "@id": courseUrl, name: course.title },
+      },
     ],
-  };
+  } as const;
 
   const breadcrumbs = [
     { label: "Home", href: "/" },
@@ -81,6 +189,13 @@ export default function CoursePage({ params }: Props) {
   return (
     <main className="container mx-auto py-8">
       <Breadcrumbs items={breadcrumbs} />
+      {/* eslint-disable-next-line react/no-danger */}
+      <Script
+        id="course-breadcrumb"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
 
       {/* Hero */}
       <header className="mb-6">
@@ -216,12 +331,251 @@ export default function CoursePage({ params }: Props) {
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
       />
+
+      {/* Course JSON-LD (Course + Offer) */}
+      <script
+        id="course-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify((() => {
+            // Build absolute URL base
+            const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.dooncodingacademy.in").replace(/\/$/, "");
+            const url = `${base}/courses/${course.slug}`;
+
+            // Normalize price for schema: try to pull a number
+            // Accepts "₹25,000", "25000", "25,000 INR", etc.
+            const priceNumber = (() => {
+              if (!course.price) return undefined;
+              const cleaned = String(course.price).replace(/[^\d.]/g, ""); // keep digits/decimal
+              return cleaned ? Number(cleaned) : undefined;
+            })();
+
+            // Convert a human duration like "6 months" or "2–3 months" to ISO 8601 duration
+            // If ambiguous (e.g., "2–3 months"), we take the upper bound (3 months).
+            const timeRequired = (() => {
+              if (!course.duration) return undefined;
+              const txt = String(course.duration).toLowerCase();
+              // Try to find "X–Y months" or "X-Y months"
+              const rangeMatch = txt.match(/(\d+)\s*[–-]\s*(\d+)\s*month/);
+              if (rangeMatch) {
+                const upper = parseInt(rangeMatch[2], 10);
+                return `P${isNaN(upper) ? 1 : upper}M`;
+              }
+              // Try to find "X months"
+              const singleM = txt.match(/(\d+)\s*month/);
+              if (singleM) {
+                const m = parseInt(singleM[1], 10);
+                return `P${isNaN(m) ? 1 : m}M`;
+              }
+              // Try "X weeks"
+              const weeks = txt.match(/(\d+)\s*week/);
+              if (weeks) {
+                const w = parseInt(weeks[1], 10);
+                // ISO: 1 week = 7 days
+                return `P${isNaN(w) ? 1 : w * 7}D`;
+              }
+              return undefined;
+            })();
+
+            // Link to LocalBusiness we added in layout.tsx
+            const providerId = `${base}/#localbusiness`;
+
+            const schema = {
+              "@context": "https://schema.org",
+              "@type": "Course",
+              "@id": `${url}#course`,
+              "name": course.title,
+              "description": course.description,
+              "url": url,
+              "courseCode": course.slug,
+              ...(timeRequired ? { "timeRequired": timeRequired } : {}),
+              "provider": {
+                "@type": "LocalBusiness",
+                "@id": providerId,
+                "name": "Doon Coding Academy",
+                "url": base
+              },
+              // Offer block: include price if we could parse one; otherwise omit "price"
+              "offers": {
+                "@type": "Offer",
+                "url": url,
+                "priceCurrency": "INR",
+                ...(typeof priceNumber === "number" ? { "price": priceNumber } : {}),
+                "availability": "https://schema.org/InStock",
+                "eligibleRegion": {
+                  "@type": "Country",
+                  "name": "India"
+                }
+              }
+            };
+
+            return schema;
+          })())
+        }}
+      />
+
+      {/* FAQPage JSON-LD for the course (no UI impact) */}
+      <script
+        id="course-faq-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify((() => {
+            const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.dooncodingacademy.in").replace(/\/$/, "");
+            const url = `${base}/courses/${course.slug}`;
+
+            // Build a small, safe FAQ set without changing data files.
+            // You can tweak per course via the switch if desired.
+            const normalize = (v?: string | number) => (v == null ? "" : String(v));
+            const priceText = normalize(course.price);
+            const durationText = normalize(course.duration);
+
+            // Default FAQs (apply to all courses)
+            let faqs: Array<{ q: string; a: string }> = [
+              {
+                q: `What is the duration of the ${course.title}?`,
+                a: durationText
+                  ? `The typical duration is ${durationText}.`
+                  : `The course duration varies by batch schedule. Contact us for the current plan.`,
+              },
+              {
+                q: `What are the fees for the ${course.title}?`,
+                a: priceText
+                  ? `The fee is ${priceText}. Flexible monthly options are available.`
+                  : `Fees depend on the current batch and offers. Please contact us for the latest fee structure.`,
+              },
+              {
+                q: "Do you provide placement assistance?",
+                a: "Yes. We offer interview prep, resume reviews, and referrals/assistance through our local network.",
+              },
+              {
+                q: "Is prior programming experience required?",
+                a: "No prior experience is required for beginner tracks. We start from fundamentals and progress to projects.",
+              },
+              {
+                q: "Do you offer live projects and certificates?",
+                a: "Yes. You’ll build practical projects and receive a completion certificate from Doon Coding Academy.",
+              },
+              {
+                q: "Where is the institute located?",
+                a: "Near DR School, Herbertpur, Dehradun (PIN 248142). Call/WhatsApp +91 7037905464 for directions.",
+              },
+            ];
+
+            // Optional per-course overrides (edit once if you want more specificity)
+            switch (course.slug) {
+              case "full-stack":
+                faqs = [
+                  ...faqs,
+                  {
+                    q: "Which stack is covered?",
+                    a: "MERN (MongoDB, Express, React, Node.js) with Generative AI integrations and deployment basics.",
+                  },
+                ];
+                break;
+              case "data-science":
+                faqs = [
+                  ...faqs,
+                  {
+                    q: "Which tools/libraries are covered?",
+                    a: "Python, NumPy, Pandas, Matplotlib, scikit-learn, and intro to AI/ML workflows with real datasets.",
+                  },
+                ];
+                break;
+              case "python":
+                faqs = [
+                  ...faqs,
+                  {
+                    q: "What will I be able to build?",
+                    a: "CLI utilities, data processing scripts, and small apps using files/JSON and OOP concepts.",
+                  },
+                ];
+                break;
+              case "java":
+                faqs = [
+                  ...faqs,
+                  {
+                    q: "Does it include Spring Boot?",
+                    a: "Yes. We cover Core Java foundations and an introduction to Spring Boot with real-world practices.",
+                  },
+                ];
+                break;
+            }
+
+            return {
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "@id": `${url}#faq`,
+              "mainEntity": faqs.map(({ q, a }) => ({
+                "@type": "Question",
+                "name": q,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": a
+                }
+              }))
+            };
+          })())
+        }}
+      />
       <Script
         id="breadcrumb-jsonld"
         type="application/ld+json"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
+    {/* Related Guides block: show 2 relevant blog posts */}
+    {(() => {
+      // Pick 2 related posts by simple heuristic: title/keywords/category mention course
+      const allPosts = getAllBlogPosts(); // drafts already excluded per your setup
+  // removed unused variable 'needle'
+
+      const related = allPosts
+        .map(p => {
+          const hay = [
+            p.title,
+            p.description,
+            Array.isArray(p.keywords) ? p.keywords.join(" ") : "",
+            typeof p.category === "string" ? p.category : ""
+          ].join(" ").toLowerCase();
+          const score =
+            (hay.includes("full") && hay.includes("stack") && course.slug === "full-stack" ? 3 : 0) +
+            (hay.includes("data") && hay.includes("science") && course.slug === "data-science" ? 3 : 0) +
+            (hay.includes("python") && course.slug === "python" ? 3 : 0) +
+            (hay.includes("java") && course.slug === "java" ? 3 : 0) +
+            (hay.includes(course.slug) ? 2 : 0) +
+            (hay.includes(course.title.toLowerCase()) ? 2 : 0) +
+            (hay.includes("dehradun") ? 1 : 0);
+          return { ...p, _score: score };
+        })
+        .filter(p => p._score > 0)
+        .sort((a, b) => b._score - a._score)
+        .slice(0, 2);
+
+      return related.length > 0 && (
+        <section className="mt-12 border-t pt-8">
+          <h2 className="text-2xl font-semibold">Related guides</h2>
+          <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+            {related.map(post => (
+              <li key={post.slug} className="rounded-2xl border p-4 hover:shadow-md transition-shadow">
+                <h3 className="text-lg font-medium">
+                  <Link href={`/blog/${post.slug}`} className="hover:underline">
+                    {post.title}
+                  </Link>
+                </h3>
+                {post.description && (
+                  <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{post.description}</p>
+                )}
+                <div className="mt-3">
+                  <Link href={`/blog/${post.slug}`} className="text-primary hover:underline">
+                    Read more →
+                  </Link>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      );
+    })()}
     </main>
   );
 }

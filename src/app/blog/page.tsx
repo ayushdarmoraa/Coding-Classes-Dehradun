@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
+import Image from "next/image";
 import {
   filterPosts,
   listCategories,
@@ -16,20 +17,43 @@ export async function generateMetadata({
 }: {
   searchParams?: { q?: string; page?: string; category?: string };
 }): Promise<Metadata> {
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  // Normalize base; prefer https even if env was set to http
+  const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = rawBase.replace(/^http:\/\//, "https://");
+
   const q = searchParams?.q?.trim();
   const page = Number(searchParams?.page || "1");
   const self = page > 1 ? `${base}/blog?page=${page}` : `${base}/blog`;
+  // For search pages, force canonical to /blog (don’t include ?q= or ?page=)
+  const canonical = q ? `${base}/blog` : self;
 
+  // If there's a search query, keep listing pages out of the index
   const robots = q ? { index: false, follow: true } : undefined;
 
   return {
-    title: "Blog | Doon Coding Academy",
+    // Title will get " | Doon Coding Academy" appended by layout.tsx template
+    title: page > 1
+      ? `Coding & Career Guides (Page ${page}) – Dehradun 2025`
+      : "Coding & Career Guides – Dehradun 2025",
     description:
-      "Guides, tutorials, and career advice on Full-Stack, Data Science, Python, and Java—optimized for Dehradun learners.",
+      "In-depth guides for Dehradun students: Full-Stack (Gen AI), Data Science, Python & Java—fees, syllabus, placements, roadmaps, and tutorials.",
     robots,
-    alternates: { canonical: self },
-    openGraph: { title: "Blog | Doon Coding Academy", description: "Guides, tutorials, and career advice.", url: self, type: "website" },
+  // Canonical: /blog (search) OR /blog?page=n (pagination) OR /blog (page 1)
+  alternates: { canonical },
+    openGraph: {
+      title: "Blog – Coding & Career Guides (Dehradun)",
+      description:
+        "Guides on Full-Stack (Gen AI), Data Science, Python & Java: fees, syllabus, placements, roadmaps, tutorials.",
+  url: canonical,
+      type: "website",
+      siteName: "Doon Coding Academy",
+    },
+    twitter: {
+      card: "summary",
+      title: "Blog – Coding & Career Guides (Dehradun)",
+      description:
+        "Full-Stack (Gen AI), Data Science, Python & Java guides: fees, syllabus, placements, roadmaps, tutorials.",
+    },
   };
 }
 export default function BlogPage({
@@ -106,9 +130,33 @@ export default function BlogPage({
       {/* Featured strip (only on default view + if we have featured) */}
       {isDefaultView && featured.length > 0 && (
         <section aria-label="Featured posts" className="mb-8">
+    const breadcrumbJsonLd = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "@id": `${base}/blog#breadcrumb`,
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          item: { "@type": "WebPage", "@id": `${base}/`, name: "Home" },
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          item: { "@type": "WebPage", "@id": `${base}/blog`, name: "Blog" },
+        },
+      ],
+    } as const;
           <div className="mb-2 flex items-center gap-2">
             <h2 className="text-xl font-semibold">Featured</h2>
             <span className="text-xs text-gray-500">Editor’s picks</span>
+        {/* eslint-disable-next-line react/no-danger */}
+        <Script
+          id="blog-breadcrumb"
+          type="application/ld+json"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        />
           </div>
 
           <div className="-mx-4 px-4 overflow-x-auto">
@@ -120,15 +168,13 @@ export default function BlogPage({
                   <li key={p.slug} className="w-80 shrink-0 snap-start">
                     <article className="h-full border rounded-2xl overflow-hidden bg-white shadow-sm flex flex-col">
                       {img ? (
-                        <div className="relative">
-                          <img
+                        <div className="relative h-44">
+                          <Image
                             src={img}
                             alt={p.imageAlt || p.title}
-                            width={800}
-                            height={420}
-                            loading="lazy"
-                            decoding="async"
-                            className="w-full h-44 object-cover"
+                            fill
+                            sizes="(max-width: 768px) 100vw, 400px"
+                            className="object-cover"
                           />
                           <span className="absolute left-2 top-2 inline-flex items-center rounded-md bg-yellow-100/95 px-2 py-0.5 text-xs font-medium text-yellow-800">
                             Featured
@@ -237,15 +283,13 @@ export default function BlogPage({
           {items.map((post) => (
             <article key={post.slug} className="border rounded-lg p-4 shadow-sm flex flex-col">
               {post.image ? (
-                <div className="mb-3 -mx-4 -mt-4">
-                  <img
+                <div className="relative mb-3 -mx-4 -mt-4 h-40">
+                  <Image
                     src={post.image}
                     alt={post.imageAlt || post.title}
-                    width={800}
-                    height={420}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-40 object-cover rounded-t-lg"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 400px"
+                    className="object-cover rounded-t-lg"
                   />
                 </div>
               ) : null}
