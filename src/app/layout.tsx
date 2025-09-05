@@ -94,6 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 addressLocality: process.env.NEXT_PUBLIC_ADDRESS_CITY || "Dehradun",
                 addressRegion: process.env.NEXT_PUBLIC_ADDRESS_STATE || "Uttarakhand",
                 postalCode: "248142",
+                addressCountry: "IN", // ← added
               },
               contactPoint: {
                 "@type": "ContactPoint",
@@ -151,6 +152,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@id": `${base}/#localbusiness`,
               "name": "Doon Coding Academy",
               "url": base,
+              "telephone": process.env.NEXT_PUBLIC_CONTACT_PHONE || undefined, // ← added
               "priceRange": "₹2000–₹30000",
               "address": {
                 "@type": "PostalAddress",
