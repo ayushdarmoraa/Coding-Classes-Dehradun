@@ -18,6 +18,50 @@ const nextConfig = {
       },
     ];
   },
+  // ✅ Add redirects to enforce single host + https
+  async redirects() {
+    return [
+      // Force www -> non-www
+      {
+        source: "/:path*",
+        has: [
+          { type: "header", key: "host", value: "www\\.dooncodingacademy\\.in" },
+        ],
+        destination: "https://dooncodingacademy.in/:path*",
+        permanent: true,
+      },
+      // Optional: ensure http -> https
+      {
+        source: "/:path*",
+        has: [
+          { type: "header", key: "x-forwarded-proto", value: "http" },
+        ],
+        destination: "https://dooncodingacademy.in/:path*",
+        permanent: true,
+      },
+    ];
+  },
+
+  // ADD THIS BLOCK
+  async redirects() {
+    return [
+      // www → non-www
+      {
+        source: "/:path*",
+        has: [{ type: "header", key: "host", value: "www\\.dooncodingacademy\\.in" }],
+        destination: "https://dooncodingacademy.in/:path*",
+        permanent: true,
+      },
+      // http → https (belt-and-suspenders)
+      {
+        source: "/:path*",
+        has: [{ type: "header", key: "x-forwarded-proto", value: "http" }],
+        destination: "https://dooncodingacademy.in/:path*",
+        permanent: true,
+      },
+    ];
+  },
+
   compress: true,
 };
 

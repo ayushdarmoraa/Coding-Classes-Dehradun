@@ -17,6 +17,8 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
     "Leading coding institute in Dehradun — Full Stack with Gen AI, Data Science, Python, Java.",
 
+  verification: process.env.NEXT_PUBLIC_GSC_VERIFICATION ? { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION } : undefined,
+
   // IMPORTANT: do NOT set a root-level canonical here,
   // or every page will canonicalize to "/".
   // Page-level files can define their own `alternates.canonical` if needed.
@@ -29,6 +31,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   <Header />
         {children}
         <Footer />
+
+        {/* GA4 (gated by env var; no-op if env is missing) */}
+        {process.env.NEXT_PUBLIC_GA_ID ? (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', { anonymize_ip: true, transport_type: 'beacon' });
+              `}
+            </Script>
+          </>
+        ) : null}
         {/* WebSite + SearchAction */}
         {/* eslint-disable-next-line react/no-danger */}
         <Script

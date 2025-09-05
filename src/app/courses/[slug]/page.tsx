@@ -6,6 +6,29 @@ import Badge from "@/components/ui/Badge";
 import CourseCard from "@/components/features/CourseCard";
 import Link from "next/link";
 import { getAllBlogPosts } from "@/lib/blog";
+// --- Mini FAQ per course (no interface changes) ---
+const faqsBySlug: Record<string, { q: string; a: string }[]> = {
+  "full-stack": [
+    { q: "What is the duration and class schedule?", a: "Duration is 6 months. Weekday and weekend batches are available; small groups for personal attention." },
+    { q: "Do you include Gen AI modules?", a: "Yes. You’ll build prompts, use APIs, and learn simple RAG patterns integrated into MERN projects." },
+    { q: "Is there placement assistance?", a: "We help with project portfolio, interview prep, and local referrals. No fake ‘guarantees’—just honest support." }
+  ],
+  "data-science": [
+    { q: "Do I need strong math?", a: "Basic algebra/probability helps, but we teach essentials as we go. You’ll focus on practical analysis and ML workflows." },
+    { q: "What tools are covered?", a: "Python, NumPy, Pandas, visualization, classic ML, and an intro to Gen AI/LLM tooling." },
+    { q: "Is there a capstone?", a: "Yes. You’ll complete a mini capstone on a real dataset with a short report/notebook." }
+  ],
+  "python": [
+    { q: "Is this good for beginners?", a: "Yes. No prior coding needed; we start from basics and move to OOP, files/JSON, and small utilities." },
+    { q: "What projects will I build?", a: "CLI tools, data parsing scripts, and small automation tasks you can showcase." },
+    { q: "How long is the course?", a: "About 4 months with paced practice and reviews." }
+  ],
+  "java": [
+    { q: "Is Spring included?", a: "You’ll learn Java foundations first with an intro to Spring basics to prepare you for backend frameworks." },
+    { q: "Any prior experience required?", a: "No. We start from syntax/OOP and build up to collections, exceptions, and IO." },
+    { q: "How long is the course?", a: "About 4 months with hands-on exercises." }
+  ]
+};
 
 type Props = { params: { slug: string } };
 
