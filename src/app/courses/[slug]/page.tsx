@@ -272,6 +272,7 @@ export default function CoursePage({ params }: Props) {
         </p>
       </section>
 
+
       {/* Curriculum */}
       <section id="curriculum" className="mt-8">
         <h2 className="text-2xl font-semibold mb-2">Curriculum</h2>
@@ -281,6 +282,88 @@ export default function CoursePage({ params }: Props) {
           ))}
         </ul>
       </section>
+
+      {/* Detailed Syllabus (Full-Stack only) */}
+      {course.slug === "full-stack" && (
+        <section id="syllabus" className="mt-8">
+          <h2 className="text-2xl font-semibold mb-2">Detailed Syllabus (MERN + Gen&nbsp;AI)</h2>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 1 — Web Foundations</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>HTML5, CSS3, responsive layouts</li>
+                <li>Tailwind CSS essentials & utility-first patterns</li>
+                <li>Git & GitHub workflow (branches, PRs, releases)</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 2 — JavaScript & TS</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>Modern JS (ES6+), async patterns, fetch</li>
+                <li>TypeScript basics for safer React/Node</li>
+                <li>Testing fundamentals (unit & integration)</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 3 — React & Next.js</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>React hooks, context, forms, routing</li>
+                <li>Next.js App Router, data fetching, metadata</li>
+                <li>State management patterns & performance</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 4 — Backend (Node.js & Express)</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>REST APIs, auth (JWT), validation</li>
+                <li>MongoDB & Mongoose (schemas, indexes)</li>
+                <li>File uploads, email/notifications</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 5 — Gen&nbsp;AI Integration</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>Prompt design & API usage</li>
+                <li>Simple RAG patterns (vector search basics)</li>
+                <li>Adding AI features into MERN apps</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 6 — Deploy & DevOps</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>Vercel & Node deployments, env management</li>
+                <li>CI basics, monitoring & logging</li>
+                <li>Performance, SEO & accessibility checks</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Projects (Full-Stack only) */}
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-2">Projects you’ll build</h3>
+            <ul className="list-disc ml-6 text-gray-700 space-y-1">
+              <li><span className="font-medium">Auth-ready MERN Starter</span> — protected routes, forms, API layer</li>
+              <li><span className="font-medium">E-commerce Mini</span> — product CRUD, cart, checkout flow</li>
+              <li><span className="font-medium">AI Notes / Q&A</span> — ingest notes, ask questions via Gen&nbsp;AI (simple RAG)</li>
+              <li><span className="font-medium">Portfolio App</span> — deploy & optimize for lighthouse/SEO</li>
+            </ul>
+          </div>
+
+          {/* Outcomes add-on */}
+          <div className="mt-6 rounded-xl bg-blue-50 border border-blue-100 p-4">
+            <p className="text-sm text-blue-900">
+              <span className="font-semibold">Outcome:</span> Ship 3–4 portfolio projects, understand MERN + Gen&nbsp;AI integration,
+              and practice interview-focused problem-solving with code reviews.
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* Prerequisites */}
       <section id="prereq" className="mt-8">
