@@ -9,26 +9,27 @@ import Badge from "@/components/ui/Badge";
 const SITE_DESC =
   process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
   "Leading coding institute in Dehradun — Full Stack with Gen AI, Data Science, Python, Java.";
+const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
 
 export const metadata: Metadata = {
-  // Home page SEO
-  title: "Coding Classes in Dehradun (2025) – Full Stack, Data Science, Python, Java",
+  title: "Doon Coding Academy | Best Coding, Data Science & AI Courses in Dehradun",
   description:
-    "Top coding classes in Dehradun (Herbertpur): Full-Stack with Gen AI, Data Science, Python & Java. Small batches (max 15), affordable fees, career-focused training.",
-  // Let layout.tsx metadataBase handle the canonical; no need to set alternates here
+    "Join Doon Coding Academy for top-rated Full Stack, Data Science, Python, and Java courses in Dehradun. Small batches, hands-on projects, affordable fees, and career support.",
+  alternates: { canonical: BASE + "/" },
   openGraph: {
-    title: "Coding Classes in Dehradun – Doon Coding Academy",
+    title: "Doon Coding Academy | Best Coding, Data Science & AI Courses in Dehradun",
     description:
-      "Learn Full-Stack with Gen AI, Data Science, Python & Java in Dehradun. Small batches, practical projects, and career-focused training.",
-    url: "/", // inherits https://www.dooncodingacademy.in via metadataBase
-    siteName: "Doon Coding Academy",
+      "Learn Full Stack (MERN + Gen AI), Data Science, Python, and Java in Dehradun. Real projects, expert mentors, and placement support.",
+    url: BASE + "/",
     type: "website",
+    siteName: "Doon Coding Academy",
   },
   twitter: {
     card: "summary",
-    title: "Coding Classes in Dehradun – Doon Coding Academy",
+    title: "Doon Coding Academy | Best Coding, Data Science & AI Courses in Dehradun",
     description:
-      "Full-Stack (Gen AI), Data Science, Python & Java. Small batches, practical projects, career-focused training in Dehradun.",
+      "Top-rated coding, data science, and AI courses in Dehradun. Small batches, hands-on projects, and career support.",
   },
 };
 
