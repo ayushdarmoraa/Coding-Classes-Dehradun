@@ -1,12 +1,86 @@
-/* eslint-disable @next/next/no-html-link-for-pages */
-/* eslint-disable @next/next/no-html-link-for-pages */
 import type { Metadata } from "next";
+const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
+import Script from "next/script";
+  // ...existing code...
+  // Place after <header>, before first <section>
+  {/* FAQPage JSON-LD */}
+  <Script
+    id="faq-schema"
+    type="application/ld+json"
+    strategy="afterInteractive"
+    dangerouslySetInnerHTML={{
+      __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "@id": `${BASE}/faq#faq`,
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Where is Doon Coding Academy located?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Near DR School, Herbertpur, Dehradun (PIN 248142)." }
+          },
+          {
+            "@type": "Question",
+            "name": "What courses do you offer?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Full Stack, Data Science, Python, and Java." }
+          },
+          {
+            "@type": "Question",
+            "name": "Do you provide placement support and career services?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. We offer interview prep, resume reviews, and referrals." }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the batch sizes?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Small batches (max 15) for personal attention." }
+          },
+          {
+            "@type": "Question",
+            "name": "Are payment plans available?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes, monthly and one-time options are available." }
+          },
+          {
+            "@type": "Question",
+            "name": "Do I need prior coding experience?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No, beginner tracks start from fundamentals." }
+          },
+          {
+            "@type": "Question",
+            "name": "Will I build real projects?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our approach is project-first for all courses." }
+          },
+          {
+            "@type": "Question",
+            "name": "Do you provide certificates?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes, you’ll receive a completion certificate." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the duration of each course?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Varies by course; see individual course pages for details." }
+          },
+          {
+            "@type": "Question",
+            "name": "How can I contact you?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Call or WhatsApp +91 7037905464 or use the contact form." }
+          }
+        ]
+      })
+    }}
+  />
+/* eslint-disable @next/next/no-html-link-for-pages */
+/* eslint-disable @next/next/no-html-link-for-pages */
+
 
 export const metadata: Metadata = {
   title: "FAQ — Doon Coding Academy (Dehradun)",
   description:
     "Answers to common questions about our Full-Stack with Gen AI, Data Science, Python, and Java courses in Dehradun—admissions, fees, duration, projects, support, and more.",
-  alternates: { canonical: "/faq" },
+  alternates: { canonical: BASE + "/faq" },
+  openGraph: {
+    url: BASE + "/faq",
+  },
 };
 
 export default function FAQPage() {

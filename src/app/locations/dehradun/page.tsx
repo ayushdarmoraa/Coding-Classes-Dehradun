@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+const GBP_URL =
+  process.env.NEXT_PUBLIC_GBP_URL || "https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9";
+const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -8,12 +12,12 @@ export const metadata: Metadata = {
   title: "Best Coding Classes in Dehradun - Doon Coding Academy Herbertpur",
   description: "Top-rated coding classes in Dehradun, Uttarakhand. Learn Full-Stack Development, Data Science, Python & Java at our Herbertpur campus. Expert instructors, job placement assistance.",
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL}/locations/dehradun`,
+    canonical: BASE + "/locations/dehradun",
   },
   openGraph: {
     title: "Best Coding Classes in Dehradun - Doon Coding Academy",
     description: "Top-rated coding classes in Dehradun, Uttarakhand. Learn Full-Stack Development, Data Science, Python & Java at our Herbertpur campus.",
-    url: "/locations/dehradun",
+    url: BASE + "/locations/dehradun",
     type: "website",
   },
 };
@@ -134,6 +138,16 @@ export default function DehradunLocationPage() {
               </h2>
               
               <div className="space-y-4 mb-8">
+                <p className="mb-2">
+                  <a
+                    href={GBP_URL}
+                    target="_blank"
+                    rel="noopener"
+                    className="text-blue-700 hover:underline"
+                  >
+                    Open in Google Maps (Directions)
+                  </a>
+                </p>
                 <div className="flex items-start space-x-3">
                   <span className="text-blue-600 text-xl">📍</span>
                   <div>

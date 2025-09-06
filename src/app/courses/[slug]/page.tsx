@@ -6,29 +6,6 @@ import Badge from "@/components/ui/Badge";
 import CourseCard from "@/components/features/CourseCard";
 import Link from "next/link";
 import { getAllBlogPosts } from "@/lib/blog";
-// --- Mini FAQ per course (no interface changes) ---
-const faqsBySlug: Record<string, { q: string; a: string }[]> = {
-  "full-stack": [
-    { q: "What is the duration and class schedule?", a: "Duration is 6 months. Weekday and weekend batches are available; small groups for personal attention." },
-    { q: "Do you include Gen AI modules?", a: "Yes. You’ll build prompts, use APIs, and learn simple RAG patterns integrated into MERN projects." },
-    { q: "Is there placement assistance?", a: "We help with project portfolio, interview prep, and local referrals. No fake ‘guarantees’—just honest support." }
-  ],
-  "data-science": [
-    { q: "Do I need strong math?", a: "Basic algebra/probability helps, but we teach essentials as we go. You’ll focus on practical analysis and ML workflows." },
-    { q: "What tools are covered?", a: "Python, NumPy, Pandas, visualization, classic ML, and an intro to Gen AI/LLM tooling." },
-    { q: "Is there a capstone?", a: "Yes. You’ll complete a mini capstone on a real dataset with a short report/notebook." }
-  ],
-  "python": [
-    { q: "Is this good for beginners?", a: "Yes. No prior coding needed; we start from basics and move to OOP, files/JSON, and small utilities." },
-    { q: "What projects will I build?", a: "CLI tools, data parsing scripts, and small automation tasks you can showcase." },
-    { q: "How long is the course?", a: "About 4 months with paced practice and reviews." }
-  ],
-  "java": [
-    { q: "Is Spring included?", a: "You’ll learn Java foundations first with an intro to Spring basics to prepare you for backend frameworks." },
-    { q: "Any prior experience required?", a: "No. We start from syntax/OOP and build up to collections, exceptions, and IO." },
-    { q: "How long is the course?", a: "About 4 months with hands-on exercises." }
-  ]
-};
 
 type Props = { params: { slug: string } };
 
@@ -160,7 +137,6 @@ export default function CoursePage({ params }: Props) {
     );
   }
 
-  const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy";
   const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
   const courseUrl = `${SITE_URL}/courses/${course.slug}`;
 
@@ -270,6 +246,46 @@ export default function CoursePage({ params }: Props) {
           This program is designed to be hands-on and outcome-focused. You’ll build portfolio-ready work,
           get mentor feedback, and prepare for real roles.
         </p>
+      </section>
+
+      {/* Local SEO: Dehradun service areas + location link */}
+      <section id="service-areas" className="mt-12 border-t pt-8">
+        <h2 className="text-2xl font-semibold mb-2">Serving Dehradun & Nearby</h2>
+        <p className="text-gray-700 mb-3">
+          Our Herbertpur campus serves students across Dehradun and nearby areas.
+          See{" "}
+          <Link href="/locations/dehradun" className="text-blue-700 hover:underline">
+            our Dehradun location
+          </Link>{" "}
+          for directions.
+        </p>
+
+        <ul className="flex flex-wrap gap-2 text-sm text-gray-700">
+          {[
+            "Dakpathar",
+            "Herbertpur",
+            "Paonta-Sahib",
+            "Vikasnagar",
+            "Sehespur",
+            "Selaqui",
+            "Suddhowala",
+            "Premnagar",
+            "Dehradun",
+          ].map((place) => (
+            <li
+              key={place}
+              className="rounded-full bg-gray-50 px-3 py-1 ring-1 ring-gray-200"
+            >
+              {place}
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-4">
+          <a href="tel:+917037905464" className="text-blue-700 hover:underline">
+            Call +91 7037905464
+          </a>
+        </div>
       </section>
 
 
@@ -558,6 +574,7 @@ export default function CoursePage({ params }: Props) {
         </section>
       )}
 
+
       {/* Outcomes */}
       <section id="outcomes" className="mt-8">
         <h2 className="text-2xl font-semibold mb-2">Outcomes</h2>
@@ -567,6 +584,105 @@ export default function CoursePage({ params }: Props) {
           ))}
         </ul>
       </section>
+
+      {/* Detailed Syllabus (Full-Stack only) */}
+      {course.slug === "full-stack" && (
+        <section id="syllabus" className="mt-8">
+          <h2 className="text-2xl font-semibold mb-2">Detailed Syllabus (Beginner → Advanced)</h2>
+
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-semibold">1) Web Foundations</h3>
+              <ul className="list-disc ml-6 text-gray-700">
+                <li>HTML5 semantics, accessibility basics, responsive layouts with CSS Grid/Flexbox</li>
+                <li>Modern CSS: utility-first mindset, Tailwind essentials, component composition</li>
+                <li>Git & GitHub workflow (branching, PRs), CLI basics</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold">2) JavaScript & TypeScript</h3>
+              <ul className="list-disc ml-6 text-gray-700">
+                <li>ES6+ syntax, modules, async/await, fetch/API calls</li>
+                <li>TypeScript fundamentals: types, interfaces, generics, narrowing</li>
+                <li>Testing intro (Jest basics), debugging skills</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold">3) React & Frontend Engineering</h3>
+              <ul className="list-disc ml-6 text-gray-700">
+                <li>React fundamentals: hooks, state, effects, context</li>
+                <li>Routing, forms, validation, component patterns</li>
+                <li>Performance & UX: code-splitting, memoization, accessibility</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold">4) Backend with Node.js & Express</h3>
+              <ul className="list-disc ml-6 text-gray-700">
+                <li>REST APIs, MVC structure, middleware, error handling</li>
+                <li>Auth & security: JWT sessions, hashing, rate-limiting, CORS</li>
+                <li>File uploads, environment management, logging</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold">5) Databases & Data Layer</h3>
+              <ul className="list-disc ml-6 text-gray-700">
+                <li>MongoDB schemas & queries, Mongoose models</li>
+                <li>Indexes, aggregation basics, transactions</li>
+                <li>Data validation & sanitization</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold">6) DevOps Basics & Deployment</h3>
+              <ul className="list-disc ml-6 text-gray-700">
+                <li>Env configs, build pipelines, CI/CD overview</li>
+                <li>Deploy on Vercel/Render, environment variables, monitoring</li>
+                <li>Performance & cost basics</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold">7) Gen AI Integration (Project-Focused)</h3>
+              <ul className="list-disc ml-6 text-gray-700">
+                <li>LLM APIs (prompt design, safety, token budgets)</li>
+                <li>Simple RAG pattern (vector store, embeddings) for app features</li>
+                <li>UX patterns: chat components, streaming responses</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold">8) Capstone & Portfolio</h3>
+              <ul className="list-disc ml-6 text-gray-700">
+                <li>End-to-end MERN app with auth, payments/CRUD, and an AI feature</li>
+                <li>README, docs, and deployment; interview-ready presentation</li>
+                <li>GitHub portfolio polish & resume alignment</li>
+              </ul>
+            </div>
+
+            <div className="mt-6">
+              <h3 className="font-semibold">Projects You’ll Build</h3>
+              <ul className="list-disc ml-6 text-gray-700">
+                <li>Responsive multi-page site (foundations)</li>
+                <li>React app with routing, forms, and API integration</li>
+                <li>Node/Express REST API + MongoDB (auth, CRUD, validation)</li>
+                <li>AI-assisted feature (chat/summary/search) using LLM APIs</li>
+                <li>Capstone MERN app deployed publicly</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold">Tools Covered</h3>
+              <p className="text-gray-700">
+                React, Node.js, Express, MongoDB, Tailwind, Git/GitHub, TypeScript, JWT, and LLM APIs.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Mini FAQs (generic, safe defaults) */}
       <section id="faqs" className="mt-10">
@@ -812,12 +928,99 @@ export default function CoursePage({ params }: Props) {
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
+    {/* On-page FAQs (mirrors JSON-LD) */}
+    {(() => {
+      // Build the same FAQ set as in the JSON-LD block
+      const normalize = (v?: string | number) => (v == null ? "" : String(v));
+      const priceText = normalize(course.price);
+      const durationText = normalize(course.duration);
+      let faqs: Array<{ q: string; a: string }> = [
+        {
+          q: `What is the duration of the ${course.title}?`,
+          a: durationText
+            ? `The typical duration is ${durationText}.`
+            : `The course duration varies by batch schedule. Contact us for the current plan.`,
+        },
+        {
+          q: `What are the fees for the ${course.title}?`,
+          a: priceText
+            ? `The fee is ${priceText}. Flexible monthly options are available.`
+            : `Fees depend on the current batch and offers. Please contact us for the latest fee structure.`,
+        },
+        {
+          q: "Do you provide placement assistance?",
+          a: "Yes. We offer interview prep, resume reviews, and referrals/assistance through our local network.",
+        },
+        {
+          q: "Is prior programming experience required?",
+          a: "No prior experience is required for beginner tracks. We start from fundamentals and progress to projects.",
+        },
+        {
+          q: "Do you offer live projects and certificates?",
+          a: "Yes. You’ll build practical projects and receive a completion certificate from Doon Coding Academy.",
+        },
+        {
+          q: "Where is the institute located?",
+          a: "Near DR School, Herbertpur, Dehradun (PIN 248142). Call/WhatsApp +91 7037905464 for directions.",
+        },
+      ];
+      switch (course.slug) {
+        case "full-stack":
+          faqs = [
+            ...faqs,
+            {
+              q: "Which stack is covered?",
+              a: "MERN (MongoDB, Express, React, Node.js) with Generative AI integrations and deployment basics.",
+            },
+          ];
+          break;
+        case "data-science":
+          faqs = [
+            ...faqs,
+            {
+              q: "Which tools/libraries are covered?",
+              a: "Python, NumPy, Pandas, Matplotlib, scikit-learn, and intro to AI/ML workflows with real datasets.",
+            },
+          ];
+          break;
+        case "python":
+          faqs = [
+            ...faqs,
+            {
+              q: "What will I be able to build?",
+              a: "CLI utilities, data processing scripts, and small apps using files/JSON and OOP concepts.",
+            },
+          ];
+          break;
+        case "java":
+          faqs = [
+            ...faqs,
+            {
+              q: "Does it include Spring Boot?",
+              a: "Yes. We cover Core Java foundations and an introduction to Spring Boot with real-world practices.",
+            },
+          ];
+          break;
+      }
+      return faqs.length ? (
+        <section id="faqs" className="mt-10">
+          <h2 className="text-2xl font-semibold mb-3">Frequently asked questions</h2>
+          <dl className="divide-y divide-gray-200 rounded-2xl border">
+            {faqs.map((f, i) => (
+              <div key={i} className="p-4">
+                <dt className="font-medium">{f.q}</dt>
+                <dd className="mt-1 text-gray-700">{f.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : null;
+    })()}
+
     {/* Related Guides block: show 2 relevant blog posts */}
     {(() => {
       // Pick 2 related posts by simple heuristic: title/keywords/category mention course
       const allPosts = getAllBlogPosts(); // drafts already excluded per your setup
-  // removed unused variable 'needle'
-
       const related = allPosts
         .map(p => {
           const hay = [

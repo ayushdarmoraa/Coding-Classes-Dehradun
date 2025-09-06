@@ -1,13 +1,32 @@
+
 import { testimonials } from "@/lib/testimonials";
 import { generateTestimonialSchema } from "@/lib/schema";
 import Script from "next/script";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
+
 export const metadata: Metadata = {
-  title: "Student Testimonials",
+  title: "Student Testimonials | Doon Coding Academy",
   description:
     "Read what our students have to say about Doon Coding Academy and their learning experience.",
+  alternates: { canonical: BASE + "/testimonials" },
+  openGraph: {
+    title: "Student Testimonials | Doon Coding Academy",
+    description:
+      "Read real experiences from Full-Stack, Data Science, Python, and Java students at Doon Coding Academy.",
+    url: BASE + "/testimonials",
+    type: "article",
+    siteName: "Doon Coding Academy",
+  },
+  twitter: {
+    card: "summary",
+    title: "Student Testimonials | Doon Coding Academy",
+    description:
+      "Real student reviews of Full-Stack, Data Science, Python, and Java programs in Dehradun.",
+  },
 };
 
 // Helpers (server-safe, no extra deps)

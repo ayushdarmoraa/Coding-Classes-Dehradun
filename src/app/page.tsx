@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getCourses } from "@/lib/courses";
 import CourseCard from "@/components/features/CourseCard";
 import TestimonialCard from "@/components/features/TestimonialCard";
@@ -6,9 +7,6 @@ import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 
-const SITE_DESC =
-  process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
-  "Leading coding institute in Dehradun — Full Stack with Gen AI, Data Science, Python, Java.";
 const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
 
@@ -117,6 +115,82 @@ export default function HomePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* Quick Answers for Featured Snippets (no schema here; main FAQ has JSON-LD) */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-semibold mb-3">Quick Answers</h2>
+
+        <div className="space-y-5">
+          <div>
+            <h3 className="text-lg font-semibold">
+              What is the duration of the Full Stack course in Dehradun?
+            </h3>
+            <p className="text-gray-700">
+              Most Full Stack programs run about 6 months. At Doon Coding Academy, the{" "}
+              <Link href="/courses/full-stack" className="text-blue-700 hover:underline">
+                Full-Stack (MERN + Gen AI)
+              </Link>{" "}
+              track is designed for beginner → advanced progression over 6 months with portfolio projects.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold">
+              What are the fees for coding courses in Dehradun?
+            </h3>
+            <p className="text-gray-700">
+              Fees vary by track and batch. Typical ranges are ₹20,000–₹30,000. For example, our{" "}
+              <Link href="/courses/full-stack" className="text-blue-700 hover:underline">
+                Full-Stack
+              </Link>{" "}
+              course is ₹25,000 and{" "}
+              <Link href="/courses/data-science" className="text-blue-700 hover:underline">
+                Data Science &amp; AI
+              </Link>{" "}
+              is ₹30,000. See each course page for the latest pricing and syllabus.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold">
+              Do I need prior coding experience to start?
+            </h3>
+            <p className="text-gray-700">
+              No. Our{" "}
+              <Link href="/courses/python" className="text-blue-700 hover:underline">
+                Python
+              </Link>{" "}
+              and{" "}
+              <Link href="/courses/java" className="text-blue-700 hover:underline">
+                Java
+              </Link>{" "}
+              tracks are beginner-friendly. If you have basics,{" "}
+              <Link href="/courses/data-science" className="text-blue-700 hover:underline">
+                Data Science
+              </Link>{" "}
+              or{" "}
+              <Link href="/courses/full-stack" className="text-blue-700 hover:underline">
+                Full-Stack
+              </Link>{" "}
+              can help you specialize.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold">
+              Do you provide placement assistance?
+            </h3>
+            <p className="text-gray-700">
+              Yes—portfolio building, interview prep, resume feedback, and local referrals.{" "}
+              <Link href="/contact" className="text-blue-700 hover:underline">
+                Contact us
+              </Link>{" "}
+              for guidance on the best track for your goals.
+            </p>
           </div>
         </div>
       </section>

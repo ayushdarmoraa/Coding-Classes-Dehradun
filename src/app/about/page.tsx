@@ -1,11 +1,19 @@
+
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+
+const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
 
 export const metadata: Metadata = {
   title: "About Doon Coding Academy | Learn Full-Stack, Data Science, Python, Java in Dehradun",
   description:
     "Doon Coding Academy is a modern, SEO-first coding institute in Dehradun offering Full-Stack with Gen AI, Data Science, Python, and Java. Practical projects, local support, flexible plans.",
+  alternates: { canonical: BASE + "/about" },
+  openGraph: {
+    url: BASE + "/about",
+  },
 };
 
 export default function AboutPage() {

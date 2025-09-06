@@ -50,7 +50,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </>
         ) : null}
         {/* WebSite + SearchAction */}
-        {/* eslint-disable-next-line react/no-danger */}
+
+        {/* WebSite + SearchAction (schema.org) */}
         <Script
           id="website-searchaction"
           type="application/ld+json"
@@ -70,8 +71,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }),
           }}
         />
-        {/* Organization / EducationalOrganization */}
-        {/* eslint-disable-next-line react/no-danger */}
+
+        {/* Organization (EducationalOrganization) schema.org */}
         <Script
           id="org-schema"
           type="application/ld+json"
@@ -80,28 +81,36 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "EducationalOrganization",
+              "@id": `${siteUrl.replace(/\/$/, "")}/#organization`,
               name: process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy",
               url: siteUrl,
+              email: "dooncodingacademy@gmail.com",
+              foundingDate: "2019-01-01",
+              founder: {
+                "@type": "Person",
+                name: "Ayush Darmora",
+                jobTitle: "Founder & Instructor",
+              },
               sameAs: [
                 process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,
                 process.env.NEXT_PUBLIC_INSTAGRAM_URL || undefined,
                 process.env.NEXT_PUBLIC_LINKEDIN_URL || undefined,
                 process.env.NEXT_PUBLIC_YOUTUBE_URL || undefined,
               ].filter(Boolean),
-              address: {
-                "@type": "PostalAddress",
-                streetAddress: "Near DR School, Herbertpur",
-                addressLocality: process.env.NEXT_PUBLIC_ADDRESS_CITY || "Dehradun",
-                addressRegion: process.env.NEXT_PUBLIC_ADDRESS_STATE || "Uttarakhand",
-                postalCode: "248142",
-                addressCountry: "IN", // ← added
-              },
               contactPoint: {
                 "@type": "ContactPoint",
-                telephone: process.env.NEXT_PUBLIC_CONTACT_PHONE || undefined,
+                telephone: "+917037905464",
                 contactType: "customer support",
                 areaServed: "IN",
                 availableLanguage: ["en", "hi"],
+              },
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: "Near DR School, Herbertpur",
+                addressLocality: "Dehradun",
+                addressRegion: "Uttarakhand",
+                postalCode: "248142",
+                addressCountry: "IN",
               },
             }),
           }}
@@ -146,41 +155,65 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         dangerouslySetInnerHTML={{
           __html: JSON.stringify((() => {
             const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.dooncodingacademy.in").replace(/\/$/, "");
+            const sameAs = [
+              process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,
+              process.env.NEXT_PUBLIC_INSTAGRAM_URL || undefined,
+              process.env.NEXT_PUBLIC_LINKEDIN_URL || undefined,
+              process.env.NEXT_PUBLIC_YOUTUBE_URL || undefined,
+            ].filter(Boolean);
+
             return {
               "@context": "https://schema.org",
               "@type": "LocalBusiness",
               "@id": `${base}/#localbusiness`,
-              "name": "Doon Coding Academy",
-              "url": base,
-              "telephone": process.env.NEXT_PUBLIC_CONTACT_PHONE || undefined,
-              "image": [`${base}/images/doon-coding-academy-logo.webp`], // ← added
-              "priceRange": "₹2000–₹30000",
-              "address": {
+              name: "Doon Coding Academy",
+              url: base,
+              ...(sameAs.length ? { sameAs } : {}),
+              telephone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "+917037905464",
+              email: "dooncodingacademy@gmail.com",
+              hasMap: process.env.NEXT_PUBLIC_GBP_URL || "https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9",
+              priceRange: "₹2000–₹30000",
+              paymentAccepted: "Cash, UPI, Debit Card, Credit Card, Net Banking, Wallets (Paytm, PhonePe, GPay), EMI",
+              address: {
                 "@type": "PostalAddress",
-                "streetAddress": "Near DR School, Herbertpur",
-                "addressLocality": "Dehradun",
-                "addressRegion": "Uttarakhand",
-                "postalCode": "248142",
-                "addressCountry": "IN"
+                streetAddress: "Near DR School, Herbertpur",
+                addressLocality: "Dehradun",
+                addressRegion: "Uttarakhand",
+                postalCode: "248142",
+                addressCountry: "IN"
               },
-              "areaServed": [{ "@type": "City", "name": "Dehradun" }],
-              "knowsAbout": [
+              areaServed: [
+                "Dakpathar",
+                "Herbertpur",
+                "Paonta-Sahib",
+                "Vikasnagar",
+                "Sehespur",
+                "Selaqui",
+                "Suddhowala",
+                "Premnagar",
+                "Dehradun"
+              ],
+              openingHoursSpecification: [
+                {
+                  "@type": "OpeningHoursSpecification",
+                  dayOfWeek: ["Wednesday","Thursday","Friday","Saturday","Sunday"],
+                  opens: "10:00",
+                  closes: "19:00"
+                }
+              ],
+              foundingDate: "2019",
+              founder: {
+                "@type": "Person",
+                name: "Ayush Darmora",
+                jobTitle: "Founder & Instructor"
+              },
+              knowsAbout: [
                 "Full-Stack Development",
                 "Gen AI",
                 "Data Science",
                 "Python",
                 "Java",
                 "Coding Classes in Dehradun"
-              ],
-              "openingHoursSpecification": [
-                {
-                  "@type": "OpeningHoursSpecification",
-                  "dayOfWeek": [
-                    "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"
-                  ],
-                  "opens": "09:00",
-                  "closes": "19:00"
-                }
               ]
             };
           })())

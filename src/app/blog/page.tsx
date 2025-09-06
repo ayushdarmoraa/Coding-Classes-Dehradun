@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
 import Image from "next/image";
+
+const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
 import {
   filterPosts,
   listCategories,
@@ -17,15 +20,12 @@ export async function generateMetadata({
 }: {
   searchParams?: { q?: string; page?: string; category?: string };
 }): Promise<Metadata> {
+
   // Normalize base; prefer https even if env was set to http
-  const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-  const base = rawBase.replace(/^http:\/\//, "https://");
 
   const q = searchParams?.q?.trim();
   const page = Number(searchParams?.page || "1");
-  const self = page > 1 ? `${base}/blog?page=${page}` : `${base}/blog`;
-  // For search pages, force canonical to /blog (don’t include ?q= or ?page=)
-  const canonical = q ? `${base}/blog` : self;
+
 
   // If there's a search query, keep listing pages out of the index
   const robots = q ? { index: false, follow: true } : undefined;
@@ -39,12 +39,12 @@ export async function generateMetadata({
       "In-depth guides for Dehradun students: Full-Stack (Gen AI), Data Science, Python & Java—fees, syllabus, placements, roadmaps, and tutorials.",
     robots,
     // Canonical: /blog (search) OR /blog?page=n (pagination) OR /blog (page 1)
-    alternates: { canonical },
+    alternates: { canonical: BASE + "/blog" },
     openGraph: {
       title: "Blog – Coding & Career Guides (Dehradun)",
       description:
         "Guides on Full-Stack (Gen AI), Data Science, Python & Java: fees, syllabus, placements, roadmaps, tutorials.",
-      url: canonical,
+      url: BASE + "/blog",
       type: "website",
       siteName: "Doon Coding Academy"
     },
@@ -169,7 +169,7 @@ export async function generateMetadata({
                         <div className="relative h-44">
                           <Image
                             src={img}
-                            alt={p.imageAlt || p.title}
+                            alt={p.imageAlt || `${p.title} — Doon Coding Academy, Dehradun`}
                             fill
                             sizes="(max-width: 768px) 100vw, 400px"
                             className="object-cover"

@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
@@ -12,6 +13,14 @@ import {
 } from "@/lib/blog";
 import { nextPrevInSeries } from "@/lib/blog";
 import Link from "next/link";
+
+// --- date helpers (safe in SSR & JSON-LD) ---
+const parseDate = (input?: string): Date | null => {
+  if (!input) return null;
+  const d = new Date(input);
+  return Number.isNaN(d.getTime()) ? null : d;
+};
+const toISO = (d: Date | null): string | undefined => (d ? d.toISOString() : undefined);
 
 export async function generateStaticParams() {
   const posts = getAllBlogPosts();
@@ -103,11 +112,12 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   if (!post) notFound();
   if (post.draft) notFound();
 
+
   const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
   const url = `${base}/blog/${post.slug}`;
-  const publishedDate = new Date(post.date);
-  const updatedDate = post.lastModified ? new Date(post.lastModified) : null;
-  const showUpdated = !!(updatedDate && updatedDate.getTime() > publishedDate.getTime());
+  const publishedDate = parseDate(post.date);
+  const updatedDate = parseDate(post.lastModified);
+  const showUpdated = !!(updatedDate && publishedDate && updatedDate.getTime() > publishedDate.getTime());
 
   const crumbs = [
     { label: "Home", href: "/" },
@@ -134,20 +144,20 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     : { "@type": "Organization", name: "Doon Coding Academy", url: base };
 
   const blogPostingJsonLd = {
-  // Stable org id for cross-entity linking (matches layout.tsx @id)
-  // Example: https://dooncodingacademy.in/#organization
-  // (base has no trailing slash)
-  // NOTE: used below in publisher
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ORG_ID: `${base}/#organization`,
+    // Stable org id for cross-entity linking (matches layout.tsx @id)
+    // Example: https://dooncodingacademy.in/#organization
+    // (base has no trailing slash)
+    // NOTE: used below in publisher
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ORG_ID: `${base}/#organization`,
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
     description: post.description,
-    datePublished: new Date(post.date).toISOString(),
-    dateModified: post.lastModified ?? new Date(post.date).toISOString(),
-  author: authorNode,
-  publisher: { "@id": `${base}/#organization` },
+    datePublished: toISO(publishedDate),
+    dateModified: toISO(updatedDate ?? publishedDate),
+    author: authorNode,
+    publisher: { "@id": `${base}/#organization` },
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     url,
     keywords: post.keywords,
@@ -221,7 +231,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         <div className="relative my-6 overflow-hidden rounded-2xl">
           <Image
             src={post.image}
-            alt={post.imageAlt || post.title}
+            alt={post.imageAlt || `${post.title} — Doon Coding Academy, Dehradun`}
             width={1200}
             height={630}
             priority
@@ -231,10 +241,14 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         </div>
       ) : null}
       <p className="text-gray-600 text-sm mb-6">
-        Originally published on {publishedDate.toLocaleDateString()}
-        {showUpdated ? (
+        {publishedDate ? (
+          <>Originally published on {publishedDate.toLocaleDateString("en-IN")}</>
+        ) : (
+          <>Originally published — date unavailable</>
+        )}
+        {showUpdated && updatedDate ? (
           <>
-            {" "}• <span className="font-medium">Updated on {updatedDate!.toLocaleDateString()}</span>
+            {" "}• <span className="font-medium">Updated on {updatedDate.toLocaleDateString("en-IN")}</span>
           </>
         ) : null}
         {" "}• {post.readingTime} min read •{" "}

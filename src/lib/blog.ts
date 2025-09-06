@@ -44,6 +44,7 @@ export interface BlogPost {
   howtoSupplies?: string[];                  // supplies list
   howtoTotalTime?: string;                   // ISO 8601 duration: "PT1H30M"
   howtoEstimatedCost?: MonetaryAmount;       // { value, currency }
+  lastModified?: string;      // optional last modified date
 }
 
 const postsDirectory = path.join(process.cwd(), "src/content/blog");

@@ -1,12 +1,26 @@
+const GBP_URL = process.env.NEXT_PUBLIC_GBP_URL || "https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9";
+      <li>
+        Directions:{" "}
+        <a href={GBP_URL} target="_blank" rel="noopener" className="text-blue-700 hover:underline">
+          Open in Google Maps
+        </a>
+      </li>
+
 import type { Metadata } from "next";
 import EnquiryForm from "@/components/features/EnquiryForm";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 
+const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
+
 export const metadata: Metadata = {
   title: "Contact Us - Doon Coding Academy",
   description: "Get in touch with Doon Coding Academy. Contact us for course enquiries, admissions, and more information about our coding programs in Dehradun.",
-  alternates: { canonical: "/contact" },
+  alternates: { canonical: BASE + "/contact" },
+  openGraph: {
+    url: BASE + "/contact",
+  },
 };
 
 const contactInfo = [

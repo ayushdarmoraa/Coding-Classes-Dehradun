@@ -1,31 +1,38 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 // src/app/courses/page.tsx
+
 import type { Metadata } from "next";
 import { getCourses, getCourseBySlug } from "@/lib/courses";
 import CourseCard from "@/components/features/CourseCard";
 import Badge from "@/components/ui/Badge";
 import Script from "next/script";
 
+// ⬇️ TOP-LEVEL (outside any function)
+const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
+
 export const metadata: Metadata = {
-  // Courses index SEO
-  title: "Coding Courses in Dehradun (2025) – Full Stack, Data Science, Python, Java",
+  title: "Courses | Doon Coding Academy",
   description:
-    "Compare coding courses in Dehradun (Herbertpur): Full-Stack with Gen AI, Data Science, Python & Java. Fees, syllabus, duration, and placement support. Small batches (max 15).",
-  // Let layout.tsx metadataBase provide canonical; no need to hard-set here
+    "Explore all coding, data science, Python, and Java courses at Doon Coding Academy, Dehradun. Compare curriculum, fees, and outcomes. Small batches, hands-on projects, and career support.",
+  alternates: { canonical: BASE + "/courses" },
   openGraph: {
-    title: "Coding Courses in Dehradun – Doon Coding Academy",
+    title: "Courses | Doon Coding Academy",
     description:
-      "Full-Stack (Gen AI), Data Science, Python & Java courses in Dehradun. See fees, syllabus, duration, and placement support.",
-    url: "/courses",
+      "Browse all Full Stack, Data Science, Python, and Java courses in Dehradun. See curriculum, fees, and outcomes. Small batches, real projects, and career support.",
+    url: BASE + "/courses",
     type: "website",
+    siteName: "Doon Coding Academy",
   },
   twitter: {
     card: "summary",
-    title: "Coding Courses in Dehradun – Doon Coding Academy",
+    title: "Courses | Doon Coding Academy",
     description:
-      "Compare Full-Stack (Gen AI), Data Science, Python & Java courses: fees, syllabus, duration & placements.",
+      "All coding, data science, and programming courses at Doon Coding Academy, Dehradun. Compare curriculum, fees, and outcomes.",
   },
 };
+
+
 
 export default function CoursesPage() {
   const courses = getCourses();
@@ -35,67 +42,44 @@ export default function CoursesPage() {
   // Feature a couple up top
   const featuredSlugs = new Set(["full-stack", "data-science"]);
   const featured = courses.filter((c) => featuredSlugs.has(c.slug));
-  const others = courses.filter((c) => !featuredSlugs.has(c.slug));
 
   // Clientless "filters" via anchor sections: map slugs to levels
-  const beginnerSlugs = new Set(["python", "java"]);
   const intermediateSlugs = new Set(["data-science"]);
   const advancedSlugs = new Set(["full-stack"]);
 
-  const beginner = courses.filter((c) => beginnerSlugs.has(c.slug));
   const intermediate = courses.filter((c) => intermediateSlugs.has(c.slug));
   const advanced = courses.filter((c) => advancedSlugs.has(c.slug));
 
-  const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000")
-    .replace(/\/$/, "")
-    .replace(/^http:\/\//, "https://");
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "@id": `${SITE_URL}/courses#breadcrumb`,
+    "@id": `${BASE}/courses#breadcrumb`,
     itemListElement: [
       {
         "@type": "ListItem",
         position: 1,
-        item: { "@type": "WebPage", "@id": `${SITE_URL}/`, name: "Home" },
+        item: { "@type": "WebPage", "@id": `${BASE}/`, name: "Home" },
       },
       {
         "@type": "ListItem",
         position: 2,
-        item: { "@type": "WebPage", "@id": `${SITE_URL}/courses`, name: "Courses" },
+        item: { "@type": "WebPage", "@id": `${BASE}/courses`, name: "Courses" },
       },
     ],
   } as const;
 
   return (
     <div className="min-h-screen bg-gray-50" id="top">
-      {/* eslint-disable-next-line react/no-danger */}
+      {/* Breadcrumb JSON-LD */}
       <Script
         id="courses-breadcrumb"
         type="application/ld+json"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      {/* Compact header */}
-      <section className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <nav aria-label="Breadcrumb" className="mb-3 text-sm">
-            <ol className="flex items-center gap-2 text-gray-600">
-              <li>
-                <a href="/" className="hover:underline text-blue-700 font-semibold">Home</a>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li className="text-gray-800 font-semibold">Courses</li>
-            </ol>
-          </nav>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl md:text-4xl font-extrabold">Our Courses</h1>
-            <Badge variant="success" className="bg-green-500 text-white">Industry-Focused</Badge>
-          </div>
-          <p className="mt-2 max-w-2xl text-gray-700">
-            Pick a program that fits your goals. Small batches, hands-on projects, and support included.
-          </p>
+      <p className="mt-2 max-w-2xl text-gray-700">
+        Pick a program that fits your goals. Small batches, hands-on projects, and support included.
+      </p>
 
           {/* Filters / Sort (anchor-only) */}
           <div className="mt-6">
@@ -119,8 +103,6 @@ export default function CoursesPage() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
       {/* Featured */}
       {featured.length > 0 && (
@@ -136,40 +118,7 @@ export default function CoursesPage() {
           </div>
         </section>
       )}
-
-      {/* All Courses */}
-      <section className="py-10" id="all">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold">All Courses</h2>
-          <p className="mt-1 text-gray-600">Foundation and specialization options for every level.</p>
-          <div className="mt-6 grid md:grid-cols-2 gap-8">
-            {(others.length ? others : courses).map((course) => (
-              <CourseCard key={course.id} course={course} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Anchor-filtered mini sections */}
-      {!!beginner.length && (
-        <section className="py-6 pt-0" id="beginner" aria-label="Beginner courses">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex items-center gap-2">
-              <h3 className="text-xl md:text-2xl font-bold">Beginner-Friendly</h3>
-              <Badge variant="primary">Start here</Badge>
-            </div>
-            <p className="mt-1 text-gray-600">Great if you’re new to coding or want a solid base.</p>
-            <div className="mt-5 grid md:grid-cols-2 gap-8">
-              {beginner.map((course) => (
-                <CourseCard key={course.id} course={course} />
-              ))}
-            </div>
-            <div className="mt-4">
-              <a href="#top" className="text-sm text-blue-700 hover:underline">Back to top</a>
-            </div>
-          </div>
-        </section>
-      )}
+{/* Removed unreachable/orphaned JSX tags and comments left outside the main return block */}
 
       {!!intermediate.length && (
         <section className="py-6" id="intermediate" aria-label="Intermediate courses">

@@ -1,58 +1,70 @@
-import { NextResponse } from "next/server";
-import { getAllBlogPosts, getPostLastModified } from "@/lib/blog";
+import { getAllBlogPosts } from "@/lib/blog";
 
-export const revalidate = 3600;
-export const dynamic = "force-static";
+const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+const SITE = rawBase.replace(/^http:\/\//, "https://");
 
-function esc(s: string) {
-  return s
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&apos;");
-}
+// ---- helpers ----
+const safeStr = (v: unknown) => (typeof v === "string" ? v : v == null ? "" : String(v));
+const escText = (s: unknown) =>
+  safeStr(s).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+const escAttr = (s: unknown) =>
+  safeStr(s).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+
+const toISO = (d?: string) => {
+  if (!d) return new Date().toISOString();
+  const x = new Date(d);
+  return Number.isNaN(x.getTime()) ? new Date().toISOString() : x.toISOString();
+};
 
 export async function GET() {
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-  const siteTitle = process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy";
 
-  const posts = getAllBlogPosts();
-  let updated = 0;
+  const posts = getAllBlogPosts()
+    .filter((p) => !p.draft)
+    .sort(
+      (a, b) =>
+        +new Date(b.lastModified ?? b.date ?? 0) -
+        +new Date(a.lastModified ?? a.date ?? 0)
+    );
 
-  const entries = posts
-    .map((p) => {
-      const url = `${base}/blog/${p.slug}`;
-      const pub = new Date(p.date);
-      const lm = getPostLastModified(p.slug);
-      const mod = lm ? new Date(lm) : pub;
-      updated = Math.max(updated, mod.getTime());
+  const feedId = `${SITE}/blog/atom`;
+  const feedSelf = `${SITE}/blog/atom`;
+  const feedHome = `${SITE}/blog`;
+  const feedTitle = "Doon Coding Academy Blog";
+  const feedUpdated = toISO(posts[0]?.lastModified ?? posts[0]?.date);
 
-      return `
-      <entry>
-        <title>${esc(p.title)}</title>
-        <link href="${url}" />
-        <id>${url}</id>
-        <updated>${mod.toISOString()}</updated>
-        <published>${pub.toISOString()}</published>
-        <summary type="html"><![CDATA[${p.description}]]></summary>
-        ${(p.keywords || []).map((k) => `<category term="${esc(k)}" />`).join("")}
-      </entry>
-    `.trim();
-    })
-    .join("");
+const entries = posts.map((p) => {
+  const link = `${SITE}/blog/${p.slug}`;
+  const title = escText(p.title);
+  const updated = toISO(p.lastModified ?? p.date);
+  const summary = escText(
+    p.description ||
+      `${String(p.title)} — insights from Doon Coding Academy (Dehradun). Compare options, syllabus, fees, and outcomes.`
+  );
+
+  return `
+  <entry>
+    <title>${title}</title>
+    <id>${escText(link)}</id>
+    <link href="${escAttr(link)}" />
+    <updated>${updated}</updated>
+    <summary type="html">${summary}</summary>
+  </entry>`;
+}).join("");
 
   const atom = `<?xml version="1.0" encoding="utf-8"?>
-  <feed xmlns="http://www.w3.org/2005/Atom">
-    <title>${esc(siteTitle)} Blog</title>
-    <id>${base}/blog</id>
-    <updated>${new Date(updated || Date.now()).toISOString()}</updated>
-    <link rel="self" href="${base}/blog/atom.xml"/>
-    <link rel="alternate" href="${base}/blog"/>
-    ${entries}
-  </feed>`.trim();
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>${escText(feedTitle)}</title>
+  <id>${escText(feedId)}</id>
+  <link href="${escAttr(feedSelf)}" rel="self"/>
+  <link href="${escAttr(feedHome)}"/>
+  <updated>${feedUpdated}</updated>
+  ${entries}
+</feed>`;
 
-  return new NextResponse(atom, {
-    headers: { "Content-Type": "application/atom+xml; charset=utf-8" },
+  return new Response(atom, {
+    headers: {
+      "Content-Type": "application/atom+xml; charset=utf-8",
+      "Cache-Control": "s-maxage=600, stale-while-revalidate=86400",
+    },
   });
 }
