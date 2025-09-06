@@ -1,83 +1,3 @@
-      {/* Detailed Syllabus (Python only) */}
-      {course.slug === "python" && (
-        <section id="syllabus" className="mt-8">
-          <h2 className="text-2xl font-semibold mb-2">Detailed Syllabus (Beginner → Advanced)</h2>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 1 — Python Basics</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Setup, virtualenv, IDE workflow</li>
-                <li>Data types, control flow, functions</li>
-                <li>Packages & pip, project structure</li>
-              </ul>
-            </div>
-
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 2 — OOP & Files</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Classes, objects, inheritance</li>
-                <li>Exceptions & error handling</li>
-                <li>File I/O, JSON, CSV, pathlib</li>
-              </ul>
-            </div>
-
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 3 — Libraries & APIs</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>requests, argparse, logging</li>
-                <li>Scheduling/automation basics</li>
-                <li>Using public APIs (REST)</li>
-              </ul>
-            </div>
-
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 4 — Data Handling</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Intro to NumPy & Pandas (light)</li>
-                <li>Data cleaning & quick analysis</li>
-                <li>Simple plotting (matplotlib)</li>
-              </ul>
-            </div>
-
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 5 — Testing & Packaging</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>pytest basics & test structure</li>
-                <li>Type hints & linters (mypy, ruff)</li>
-                <li>Packaging, CLI entry points</li>
-              </ul>
-            </div>
-
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 6 — Deployment Basics</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Virtualenvs on servers</li>
-                <li>Environment variables & secrets</li>
-                <li>Docker (intro) & task automation</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Projects (Python only) */}
-          <div className="mt-8">
-            <h3 className="text-xl font-semibold mb-2">Projects you’ll build</h3>
-            <ul className="list-disc ml-6 text-gray-700 space-y-1">
-              <li><span className="font-medium">CLI Utility</span> — parse files/JSON, arguments, and logs</li>
-              <li><span className="font-medium">API Automation</span> — fetch & store data from a public API</li>
-              <li><span className="font-medium">Data Mini-Analysis</span> — clean, analyze, and plot a dataset</li>
-              <li><span className="font-medium">Packaging</span> — ship a small tool with a proper CLI</li>
-            </ul>
-          </div>
-
-          {/* Outcomes add-on */}
-          <div className="mt-6 rounded-xl bg-blue-50 border border-blue-100 p-4">
-            <p className="text-sm text-blue-900">
-              <span className="font-semibold">Outcome:</span> Write clean, tested Python; automate real tasks; and publish a small, reusable tool.
-            </p>
-          </div>
-        </section>
-      )}
 import type { Metadata } from "next";
 import Script from "next/script";
 import { getCourseBySlug, getCourses } from "@/lib/courses";
@@ -609,6 +529,7 @@ export default function CoursePage({ params }: Props) {
           </div>
         </section>
       )}
+
       {/* Prerequisites */}
       <section id="prereq" className="mt-8">
         <h2 className="text-2xl font-semibold mb-2">Prerequisites</h2>
@@ -618,6 +539,24 @@ export default function CoursePage({ params }: Props) {
           ))}
         </ul>
       </section>
+
+      {/* Detailed Syllabus (Python only) */}
+      {course.slug === "python" && (
+        <section id="syllabus" className="mt-8">
+          <h2 className="text-2xl font-semibold mb-2">Detailed Syllabus (Beginner → Advanced)</h2>
+          <ul className="list-disc ml-6 space-y-1">
+            <li>Python basics: syntax, variables, control flow, functions</li>
+            <li>Data structures: lists, tuples, dicts, sets; comprehension patterns</li>
+            <li>File I/O, JSON, errors, modules & packages</li>
+            <li>OOP: classes, inheritance, dunder methods</li>
+            <li>Virtualenv & packaging; CLI utilities</li>
+            <li>NumPy & Pandas for data wrangling</li>
+            <li>Plotting with Matplotlib; simple dashboards</li>
+            <li>APIs & HTTP; basic web scraping</li>
+            <li>Mini-projects: automation scripts & data pipelines</li>
+          </ul>
+        </section>
+      )}
 
       {/* Outcomes */}
       <section id="outcomes" className="mt-8">
