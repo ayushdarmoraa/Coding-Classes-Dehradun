@@ -273,21 +273,11 @@ export default function CoursePage({ params }: Props) {
       </section>
 
 
-      {/* Curriculum */}
-      <section id="curriculum" className="mt-8">
-        <h2 className="text-2xl font-semibold mb-2">Curriculum</h2>
-        <ul className="list-disc ml-6 space-y-1">
-          {course.curriculum.map((topic, idx) => (
-            <li key={idx}>{topic}</li>
-          ))}
-        </ul>
-      </section>
 
       {/* Detailed Syllabus (Full-Stack only) */}
       {course.slug === "full-stack" && (
         <section id="syllabus" className="mt-8">
           <h2 className="text-2xl font-semibold mb-2">Detailed Syllabus (MERN + Gen&nbsp;AI)</h2>
-
           <div className="grid md:grid-cols-2 gap-4">
             <div className="rounded-2xl border p-4">
               <h3 className="font-semibold mb-1">Module 1 — Web Foundations</h3>
@@ -297,7 +287,6 @@ export default function CoursePage({ params }: Props) {
                 <li>Git & GitHub workflow (branches, PRs, releases)</li>
               </ul>
             </div>
-
             <div className="rounded-2xl border p-4">
               <h3 className="font-semibold mb-1">Module 2 — JavaScript & TS</h3>
               <ul className="list-disc ml-5 text-gray-700 space-y-1">
@@ -306,7 +295,6 @@ export default function CoursePage({ params }: Props) {
                 <li>Testing fundamentals (unit & integration)</li>
               </ul>
             </div>
-
             <div className="rounded-2xl border p-4">
               <h3 className="font-semibold mb-1">Module 3 — React & Next.js</h3>
               <ul className="list-disc ml-5 text-gray-700 space-y-1">
@@ -315,7 +303,6 @@ export default function CoursePage({ params }: Props) {
                 <li>State management patterns & performance</li>
               </ul>
             </div>
-
             <div className="rounded-2xl border p-4">
               <h3 className="font-semibold mb-1">Module 4 — Backend (Node.js & Express)</h3>
               <ul className="list-disc ml-5 text-gray-700 space-y-1">
@@ -324,7 +311,6 @@ export default function CoursePage({ params }: Props) {
                 <li>File uploads, email/notifications</li>
               </ul>
             </div>
-
             <div className="rounded-2xl border p-4">
               <h3 className="font-semibold mb-1">Module 5 — Gen&nbsp;AI Integration</h3>
               <ul className="list-disc ml-5 text-gray-700 space-y-1">
@@ -333,7 +319,6 @@ export default function CoursePage({ params }: Props) {
                 <li>Adding AI features into MERN apps</li>
               </ul>
             </div>
-
             <div className="rounded-2xl border p-4">
               <h3 className="font-semibold mb-1">Module 6 — Deploy & DevOps</h3>
               <ul className="list-disc ml-5 text-gray-700 space-y-1">
@@ -343,7 +328,6 @@ export default function CoursePage({ params }: Props) {
               </ul>
             </div>
           </div>
-
           {/* Projects (Full-Stack only) */}
           <div className="mt-8">
             <h3 className="text-xl font-semibold mb-2">Projects you’ll build</h3>
@@ -354,12 +338,93 @@ export default function CoursePage({ params }: Props) {
               <li><span className="font-medium">Portfolio App</span> — deploy & optimize for lighthouse/SEO</li>
             </ul>
           </div>
-
           {/* Outcomes add-on */}
           <div className="mt-6 rounded-xl bg-blue-50 border border-blue-100 p-4">
             <p className="text-sm text-blue-900">
               <span className="font-semibold">Outcome:</span> Ship 3–4 portfolio projects, understand MERN + Gen&nbsp;AI integration,
               and practice interview-focused problem-solving with code reviews.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* Detailed Syllabus (Data Science only) */}
+      {course.slug === "data-science" && (
+        <section id="syllabus" className="mt-8">
+          <h2 className="text-2xl font-semibold mb-2">Detailed Syllabus (Python • ML • AI)</h2>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 1 — Python Foundations</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>Python syntax, IDEs, virtual envs</li>
+                <li>Data types, control flow, functions</li>
+                <li>Files, JSON, modules & packaging</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 2 — Data Analysis</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>NumPy arrays & vectorization</li>
+                <li>Pandas: series, dataframes, joins, groupby</li>
+                <li>Cleaning, EDA, feature engineering</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 3 — Visualization</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>Matplotlib & Plotly basics</li>
+                <li>Dashboards & storytelling</li>
+                <li>Exporting charts for the web</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 4 — Machine Learning</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>ML workflow, train/val/test splits</li>
+                <li>scikit-learn: regression, classification, metrics</li>
+                <li>Model tuning & cross-validation</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 5 — SQL & Data Ops</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>SQL querying & joins</li>
+                <li>Connecting Python ↔ DB</li>
+                <li>Basics of pipelines & scheduling</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 6 — Gen&nbsp;AI Intro</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>Prompting & API usage</li>
+                <li>Lightweight embeddings & retrieval</li>
+                <li>Using AI to augment analysis</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Projects (Data Science only) */}
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-2">Projects you’ll build</h3>
+            <ul className="list-disc ml-6 text-gray-700 space-y-1">
+              <li><span className="font-medium">Exploratory Data Analysis</span> — real dataset cleaning & insights report</li>
+              <li><span className="font-medium">Predictive Model</span> — scikit-learn pipeline with evaluation</li>
+              <li><span className="font-medium">Analytics Dashboard</span> — interactive charts for stakeholders</li>
+              <li><span className="font-medium">AI-Aided Notebook</span> — prompt-assisted feature ideas & summaries</li>
+            </ul>
+          </div>
+
+          {/* Outcomes add-on */}
+          <div className="mt-6 rounded-xl bg-blue-50 border border-blue-100 p-4">
+            <p className="text-sm text-blue-900">
+              <span className="font-semibold">Outcome:</span> Build solid Python + ML foundations, ship 3 portfolio artifacts
+              (EDA, model, dashboard), and learn to use Gen&nbsp;AI to accelerate analysis.
             </p>
           </div>
         </section>
