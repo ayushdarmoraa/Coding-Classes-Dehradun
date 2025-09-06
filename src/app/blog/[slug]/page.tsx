@@ -21,11 +21,11 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const post = getPostBySlug(params.slug);
   if (!post || post.draft) return {};
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+
+  // ✅ keep ONLY this base/url block
+  const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = rawBase.replace(/^http:\/\//, "https://");
   const url = `${base}/blog/${post.slug}`;
-    const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-    const base = rawBase.replace(/^http:\/\//, "https://");
-    const url = `${base}/blog/${post.slug}`;
 
     // Fallback ensures every post gets a unique, click-friendly description
     const makeFallbackDescription = (title: string) => {
