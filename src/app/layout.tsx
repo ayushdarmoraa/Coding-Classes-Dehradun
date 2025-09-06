@@ -152,7 +152,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@id": `${base}/#localbusiness`,
               "name": "Doon Coding Academy",
               "url": base,
-              "telephone": process.env.NEXT_PUBLIC_CONTACT_PHONE || undefined, // ← added
+              "telephone": process.env.NEXT_PUBLIC_CONTACT_PHONE || undefined,
+              "image": [`${base}/images/doon-coding-academy-logo.webp`], // ← added
               "priceRange": "₹2000–₹30000",
               "address": {
                 "@type": "PostalAddress",
