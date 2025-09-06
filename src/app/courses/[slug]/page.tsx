@@ -510,6 +510,105 @@ export default function CoursePage({ params }: Props) {
         </section>
       )}
 
+      {/* Detailed Syllabus (Java only) */}
+      {course.slug === "java" && (
+        <section id="syllabus" className="mt-8">
+          <h2 className="text-2xl font-semibold mb-2">Detailed Syllabus (Core Java + Spring Boot)</h2>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 1 — Core Java Foundations</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>JDK/JRE, IDE setup (IntelliJ/Eclipse)</li>
+                <li>Syntax, data types, control flow</li>
+                <li>Methods, packages, access modifiers</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 2 — OOP Essentials</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>Classes, objects, inheritance, polymorphism</li>
+                <li>Interfaces, abstract classes</li>
+                <li>Encapsulation & immutability</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 3 — Collections & Generics</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>List, Set, Map, Queue</li>
+                <li>Iterators, streams (intro)</li>
+                <li>Generics & common patterns</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 4 — Exceptions & I/O</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>Checked vs unchecked exceptions</li>
+                <li>Try-with-resources</li>
+                <li>File I/O, serialization basics</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 5 — JDBC & SQL</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>JDBC drivers & connections</li>
+                <li>CRUD with PreparedStatement</li>
+                <li>Basic schema design & indexing</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 6 — Spring Boot (Intro)</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>Boot project structure & starters</li>
+                <li>REST controllers, DTOs, validation</li>
+                <li>Data JPA with MySQL/Postgres</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 7 — Build & Testing</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>Maven/Gradle basics</li>
+                <li>JUnit & Mockito (unit tests)</li>
+                <li>Configuration & profiles</li>
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border p-4">
+              <h3 className="font-semibold mb-1">Module 8 — Deploy & Ops</h3>
+              <ul className="list-disc ml-5 text-gray-700 space-y-1">
+                <li>Packaging JARs, env variables</li>
+                <li>Deploying a Boot app</li>
+                <li>Logging & simple monitoring</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Projects (Java only) */}
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-2">Projects you’ll build</h3>
+            <ul className="list-disc ml-6 text-gray-700 space-y-1">
+              <li><span className="font-medium">Console Banking App</span> — OOP, exceptions, file I/O</li>
+              <li><span className="font-medium">Library Manager (JDBC)</span> — CRUD, queries, pagination</li>
+              <li><span className="font-medium">Spring Boot REST API</span> — validation, JPA, Postman tests</li>
+              <li><span className="font-medium">Mini MVC Web</span> — simple UI consuming the Boot API</li>
+            </ul>
+          </div>
+
+          {/* Outcomes add-on */}
+          <div className="mt-6 rounded-xl bg-blue-50 border border-blue-100 p-4">
+            <p className="text-sm text-blue-900">
+              <span className="font-semibold">Outcome:</span> Strong Core Java skills, a working REST API with Spring Boot,
+              and 3–4 portfolio projects to showcase.
+            </p>
+          </div>
+        </section>
+      )}
       {/* Prerequisites */}
       <section id="prereq" className="mt-8">
         <h2 className="text-2xl font-semibold mb-2">Prerequisites</h2>
