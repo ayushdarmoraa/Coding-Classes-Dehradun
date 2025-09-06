@@ -23,35 +23,40 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   if (!post || post.draft) return {};
   const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
   const url = `${base}/blog/${post.slug}`;
-  // Resolve image: allow absolute URLs OR /public paths (e.g., /images/blog/foo.jpg)
-  const defaultOg = `${base}/images/og/blog-default.jpg`;
-  const raw = post.image?.trim();
-  const img = raw ? (raw.startsWith("http") ? raw : `${base}${raw.startsWith("/") ? "" : "/"}${raw}`) : defaultOg;
-  const imgAlt = post.imageAlt || post.title;
-  // Respect noindex (drafts get empty metadata)
-  const robots = post.noindex ? { index: false, follow: true } : undefined;
-  return {
-    title: `${post.title} | Doon Coding Academy`,
-    description: post.description,
-    keywords: post.keywords,
-    alternates: { canonical: url },
-    robots,
-    openGraph: {
-      title: post.title,
-      description: post.description,
-      url,
-      type: "article",
-      publishedTime: new Date(post.date).toISOString(),
-      tags: post.keywords,
-      images: [{ url: img, width: 1200, height: 630, alt: imgAlt }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: post.title,
-      description: post.description,
-      images: [img],
-    },
-  };
+    const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+    const base = rawBase.replace(/^http:\/\//, "https://");
+    const url = `${base}/blog/${post.slug}`;
+
+    // Fallback ensures every post gets a unique, click-friendly description
+    const makeFallbackDescription = (title: string) => {
+      const baseLine = `${title} — insights from Doon Coding Academy (Dehradun).`;
+      const extra = " Compare options, syllabus, fees, and outcomes. Updated 2025.";
+      const text = `${baseLine}${extra}`;
+      return text.length > 160 ? text.slice(0, 157) + "…" : text;
+    };
+
+    const description =
+      (post.description && post.description.trim().length > 0)
+        ? post.description.trim()
+        : makeFallbackDescription(post.title);
+
+    return {
+      title: `${post.title} | Doon Coding Academy`,
+      description,
+      alternates: { canonical: url },
+      openGraph: {
+        title: post.title,
+        description,
+        url,
+        type: "article",
+        siteName: "Doon Coding Academy",
+      },
+      twitter: {
+        card: "summary",
+        title: post.title,
+        description,
+      },
+    };
 }
 
 // Heuristic: pick the best-matching course CTA by scanning title/desc/keywords
