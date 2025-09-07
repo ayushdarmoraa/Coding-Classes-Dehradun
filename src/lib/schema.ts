@@ -95,6 +95,10 @@ export function generateTestimonialSchema(testimonials: Testimonial[]) {
         reviewBody: testimonial.text,
         name: testimonial.course || "Student Testimonial", // Use course name or generic
         reviewRating: testimonial.rating ? { "@type": "Rating", ratingValue: String(testimonial.rating), bestRating: "5" } : undefined,
+        itemReviewed: {
+          "@type": "LocalBusiness",
+          "@id": "https://www.dooncodingacademy.in/#localbusiness"
+        },
       },
     })),
   };
