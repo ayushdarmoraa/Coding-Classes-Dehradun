@@ -17,7 +17,10 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
     "Leading coding institute in Dehradun — Full Stack with Gen AI, Data Science, Python, Java.",
 
-  verification: process.env.NEXT_PUBLIC_GSC_VERIFICATION ? { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION } : undefined,
+  // Google Search Console verification (env-gated)
+  verification: process.env.NEXT_PUBLIC_GSC_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION }
+    : undefined,
 
   // IMPORTANT: do NOT set a root-level canonical here,
   // or every page will canonicalize to "/".
@@ -28,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-  <Header />
+        <Header />
         {children}
         <Footer />
 
@@ -47,61 +50,50 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', { anonymize_ip: true, transport_type: 'beacon' });
               `}
             </Script>
-            <Script id="ga4-click-events" strategy="afterInteractive">
-            {`
-              (function () {
-                if (!window.gtag) return;
 
-                function send(eventName, params) {
-                  try { window.gtag('event', eventName, params || {}); } catch (_) {}
-                }
-
-                function handler(e) {
-                  var el = e.target;
-                  if (!(el instanceof Element)) return;
-                  var a = el.closest('a');
-                  if (!a) return;
-
-                  var href = (a.getAttribute('href') || '').trim();
-                  if (!href) return;
-
-                  var lowerHref = href.toLowerCase();
-                  var text = (a.textContent || '').trim().toLowerCase();
-                  var page_path = location.pathname;
-
-                  // 1) Phone clicks
-                  if (lowerHref.startsWith('tel:')) {
-                    var phone = lowerHref.replace('tel:', '').replace(/[^0-9+]/g, '');
-                    send('contact_click', { method: 'tel', value: phone, page_path });
-                    return;
+            {/* Delegated click tracking for key CTAs: tel, WhatsApp, Directions, Enroll/Consultation */}
+            <Script id="ga4-delegated-clicks" strategy="afterInteractive">
+              {`
+                (function () {
+                  function findAnchor(el) {
+                    while (el && el !== document.body) {
+                      if (el.tagName === 'A') return el;
+                      el = el.parentElement;
+                    }
+                    return null;
                   }
-
-                  // 2) WhatsApp clicks
-                  if (lowerHref.includes('wa.me') || lowerHref.includes('whatsapp')) {
-                    send('contact_click', { method: 'whatsapp', href, page_path });
-                    return;
+                  function track(type, href, text) {
+                    if (!window.gtag) return;
+                    window.gtag('event', type, {
+                      event_category: 'engagement',
+                      link_url: href || '',
+                      link_text: (text || '').trim().slice(0, 100)
+                    });
                   }
+                  document.addEventListener('click', function (e) {
+                    var a = findAnchor(e.target);
+                    if (!a) return;
+                    var href = (a.getAttribute('href') || '').trim();
+                    var txt = (a.textContent || a.getAttribute('aria-label') || '').trim();
 
-                  // 3) Directions / Maps clicks
-                  if (lowerHref.includes('maps.app.goo.gl') || lowerHref.includes('goo.gl/maps') || lowerHref.includes('/maps')) {
-                    send('contact_click', { method: 'directions', href, page_path });
-                    return;
-                  }
-
-                  // 4) Enroll / Consultation CTAs (match by visible text)
-                  if (/enroll|consultation/.test(text)) {
-                    send('cta_click', { cta: text.slice(0, 60), href, page_path });
-                    return;
-                  }
-                }
-
-                document.addEventListener('click', handler, true);
-              })();
-            `}
+                    if (href.startsWith('tel:')) {
+                      track('tel_click', href, txt); return;
+                    }
+                    if (href.includes('wa.me') || href.includes('api.whatsapp.com') || href.startsWith('whatsapp:')) {
+                      track('whatsapp_click', href, txt); return;
+                    }
+                    if (href.includes('maps.app.goo.gl') || href.includes('google.com/maps')) {
+                      track('directions_click', href, txt); return;
+                    }
+                    if (href.includes('/contact') || /enroll|consult/i.test(txt)) {
+                      track('enroll_click', href, txt); return;
+                    }
+                  }, true);
+                })();
+              `}
             </Script>
           </>
         ) : null}
-        {/* WebSite + SearchAction */}
 
         {/* WebSite + SearchAction (schema.org) */}
         <Script
@@ -143,6 +135,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 name: "Ayush Darmora",
                 jobTitle: "Founder & Instructor",
               },
+              // Social profiles (env-gated, filtered for presence)
               sameAs: [
                 process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,
                 process.env.NEXT_PUBLIC_INSTAGRAM_URL || undefined,
@@ -174,105 +167,97 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function () {
-      function closeMenu() {
-        var cb = document.getElementById('nav-toggle');
-        if (cb && cb.checked) cb.checked = false;
-      }
-
-      // Close when any header/mobile-menu link is clicked
-      document.addEventListener('click', function (e) {
-        var el = e.target;
-        if (!(el instanceof Element)) return;
-        var anchor = el.closest('a');
-        if (!anchor) return;
-        if (anchor.closest('header') || anchor.closest('#mobile-menu')) closeMenu();
-      }, true);
-
-      // Close on back/forward, and hash changes
-      window.addEventListener('popstate', closeMenu);
-      window.addEventListener('hashchange', closeMenu);
-
-      // Close on Escape
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeMenu();
-      });
-    })();`,
+              function closeMenu() {
+                var cb = document.getElementById('nav-toggle');
+                if (cb && cb.checked) cb.checked = false;
+              }
+              document.addEventListener('click', function (e) {
+                var el = e.target;
+                if (!(el instanceof Element)) return;
+                var anchor = el.closest('a');
+                if (!anchor) return;
+                if (anchor.closest('header') || anchor.closest('#mobile-menu')) closeMenu();
+              }, true);
+              window.addEventListener('popstate', closeMenu);
+              window.addEventListener('hashchange', closeMenu);
+              document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeMenu();
+              });
+            })();`,
           }}
         />
-      {/* LocalBusiness JSON-LD for Local SEO */}
-      {/* eslint-disable-next-line react/no-danger */}
-      <script
-        id="localbusiness-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify((() => {
-            const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.dooncodingacademy.in").replace(/\/$/, "");
-            const sameAs = [
-              process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,
-              process.env.NEXT_PUBLIC_INSTAGRAM_URL || undefined,
-              process.env.NEXT_PUBLIC_LINKEDIN_URL || undefined,
-              process.env.NEXT_PUBLIC_YOUTUBE_URL || undefined,
-            ].filter(Boolean);
 
-            return {
-              "@context": "https://schema.org",
-              "@type": "LocalBusiness",
-              "@id": `${base}/#localbusiness`,
-              name: "Doon Coding Academy",
-              url: base,
-              ...(sameAs.length ? { sameAs } : {}),
-              telephone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "+917037905464",
-              email: "dooncodingacademy@gmail.com",
-              hasMap: process.env.NEXT_PUBLIC_GBP_URL || "https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9",
-              priceRange: "₹2000–₹30000",
-              paymentAccepted: "Cash, UPI, Debit Card, Credit Card, Net Banking, Wallets (Paytm, PhonePe, GPay), EMI",
-              image: [`${base}/images/Doon-Coding-Academy-Logo.png`],
-              logo: `${base}/images/Doon-Coding-Academy-Logo.png`,
-              address: {
-                "@type": "PostalAddress",
-                streetAddress: "Near DR School, Herbertpur",
-                addressLocality: "Dehradun",
-                addressRegion: "Uttarakhand",
-                postalCode: "248142",
-                addressCountry: "IN"
-              },
-              areaServed: [
-                { "@type": "Place", "name": "Dakpathar" },
-                { "@type": "Place", "name": "Herbertpur" },
-                { "@type": "Place", "name": "Paonta-Sahib" },
-                { "@type": "Place", "name": "Vikasnagar" },
-                { "@type": "Place", "name": "Sehespur" },
-                { "@type": "Place", "name": "Selaqui" },
-                { "@type": "Place", "name": "Suddhowala" },
-                { "@type": "Place", "name": "Premnagar" },
-                { "@type": "City",  "name": "Dehradun" }
-              ],
-              openingHoursSpecification: [
-                {
-                  "@type": "OpeningHoursSpecification",
-                  dayOfWeek: ["Wednesday","Thursday","Friday","Saturday","Sunday"],
-                  opens: "10:00",
-                  closes: "19:00"
-                }
-              ],
-              foundingDate: "2019",
-              founder: {
-                "@type": "Person",
-                name: "Ayush Darmora",
-                jobTitle: "Founder & Instructor"
-              },
-              knowsAbout: [
-                "Full-Stack Development",
-                "Gen AI",
-                "Data Science",
-                "Python",
-                "Java",
-                "Coding Classes in Dehradun"
-              ]
-            };
-          })())
-        }}
-      />
+        {/* LocalBusiness JSON-LD for Local SEO */}
+        <script
+          id="localbusiness-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify((() => {
+              const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.dooncodingacademy.in").replace(/\/$/, "");
+              const sameAs = [
+                process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,
+                process.env.NEXT_PUBLIC_INSTAGRAM_URL || undefined,
+                process.env.NEXT_PUBLIC_LINKEDIN_URL || undefined,
+                process.env.NEXT_PUBLIC_YOUTUBE_URL || undefined,
+              ].filter(Boolean);
+
+              return {
+                "@context": "https://schema.org",
+                "@type": "LocalBusiness",
+                "@id": `${base}/#localbusiness`,
+                name: "Doon Coding Academy",
+                url: base,
+                ...(sameAs.length ? { sameAs } : {}),
+                telephone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "+917037905464",
+                email: "dooncodingacademy@gmail.com",
+                hasMap: process.env.NEXT_PUBLIC_GBP_URL || "https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9",
+                priceRange: "₹2000–₹30000",
+                paymentAccepted: "Cash, UPI, Debit Card, Credit Card, Net Banking, Wallets (Paytm, PhonePe, GPay), EMI",
+                address: {
+                  "@type": "PostalAddress",
+                  streetAddress: "Near DR School, Herbertpur",
+                  addressLocality: "Dehradun",
+                  addressRegion: "Uttarakhand",
+                  postalCode: "248142",
+                  addressCountry: "IN"
+                },
+                areaServed: [
+                  { "@type": "Place", "name": "Dakpathar" },
+                  { "@type": "Place", "name": "Herbertpur" },
+                  { "@type": "Place", "name": "Paonta-Sahib" },
+                  { "@type": "Place", "name": "Vikasnagar" },
+                  { "@type": "Place", "name": "Sehespur" },
+                  { "@type": "Place", "name": "Selaqui" },
+                  { "@type": "Place", "name": "Suddhowala" },
+                  { "@type": "Place", "name": "Premnagar" },
+                  { "@type": "City",  "name": "Dehradun" }
+                ],
+                openingHoursSpecification: [
+                  {
+                    "@type": "OpeningHoursSpecification",
+                    dayOfWeek: ["Wednesday","Thursday","Friday","Saturday","Sunday"],
+                    opens: "10:00",
+                    closes: "19:00"
+                  }
+                ],
+                foundingDate: "2019",
+                founder: {
+                  "@type": "Person",
+                  name: "Ayush Darmora",
+                  jobTitle: "Founder & Instructor"
+                },
+                knowsAbout: [
+                  "Full-Stack Development",
+                  "Gen AI",
+                  "Data Science",
+                  "Python",
+                  "Java",
+                  "Coding Classes in Dehradun"
+                ]
+              };
+            })())
+          }}
+        />
       </body>
     </html>
   );
