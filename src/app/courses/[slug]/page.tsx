@@ -142,6 +142,13 @@ export default function CoursePage({ params }: Props) {
 
   // JSON-LD: Course
   const ORG_ID = `${SITE_URL.replace(/\/$/, "")}/#organization`;
+  const parsePriceNumber = (v?: string | number) => {
+    if (v == null) return undefined;
+    const cleaned = String(v).replace(/[^\d.]/g, "");
+    return cleaned ? Number(cleaned) : undefined;
+  };
+  const priceNumberTop = parsePriceNumber(course.price);
+
   const courseJsonLd = {
     "@context": "https://schema.org",
     "@type": "Course",
@@ -149,6 +156,21 @@ export default function CoursePage({ params }: Props) {
     description: course.description,
     provider: { "@id": ORG_ID },
     url: courseUrl,
+    // ▼ Add minimal required fields so this Course item is valid for "Course info"
+    "offers": {
+      "@type": "Offer",
+      "url": courseUrl,
+      "priceCurrency": "INR",
+      ...(typeof priceNumberTop === "number" ? { "price": priceNumberTop } : {}),
+      "category": "Paid",
+      "availability": "https://schema.org/InStock"
+    },
+    "hasCourseInstance": [{
+      "@type": "CourseInstance",
+      "name": course.title,
+      "courseMode": "InPerson",
+      "url": courseUrl
+    }]
   };
 
   // JSON-LD: BreadcrumbList (stable @id, WebPage nodes)
@@ -806,6 +828,7 @@ export default function CoursePage({ params }: Props) {
                 "url": url,
                 "priceCurrency": "INR",
                 ...(typeof priceNumber === "number" ? { "price": priceNumber } : {}),
+                "category": "Paid",
                 "availability": "https://schema.org/InStock",
                 "eligibleRegion": {
                   "@type": "Country",
