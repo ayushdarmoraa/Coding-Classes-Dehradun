@@ -156,21 +156,23 @@ export default function CoursePage({ params }: Props) {
     description: course.description,
     provider: { "@id": ORG_ID },
     url: courseUrl,
-    // ▼ Add minimal required fields so this Course item is valid for "Course info"
-    "offers": {
+    offers: {
       "@type": "Offer",
-      "url": courseUrl,
-      "priceCurrency": "INR",
-      ...(typeof priceNumberTop === "number" ? { "price": priceNumberTop } : {}),
-      "category": "Paid",
-      "availability": "https://schema.org/InStock"
+      url: courseUrl,
+      priceCurrency: "INR",
+      ...(typeof priceNumberTop === "number" ? { price: priceNumberTop } : {}),
+      category: "Paid",
+      availability: "https://schema.org/InStock",
     },
-    "hasCourseInstance": [{
-      "@type": "CourseInstance",
-      "name": course.title,
-      "courseMode": "InPerson",
-      "url": courseUrl
-    }]
+    hasCourseInstance: [
+      {
+        "@type": "CourseInstance",
+        name: course.title,
+        courseMode: "In person",          // ← valid enum text
+        courseSchedule: "Wed–Sun 10:00–19:00 IST",
+        url: courseUrl,
+      },
+    ],
   };
 
   // JSON-LD: BreadcrumbList (stable @id, WebPage nodes)
@@ -834,7 +836,14 @@ export default function CoursePage({ params }: Props) {
                   "@type": "Country",
                   "name": "India"
                 }
-              }
+              },
+              "hasCourseInstance": [{
+                "@type": "CourseInstance",
+                "name": course.title,
+                "courseMode": "In person",            // ← valid enum text
+                "courseSchedule": "Wed–Sun 10:00–19:00 IST",
+                "url": url
+              }]
             };
 
             return schema;
