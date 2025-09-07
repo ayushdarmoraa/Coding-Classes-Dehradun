@@ -1017,57 +1017,61 @@ export default function CoursePage({ params }: Props) {
       ) : null;
     })()}
 
-    {/* Related Guides block: show 2 relevant blog posts */}
-    {(() => {
-      // Pick 2 related posts by simple heuristic: title/keywords/category mention course
-      const allPosts = getAllBlogPosts(); // drafts already excluded per your setup
-      const related = allPosts
-        .map(p => {
-          const hay = [
-            p.title,
-            p.description,
-            Array.isArray(p.keywords) ? p.keywords.join(" ") : "",
-            typeof p.category === "string" ? p.category : ""
-          ].join(" ").toLowerCase();
-          const score =
-            (hay.includes("full") && hay.includes("stack") && course.slug === "full-stack" ? 3 : 0) +
-            (hay.includes("data") && hay.includes("science") && course.slug === "data-science" ? 3 : 0) +
-            (hay.includes("python") && course.slug === "python" ? 3 : 0) +
-            (hay.includes("java") && course.slug === "java" ? 3 : 0) +
-            (hay.includes(course.slug) ? 2 : 0) +
-            (hay.includes(course.title.toLowerCase()) ? 2 : 0) +
-            (hay.includes("dehradun") ? 1 : 0);
-          return { ...p, _score: score };
-        })
-        .filter(p => p._score > 0)
-        .sort((a, b) => b._score - a._score)
-        .slice(0, 2);
+      {/* Further reading block: show up to 5 internal links */}
+      {(() => {
+        // Pick 3–5 related posts by a simple heuristic: title/keywords/category mention the course
+        const allPosts = getAllBlogPosts(); // drafts already excluded per your setup
+        const related = allPosts
+          .map(p => {
+            const hay = [
+              p.title,
+              p.description,
+              Array.isArray(p.keywords) ? p.keywords.join(" ") : "",
+              typeof p.category === "string" ? p.category : ""
+            ].join(" ").toLowerCase();
+            const score =
+              (hay.includes("full") && hay.includes("stack") && course.slug === "full-stack" ? 3 : 0) +
+              (hay.includes("data") && hay.includes("science") && course.slug === "data-science" ? 3 : 0) +
+              (hay.includes("python") && course.slug === "python" ? 3 : 0) +
+              (hay.includes("java") && course.slug === "java" ? 3 : 0) +
+              (hay.includes(course.slug) ? 2 : 0) +
+              (hay.includes(course.title.toLowerCase()) ? 2 : 0) +
+              // small nudges for typical intent keywords
+              (hay.includes("fees") ? 1 : 0) +
+              (hay.includes("syllabus") ? 1 : 0) +
+              (hay.includes("career") || hay.includes("outcomes") ? 1 : 0) +
+              (hay.includes("dehradun") ? 1 : 0);
+            return { ...p, _score: score };
+          })
+          .filter(p => p._score > 0)
+          .sort((a, b) => b._score - a._score)
+          .slice(0, 5); // ⬅️ increase to 5
 
-      return related.length > 0 && (
-        <section className="mt-12 border-t pt-8">
-          <h2 className="text-2xl font-semibold">Related guides</h2>
-          <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-            {related.map(post => (
-              <li key={post.slug} className="rounded-2xl border p-4 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-medium">
-                  <Link href={`/blog/${post.slug}`} className="hover:underline">
-                    {post.title}
-                  </Link>
-                </h3>
-                {post.description && (
-                  <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{post.description}</p>
-                )}
-                <div className="mt-3">
-                  <Link href={`/blog/${post.slug}`} className="text-primary hover:underline">
-                    Read more →
-                  </Link>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      );
-    })()}
+        return related.length > 0 && (
+          <section className="mt-12 border-t pt-8">
+            <h2 className="text-2xl font-semibold">Further reading</h2>
+            <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+              {related.map(post => (
+                <li key={post.slug} className="rounded-2xl border p-4 hover:shadow-md transition-shadow">
+                  <h3 className="text-lg font-medium">
+                    <Link href={`/blog/${post.slug}`} className="hover:underline">
+                      {post.title}
+                    </Link>
+                  </h3>
+                  {post.description && (
+                    <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{post.description}</p>
+                  )}
+                  <div className="mt-3">
+                    <Link href={`/blog/${post.slug}`} className="text-primary hover:underline">
+                      Read more →
+                    </Link>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })()}
     </main>
   );
 }

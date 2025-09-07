@@ -47,6 +47,58 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', { anonymize_ip: true, transport_type: 'beacon' });
               `}
             </Script>
+            <Script id="ga4-click-events" strategy="afterInteractive">
+            {`
+              (function () {
+                if (!window.gtag) return;
+
+                function send(eventName, params) {
+                  try { window.gtag('event', eventName, params || {}); } catch (_) {}
+                }
+
+                function handler(e) {
+                  var el = e.target;
+                  if (!(el instanceof Element)) return;
+                  var a = el.closest('a');
+                  if (!a) return;
+
+                  var href = (a.getAttribute('href') || '').trim();
+                  if (!href) return;
+
+                  var lowerHref = href.toLowerCase();
+                  var text = (a.textContent || '').trim().toLowerCase();
+                  var page_path = location.pathname;
+
+                  // 1) Phone clicks
+                  if (lowerHref.startsWith('tel:')) {
+                    var phone = lowerHref.replace('tel:', '').replace(/[^0-9+]/g, '');
+                    send('contact_click', { method: 'tel', value: phone, page_path });
+                    return;
+                  }
+
+                  // 2) WhatsApp clicks
+                  if (lowerHref.includes('wa.me') || lowerHref.includes('whatsapp')) {
+                    send('contact_click', { method: 'whatsapp', href, page_path });
+                    return;
+                  }
+
+                  // 3) Directions / Maps clicks
+                  if (lowerHref.includes('maps.app.goo.gl') || lowerHref.includes('goo.gl/maps') || lowerHref.includes('/maps')) {
+                    send('contact_click', { method: 'directions', href, page_path });
+                    return;
+                  }
+
+                  // 4) Enroll / Consultation CTAs (match by visible text)
+                  if (/enroll|consultation/.test(text)) {
+                    send('cta_click', { cta: text.slice(0, 60), href, page_path });
+                    return;
+                  }
+                }
+
+                document.addEventListener('click', handler, true);
+              })();
+            `}
+            </Script>
           </>
         ) : null}
         {/* WebSite + SearchAction */}
@@ -183,15 +235,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 addressCountry: "IN"
               },
               areaServed: [
-                "Dakpathar",
-                "Herbertpur",
-                "Paonta-Sahib",
-                "Vikasnagar",
-                "Sehespur",
-                "Selaqui",
-                "Suddhowala",
-                "Premnagar",
-                "Dehradun"
+                { "@type": "Place", "name": "Dakpathar" },
+                { "@type": "Place", "name": "Herbertpur" },
+                { "@type": "Place", "name": "Paonta-Sahib" },
+                { "@type": "Place", "name": "Vikasnagar" },
+                { "@type": "Place", "name": "Sehespur" },
+                { "@type": "Place", "name": "Selaqui" },
+                { "@type": "Place", "name": "Suddhowala" },
+                { "@type": "Place", "name": "Premnagar" },
+                { "@type": "City",  "name": "Dehradun" }
               ],
               openingHoursSpecification: [
                 {
