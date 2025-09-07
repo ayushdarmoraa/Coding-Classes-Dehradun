@@ -684,23 +684,21 @@ export default async function CoursePage({ params }: Props) {
             const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.dooncodingacademy.in").replace(/\/$/, "");
             const url = `${base}/courses/${course.slug}`;
 
-            // Try to parse a numeric price if present (e.g. "₹25,000")
+            // Parse price to a number if possible
             const priceNumber = (() => {
               if (!course.price) return undefined;
               const cleaned = String(course.price).replace(/[^\d.]/g, "");
               return cleaned ? Number(cleaned) : undefined;
             })();
 
-            // Convert "6 months" or "2–3 months" -> ISO 8601 (optional)
+            // Optional: convert "6 months" to ISO duration
             const timeRequired = (() => {
               if (!course.duration) return undefined;
               const txt = String(course.duration).toLowerCase();
-              const range = txt.match(/(\d+)\s*[–-]\s*(\d+)\s*month/);
-              if (range) { const upper = parseInt(range[2], 10); return `P${isNaN(upper) ? 1 : upper}M`; }
-              const single = txt.match(/(\d+)\s*month/);
-              if (single) { const m = parseInt(single[1], 10); return `P${isNaN(m) ? 1 : m}M`; }
-              const weeks = txt.match(/(\d+)\s*week/);
-              if (weeks) { const w = parseInt(weeks[1], 10); return `P${isNaN(w) ? 1 : w * 7}D`; }
+              const m = txt.match(/(\d+)\s*month/);
+              if (m) return `P${parseInt(m[1], 10)}M`;
+              const w = txt.match(/(\d+)\s*week/);
+              if (w) return `P${parseInt(w[1], 10) * 7}D`;
               return undefined;
             })();
 
@@ -726,7 +724,16 @@ export default async function CoursePage({ params }: Props) {
                 ...(typeof priceNumber === "number" ? { price: priceNumber } : {}),
                 availability: "https://schema.org/InStock",
                 eligibleRegion: { "@type": "Country", name: "India" },
-                category: "Education"
+                category: "Paid"
+              },
+              hasCourseInstance: {
+                "@type": "CourseInstance",
+                name: course.title,
+                url,
+                // ✅ Use Google-accepted enum
+                courseMode: "InPerson",
+                // ✅ Use workload (plain text) instead of Schedule
+                courseWorkload: "Wed–Sun 10:00–19:00 IST"
               }
             };
           })())
