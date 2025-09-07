@@ -185,46 +185,30 @@ export default async function CoursePage({ params }: Props) {
 
   const faqs = [...baseFaqs, ...extraFaqs];
 
-  // Price → number (for Offer)
+
+  // --- Course JSON-LD (GSC-compliant, single block, no Schedule, correct enums) ---
+  // Parse price like "₹25,000"
   const priceNumber = (() => {
     if (!course.price) return undefined;
     const cleaned = String(course.price).replace(/[^\d.]/g, "");
     return cleaned ? Number(cleaned) : undefined;
   })();
 
-  // Human duration → ISO 8601
+  // Optional duration -> ISO 8601 (e.g. "6 months" -> "P6M")
   const timeRequired = (() => {
     if (!course.duration) return undefined;
     const txt = String(course.duration).toLowerCase();
     const range = txt.match(/(\d+)\s*[–-]\s*(\d+)\s*month/);
-    if (range) {
-      const upper = parseInt(range[2], 10);
-      return `P${isNaN(upper) ? 1 : upper}M`;
-    }
-    const mm = txt.match(/(\d+)\s*month/);
-    if (mm) return `P${parseInt(mm[1], 10)}M`;
-    const ww = txt.match(/(\d+)\s*week/);
-    if (ww) return `P${parseInt(ww[1], 10) * 7}D`;
+    if (range) return `P${parseInt(range[2], 10) || 1}M`;
+    const m = txt.match(/(\d+)\s*month/);
+    if (m) return `P${parseInt(m[1], 10) || 1}M`;
+    const w = txt.match(/(\d+)\s*week/);
+    if (w) return `P${(parseInt(w[1], 10) || 1) * 7}D`;
     return undefined;
   })();
 
-  // Schedule for CourseInstance (GSC-friendly)
-  const schedule = {
-    "@type": "Schedule",
-    repeatFrequency: "P1W",
-    repeatCount: 52,
-    byDay: [
-      "https://schema.org/Wednesday",
-      "https://schema.org/Thursday",
-      "https://schema.org/Friday",
-      "https://schema.org/Saturday",
-      "https://schema.org/Sunday",
-    ],
-    startTime: "10:00",
-    endTime: "19:00",
-    scheduleTimezone: "Asia/Kolkata",
-    name: "Wed–Sun 10:00–19:00 IST",
-  };
+  // If you want to express weekly workload (e.g., 5 days × 9h = 45h):
+  const weeklyWorkloadISO = "PT45H"; // <- adjust if needed
 
   const courseSchema = {
     "@context": "https://schema.org",
@@ -236,17 +220,10 @@ export default async function CoursePage({ params }: Props) {
     courseCode: course.slug,
     ...(timeRequired ? { timeRequired } : {}),
     provider: {
-      "@type": "LocalBusiness",
-      "@id": `${base}/#localbusiness`,
+      "@type": "EducationalOrganization",
+      "@id": `${base}/#organization`,
       name: "Doon Coding Academy",
-      url: base,
-    },
-    hasCourseInstance: {
-      "@type": "CourseInstance",
-      name: course.title,
-      url: pageUrl,
-      // omit courseMode to avoid enum warnings
-      courseSchedule: schedule,
+      url: base
     },
     offers: {
       "@type": "Offer",
@@ -254,9 +231,33 @@ export default async function CoursePage({ params }: Props) {
       priceCurrency: "INR",
       ...(typeof priceNumber === "number" ? { price: priceNumber } : {}),
       availability: "https://schema.org/InStock",
-      eligibleRegion: { "@type": "Country", name: "India" },
       category: "Education",
+      eligibleRegion: { "@type": "Country", name: "India" }
     },
+    hasCourseInstance: [{
+      "@type": "CourseInstance",
+      name: course.title,
+      url: pageUrl,
+      // ✅ Use enumeration URL to satisfy Google’s checker
+      courseMode: "https://schema.org/OfflineEventAttendanceMode",
+      // ✅ ISO 8601 duration for workload (optional but valid)
+      courseWorkload: weeklyWorkloadISO,
+      // ✅ Optional explicit dates (use your real batch dates if you want)
+      // startDate: "2025-09-10",
+      // endDate: "2026-02-28",
+      location: {
+        "@type": "Place",
+        name: "Doon Coding Academy",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "Near DR School, Herbertpur",
+          addressLocality: "Dehradun",
+          addressRegion: "Uttarakhand",
+          postalCode: "248142",
+          addressCountry: "IN"
+        }
+      }
+    }]
   };
 
 
@@ -281,8 +282,14 @@ export default async function CoursePage({ params }: Props) {
       {/* JSON-LD (Breadcrumbs, Course, FAQ) */}
       <Script id="course-breadcrumb" type="application/ld+json" strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <Script id="course-schema" type="application/ld+json" strategy="afterInteractive"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
+      <Script
+        id="course-schema"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(courseSchema)
+        }}
+      />
       <Script id="course-faq-schema" type="application/ld+json" strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
@@ -675,70 +682,7 @@ export default async function CoursePage({ params }: Props) {
           </section>
         ) : null;
       })()}
-      <script
-        id="course-schema"
-        type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify((() => {
-            const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.dooncodingacademy.in").replace(/\/$/, "");
-            const url = `${base}/courses/${course.slug}`;
 
-            // Parse price to a number if possible
-            const priceNumber = (() => {
-              if (!course.price) return undefined;
-              const cleaned = String(course.price).replace(/[^\d.]/g, "");
-              return cleaned ? Number(cleaned) : undefined;
-            })();
-
-            // Optional: convert "6 months" to ISO duration
-            const timeRequired = (() => {
-              if (!course.duration) return undefined;
-              const txt = String(course.duration).toLowerCase();
-              const m = txt.match(/(\d+)\s*month/);
-              if (m) return `P${parseInt(m[1], 10)}M`;
-              const w = txt.match(/(\d+)\s*week/);
-              if (w) return `P${parseInt(w[1], 10) * 7}D`;
-              return undefined;
-            })();
-
-            return {
-              "@context": "https://schema.org",
-              "@type": "Course",
-              "@id": `${url}#course`,
-              name: course.title,
-              description: course.description,
-              url,
-              courseCode: course.slug,
-              ...(timeRequired ? { timeRequired } : {}),
-              provider: {
-                "@type": "LocalBusiness",
-                "@id": `${base}/#localbusiness`,
-                name: "Doon Coding Academy",
-                url: base
-              },
-              offers: {
-                "@type": "Offer",
-                url,
-                priceCurrency: "INR",
-                ...(typeof priceNumber === "number" ? { price: priceNumber } : {}),
-                availability: "https://schema.org/InStock",
-                eligibleRegion: { "@type": "Country", name: "India" },
-                category: "Paid"
-              },
-              hasCourseInstance: {
-                "@type": "CourseInstance",
-                name: course.title,
-                url,
-                // ✅ Use Google-accepted enum
-                courseMode: "InPerson",
-                // ✅ Use workload (plain text) instead of Schedule
-                courseWorkload: "Wed–Sun 10:00–19:00 IST"
-              }
-            };
-          })())
-        }}
-      />
     </main>
   );
 }
