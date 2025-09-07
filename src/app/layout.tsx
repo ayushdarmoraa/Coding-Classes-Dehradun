@@ -226,6 +226,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               hasMap: process.env.NEXT_PUBLIC_GBP_URL || "https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9",
               priceRange: "₹2000–₹30000",
               paymentAccepted: "Cash, UPI, Debit Card, Credit Card, Net Banking, Wallets (Paytm, PhonePe, GPay), EMI",
+              image: [`${base}/images/Doon-Coding-Academy-Logo.png`],
+              logo: `${base}/images/Doon-Coding-Academy-Logo.png`,
               address: {
                 "@type": "PostalAddress",
                 streetAddress: "Near DR School, Herbertpur",
