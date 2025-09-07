@@ -207,6 +207,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 "@id": `${base}/#localbusiness`,
                 name: "Doon Coding Academy",
                 url: base,
+                image: ["https://www.dooncodingacademy.in/images/Doon-Coding-Academy-Logo.png"],
                 ...(sameAs.length ? { sameAs } : {}),
                 telephone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "+917037905464",
                 email: "dooncodingacademy@gmail.com",
