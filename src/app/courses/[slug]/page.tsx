@@ -675,6 +675,63 @@ export default async function CoursePage({ params }: Props) {
           </section>
         ) : null;
       })()}
+      <script
+        id="course-schema"
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify((() => {
+            const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.dooncodingacademy.in").replace(/\/$/, "");
+            const url = `${base}/courses/${course.slug}`;
+
+            // Try to parse a numeric price if present (e.g. "₹25,000")
+            const priceNumber = (() => {
+              if (!course.price) return undefined;
+              const cleaned = String(course.price).replace(/[^\d.]/g, "");
+              return cleaned ? Number(cleaned) : undefined;
+            })();
+
+            // Convert "6 months" or "2–3 months" -> ISO 8601 (optional)
+            const timeRequired = (() => {
+              if (!course.duration) return undefined;
+              const txt = String(course.duration).toLowerCase();
+              const range = txt.match(/(\d+)\s*[–-]\s*(\d+)\s*month/);
+              if (range) { const upper = parseInt(range[2], 10); return `P${isNaN(upper) ? 1 : upper}M`; }
+              const single = txt.match(/(\d+)\s*month/);
+              if (single) { const m = parseInt(single[1], 10); return `P${isNaN(m) ? 1 : m}M`; }
+              const weeks = txt.match(/(\d+)\s*week/);
+              if (weeks) { const w = parseInt(weeks[1], 10); return `P${isNaN(w) ? 1 : w * 7}D`; }
+              return undefined;
+            })();
+
+            return {
+              "@context": "https://schema.org",
+              "@type": "Course",
+              "@id": `${url}#course`,
+              name: course.title,
+              description: course.description,
+              url,
+              courseCode: course.slug,
+              ...(timeRequired ? { timeRequired } : {}),
+              provider: {
+                "@type": "LocalBusiness",
+                "@id": `${base}/#localbusiness`,
+                name: "Doon Coding Academy",
+                url: base
+              },
+              offers: {
+                "@type": "Offer",
+                url,
+                priceCurrency: "INR",
+                ...(typeof priceNumber === "number" ? { price: priceNumber } : {}),
+                availability: "https://schema.org/InStock",
+                eligibleRegion: { "@type": "Country", name: "India" },
+                category: "Education"
+              }
+            };
+          })())
+        }}
+      />
     </main>
   );
 }
