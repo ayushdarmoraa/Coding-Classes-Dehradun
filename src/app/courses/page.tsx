@@ -39,14 +39,17 @@ export default function CoursesPage() {
   const python = getCourseBySlug("python");
   const java = getCourseBySlug("java");
 
+
   // Feature a couple up top
   const featuredSlugs = new Set(["full-stack", "data-science"]);
   const featured = courses.filter((c) => featuredSlugs.has(c.slug));
 
-  // Clientless "filters" via anchor sections: map slugs to levels
+  // Beginner, Intermediate, Advanced slug sets
+  const beginnerSlugs = new Set(["python", "java"]);
   const intermediateSlugs = new Set(["data-science"]);
   const advancedSlugs = new Set(["full-stack"]);
 
+  const beginner = courses.filter((c) => beginnerSlugs.has(c.slug));
   const intermediate = courses.filter((c) => intermediateSlugs.has(c.slug));
   const advanced = courses.filter((c) => advancedSlugs.has(c.slug));
 
@@ -119,6 +122,26 @@ export default function CoursesPage() {
         </section>
       )}
 {/* Removed unreachable/orphaned JSX tags and comments left outside the main return block */}
+
+      {!!beginner.length && (
+        <section className="py-6" id="beginner" aria-label="Beginner courses">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex items-center gap-2">
+              <h3 className="text-xl md:text-2xl font-bold">Beginner</h3>
+              <Badge variant="primary">No experience needed</Badge>
+            </div>
+            <p className="mt-1 text-gray-600">Start from scratch and build strong fundamentals.</p>
+            <div className="mt-5 grid md:grid-cols-2 gap-8">
+              {beginner.map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+            <div className="mt-4">
+              <a href="#top" className="text-sm text-blue-700 hover:underline">Back to top</a>
+            </div>
+          </div>
+        </section>
+      )}
 
       {!!intermediate.length && (
         <section className="py-6" id="intermediate" aria-label="Intermediate courses">

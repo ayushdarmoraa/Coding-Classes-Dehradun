@@ -67,7 +67,7 @@ const courses: Course[] = [
     title: "Python Programming",
     description:
       "Start-to-pro Python: syntax, data structures, OOP, file/JSON work, and small projects.",
-  price: "₹6,000 (or ₹2,000/month)",
+  price: PRICES.PYTHON,
   duration: "4 months",
   level: "Intermediate",
     curriculum: [
@@ -90,7 +90,7 @@ const courses: Course[] = [
     title: "Java Programming",
     description:
       "Core Java foundations: syntax, OOP, collections, exceptions, and intro to Spring basics.",
-  price: "₹6,000 (or ₹2,000/month)",
+  price: PRICES.JAVA,
   duration: "4 months",
   level: "Intermediate",
     curriculum: [

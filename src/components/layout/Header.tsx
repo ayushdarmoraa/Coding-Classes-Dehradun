@@ -46,7 +46,7 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
             ))}
 
             {/* Courses dropdown (desktop only) */}
-            <li className="relative md:group">
+            <li className="relative group">
               <Link
                 href="/courses"
                 className={`px-2 py-2 transition-colors duration-200 hover:text-yellow-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 touch-manipulation ${
