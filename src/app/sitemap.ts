@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   { url: `${base}/online-courses/data-science`, lastModified: new Date(), changeFrequency: "weekly",  priority: 0.85 },
   { url: `${base}/online-courses/python`, lastModified: new Date(), changeFrequency: "weekly",  priority: 0.85 },
   { url: `${base}/online-courses/java`, lastModified: new Date(), changeFrequency: "weekly",  priority: 0.85 },
+  { url: `${base}/online-courses/full-stack`, lastModified: new Date(), changeFrequency: "weekly",  priority: 0.85 },
     { url: `${base}/contact`,    lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
   { url: `${base}/locations/dehradun`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
     { url: `${base}/testimonials`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
