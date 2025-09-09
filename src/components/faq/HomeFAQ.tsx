@@ -25,19 +25,31 @@ export default function HomeFAQ() {
       a: (
         <>
           Yes. We run live online cohorts with recordings for{" "}
-          <Link className="text-blue-600 underline underline-offset-2" href="/online-courses/full-stack">
+          <Link
+            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+            href="/online-courses/full-stack"
+          >
             Full-Stack
           </Link>
           ,{" "}
-          <Link className="text-blue-600 underline underline-offset-2" href="/online-courses/data-science">
+          <Link
+            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+            href="/online-courses/data-science"
+          >
             Data Science &amp; AI
           </Link>
           ,{" "}
-          <Link className="text-blue-600 underline underline-offset-2" href="/online-courses/python">
+          <Link
+            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+            href="/online-courses/python"
+          >
             Python
           </Link>
           , and{" "}
-          <Link className="text-blue-600 underline underline-offset-2" href="/online-courses/java">
+          <Link
+            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+            href="/online-courses/java"
+          >
             Java
           </Link>
           . Join from anywhere in India.
@@ -72,19 +84,31 @@ export default function HomeFAQ() {
         <>
           Typical ranges: Full-Stack ₹25,000; Data Science ₹30,000; Python ₹12,000; Java ₹12,000. See each syllabus for
           the latest pricing:{" "}
-          <Link className="text-blue-600 underline underline-offset-2" href="/courses/full-stack">
+          <Link
+            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+            href="/courses/full-stack"
+          >
             Full-Stack (On-Campus)
           </Link>
           ,{" "}
-          <Link className="text-blue-600 underline underline-offset-2" href="/courses/data-science">
+          <Link
+            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+            href="/courses/data-science"
+          >
             Data Science (On-Campus)
           </Link>
           ,{" "}
-          <Link className="text-blue-600 underline underline-offset-2" href="/courses/python">
+          <Link
+            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+            href="/courses/python"
+          >
             Python (On-Campus)
           </Link>
           ,{" "}
-          <Link className="text-blue-600 underline underline-offset-2" href="/courses/java">
+          <Link
+            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+            href="/courses/java"
+          >
             Java (On-Campus)
           </Link>
           .
@@ -113,10 +137,12 @@ export default function HomeFAQ() {
         </h2>
         <p className="mt-3 text-base text-gray-600">
           Quick answers about on-campus and online cohorts. Still unsure?{" "}
-          <Link href="/contact" className="text-blue-600 underline underline-offset-2">
+          <Link
+            href="/contact"
+            className="inline-block rounded-full bg-blue-600 px-3 py-1 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition"
+          >
             Talk to us
           </Link>
-          .
         </p>
       </div>
 
