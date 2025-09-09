@@ -1,10 +1,10 @@
 /** @type {import("next").NextConfig} */
 const nextConfig = {
-
   images: {
     formats: ["image/webp", "image/avif"],
     minimumCacheTTL: 31536000, // 1 year
   },
+
   async headers() {
     return [
       {
@@ -18,46 +18,22 @@ const nextConfig = {
       },
     ];
   },
-  // ✅ Add redirects to enforce single host + https
-  async redirects() {
-    return [
-      // Force www -> non-www
-      {
-        source: "/:path*",
-        has: [
-          { type: "header", key: "host", value: "www\\.dooncodingacademy\\.in" },
-        ],
-        destination: "https://dooncodingacademy.in/:path*",
-        permanent: true,
-      },
-      // Optional: ensure http -> https
-      {
-        source: "/:path*",
-        has: [
-          { type: "header", key: "x-forwarded-proto", value: "http" },
-        ],
-        destination: "https://dooncodingacademy.in/:path*",
-        permanent: true,
-      },
-    ];
-  },
 
-  // ADD THIS BLOCK
   async redirects() {
     return [
-      // www → non-www
+      // 1) Collapse any www (http or https) to apex HTTPS in a single hop
       {
         source: "/:path*",
-        has: [{ type: "header", key: "host", value: "www\\.dooncodingacademy\\.in" }],
+        has: [{ type: "host", value: "www.dooncodingacademy.in" }],
         destination: "https://dooncodingacademy.in/:path*",
-        permanent: true,
+        statusCode: 301,
       },
-      // http → https (belt-and-suspenders)
+      // 2) Force HTTPS on apex
       {
         source: "/:path*",
         has: [{ type: "header", key: "x-forwarded-proto", value: "http" }],
         destination: "https://dooncodingacademy.in/:path*",
-        permanent: true,
+        statusCode: 301,
       },
     ];
   },
