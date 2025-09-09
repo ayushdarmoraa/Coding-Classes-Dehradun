@@ -13,15 +13,15 @@ const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
 const APEX = BASE.replace(/^https:\/\/www\./, "https://");
 
 export const metadata: Metadata = {
-  title: "Doon Coding Academy | Best Coding, Data Science & AI Courses in Dehradun",
+  title: "Coding Courses in Dehradun & Online in India",
   description:
-    "Join Doon Coding Academy for top-rated Full Stack, Data Science, Python, and Java courses in Dehradun. Small batches, hands-on projects, affordable fees, and career support.",
+    "Join DCA for Full-Stack, Data Science, Python & Java—live in Dehradun and online across India. Small batches, projects, recordings & mentor support.",
   // ✅ Canonical to apex (trailing slash)
   alternates: { canonical: APEX + "/" },
   openGraph: {
-    title: "Doon Coding Academy | Best Coding, Data Science & AI Courses in Dehradun",
+    title: "Coding Courses in Dehradun & Online in India",
     description:
-      "Learn Full Stack (MERN + Gen AI), Data Science, Python, and Java in Dehradun. Real projects, expert mentors, and placement support.",
+      "Join DCA for Full-Stack, Data Science, Python & Java—live in Dehradun and online across India. Small batches, projects, recordings & mentor support.",
     // ✅ OG url to apex + add image
     url: APEX + "/",
     type: "website",
@@ -30,9 +30,9 @@ export const metadata: Metadata = {
   twitter: {
     // ✅ Large image card + image fallback
     card: "summary_large_image",
-    title: "Doon Coding Academy | Best Coding, Data Science & AI Courses in Dehradun",
+    title: "Coding Courses in Dehradun & Online in India",
     description:
-      "Top-rated coding, data science, and AI courses in Dehradun. Small batches, hands-on projects, and career support.",
+      "Join DCA for Full-Stack, Data Science, Python & Java—live in Dehradun and online across India. Small batches, projects, recordings & mentor support.",
   },
 };
 
@@ -80,9 +80,8 @@ export default function HomePage() {
           </Badge>
           
           <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-            Code Your Future.<br />
-            <span className="text-blue-200">Launch Your Career</span><br />
-            <span className="text-yellow-300">with AI-Powered Courses</span>
+            Coding Courses in Dehradun<br />
+            <span className="text-blue-200">&amp; Online in India</span>
           </h1>
           
           <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed text-blue-100">

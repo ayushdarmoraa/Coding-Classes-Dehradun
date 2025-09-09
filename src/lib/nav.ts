@@ -5,6 +5,7 @@ export type CourseLink = { href: string; label: string; accent?: boolean };
 export const NAV_LINKS: readonly NavLink[] = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
+  { href: "/online-courses", label: "Online Courses" },
   // "Courses" is handled as its own dropdown/accordion in Header
   { href: "/faq", label: "FAQ" },
   { href: "/testimonials", label: "Testimonials" },
