@@ -9,25 +9,32 @@ import Badge from "@/components/ui/Badge";
 
 const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
+// NEW: force apex (strip leading "www.")
+const APEX = BASE.replace(/^https:\/\/www\./, "https://");
 
 export const metadata: Metadata = {
   title: "Doon Coding Academy | Best Coding, Data Science & AI Courses in Dehradun",
   description:
     "Join Doon Coding Academy for top-rated Full Stack, Data Science, Python, and Java courses in Dehradun. Small batches, hands-on projects, affordable fees, and career support.",
-  alternates: { canonical: BASE + "/" },
+  // ✅ Canonical to apex (trailing slash)
+  alternates: { canonical: APEX + "/" },
   openGraph: {
     title: "Doon Coding Academy | Best Coding, Data Science & AI Courses in Dehradun",
     description:
       "Learn Full Stack (MERN + Gen AI), Data Science, Python, and Java in Dehradun. Real projects, expert mentors, and placement support.",
-    url: BASE + "/",
+    // ✅ OG url to apex + add image
+    url: APEX + "/",
     type: "website",
     siteName: "Doon Coding Academy",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
-    card: "summary",
+    // ✅ Large image card + image fallback
+    card: "summary_large_image",
     title: "Doon Coding Academy | Best Coding, Data Science & AI Courses in Dehradun",
     description:
       "Top-rated coding, data science, and AI courses in Dehradun. Small batches, hands-on projects, and career support.",
+    images: ["/og-image.png"],
   },
 };
 
