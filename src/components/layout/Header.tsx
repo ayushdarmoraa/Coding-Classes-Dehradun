@@ -31,8 +31,8 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
 
           {/* Desktop nav */}
           <ul className="hidden md:flex items-center space-x-6">
-            {/* static pages */}
-            {NAV_LINKS.map((item) => (
+            {/* static pages (exclude top-level Online Courses; now under Courses dropdown) */}
+            {NAV_LINKS.filter(i => i.href !== "/online-courses").map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
@@ -66,6 +66,31 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
                            motion-reduce:transition-none motion-reduce:transform-none"
               >
                 <ul className="py-2 text-sm">
+                  {/* Quick access: On-Campus vs Online */}
+                  <li>
+                    <Link
+                      href="/courses"
+                      className={`block px-4 py-2 rounded-md transition-colors duration-150 hover:bg-blue-600/60 focus:outline-none focus-visible:bg-blue-600/60 ${
+                        isActive("/courses") ? "font-semibold underline underline-offset-4" : ""
+                      } text-yellow-300 font-semibold`}
+                    >
+                      On-Campus (Dehradun)
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/online-courses"
+                      className={`block px-4 py-2 rounded-md transition-colors duration-150 hover:bg-blue-600/60 focus:outline-none focus-visible:bg-blue-600/60 ${
+                        isActive("/online-courses") ? "font-semibold underline underline-offset-4" : ""
+                      }`}
+                    >
+                      Online (India)
+                    </Link>
+                  </li>
+
+                  {/* Divider */}
+                  <li className="my-1 mx-3 border-t border-white/15" aria-hidden />
+
                   {COURSE_LINKS.map((c) => (
                     <li key={c.href}>
                       <Link
@@ -215,6 +240,12 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
       <div className="grid grid-rows-[0fr] peer-checked/courses:grid-rows-[1fr] transition-[grid-template-rows] duration-200">
         <div className="overflow-hidden">
         <ul className="pb-2">
+          {/* Combined menu entries */}
+          <li>
+          <Link href="/online-courses" className="block mx-6 my-1 rounded-lg px-4 py-2.5 hover:bg-white/10 active:bg-white/15">
+            Online (India)
+          </Link>
+          </li>
           <li>
           <Link href="/courses/full-stack" className="block mx-6 my-1 rounded-lg px-4 py-2.5 hover:bg-white/10 active:bg-white/15">
             Full-Stack with Gen AI
