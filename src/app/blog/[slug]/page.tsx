@@ -68,43 +68,15 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     };
 }
 
-// Heuristic: pick the best-matching course CTA by scanning title/desc/keywords
-function pickCourseCTA(post: { title: string; description: string; keywords?: string[] }) {
+// Heuristic: derive the best-matching course key for online/offline CTAs
+type CourseKey = "full-stack" | "data-science" | "python" | "java";
+function pickCourseKey(post: { title: string; description: string; keywords?: string[] }): CourseKey {
   const hay = `${post.title} ${post.description} ${(post.keywords || []).join(" ")}`.toLowerCase();
-
-  if (/(data\s*science|machine\s*learning|ml|ai|pandas|numpy|statistics)/.test(hay)) {
-    return {
-      title: "Data Science & AI",
-      blurb: "Learn Python, NumPy, Pandas, ML & model evaluation — with hands-on projects.",
-      href: "/courses/data-science",
-    };
-  }
-  if (/(full[-\s]?stack|mern|react|node|express|mongodb|next\.?js)/.test(hay)) {
-    return {
-      title: "Full-Stack Development (MERN + Gen AI)",
-      blurb: "Go end-to-end with React, Node.js, MongoDB and Gen AI integrations.",
-      href: "/courses/full-stack",
-    };
-  }
-  if (/(python|pythonic|cli|scripts)/.test(hay)) {
-    return {
-      title: "Python Programming",
-      blurb: "Master Python fundamentals, OOP, files/JSON, and build useful mini-projects.",
-      href: "/courses/python",
-    };
-  }
-  if (/(java|spring|oop|collections)/.test(hay)) {
-    return {
-      title: "Java Programming",
-      blurb: "Solidify Java fundamentals — OOP, collections, exceptions, and basics of Spring.",
-      href: "/courses/java",
-    };
-  }
-  return {
-    title: "Explore our courses",
-    blurb: "Not sure where to start? Browse all tracks — Full-Stack, Data Science, Python, Java.",
-    href: "/courses",
-  };
+  if (/(data\s*science|machine\s*learning|ml|ai|pandas|numpy|statistics)/.test(hay)) return "data-science";
+  if (/(full[-\s]?stack|mern|react|node|express|mongodb|next\.?js)/.test(hay)) return "full-stack";
+  if (/(python|pythonic|cli|scripts)/.test(hay)) return "python";
+  if (/(java|spring|oop|collections)/.test(hay)) return "java";
+  return "full-stack";
 }
 
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
@@ -332,44 +304,35 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         )}
       </div>
 
-      {/* Conversion CTA (maps post topic → best course) */}
+      {/* Conversion CTA: separate online/offline course links + FAQs */}
       <section className="mt-10 rounded-2xl border border-blue-700/20 bg-blue-600/5 p-5">
         {(() => {
-          const cta = pickCourseCTA(post);
+          const key = pickCourseKey(post);
           const utm = `utm_source=blog&utm_medium=cta&utm_campaign=blog_to_course&utm_content=${encodeURIComponent(post.slug)}`;
-          const primaryHref = `${cta.href}${cta.href.includes("?") ? "&" : "?"}${utm}`;
-          const allCoursesHref = `/courses?${utm}`;
+          const onlineHref = `/online-courses/${key}?${utm}`;
+          const offlineHref = `/courses/${key}?${utm}`;
           return (
             <>
-              <h2 className="text-xl font-semibold mb-2">Ready to go deeper? {cta.title}</h2>
-              <p className="text-gray-700 mb-3">{cta.blurb}</p>
+              <h2 className="text-xl font-semibold mb-2">Ready to go deeper?</h2>
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href={primaryHref}
+                  href={onlineHref}
                   className="inline-flex items-center rounded-xl bg-blue-700 px-4 py-2 text-white text-sm font-semibold shadow-sm hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-blue-700/30"
                 >
-                  View course
+                  View online course
                 </Link>
                 <Link
-                  href="/contact"
+                  href={offlineHref}
                   className="inline-flex items-center rounded-xl border border-blue-700 px-4 py-2 text-blue-700 text-sm font-semibold hover:bg-blue-700/5 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
                 >
-                  Get a free consultation
+                  View offline course
                 </Link>
                 <Link
-                  href={allCoursesHref}
+                  href="/faq"
                   className="inline-flex items-center rounded-xl border border-blue-700 px-4 py-2 text-blue-700 text-sm font-semibold hover:bg-blue-700/5 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
                 >
-                  Explore all courses
+                  Read FAQs
                 </Link>
-                <a
-                  href="https://wa.me/917037905464?text=Hi%2C%20I%27m%20interested%20after%20reading%20your%20blog%20post"
-                  target="_blank"
-                  rel="noopener"
-                  className="inline-flex items-center rounded-xl border border-blue-700 px-4 py-2 text-blue-700 text-sm font-semibold hover:bg-blue-700/5 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
-                >
-                  Chat on WhatsApp
-                </a>
               </div>
             </>
           );
