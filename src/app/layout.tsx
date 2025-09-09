@@ -201,12 +201,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
 
         {/* LocalBusiness JSON-LD for Local SEO */}
-        <script
+    <script
           id="localbusiness-schema"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify((() => {
-              const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.dooncodingacademy.in").replace(/\/$/, "");
+      // Use the normalized apex siteUrl computed above
+      const base = siteUrl.replace(/\/$/, "");
               const sameAs = [
                 process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,
                 process.env.NEXT_PUBLIC_INSTAGRAM_URL || undefined,
@@ -220,7 +221,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 "@id": `${base}/#localbusiness`,
                 name: "Doon Coding Academy",
                 url: base,
-                image: ["https://www.dooncodingacademy.in/images/Doon-Coding-Academy-Logo.png"],
+                image: [`${base}/images/Doon-Coding-Academy-Logo.png`],
                 ...(sameAs.length ? { sameAs } : {}),
                 telephone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "+917037905464",
                 email: "dooncodingacademy@gmail.com",
