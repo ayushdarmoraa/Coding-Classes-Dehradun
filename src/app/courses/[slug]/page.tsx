@@ -7,6 +7,7 @@ import { getCourseBySlug } from "@/lib/courses";
 import { getAllBlogPosts } from "@/lib/blog";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
 
 type Props = { params: { slug: string } };
 
@@ -119,6 +120,15 @@ export default async function CoursePage({ params }: Props) {
     { label: "Courses", href: "/courses" },
     { label: course.title, href: `/courses/${course.slug}` },
   ];
+
+  // Mapping for offline → online cross-links
+  const { slug } = params;
+  const ONLINE_TARGETS: Record<string, string> = {
+    "full-stack": "/online-courses/full-stack",
+    "data-science": "/online-courses/data-science",
+    python: "/online-courses/python",
+    java: "/online-courses/java",
+  };
 
 
 
@@ -318,6 +328,15 @@ export default async function CoursePage({ params }: Props) {
             Chat on WhatsApp
           </a>
         </div>
+
+        {/* Offline → Online cross-link (per SEO plan) */}
+        {ONLINE_TARGETS[slug] ? (
+          <div className="mt-3">
+            <Button href={ONLINE_TARGETS[slug]} variant="secondary" size="lg">
+              Not in Dehradun? Learn Online (Live + Projects)
+            </Button>
+          </div>
+        ) : null}
 
         {/* In-page nav */}
         <nav className="mt-6">
