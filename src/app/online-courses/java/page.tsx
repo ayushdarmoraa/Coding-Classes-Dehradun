@@ -106,6 +106,22 @@ export default function JavaOnlinePage() {
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+
+      <script
+        id="breadcrumbs-online-courses-java"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "https://dooncodingacademy.in" },
+              { "@type": "ListItem", position: 2, name: "Online Courses", item: "https://dooncodingacademy.in/online-courses" },
+              { "@type": "ListItem", position: 3, name: "Online Java Course in India (Live + Projects)", item: "https://dooncodingacademy.in/online-courses/java" }
+            ]
+          })
+        }}
+      />
     </div>
   );
 }

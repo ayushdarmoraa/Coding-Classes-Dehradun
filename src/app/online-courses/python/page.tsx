@@ -64,6 +64,22 @@ export default function OnlinePythonPage() {
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
       />
+
+      <script
+        id="breadcrumbs-online-courses-python"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "https://dooncodingacademy.in" },
+              { "@type": "ListItem", position: 2, name: "Online Courses", item: "https://dooncodingacademy.in/online-courses" },
+              { "@type": "ListItem", position: 3, name: "Online Python Course in India (Live + Projects)", item: "https://dooncodingacademy.in/online-courses/python" }
+            ]
+          })
+        }}
+      />
     </div>
   );
 }
