@@ -80,8 +80,7 @@ export default function HomePage() {
           </Badge>
           
           <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-            Coding Courses in Dehradun<br />
-            <span className="text-blue-200">&amp; Online in India</span>
+            Coding Courses in Dehradun &amp; Online in India
           </h1>
           
           <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed text-blue-100">

@@ -72,9 +72,8 @@ export async function generateMetadata({
   // Exclude featured from page 1 default view grid to avoid duplication
   const isDefaultView = !category && !q && page === 1;
   const filtered = filterPosts({ category, q });
-  const visibleList = isDefaultView && featured.length
-    ? filtered.filter((p) => !p.featured)
-    : filtered;
+  // Show all filtered posts in the grid (do not exclude featured from page 1)
+  const visibleList = filtered;
 
   const { items, totalPages } = paginate(visibleList, page, 6);
 

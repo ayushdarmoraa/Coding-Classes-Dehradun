@@ -64,16 +64,16 @@ export default function OnlineCoursesPage() {
                   </div>
                   <div className="shrink-0 self-start sm:self-center">
                     {course.slug === "full-stack" && (
-                      <Button href="/courses/full-stack" size="md">View</Button>
+                      <Button href="/online-courses/full-stack" size="md">View</Button>
                     )}
                     {course.slug === "data-science" && (
-                      <Button href="/courses/data-science" size="md">View</Button>
+                      <Button href="/online-courses/data-science" size="md">View</Button>
                     )}
                     {course.slug === "python" && (
-                      <Button href="/courses/python" size="md">View</Button>
+                      <Button href="/online-courses/python" size="md">View</Button>
                     )}
                     {course.slug === "java" && (
-                      <Button href="/courses/java" size="md">View</Button>
+                      <Button href="/online-courses/java" size="md">View</Button>
                     )}
                   </div>
                 </div>
