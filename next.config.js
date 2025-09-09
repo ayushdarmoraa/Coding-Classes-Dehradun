@@ -21,14 +21,7 @@ const nextConfig = {
 
   async redirects() {
     return [
-      // 1) Collapse any www (http or https) to apex HTTPS in a single hop
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "www.dooncodingacademy.in" }],
-        destination: "https://dooncodingacademy.in/:path*",
-        statusCode: 301,
-      },
-      // 2) Force HTTPS on apex
+  // Force HTTPS on apex (www handled at edge via vercel.json)
       {
         source: "/:path*",
         has: [{ type: "header", key: "x-forwarded-proto", value: "http" }],
