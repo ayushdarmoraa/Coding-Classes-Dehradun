@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getCourses } from "@/lib/courses";
 import CourseCard from "@/components/features/CourseCard";
 import TestimonialCard from "@/components/features/TestimonialCard";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import HomeFAQ from "@/components/faq/HomeFAQ";
 
 const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
@@ -123,113 +123,8 @@ export default function HomePage() {
       </section>
 
 
-      {/* FAQ (Home) — mixed local + online intents; no JSON-LD here */}
-      <section className="mb-12" aria-labelledby="home-faq">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 id="home-faq" className="text-2xl font-semibold mb-3">Frequently Asked Questions</h2>
-
-          <div className="space-y-5">
-            <div>
-              <h3 className="text-lg font-semibold">Do you offer online coding classes across India?</h3>
-              <p className="text-gray-700">
-                Yes. We run live online cohorts with recordings for{" "}
-                <Link href="/courses/full-stack" className="text-blue-700 hover:underline">Full-Stack</Link>,{" "}
-                <Link href="/courses/data-science" className="text-blue-700 hover:underline">Data Science &amp; AI</Link>,{" "}
-                <Link href="/courses/python" className="text-blue-700 hover:underline">Python</Link>, and{" "}
-                <Link href="/courses/java" className="text-blue-700 hover:underline">Java</Link>. Join from anywhere in India.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold">Are classes live or recorded?</h3>
-              <p className="text-gray-700">
-                Sessions are live with mentors, and every class is recorded so you can revise on your own time.
-                We also run weekly doubt-clearing and project review slots.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold">Where is your Dehradun campus?</h3>
-              <p className="text-gray-700">
-                We’re in Herbertpur, Dehradun (near DR School). Local students can choose on-campus or hybrid modes;
-                others can attend the same cohorts online.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold">What are the fees for each course?</h3>
-              <p className="text-gray-700">
-                Typical ranges: Full-Stack ₹25,000; Data Science ₹30,000; Python ₹12,000; Java ₹12,000.
-                See each course page for the latest pricing and syllabus:&nbsp;
-                <Link href="/courses/full-stack" className="text-blue-700 hover:underline">Full-Stack</Link>,{" "}
-                <Link href="/courses/data-science" className="text-blue-700 hover:underline">Data Science &amp; AI</Link>,{" "}
-                <Link href="/courses/python" className="text-blue-700 hover:underline">Python</Link>,{" "}
-                <Link href="/courses/java" className="text-blue-700 hover:underline">Java</Link>.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold">How long are the programs?</h3>
-              <p className="text-gray-700">
-                Full-Stack &amp; Data Science run ~6 months; Python &amp; Java ~4 months.
-                Each track includes hands-on projects and assessments.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold">What is the batch size and schedule?</h3>
-              <p className="text-gray-700">
-                We cap batches at about 15 learners. Slots are available on weekdays and weekends.
-                Share your preferred timing on{" "}
-                <Link href="/contact" className="text-blue-700 hover:underline">Contact</Link> and we’ll align you to a cohort.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold">Do I need prior coding experience?</h3>
-              <p className="text-gray-700">
-                Beginners can start with{" "}
-                <Link href="/courses/python" className="text-blue-700 hover:underline">Python</Link> or{" "}
-                <Link href="/courses/java" className="text-blue-700 hover:underline">Java</Link>.
-                If you already know the basics, consider{" "}
-                <Link href="/courses/data-science" className="text-blue-700 hover:underline">Data Science</Link> or{" "}
-                <Link href="/courses/full-stack" className="text-blue-700 hover:underline">Full-Stack</Link>.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold">Do you provide placement assistance?</h3>
-              <p className="text-gray-700">
-                Yes—portfolio building, mock interviews, resume review, and referrals.
-                Our recent placement rate is ~85%. For guidance,{" "}
-                <Link href="/contact" className="text-blue-700 hover:underline">talk to a mentor</Link>.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold">Will I get a certificate and real projects?</h3>
-              <p className="text-gray-700">
-                You’ll earn a course completion certificate and ship 3–5 portfolio-ready projects,
-                reviewed by mentors with actionable feedback.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold">How do I enroll or book a counselling call?</h3>
-              <p className="text-gray-700">
-                Pick your track on{" "}
-                <Link href="/courses" className="text-blue-700 hover:underline">All Courses</Link>{" "}
-                and hit “Enroll / Consultation”, or message us via{" "}
-                <Link href="/contact" className="text-blue-700 hover:underline">Contact</Link>.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <Link href="/faq" className="text-blue-700 hover:underline font-semibold">See all FAQs →</Link>
-          </div>
-        </div>
-      </section>
+  {/* FAQ (Home) — compact accordion, one-open-at-a-time */}
+  <HomeFAQ />
 
       {/* Trust Signals */}
       <section className="py-16 bg-gray-50">
