@@ -67,44 +67,111 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               `}
             </Script>
 
-            {/* Delegated click tracking for key CTAs: tel, WhatsApp, Directions, Enroll/Consultation */}
+            {/* GA4 delegated click tracking (normalized) */}
             <Script id="ga4-delegated-clicks" strategy="afterInteractive">
               {`
                 (function () {
-                  function findAnchor(el) {
-                    while (el && el !== document.body) {
-                      if (el.tagName === 'A') return el;
-                      el = el.parentElement;
-                    }
-                    return null;
+                  function gtagSafe() {
+                    if (typeof window === 'undefined' || typeof window.gtag !== 'function') return;
+                    window.gtag.apply(null, arguments);
                   }
-                  function track(type, href, text) {
-                    if (!window.gtag) return;
-                    window.gtag('event', type, {
-                      event_category: 'engagement',
-                      link_url: href || '',
-                      link_text: (text || '').trim().slice(0, 100)
-                    });
-                  }
-                  document.addEventListener('click', function (e) {
-                    var a = findAnchor(e.target);
-                    if (!a) return;
-                    var href = (a.getAttribute('href') || '').trim();
-                    var txt = (a.textContent || a.getAttribute('aria-label') || '').trim();
 
-                    if (href.startsWith('tel:')) {
-                      track('tel_click', href, txt); return;
-                    }
-                    if (href.includes('wa.me') || href.includes('api.whatsapp.com') || href.startsWith('whatsapp:')) {
-                      track('whatsapp_click', href, txt); return;
-                    }
-                    if (href.includes('maps.app.goo.gl') || href.includes('google.com/maps')) {
-                      track('directions_click', href, txt); return;
-                    }
-                    if (href.includes('/contact') || /enroll|consult/i.test(txt)) {
-                      track('enroll_click', href, txt); return;
-                    }
-                  }, true);
+                  function pageTypeFromPath(path) {
+                    if (path === '/' || path === '') return 'home';
+                    if (path.startsWith('/online-courses/')) return 'online_course';
+                    if (path === '/online-courses') return 'online_course';
+                    if (path.startsWith('/courses/')) return 'course';
+                    if (path === '/courses') return 'course';
+                    if (path.startsWith('/blog/')) return 'blog';
+                    if (path === '/blog') return 'blog';
+                    if (path.startsWith('/vs/')) return 'vs';
+                    if (path.startsWith('/locations/')) return 'locations';
+                    return 'home';
+                  }
+
+                  function courseSlugFromPath(path) {
+                    // /courses/[slug] OR /online-courses/[slug]
+                    var m = path.match(/^\/(?:online-courses|courses)\/([^\/]+)/);
+                    return m ? m[1] : undefined;
+                  }
+
+                  function cityFromPath(path) {
+                    // Dehradun for onsite pages and the location page
+                    if (path.startsWith('/locations/dehradun')) return 'Dehradun';
+                    if (path.startsWith('/courses/')) return 'Dehradun'; // onsite courses
+                    return undefined; // online and others
+                  }
+
+                  function isTel(href) {
+                    return href && href.toLowerCase().startsWith('tel:');
+                  }
+                  function isWhatsApp(href) {
+                    if (!href) return false;
+                    var h = href.toLowerCase();
+                    return h.includes('wa.me') || h.includes('api.whatsapp.com') || h.startsWith('whatsapp:');
+                  }
+                  function isDirections(href) {
+                    if (!href) return false;
+                    var h = href.toLowerCase();
+                    return h.includes('maps.app.goo.gl') || h.includes('google.com/maps');
+                  }
+                  function isEnroll(anchor) {
+                    if (!anchor) return false;
+                    var href = (anchor.getAttribute('href') || '').toLowerCase();
+                    if (href.startsWith('/contact')) return true;
+                    var txt = (anchor.textContent || '').toLowerCase();
+                    return /enroll|consult/.test(txt);
+                  }
+
+                  function paramsBase() {
+                    var path = (location && location.pathname) || '/';
+                    return {
+                      page_type: pageTypeFromPath(path),
+                      course_slug: courseSlugFromPath(path),
+                      city: cityFromPath(path)
+                    };
+                  }
+
+                  // Remove previous listener if hot reloading
+                  if (window.__ga4DelegatedClickHandler) {
+                    document.removeEventListener('click', window.__ga4DelegatedClickHandler, true);
+                  }
+
+                  window.__ga4DelegatedClickHandler = function (e) {
+                    try {
+                      var el = e.target;
+                      // Find closest anchor
+                      var a = el && (el.closest ? el.closest('a') : null);
+                      if (!a) return;
+
+                      var href = a.getAttribute('href') || '';
+
+                      // Precedence: tel -> whatsapp -> directions -> enroll
+                      var base = paramsBase();
+
+                      if (isTel(href)) {
+                        gtagSafe('event', 'lead_contact_click', Object.assign({ channel: 'phone' }, base));
+                        return;
+                      }
+
+                      if (isWhatsApp(href)) {
+                        gtagSafe('event', 'lead_contact_click', Object.assign({ channel: 'whatsapp' }, base));
+                        return;
+                      }
+
+                      if (isDirections(href)) {
+                        gtagSafe('event', 'lead_contact_click', Object.assign({ channel: 'directions' }, base));
+                        return;
+                      }
+
+                      if (isEnroll(a)) {
+                        gtagSafe('event', 'cta_enroll_click', base);
+                        return;
+                      }
+                    } catch (_) {}
+                  };
+
+                  document.addEventListener('click', window.__ga4DelegatedClickHandler, true);
                 })();
               `}
             </Script>
