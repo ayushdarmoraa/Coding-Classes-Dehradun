@@ -1,0 +1,10 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.dooncodingacademy.in" }],
+      "destination": "https://dooncodingacademy.in/$1",
+      "statusCode": 301
+    }
+  ]
+}
