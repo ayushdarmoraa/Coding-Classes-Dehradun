@@ -1,24 +1,30 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 const GBP_URL =
   process.env.NEXT_PUBLIC_GBP_URL || "https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9";
-const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { getCourses } from "@/lib/courses";
 
 export const metadata: Metadata = {
-  title: "Best Coding Classes in Dehradun - Doon Coding Academy Herbertpur",
-  description: "Top-rated coding classes in Dehradun, Uttarakhand. Learn Full-Stack Development, Data Science, Python & Java at our Herbertpur campus. Expert instructors, job placement assistance.",
-  alternates: {
-    canonical: BASE + "/locations/dehradun",
-  },
+  title: "Coding Classes in Dehradun (On-Campus & Hybrid)",
+  description:
+    "Join DCA in Dehradun for Full-Stack, Data Science, Python & Java. Small batches, mentor hours, real projects, and placement support—plus online cohorts for non-locals.",
+  alternates: { canonical: "https://dooncodingacademy.in/locations/dehradun" },
   openGraph: {
-    title: "Best Coding Classes in Dehradun - Doon Coding Academy",
-    description: "Top-rated coding classes in Dehradun, Uttarakhand. Learn Full-Stack Development, Data Science, Python & Java at our Herbertpur campus.",
-    url: BASE + "/locations/dehradun",
+    title: "Coding Classes in Dehradun (On-Campus & Hybrid)",
+    description:
+      "Join DCA in Dehradun for Full-Stack, Data Science, Python & Java. Small batches, mentor hours, real projects, and placement support—plus online cohorts for non-locals.",
+    url: "https://dooncodingacademy.in/locations/dehradun",
     type: "website",
+    siteName: "Doon Coding Academy",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Coding Classes in Dehradun (On-Campus & Hybrid)",
+    description:
+      "Join DCA in Dehradun for Full-Stack, Data Science, Python & Java. Small batches, mentor hours, real projects, and placement support—plus online cohorts for non-locals.",
   },
 };
 
@@ -219,6 +225,110 @@ export default function DehradunLocationPage() {
                 </p>
               </div>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Local Lander: Dehradun SEO Block */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            Learn Coding in Dehradun (On-Campus & Hybrid)
+          </h2>
+
+          <p className="text-lg text-gray-700 mb-5">
+            Dehradun is a great place to get job-ready tech skills. At Doon Coding Academy (near DR School, Herbertpur),
+            you’ll learn in <strong>small batches</strong> with <strong>mentor support</strong>, real-world projects, and a
+            schedule that works for students and working professionals alike. Prefer the classroom? Join our <strong>on-campus</strong> sessions.
+            Need flexibility? Use our <strong>hybrid</strong> option—attend in person when you can and keep progressing with
+            recorded sessions, doubt-clearing hours, and weekly project reviews.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-10">
+            <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Where You’ll Study</h3>
+              <p className="text-gray-700">
+                Our campus environment stays focused and practical: short theory blocks, lots of hands-on coding,
+                and immediate feedback from instructors. You’ll build portfolio projects and practice interviews
+                so you’re ready for real roles in web development and data.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Getting Here</h3>
+              <p className="text-gray-700">
+                We serve nearby areas like Herbertpur, Vikasnagar, Selaqui, Premnagar, and Dehradun city.
+                Public transport and shared rides are common on the main routes, and there’s convenient local
+                access around the campus area.
+              </p>
+              <ul className="mt-3 list-disc list-inside text-gray-700 space-y-1">
+                <li>Weekday timings typically <strong>10:00–19:00</strong> (check current batch schedule).</li>
+                <li>Hybrid option for commuters—skip the travel when needed and stay on track.</li>
+                <li>Mentor hours and project check-ins keep you progressing every week.</li>
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">How the Hybrid Model Works</h3>
+              <p className="text-gray-700">
+                Every cohort includes live sessions (in person or online), session <strong>recordings</strong>,
+                structured <strong>doubt support</strong>, and <strong>project reviews</strong>. You’ll never be stuck:
+                show your code, get feedback, and move to the next milestone.
+              </p>
+              <ul className="mt-3 list-disc list-inside text-gray-700 space-y-1">
+                <li>Live + recordings for revision and catch-up.</li>
+                <li>Clear weekly outcomes and checkpoints.</li>
+                <li>Interview prep and placement guidance near graduation.</li>
+              </ul>
+            </div>
+          </div>
+
+          <h3 className="text-2xl font-semibold text-gray-900 mb-3">Courses You Can Join On-Campus</h3>
+          <p className="text-gray-700 mb-4">
+            Pick the track that fits your goals. All programs include practical projects and mentor support:
+            <Link href="/courses/full-stack" className="text-blue-700 hover:underline font-medium"> Full-Stack (MERN + Gen AI)</Link>,
+            <Link href="/courses/data-science" className="text-blue-700 hover:underline font-medium"> Data Science &amp; AI</Link>,
+            <Link href="/courses/python" className="text-blue-700 hover:underline font-medium"> Python</Link>, and
+            <Link href="/courses/java" className="text-blue-700 hover:underline font-medium"> Java</Link>.
+          </p>
+          <ul className="grid md:grid-cols-2 gap-6 text-gray-700 mb-8">
+            <li className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+              <strong>Full-Stack (6 months)</strong> — Modern front-end + back-end with real deployments, teamwork, and
+              Gen-AI aids for productivity.
+            </li>
+            <li className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+              <strong>Data Science (6 months)</strong> — Python, data wrangling, visualization, and foundations for ML workflows.
+            </li>
+            <li className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+              <strong>Python (4 months)</strong> — Beginner-friendly path into programming and automation.
+            </li>
+            <li className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+              <strong>Java (4 months)</strong> — Strong OOP base used widely in enterprise development.
+            </li>
+          </ul>
+
+          <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 mb-8">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Not in Dehradun?</h3>
+            <p className="text-gray-700">
+              Join our <strong>online cohorts</strong>—live classes with recordings, mentor hours, community, and the same
+              project-driven approach, designed for learners across India. It’s the best of structured guidance with
+              flexible access.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              href="/courses"
+              className="inline-flex items-center justify-center rounded-lg px-6 py-3 text-base font-medium bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md hover:shadow-lg"
+            >
+              Explore On-Campus Courses
+            </Link>
+            <Link
+              href="/online-courses"
+              className="inline-flex items-center justify-center rounded-lg px-6 py-3 text-base font-medium border-2 border-blue-600 text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              See Online Cohorts (Live + Projects)
+            </Link>
           </div>
         </div>
       </section>
@@ -425,6 +535,31 @@ export default function DehradunLocationPage() {
           </div>
         </div>
       </section>
+
+      <script
+        id="breadcrumbs-dehradun"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: "https://dooncodingacademy.in/"
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Dehradun",
+                item: "https://dooncodingacademy.in/locations/dehradun"
+              }
+            ]
+          }),
+        }}
+      />
     </div>
   );
 }
