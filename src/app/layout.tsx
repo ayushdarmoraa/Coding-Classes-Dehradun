@@ -9,22 +9,35 @@ const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").re
 const siteUrl = rawBase.replace(/^http:\/\//, "https://");
 
 export const metadata: Metadata = {
-  // Global canonical base for all routes
+  // Global canonical base for all routes (remains env-driven)
   metadataBase: new URL(siteUrl),
 
-  title: { default: "Doon Coding Academy", template: "%s | Doon Coding Academy" },
+  // ↓ Updated defaults
+  title: { default: "DCA – Coding & Data Science Courses", template: "%s | DCA" },
   description:
     process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
     "Leading coding institute in Dehradun — Full Stack with Gen AI, Data Science, Python, Java.",
 
-  // Google Search Console verification (env-gated)
+  // NEW: Open Graph defaults
+  openGraph: {
+    type: "website",
+    siteName: "Doon Coding Academy",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
+
+  // NEW: Twitter defaults
+  twitter: {
+    card: "summary_large_image",
+    // creator: "@your_handle" // (optional) add if/when you have one
+  },
+
+  // GSC verification (unchanged)
   verification: process.env.NEXT_PUBLIC_GSC_VERIFICATION
     ? { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION }
     : undefined,
 
-  // IMPORTANT: do NOT set a root-level canonical here,
-  // or every page will canonicalize to "/".
-  // Page-level files can define their own `alternates.canonical` if needed.
+  // IMPORTANT: do NOT set a root-level canonical here.
+  // Per-page files can define `alternates.canonical` when needed.
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
