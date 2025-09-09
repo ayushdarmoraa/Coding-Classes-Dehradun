@@ -97,7 +97,8 @@ export function generateTestimonialSchema(testimonials: Testimonial[]) {
         reviewRating: testimonial.rating ? { "@type": "Rating", ratingValue: String(testimonial.rating), bestRating: "5" } : undefined,
         itemReviewed: {
           "@type": "LocalBusiness",
-          "@id": "https://www.dooncodingacademy.in/#localbusiness"
+          // Derive stable @id from env, normalized to https and without trailing slash
+          "@id": `${(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "").replace(/^http:\/\//, "https://")}/#localbusiness`
         },
       },
     })),

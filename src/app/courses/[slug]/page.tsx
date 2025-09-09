@@ -100,7 +100,7 @@ export default async function CoursePage({ params }: Props) {
   const course = getCourseBySlug(params.slug);
   if (!course) notFound();
 
-  const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.dooncodingacademy.in").replace(/\/$/, "");
+  const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
   const base = rawBase.replace(/^http:\/\//, "https://");
   const pageUrl = `${base}/courses/${course.slug}`;
 
@@ -218,7 +218,7 @@ export default async function CoursePage({ params }: Props) {
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify((() => {
-            const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.dooncodingacademy.in").replace(/\/$/, "");
+            const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
             const url = `${base}/courses/${course.slug}`;
 
             // Parse price to number if present

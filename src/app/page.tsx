@@ -127,77 +127,110 @@ export default function HomePage() {
       </section>
 
 
-      {/* Quick Answers for Featured Snippets (no schema here; main FAQ has JSON-LD) */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-3">Quick Answers</h2>
+      {/* FAQ (Home) — mixed local + online intents; no JSON-LD here */}
+      <section className="mb-12" aria-labelledby="home-faq">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 id="home-faq" className="text-2xl font-semibold mb-3">Frequently Asked Questions</h2>
 
-        <div className="space-y-5">
-          <div>
-            <h3 className="text-lg font-semibold">
-              What is the duration of the Full Stack course in Dehradun?
-            </h3>
-            <p className="text-gray-700">
-              Most Full Stack programs run about 6 months. At Doon Coding Academy, the{" "}
-              <Link href="/courses/full-stack" className="text-blue-700 hover:underline">
-                Full-Stack (MERN + Gen AI)
-              </Link>{" "}
-              track is designed for beginner → advanced progression over 6 months with portfolio projects.
-            </p>
+          <div className="space-y-5">
+            <div>
+              <h3 className="text-lg font-semibold">Do you offer online coding classes across India?</h3>
+              <p className="text-gray-700">
+                Yes. We run live online cohorts with recordings for{" "}
+                <Link href="/courses/full-stack" className="text-blue-700 hover:underline">Full-Stack</Link>,{" "}
+                <Link href="/courses/data-science" className="text-blue-700 hover:underline">Data Science &amp; AI</Link>,{" "}
+                <Link href="/courses/python" className="text-blue-700 hover:underline">Python</Link>, and{" "}
+                <Link href="/courses/java" className="text-blue-700 hover:underline">Java</Link>. Join from anywhere in India.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold">Are classes live or recorded?</h3>
+              <p className="text-gray-700">
+                Sessions are live with mentors, and every class is recorded so you can revise on your own time.
+                We also run weekly doubt-clearing and project review slots.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold">Where is your Dehradun campus?</h3>
+              <p className="text-gray-700">
+                We’re in Herbertpur, Dehradun (near DR School). Local students can choose on-campus or hybrid modes;
+                others can attend the same cohorts online.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold">What are the fees for each course?</h3>
+              <p className="text-gray-700">
+                Typical ranges: Full-Stack ₹25,000; Data Science ₹30,000; Python ₹12,000; Java ₹12,000.
+                See each course page for the latest pricing and syllabus:&nbsp;
+                <Link href="/courses/full-stack" className="text-blue-700 hover:underline">Full-Stack</Link>,{" "}
+                <Link href="/courses/data-science" className="text-blue-700 hover:underline">Data Science &amp; AI</Link>,{" "}
+                <Link href="/courses/python" className="text-blue-700 hover:underline">Python</Link>,{" "}
+                <Link href="/courses/java" className="text-blue-700 hover:underline">Java</Link>.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold">How long are the programs?</h3>
+              <p className="text-gray-700">
+                Full-Stack &amp; Data Science run ~6 months; Python &amp; Java ~4 months.
+                Each track includes hands-on projects and assessments.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold">What is the batch size and schedule?</h3>
+              <p className="text-gray-700">
+                We cap batches at about 15 learners. Slots are available on weekdays and weekends.
+                Share your preferred timing on{" "}
+                <Link href="/contact" className="text-blue-700 hover:underline">Contact</Link> and we’ll align you to a cohort.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold">Do I need prior coding experience?</h3>
+              <p className="text-gray-700">
+                Beginners can start with{" "}
+                <Link href="/courses/python" className="text-blue-700 hover:underline">Python</Link> or{" "}
+                <Link href="/courses/java" className="text-blue-700 hover:underline">Java</Link>.
+                If you already know the basics, consider{" "}
+                <Link href="/courses/data-science" className="text-blue-700 hover:underline">Data Science</Link> or{" "}
+                <Link href="/courses/full-stack" className="text-blue-700 hover:underline">Full-Stack</Link>.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold">Do you provide placement assistance?</h3>
+              <p className="text-gray-700">
+                Yes—portfolio building, mock interviews, resume review, and referrals.
+                Our recent placement rate is ~85%. For guidance,{" "}
+                <Link href="/contact" className="text-blue-700 hover:underline">talk to a mentor</Link>.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold">Will I get a certificate and real projects?</h3>
+              <p className="text-gray-700">
+                You’ll earn a course completion certificate and ship 3–5 portfolio-ready projects,
+                reviewed by mentors with actionable feedback.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold">How do I enroll or book a counselling call?</h3>
+              <p className="text-gray-700">
+                Pick your track on{" "}
+                <Link href="/courses" className="text-blue-700 hover:underline">All Courses</Link>{" "}
+                and hit “Enroll / Consultation”, or message us via{" "}
+                <Link href="/contact" className="text-blue-700 hover:underline">Contact</Link>.
+              </p>
+            </div>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold">
-              What are the fees for coding courses in Dehradun?
-            </h3>
-            <p className="text-gray-700">
-              Fees vary by track and batch. Typical ranges are ₹20,000–₹30,000. For example, our{" "}
-              <Link href="/courses/full-stack" className="text-blue-700 hover:underline">
-                Full-Stack
-              </Link>{" "}
-              course is ₹25,000 and{" "}
-              <Link href="/courses/data-science" className="text-blue-700 hover:underline">
-                Data Science &amp; AI
-              </Link>{" "}
-              is ₹30,000. See each course page for the latest pricing and syllabus.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold">
-              Do I need prior coding experience to start?
-            </h3>
-            <p className="text-gray-700">
-              No. Our{" "}
-              <Link href="/courses/python" className="text-blue-700 hover:underline">
-                Python
-              </Link>{" "}
-              and{" "}
-              <Link href="/courses/java" className="text-blue-700 hover:underline">
-                Java
-              </Link>{" "}
-              tracks are beginner-friendly. If you have basics,{" "}
-              <Link href="/courses/data-science" className="text-blue-700 hover:underline">
-                Data Science
-              </Link>{" "}
-              or{" "}
-              <Link href="/courses/full-stack" className="text-blue-700 hover:underline">
-                Full-Stack
-              </Link>{" "}
-              can help you specialize.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold">
-              Do you provide placement assistance?
-            </h3>
-            <p className="text-gray-700">
-              Yes—portfolio building, interview prep, resume feedback, and local referrals.{" "}
-              <Link href="/contact" className="text-blue-700 hover:underline">
-                Contact us
-              </Link>{" "}
-              for guidance on the best track for your goals.
-            </p>
+          <div className="mt-6">
+            <Link href="/faq" className="text-blue-700 hover:underline font-semibold">See all FAQs →</Link>
           </div>
         </div>
       </section>
@@ -244,6 +277,168 @@ export default function HomePage() {
                 Stay ahead with Gen AI tools and techniques integrated into our Full-Stack program.
               </p>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Online with DCA (Home) */}
+      <section className="py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Why Online with DCA (Live + Projects)
+            </h2>
+            <p className="text-lg text-gray-700 max-w-3xl mx-auto">
+              Learn from anywhere in India without losing the structure and accountability of a classroom.
+              Our live sessions run on a fixed cohort schedule and every class is recorded the same day,
+              so you can revise at your pace. Dedicated mentor hours keep your doubts unblocked, while a
+              tight-knit peer community helps you stay consistent and ship work that employers notice.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="p-6 h-full">
+              <h3 className="text-xl font-semibold mb-2">Live classes + recordings</h3>
+              <p className="text-gray-600">
+                Attend interactive lectures with Q&amp;A and get full recordings with timestamps and
+                resources so you never fall behind—even if you miss a session.
+              </p>
+            </Card>
+
+            <Card className="p-6 h-full">
+              <h3 className="text-xl font-semibold mb-2">Mentor hours &amp; code reviews</h3>
+              <p className="text-gray-600">
+                Book evening IST office hours for 1:1 help. Get actionable feedback on assignments,
+                pull-requests, and project architecture to level up quickly.
+              </p>
+            </Card>
+
+            <Card className="p-6 h-full">
+              <h3 className="text-xl font-semibold mb-2">Structured cohort flow</h3>
+              <p className="text-gray-600">
+                Weekly goals, sprints, and demo-days keep momentum high. Clear rubrics define what
+                “good” looks like for every module.
+              </p>
+            </Card>
+
+            <Card className="p-6 h-full">
+              <h3 className="text-xl font-semibold mb-2">Hands-on, portfolio projects</h3>
+              <p className="text-gray-600">
+                Build real apps and data notebooks from scratch. Repo-first learning with GitHub issues,
+                PRs, and reviews—exactly how modern teams work.
+              </p>
+            </Card>
+
+            <Card className="p-6 h-full">
+              <h3 className="text-xl font-semibold mb-2">Accountability &amp; community</h3>
+              <p className="text-gray-600">
+                Small batches, stand-ups, peer reviews, and challenge streaks keep you consistent.
+                Learn together, grow faster.
+              </p>
+            </Card>
+
+            <Card className="p-6 h-full">
+              <h3 className="text-xl font-semibold mb-2">Tools &amp; support</h3>
+              <p className="text-gray-600">
+                GitHub Classroom, Notion roadmaps, Kaggle/CodeSandbox, Zoom. Seamless onboarding and
+                quick tech support so the focus stays on learning.
+              </p>
+            </Card>
+          </div>
+
+          <p className="text-lg text-gray-700 max-w-4xl mx-auto mt-8 text-center">
+            Prefer a campus vibe? You can attend hybrid sessions in Dehradun when convenient—your cohort
+            progress and support remain the same.
+          </p>
+
+          <div className="text-center mt-10">
+            <Button href="/courses" size="lg" variant="primary" className="mr-3">
+              Explore Courses
+            </Button>
+            <Button href="/contact" size="lg" variant="ghost">
+              Talk to a Mentor
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Snapshot: Modes, Duration, Fees & Outcomes */}
+      <section className="py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+            Snapshot: Modes, Duration, Fees & Outcomes
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Compare tracks at a glance. All cohorts include live sessions, recordings,
+            mentor hours, and project reviews to keep you progressing every week.
+          </p>
+
+          <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-gray-50 text-gray-700">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Course</th>
+                  <th className="px-4 py-3 font-semibold">Mode</th>
+                  <th className="px-4 py-3 font-semibold">Duration</th>
+                  <th className="px-4 py-3 font-semibold">Fees</th>
+                  <th className="px-4 py-3 font-semibold">Placement rate</th>
+                  <th className="px-4 py-3 font-semibold text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                <tr>
+                  <td className="px-4 py-3">Full-Stack Development (MERN + Gen AI)</td>
+                  <td className="px-4 py-3">Online / Hybrid</td>
+                  <td className="px-4 py-3">6 months</td>
+                  <td className="px-4 py-3">
+                    ₹25,000 <span className="text-gray-500 text-xs">(₹5,000/month)</span>
+                  </td>
+                  <td className="px-4 py-3">85%</td>
+                  <td className="px-4 py-3 text-right">
+                    <Button href="/courses/full-stack" size="sm">View</Button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="px-4 py-3">Data Science &amp; AI</td>
+                  <td className="px-4 py-3">Online / Hybrid</td>
+                  <td className="px-4 py-3">6 months</td>
+                  <td className="px-4 py-3">
+                    ₹30,000 <span className="text-gray-500 text-xs">(₹6,000/month)</span>
+                  </td>
+                  <td className="px-4 py-3">85%</td>
+                  <td className="px-4 py-3 text-right">
+                    <Button href="/courses/data-science" size="sm">View</Button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="px-4 py-3">Python Programming</td>
+                  <td className="px-4 py-3">Online / Hybrid</td>
+                  <td className="px-4 py-3">4 months</td>
+                  <td className="px-4 py-3">
+                    ₹12,000 <span className="text-gray-500 text-xs">(₹4,000/month)</span>
+                  </td>
+                  <td className="px-4 py-3">85%</td>
+                  <td className="px-4 py-3 text-right">
+                    <Button href="/courses/python" size="sm">View</Button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="px-4 py-3">Java Programming</td>
+                  <td className="px-4 py-3">Online / Hybrid</td>
+                  <td className="px-4 py-3">4 months</td>
+                  <td className="px-4 py-3">
+                    ₹12,000 <span className="text-gray-500 text-xs">(₹4,000/month)</span>
+                  </td>
+                  <td className="px-4 py-3">85%</td>
+                  <td className="px-4 py-3 text-right">
+                    <Button href="/courses/java" size="sm">View</Button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>

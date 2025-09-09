@@ -4,9 +4,11 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Script from "next/script";
 
-// Build a single, normalized site URL we can reuse everywhere
-const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const siteUrl = rawBase.replace(/^http:\/\//, "https://");
+// Build a single, normalized site URL we can reuse everywhere (force https, strip trailing slash, drop www)
+const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "https://dooncodingacademy.in").replace(/\/$/, "");
+const siteUrl = rawBase
+  .replace(/^http:\/\//, "https://")
+  .replace(/^https:\/\/www\./, "https://");
 
 export const metadata: Metadata = {
   // Global canonical base for all routes (remains env-driven)
@@ -22,12 +24,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Doon Coding Academy",
-    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  images: [{ url: "/images/og-image.png", width: 1200, height: 630 }],
   },
 
   // NEW: Twitter defaults
   twitter: {
     card: "summary_large_image",
+  images: ["/images/og-image.png"],
     // creator: "@your_handle" // (optional) add if/when you have one
   },
 
