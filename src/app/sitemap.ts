@@ -24,6 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/blog/series`, lastModified: new Date(), changeFrequency: "daily", priority: 0.6 },
     { url: `${base}/blog/archive`, lastModified: new Date(), changeFrequency: "daily", priority: 0.6 },
     { url: `${base}/faq`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
+    { url: `${base}/vs/coding-ninjas`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
   ];
 
   const coursePages: MetadataRoute.Sitemap = getCourses().map((c) => ({
