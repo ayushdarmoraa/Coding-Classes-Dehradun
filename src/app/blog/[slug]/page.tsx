@@ -79,10 +79,11 @@ function pickCourseKey(post: { title: string; description: string; keywords?: st
   return "full-stack";
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+export default async function BlogPostPage({ params, searchParams }: { params: { slug: string }; searchParams?: { preview?: string } }) {
   const post = await getPostHtmlBySlug(params.slug);
   if (!post) notFound();
-  if (post.draft) notFound();
+  const preview = (searchParams?.preview || "").toString() === "1" || (searchParams?.preview || "").toString().toLowerCase() === "true";
+  if (post.draft && !preview) notFound();
 
 
   const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
@@ -197,6 +198,11 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   return (
     <div className="container mx-auto p-4">
       <Breadcrumbs items={crumbs} />
+      {post.draft ? (
+        <p className="mb-3 text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-md px-2 py-1 inline-block">
+          Draft preview — this post is not published.
+        </p>
+      ) : null}
       <h1 className="text-4xl font-bold mb-2">{post.title}</h1>
       {/* Optional hero image (renders only if post.image is provided) */}
       {post.image ? (
