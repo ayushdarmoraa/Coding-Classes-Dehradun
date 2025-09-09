@@ -46,6 +46,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* CWV: preconnect for Google Fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+      </head>
       <body>
         <Header />
         {children}
@@ -244,47 +249,49 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
 
-        {/* Close mobile menu after navigation / interactions */}
+        {/* Close mobile menu after navigation / interactions (guarded, passive) */}
         <Script
           id="close-mobile-menu"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function () {
-              function closeMenu() {
-                var cb = document.getElementById('nav-toggle');
-                if (cb && cb.checked) cb.checked = false;
-              }
-              document.addEventListener('click', function (e) {
-                var el = e.target;
-                if (!(el instanceof Element)) return;
-                var anchor = el.closest('a');
-                if (!anchor) return;
-                if (anchor.closest('header') || anchor.closest('#mobile-menu')) closeMenu();
-              }, true);
-              window.addEventListener('popstate', closeMenu);
-              window.addEventListener('hashchange', closeMenu);
-              document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') closeMenu();
-              });
+              try {
+                function closeMenu() {
+                  var cb = document.getElementById('nav-toggle');
+                  if (cb && 'checked' in cb && cb.checked) cb.checked = false;
+                }
+                function onDocClick(e) {
+                  var el = e.target;
+                  if (!(el instanceof Element)) return;
+                  var anchor = el.closest && el.closest('a');
+                  if (!anchor) return;
+                  if (anchor.closest('header') || anchor.closest('#mobile-menu')) closeMenu();
+                }
+                document.addEventListener('click', onDocClick, { capture: true, passive: true });
+                window.addEventListener('popstate', closeMenu);
+                window.addEventListener('hashchange', closeMenu);
+                document.addEventListener('keydown', function (e) {
+                  if (e.key === 'Escape') closeMenu();
+                });
+              } catch (_) {}
             })();`,
           }}
         />
 
-        {/* LocalBusiness JSON-LD for Local SEO */}
-    <script
+        {/* LocalBusiness JSON-LD for Local SEO (non-blocking) */}
+        <Script
           id="localbusiness-schema"
           type="application/ld+json"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify((() => {
-      // Use the normalized apex siteUrl computed above
-      const base = siteUrl.replace(/\/$/, "");
+              const base = siteUrl.replace(/\/$/, "");
               const sameAs = [
                 process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,
                 process.env.NEXT_PUBLIC_INSTAGRAM_URL || undefined,
                 process.env.NEXT_PUBLIC_LINKEDIN_URL || undefined,
                 process.env.NEXT_PUBLIC_YOUTUBE_URL || undefined,
               ].filter(Boolean);
-
               return {
                 "@context": "https://schema.org",
                 "@type": "LocalBusiness",
