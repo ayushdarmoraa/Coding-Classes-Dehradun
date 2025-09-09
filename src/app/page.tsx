@@ -26,7 +26,6 @@ export const metadata: Metadata = {
     url: APEX + "/",
     type: "website",
     siteName: "Doon Coding Academy",
-    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     // ✅ Large image card + image fallback
@@ -34,7 +33,6 @@ export const metadata: Metadata = {
     title: "Doon Coding Academy | Best Coding, Data Science & AI Courses in Dehradun",
     description:
       "Top-rated coding, data science, and AI courses in Dehradun. Small batches, hands-on projects, and career support.",
-    images: ["/og-image.png"],
   },
 };
 
