@@ -1,11 +1,11 @@
-'use client';
-
-import React, { useState } from 'react';
+"use client";
+import React, { useState, useRef, useMemo } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import Select from '@/components/ui/Select';
 import Card from '@/components/ui/Card';
+import { track, derivePageContext } from '@/lib/analytics';
 
 interface FormData {
   name: string;
@@ -41,9 +41,26 @@ const EnquiryForm: React.FC = () => {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [submitMessage, setSubmitMessage] = useState('');
 
+  // --- Analytics context ---
+  const startedRef = useRef(false);
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
+  const ctx = useMemo(() => derivePageContext(pathname), [pathname]);
+
+  const emitStartOnce = () => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    track('lead_form_start', {
+      page_type: ctx.page_type,
+      course_slug: ctx.course_slug || '(none)',
+      city: ctx.city,
+      page_path: pathname,
+    });
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    emitStartOnce();
     
     // Clear error when user starts typing
     if (errors[name]) {
@@ -84,6 +101,16 @@ const EnquiryForm: React.FC = () => {
     e.preventDefault();
     
     if (!validateForm()) {
+      // Validation error event
+      track('lead_form_error', {
+        page_type: ctx.page_type,
+        course_slug: ctx.course_slug || '(none)',
+        city: ctx.city,
+        page_path: pathname,
+        error_origin: 'validation',
+        field_errors: Object.keys(errors).length ? Object.keys(errors) : undefined,
+        has_message: Boolean(formData.message.trim()),
+      });
       return;
     }
     
@@ -91,7 +118,7 @@ const EnquiryForm: React.FC = () => {
     setSubmitStatus('idle');
     
     try {
-      const response = await fetch('/api/enquiry', {
+  const response = await fetch('/api/enquiry', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,6 +131,13 @@ const EnquiryForm: React.FC = () => {
       if (result.success) {
         setSubmitStatus('success');
         setSubmitMessage(result.message);
+        track('lead_form_submit', {
+          page_type: ctx.page_type,
+          course_slug: ctx.course_slug || '(none)',
+          city: ctx.city,
+            page_path: pathname,
+          has_message: Boolean(formData.message.trim()),
+        });
         setFormData({
           name: '',
           email: '',
@@ -114,6 +148,18 @@ const EnquiryForm: React.FC = () => {
       } else {
         setSubmitStatus('error');
         setSubmitMessage(result.message || 'Something went wrong. Please try again.');
+        const serverFieldErrors: string[] = Array.isArray(result.errors)
+          ? result.errors.map((er: { field?: string }) => er.field).filter(Boolean)
+          : [];
+        track('lead_form_error', {
+          page_type: ctx.page_type,
+          course_slug: ctx.course_slug || '(none)',
+          city: ctx.city,
+          page_path: pathname,
+          error_origin: 'server',
+          field_errors: serverFieldErrors.length ? serverFieldErrors : undefined,
+          has_message: Boolean(formData.message.trim()),
+        });
         
         // Handle validation errors from server
         if (result.errors) {
@@ -127,6 +173,14 @@ const EnquiryForm: React.FC = () => {
     } catch {
       setSubmitStatus('error');
       setSubmitMessage('Network error. Please check your connection and try again.');
+      track('lead_form_error', {
+        page_type: ctx.page_type,
+        course_slug: ctx.course_slug || '(none)',
+        city: ctx.city,
+        page_path: pathname,
+        error_origin: 'server',
+        has_message: Boolean(formData.message.trim()),
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -161,7 +215,15 @@ const EnquiryForm: React.FC = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          emitStartOnce();
+          handleSubmit(e);
+        }}
+        onFocus={emitStartOnce}
+        onChange={emitStartOnce}
+        className="space-y-6"
+      >
         <div className="grid md:grid-cols-2 gap-6">
           <Input
             label="Full Name"
