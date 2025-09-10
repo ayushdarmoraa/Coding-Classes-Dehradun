@@ -346,6 +346,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   name: "Ayush Darmora",
                   jobTitle: "Founder & Instructor"
                 },
+                geo: {
+                  "@type": "GeoCoordinates",
+                  latitude: 30.43859,
+                  longitude: 77.74087
+                },
                 knowsAbout: [
                   "Full-Stack Development",
                   "Gen AI",
