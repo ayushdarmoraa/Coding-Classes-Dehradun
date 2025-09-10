@@ -10,6 +10,7 @@ const ONLINE_COURSE_SLUGS = new Set(['full-stack', 'data-science', 'python', 'ja
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = []
+  const now = new Date()
 
   // --- Static evergreen pages (monthly) ---
   const staticMonthly = [
@@ -66,6 +67,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${BASE_URL}/online-courses/${c.slug}`,
       // Fallback lastModified: omit or use new Date() if you prefer freshness signals
       // lastModified: new Date(),
+      priority: 0.9,
+    })
+  }
+
+  // --- Offline (on-campus) course detail pages /courses/[slug] ---
+  for (const c of courses) {
+    entries.push({
+      url: `${BASE_URL}/courses/${c.slug}`,
+      lastModified: now,
       priority: 0.9,
     })
   }
