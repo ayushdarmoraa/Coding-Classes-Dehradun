@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { breadcrumbLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Coding Classes in Noida (Online) – Doon Coding Academy",
@@ -21,31 +22,17 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  const breadcrumbLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://dooncodingacademy.in/",
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Noida",
-        item: "https://dooncodingacademy.in/locations/noida",
-      },
-    ],
-  };
+  const crumbs = breadcrumbLd([
+    { name: "Home", url: "https://dooncodingacademy.in/" },
+    { name: "Noida", url: "https://dooncodingacademy.in/locations/noida" },
+  ]);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }}
       />
       <main className="max-w-6xl mx-auto px-4 py-10">
         {/* Hero */}
@@ -172,6 +159,48 @@ export default function Page() {
             </div>
           </div>
         </section>
+
+        {/* FAQPage JSON-LD for Noida */}
+        <script
+          id="faq-noida"
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: [
+                {
+                  "@type": "Question",
+                  name: "Is there a DCA center in Noida?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text:
+                      "No. We serve Noida learners via live online cohorts. Our only physical campus is in Dehradun.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "What’s the class schedule?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text:
+                      "Evening slots on weekdays plus weekend mentor hours. Recordings are provided for revision.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Do you provide placement support for Noida learners?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text:
+                      "Yes. You’ll get project reviews, resume prep, mock interviews, and guidance on targeting NCR roles.",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
 
         {/* CTA */}
         <section className="mb-2">

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { breadcrumbLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Coding Classes in Mumbai (Online) – Doon Coding Academy",
@@ -21,31 +22,17 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  const breadcrumbLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://dooncodingacademy.in/",
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Mumbai",
-        item: "https://dooncodingacademy.in/locations/mumbai",
-      },
-    ],
-  };
+  const crumbs = breadcrumbLd([
+    { name: "Home", url: "https://dooncodingacademy.in/" },
+    { name: "Mumbai", url: "https://dooncodingacademy.in/locations/mumbai" },
+  ]);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }}
       />
       <main className="max-w-6xl mx-auto px-4 py-10">
         {/* Hero */}
