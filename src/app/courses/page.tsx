@@ -6,6 +6,7 @@ import { getCourses, getCourseBySlug } from "@/lib/courses";
 import CourseCard from "@/components/features/CourseCard";
 import Badge from "@/components/ui/Badge";
 import Script from "next/script";
+import Link from "next/link";
 
 // ⬇️ TOP-LEVEL (outside any function)
 const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
@@ -82,6 +83,10 @@ export default function CoursesPage() {
       />
       <p className="mt-2 max-w-2xl text-gray-700">
         Pick a program that fits your goals. Small batches, hands-on projects, and support included.
+      </p>
+      <p className="mt-2 text-sm text-gray-600">
+        Need city / online context? Visit our{' '}
+        <Link href="/locations" className="text-blue-700 hover:underline">Locations</Link> page.
       </p>
 
           {/* Filters / Sort (anchor-only) */}

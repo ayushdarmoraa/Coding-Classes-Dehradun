@@ -52,6 +52,11 @@ export default function AboutPage() {
               </a>
             </div>
 
+            <p className="mt-3 text-sm text-gray-600">
+              Looking for city or online options?{' '}
+              <Link href="/locations" className="text-blue-700 hover:underline">See Locations</Link>.
+            </p>
+
             <ul className="mt-6 grid gap-3 sm:grid-cols-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
                 <span className="mt-1 h-2 w-2 rounded-full bg-yellow-400"></span>
