@@ -37,6 +37,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // --- Blog index (weekly) ---
+
+  // --- Locations index + city landers (online-only cities) ---
+  entries.push({
+    url: `${BASE_URL}/locations`,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+    lastModified: now,
+  })
+  for (const slug of ['noida', 'bangalore', 'mumbai']) {
+    entries.push({
+      url: `${BASE_URL}/locations/${slug}`,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+      lastModified: now,
+    })
+  }
+
   entries.push({
     url: `${BASE_URL}/blog`,
     changeFrequency: 'weekly',
