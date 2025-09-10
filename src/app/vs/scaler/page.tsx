@@ -105,6 +105,25 @@ export default function Page() {
         </p>
       </div>
 
+      {/* Further reading & next steps (new) */}
+      <section className="mt-8">
+        <h2 className="text-xl font-semibold">Further reading &amp; next steps</h2>
+        <ul className="list-disc pl-6 space-y-2">
+          <li>
+            Not sure between live cohorts and recorded videos? Read{" "}
+            <Link href="/blog/live-vs-recorded-coding-classes-india" className="text-blue-700 hover:underline">
+              Live vs Recorded Coding Classes (India)
+            </Link>.
+          </li>
+          <li>
+            Ready to learn online with mentors and projects? Explore our{" "}
+            <Link href="/online-courses/full-stack" className="text-blue-700 hover:underline">
+              Online Full-Stack Course in India
+            </Link>.
+          </li>
+        </ul>
+      </section>
+
       {/* CTAs */}
       <div className="mt-10 flex flex-wrap gap-3">
         <Button href="/online-courses/full-stack" size="lg" variant="primary">
