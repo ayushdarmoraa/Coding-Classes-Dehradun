@@ -292,6 +292,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 process.env.NEXT_PUBLIC_LINKEDIN_URL || undefined,
                 process.env.NEXT_PUBLIC_YOUTUBE_URL || undefined,
               ].filter(Boolean);
+              // Ensure key profiles are always present
+              const staticProfiles = [
+                'https://instagram.com/dooncodingacademy/',
+                'https://maps.app.goo.gl/zCsj8wk4CCttrune6'
+              ];
+              for (const profile of staticProfiles) {
+                if (!sameAs.includes(profile)) sameAs.push(profile);
+              }
               return {
                 "@context": "https://schema.org",
                 "@type": "LocalBusiness",
