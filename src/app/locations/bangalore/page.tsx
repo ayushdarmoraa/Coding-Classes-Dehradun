@@ -171,6 +171,48 @@ export default function Page() {
           </div>
         </section>
 
+        {/* FAQPage JSON-LD for Bangalore */}
+        <script
+          id="faq-bangalore"
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: [
+                {
+                  "@type": "Question",
+                  name: "Is there a DCA center in Bangalore?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text:
+                      "No. We serve Bangalore learners via live online cohorts. Our only physical campus is in Dehradun.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "What’s the class schedule?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text:
+                      "Evening slots on weekdays plus weekend mentor hours. Recordings are provided for revision.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Do you provide placement support for Bangalore learners?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text:
+                      "Yes. You’ll get project reviews, resume prep, mock interviews, and targeted guidance for Bangalore roles.",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
+
         {/* CTA (reuse Noida text/links) */}
         <section className="mb-2">
           <div className="flex flex-wrap gap-3">
