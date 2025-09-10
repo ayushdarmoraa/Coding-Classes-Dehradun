@@ -126,22 +126,27 @@ export default function Page() {
         </div>
       </section>
 
-      {/* FAQs & trust step */}
-      <section aria-labelledby="faqs-next" className="mb-10">
-        <h2 id="faqs-next" className="text-2xl font-semibold mb-3">Still deciding?</h2>
-        <p className="text-gray-800">
-          Check common questions in our{" "}
-          <Link href="/faq" className="text-blue-700 hover:underline">FAQ</Link>, or skim this
-          blog guide for a deeper look at outcomes and what to expect:
-        </p>
-        <ul className="mt-3 list-disc pl-6 text-gray-800">
+      {/* Still deciding? (expanded, retains existing styles) */}
+      <section className="mt-8">
+        <h2 className="text-xl font-semibold">Still deciding?</h2>
+        <ul className="list-disc pl-6 space-y-2">
           <li>
-            <Link
-              href="/blog/best-full-stack-course-dehradun-2025"
-              className="text-blue-700 hover:underline"
-            >
-              Best Full-Stack Course in Dehradun (2025): Fees, Duration, Outcomes
-            </Link>
+            Not sure between live cohorts and recorded videos? Read{" "}
+            <Link href="/blog/live-vs-recorded-coding-classes-india" className="text-blue-700 hover:underline">
+              Live vs Recorded Coding Classes (India)
+            </Link>.
+          </li>
+          <li>
+            Planning a visit to our campus? See{" "}
+            <Link href="/blog/visit-dca-campus-dehradun-guide" className="text-blue-700 hover:underline">
+              Visit DCA Campus (Dehradun): A Practical Guide
+            </Link>.
+          </li>
+          <li>
+            Prefer on-campus learning? Explore{" "}
+            <Link href="/courses/full-stack" className="text-blue-700 hover:underline">
+              Full-Stack in Dehradun (On-Campus/Hybrid)
+            </Link>.
           </li>
         </ul>
       </section>
