@@ -105,6 +105,15 @@ export default function HomePage() {
               Chat on WhatsApp
             </Button>
           </div>
+
+          {/* subtle internal link to Locations per SEO plan */}
+          <p className="mt-3 text-sm text-gray-600">
+            Prefer city context? Visit our{" "}
+            <a href="/locations" className="text-blue-700 hover:underline">
+              Locations
+            </a>{" "}
+            page.
+          </p>
           
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
