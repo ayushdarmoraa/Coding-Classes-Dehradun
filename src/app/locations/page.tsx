@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { breadcrumbLd } from "@/lib/seo";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 
@@ -34,14 +35,10 @@ interface Tile {
 }
 
 export default function LocationsIndexPage() {
-  const breadcrumbLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://dooncodingacademy.in/" },
-      { "@type": "ListItem", position: 2, name: "Locations", item: "https://dooncodingacademy.in/locations" },
-    ],
-  };
+  const crumbs = breadcrumbLd([
+    { name: "Home", url: "https://dooncodingacademy.in/" },
+    { name: "Locations", url: "https://dooncodingacademy.in/locations" },
+  ]);
 
   const tiles: Tile[] = [
     {
@@ -84,7 +81,7 @@ export default function LocationsIndexPage() {
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }}
       />
       <main className="max-w-6xl mx-auto px-4 py-10">
         {/* Hero */}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { breadcrumbLd } from "@/lib/seo";
 const GBP_URL =
   process.env.NEXT_PUBLIC_GBP_URL || "https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9";
 import Card from "@/components/ui/Card";
@@ -62,6 +63,10 @@ const localCompanies = [
 ];
 
 export default function DehradunLocationPage() {
+  const crumbs = breadcrumbLd([
+    { name: "Home", url: "https://dooncodingacademy.in/" },
+    { name: "Dehradun", url: "https://dooncodingacademy.in/locations/dehradun" },
+  ]);
   const courses = getCourses();
 
   return (
@@ -539,26 +544,8 @@ export default function DehradunLocationPage() {
       <script
         id="breadcrumbs-dehradun"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              {
-                "@type": "ListItem",
-                position: 1,
-                name: "Home",
-                item: "https://dooncodingacademy.in/"
-              },
-              {
-                "@type": "ListItem",
-                position: 2,
-                name: "Dehradun",
-                item: "https://dooncodingacademy.in/locations/dehradun"
-              }
-            ]
-          }),
-        }}
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }}
       />
     </div>
   );
