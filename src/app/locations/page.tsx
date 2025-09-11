@@ -1,10 +1,9 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { breadcrumbLd } from "@/lib/seo";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Locations – Learn Online or Visit Dehradun | DCA",
   description:
     "Choose your path with Doon Coding Academy: visit our Dehradun campus for on-campus classes or join our live online cohorts from cities like Noida and Bangalore.",
