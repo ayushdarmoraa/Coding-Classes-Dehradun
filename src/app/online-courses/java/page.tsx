@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Button from "@/components/ui/Button";
+import Link from "next/link";
 import Card from "@/components/ui/Card";
 
 // Build apex base URL: https + no trailing slash + drop www
@@ -64,7 +65,8 @@ export default function JavaOnlinePage() {
           </h1>
           <p className="mt-4 text-lg text-gray-700">
             Learn core Java, OOP, collections, JDBC, and hands-on project work in a live online cohort.
-            Every session includes recordings, mentor hours, and weekly feedback so you keep progressing.
+            Every session includes recordings, mentor hours, and weekly feedback so you keep progressing. {" "}
+            <Link href="/courses/java" className="underline text-blue-700">Prefer on-campus? See Java in Dehradun</Link>
           </p>
 
           <div className="mt-8 grid md:grid-cols-2 gap-6">
@@ -122,6 +124,9 @@ export default function JavaOnlinePage() {
           })
         }}
       />
+      <div className="mt-8 text-center pb-12">
+        <Link href="/locations" className="underline text-blue-700 text-sm">See campus & cities</Link>
+      </div>
     </div>
   );
 }

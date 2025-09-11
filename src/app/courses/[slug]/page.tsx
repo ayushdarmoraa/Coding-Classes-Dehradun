@@ -307,7 +307,16 @@ export default async function CoursePage({ params }: Props) {
       {/* Hero */}
       <header className="mb-6">
         <h1 className="text-3xl md:text-4xl font-extrabold mb-3">{course.title}</h1>
-        <p className="text-gray-700 max-w-3xl">{course.description}</p>
+        <p className="text-gray-700 max-w-3xl">
+          {course.description}{" "}
+          {/* Inline cross-link to online variant (fallback full-stack) */}
+          <Link
+            href={(ONLINE_TARGETS[slug] ?? "/online-courses/full-stack")}
+            className="underline text-blue-700 hover:text-blue-800"
+          >
+            Learn this track online (live cohort)
+          </Link>
+        </p>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <Badge variant="success" className="bg-green-500 text-white">Duration: {course.duration}</Badge>
@@ -457,6 +466,13 @@ export default async function CoursePage({ params }: Props) {
               and practice interview-focused problem-solving with code reviews.
             </p>
           </div>
+
+          {/* Compare with online block */}
+          <div className="mt-6">
+            <Link href="/online-courses/full-stack" className="text-blue-700 hover:underline font-medium">
+              Prefer online? See the Live Full-Stack cohort →
+            </Link>
+          </div>
         </section>
       )}
 
@@ -529,6 +545,12 @@ export default async function CoursePage({ params }: Props) {
               <span className="font-semibold">Outcome:</span> Build solid Python + ML foundations, ship 3 portfolio artifacts
               (EDA, model, dashboard), and learn to use Gen&nbsp;AI to accelerate analysis.
             </p>
+          </div>
+
+          <div className="mt-6">
+            <Link href="/online-courses/data-science" className="text-blue-700 hover:underline font-medium">
+              Compare with the Online Data Science cohort →
+            </Link>
           </div>
         </section>
       )}
@@ -619,6 +641,12 @@ export default async function CoursePage({ params }: Props) {
               and 3–4 portfolio projects to showcase.
             </p>
           </div>
+
+          <div className="mt-6">
+            <Link href="/online-courses/java" className="text-blue-700 hover:underline font-medium">
+              Compare with the Online Java cohort →
+            </Link>
+          </div>
         </section>
       )}
 
@@ -636,6 +664,13 @@ export default async function CoursePage({ params }: Props) {
         <ul className="list-disc ml-6 space-y-1">
           {course.outcomes.map((outcome, idx) => <li key={idx}>{outcome}</li>)}
         </ul>
+      </section>
+
+      {/* Outcomes CTA augmentation */}
+      <section className="mt-6">
+        <p className="text-sm text-gray-600">
+          Want to sit in first? <Link href="/locations/dehradun" className="underline text-blue-700">Visit the Dehradun campus</Link> for a trial session.
+        </p>
       </section>
 
       {/* FAQs (UI mirrors JSON-LD) */}

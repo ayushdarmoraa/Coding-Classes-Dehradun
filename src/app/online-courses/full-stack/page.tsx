@@ -73,7 +73,10 @@ export default function OnlineFullStackPage() {
           <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto">
             Live, cohort-based training with <strong>projects</strong>, <strong>recordings</strong>,
             and <strong>mentor hours</strong>. Small batches, hands-on reviews, and placement
-            support—fully online.
+            support—fully online. {" "}
+            <Link href="/courses/full-stack" className="underline text-yellow-200 hover:text-white">
+              Prefer on-campus? See Dehradun Full-Stack
+            </Link>
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <Button href="/contact" size="lg" className="bg-yellow-400 text-blue-900 font-semibold hover:bg-yellow-500">
@@ -159,6 +162,9 @@ export default function OnlineFullStackPage() {
               See the on-campus Full-Stack program
             </Link>
             .
+          </p>
+          <p className="mt-3 text-sm">
+            Want city options? <Link href="/locations" className="text-blue-700 underline">Browse locations</Link>.
           </p>
         </div>
       </section>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Button from "@/components/ui/Button";
+import Link from "next/link";
 
 // Build apex base URL (https, no trailing slash, no www)
 const RAW = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
@@ -65,7 +66,8 @@ export default function OnlineDataSciencePage() {
           </h1>
           <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto">
             Learn Python, data wrangling, visualization, ML fundamentals, and project workflows.
-            Includes live classes, recordings, mentor hours, and structured career support.
+            Includes live classes, recordings, mentor hours, and structured career support. {" "}
+            <Link href="/courses/data-science" className="underline text-yellow-200 hover:text-white">Prefer on-campus? See Dehradun Data Science</Link>
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
             <Button href="/contact" size="lg" className="bg-yellow-400 text-blue-900 font-semibold hover:bg-yellow-500">
@@ -103,6 +105,14 @@ export default function OnlineDataSciencePage() {
               6 months · small batches · live + recordings · weekly mentor hours · project reviews · placement help.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Bottom CTA */}
+      <section className="pb-12 -mt-4">
+        <div className="max-w-5xl mx-auto px-4 text-center">
+          <p className="text-sm text-blue-600 mb-3">Explore offline + other cities</p>
+          <Link href="/locations" className="inline-block underline text-blue-700">See campus & cities</Link>
         </div>
       </section>
 

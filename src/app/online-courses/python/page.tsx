@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Button from "@/components/ui/Button";
+import Link from "next/link";
 
 const RAW = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 const SITE = RAW.replace(/^http:\/\//, "https://").replace(/^https:\/\/www\./, "https://");
@@ -50,7 +51,8 @@ export default function OnlinePythonPage() {
       </h1>
       <p className="text-lg text-gray-700 mb-6">
         Learn Python live online from anywhere in India. Small batches, weekly projects,
-        mentor hours, and recordings so you never fall behind.
+        mentor hours, and recordings so you never fall behind. {" "}
+        <Link href="/courses/python" className="underline text-blue-700">Prefer on-campus? See Dehradun Python</Link>
       </p>
 
       <div className="flex gap-3 mb-10">
@@ -80,6 +82,9 @@ export default function OnlinePythonPage() {
           })
         }}
       />
+      <div className="mt-10 text-center">
+        <Link href="/locations" className="underline text-blue-700 text-sm">See campus & cities</Link>
+      </div>
     </div>
   );
 }
