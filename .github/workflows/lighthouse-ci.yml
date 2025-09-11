@@ -1,0 +1,67 @@
+name: Lighthouse CI (mobile checks)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+jobs:
+  lighthouse:
+    name: Lighthouse mobile (representative pages)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start dev server (background)
+        run: |
+          npm run build
+          npm run start &> lhci-server.log &
+          echo $! > .lhci_server_pid
+        env:
+          NODE_ENV: production
+
+      - name: Wait for server
+        run: |
+          for i in {1..30}; do
+            if nc -z localhost 3000; then
+              echo "Server up"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Timed out waiting for server" >&2
+          exit 1
+
+      - name: Run Lighthouse checks (treosh/lighthouse-ci-action)
+        uses: treosh/lighthouse-ci-action@v9
+        with:
+          urls: |
+            http://localhost:3000/
+            http://localhost:3000/courses/full-stack
+            http://localhost:3000/online-courses/full-stack
+            http://localhost:3000/locations/dehradun
+          configPath: .lighthouserc.json
+          output: html
+          uploadArtifacts: true
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Save LHCI logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lhci-logs
+          path: ./lighthouseci_reports || ./lhci-report || ./lhci

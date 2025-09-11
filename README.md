@@ -67,6 +67,13 @@ The checks are intentionally heuristic. If you have special cases (dynamic metad
 
 If you want additional rules (BreadcrumbList required on location pages, max unique internal link targets, etc.) extend `scripts/seo-qa-check.js` accordingly.
 
+## Lighthouse CI (CWV) checks
+
+Local run:
+1. Build and start the app locally (workflow assumes `npm run build` then `npm run start` on port 3000).
+2. Run Lighthouse locally (optional):
+   ```bash
+   npx -y @lhci/cli@0.10 autorun --config=./.lighthouserc.json
 ## License
 
 This project is provided for educational purposes. Feel free to modify and reuse as needed.
