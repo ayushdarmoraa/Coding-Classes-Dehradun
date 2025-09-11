@@ -1,0 +1,30 @@
+name: SEO QA (pre-merge)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - feature/**
+
+jobs:
+  seo-qa:
+    name: SEO QA checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dev dependencies
+        run: npm ci
+
+      - name: Run SEO QA script
+        run: node scripts/seo-qa-check.js
