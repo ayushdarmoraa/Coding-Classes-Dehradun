@@ -116,6 +116,7 @@ export default function Page() {
             </Link>
             .
           </p>
+          {/* Pruned extra comparison links for density */}
         </section>
 
         {/* Job market context */}
@@ -128,6 +129,9 @@ export default function Page() {
             Our cohorts focus on building &amp; shipping real projects so you can
             interview with confidence.
           </p>
+          <p className="text-gray-700 mt-3 text-sm">
+            Interested in placements? See the <Link href="/faq" className="underline text-blue-700">FAQ</Link>.
+          </p>
         </section>
 
         {/* FAQs */}
@@ -139,6 +143,8 @@ export default function Page() {
               <p className="text-gray-700">
                 No. We serve Noida learners via <strong>live online</strong>{" "}
                 cohorts. Our only physical campus is in Dehradun.
+                {" "}
+                <Link href="/locations/dehradun" className="underline text-blue-700">See campus details</Link>.
               </p>
             </div>
             <div>

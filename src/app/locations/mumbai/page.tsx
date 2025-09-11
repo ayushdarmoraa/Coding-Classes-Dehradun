@@ -116,6 +116,7 @@ export default function Page() {
             </Link>
             .
           </p>
+          {/* Pruned data science comparison links */}
         </section>
 
         {/* Job market context */}
@@ -125,6 +126,9 @@ export default function Page() {
             From fintech and media tech to product startups and IT services,
             employers in Mumbai look for applied skills and portfolio proof.
             Our cohorts mirror workplace workflows so you’re ready on day one.
+          </p>
+          <p className="text-gray-700 mt-3 text-sm">
+            Placement support: <Link href="/faq" className="underline text-blue-700">FAQ</Link>.
           </p>
         </section>
 
@@ -137,6 +141,8 @@ export default function Page() {
               <p className="text-gray-700">
                 No. We serve Mumbai learners via <strong>live online</strong>{" "}
                 cohorts. Our only physical campus is in Dehradun.
+                {" "}
+                <Link href="/locations/dehradun" className="underline text-blue-700">See campus details</Link>.
               </p>
             </div>
             <div>
