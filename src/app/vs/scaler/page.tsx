@@ -124,6 +124,21 @@ export default function Page() {
         </ul>
       </section>
 
+      {/* Conclusion (pruned) */}
+      <section aria-labelledby="vs-scaler-conclusion" className="mt-10 border-t pt-8">
+        <h2 id="vs-scaler-conclusion" className="text-xl font-semibold mb-3">Conclusion</h2>
+        <p className="text-gray-700">
+          If you want small cohorts, live mentor feedback, and portfolio-depth projects, our {" "}
+          <Link href="/courses/full-stack" className="text-blue-700 hover:underline">Full-Stack Bootcamp (On-Campus)</Link> is a focused, project-first path.
+        </p>
+        <p className="mt-2 text-sm text-gray-600">
+          Prefer a visit first? <Link href="/locations/dehradun" className="underline text-blue-700">See the Dehradun campus</Link>.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Button href="/courses/full-stack" size="lg" variant="primary">Explore Full-Stack Bootcamp</Button>
+        </div>
+      </section>
+
       {/* CTAs */}
       <div className="mt-10 flex flex-wrap gap-3">
         <Button href="/online-courses/full-stack" size="lg" variant="primary">

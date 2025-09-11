@@ -161,6 +161,21 @@ export default function Page() {
         </Button>
       </div>
 
+      {/* Conclusion (pruned) */}
+      <section aria-labelledby="vs-coding-ninjas-conclusion" className="mt-10 border-t pt-8">
+        <h2 id="vs-coding-ninjas-conclusion" className="text-xl font-semibold mb-3">Conclusion</h2>
+        <p className="text-gray-700">
+          For hands-on mentorship, smaller cohorts, and structured project reviews choose the {" "}
+          <Link href="/courses/full-stack" className="text-blue-700 hover:underline">Full-Stack Bootcamp (On-Campus)</Link>.
+        </p>
+        <p className="mt-2 text-sm text-gray-600">
+          Want to visit first? <Link href="/locations/dehradun" className="underline text-blue-700">See the Dehradun campus</Link>.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Button href="/courses/full-stack" size="lg" variant="primary">Explore Full-Stack Bootcamp</Button>
+        </div>
+      </section>
+
       {/* BreadcrumbList JSON-LD (no /vs index yet → 2-item trail) */}
       <script
         id="breadcrumb-vs-coding-ninjas"
