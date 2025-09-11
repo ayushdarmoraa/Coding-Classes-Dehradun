@@ -41,6 +41,32 @@ Additional utilities and data live under `src/lib`.
 
 This site is designed to be deployed on **Vercel**. Commit changes to the `main` branch, and Vercel will handle the build and deployment process automatically.
 
+## SEO QA (pre-merge) checks
+
+We run a lightweight SEO QA script on PRs to detect basic issues early:
+
+* Ensures one `<h1>` in the page `<main>` content.
+* Heuristic check for a canonical (`<link rel="canonical">` or `metadataBase` / exported metadata).
+* Heuristic checks for JSON-LD presence for Course / FAQ / BreadcrumbList where expected.
+
+Run locally:
+
+```bash
+# Node 18+ recommended
+node scripts/seo-qa-check.js
+```
+
+CI:
+
+The script is executed by `.github/workflows/seo-qa.yml` on PRs and feature branch pushes.
+
+Notes:
+
+The checks are intentionally heuristic. If you have special cases (dynamic metadata injection, server-only metadata), you can skip the check for a file by adding a top-line comment:
+`// seo-qa-skip` at the top of the page file (this script can be extended to ignore files containing that comment).
+
+If you want additional rules (BreadcrumbList required on location pages, max unique internal link targets, etc.) extend `scripts/seo-qa-check.js` accordingly.
+
 ## License
 
 This project is provided for educational purposes. Feel free to modify and reuse as needed.
