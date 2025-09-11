@@ -135,16 +135,36 @@ export default function Page() {
           Prefer a visit first? <Link href="/locations/dehradun" className="underline text-blue-700">See the Dehradun campus</Link>.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Button href="/courses/full-stack" size="lg" variant="primary">Explore Full-Stack Bootcamp</Button>
+          <Button
+            href="/courses/full-stack"
+            size="lg"
+            variant="primary"
+            event="cta_enroll_click"
+            eventParams={{ page_type: 'comparison', course_slug: 'full-stack', variant: 'conclusion_primary' }}
+          >
+            Explore Full-Stack Bootcamp
+          </Button>
         </div>
       </section>
 
       {/* CTAs */}
       <div className="mt-10 flex flex-wrap gap-3">
-        <Button href="/online-courses/full-stack" size="lg" variant="primary">
+        <Button
+          href="/online-courses/full-stack"
+          size="lg"
+          variant="primary"
+          event="cta_enroll_click"
+          eventParams={{ page_type: 'comparison', course_slug: 'full-stack', variant: 'post_body_primary_online' }}
+        >
           Start Full-Stack Online (Live + Projects)
         </Button>
-        <Button href="/blog/best-full-stack-course-dehradun-2025" size="lg" variant="secondary">
+        <Button
+          href="/blog/best-full-stack-course-dehradun-2025"
+          size="lg"
+          variant="secondary"
+          event="cta_enroll_click"
+          eventParams={{ page_type: 'comparison', course_slug: 'full-stack', variant: 'post_body_secondary_guide' }}
+        >
           Read: Best Full-Stack Course (Guide)
         </Button>
       </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import Button from "@/components/ui/Button";
+import { trackEnrollClick } from "@/lib/analytics";
 import Card from "@/components/ui/Card";
 
 // Normalize base URL → https + apex (no trailing slash)
@@ -79,10 +80,22 @@ export default function OnlineFullStackPage() {
             </Link>
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-            <Button href="/contact" size="lg" className="bg-yellow-400 text-blue-900 font-semibold hover:bg-yellow-500">
+            <Button
+              href="/contact"
+              size="lg"
+              className="bg-yellow-400 text-blue-900 font-semibold hover:bg-yellow-500"
+              event="cta_enroll_click"
+              eventParams={{ page_type: 'online_course', course_slug: 'full-stack', city: 'india', variant: 'hero_primary' }}
+            >
               Talk to a Mentor
             </Button>
-            <Button href="/courses/full-stack" size="lg" variant="secondary">
+            <Button
+              href="/courses/full-stack"
+              size="lg"
+              variant="secondary"
+              event="cta_enroll_click"
+              eventParams={{ page_type: 'online_course', course_slug: 'full-stack', city: 'india', variant: 'hero_secondary_oncampus' }}
+            >
               Prefer On-Campus (Dehradun)?
             </Button>
           </div>
@@ -146,8 +159,21 @@ export default function OnlineFullStackPage() {
               <li>Recordings, notes & tasks inside the cohort space.</li>
             </ul>
             <div className="mt-4 flex gap-3">
-              <Button href="/contact">Enroll / Ask Questions</Button>
-              <Button href="/faq" variant="ghost">See FAQs</Button>
+              <Button
+                href="/contact"
+                event="cta_enroll_click"
+                eventParams={{ page_type: 'online_course', course_slug: 'full-stack', city: 'india', variant: 'cohort_card_primary' }}
+              >
+                Enroll / Ask Questions
+              </Button>
+              <Button
+                href="/faq"
+                variant="ghost"
+                event="cta_enroll_click"
+                eventParams={{ page_type: 'online_course', course_slug: 'full-stack', city: 'india', variant: 'cohort_card_faq' }}
+              >
+                See FAQs
+              </Button>
             </div>
           </Card>
         </div>

@@ -46,3 +46,17 @@ export function derivePageContext(pathname: string): {
 
   return { page_type, course_slug, city };
 }
+
+// Convenience wrappers (domain-specific semantic events)
+export function trackLeadClick(channel: 'phone' | 'whatsapp' | 'directions', extra: GAParams = {}) {
+  track('lead_contact_click', { channel, ...extra });
+}
+
+export function trackEnrollClick(params: { page_type: string; course_slug?: string; city?: string; variant?: string }) {
+  const { page_type, course_slug, city, variant } = params;
+  track('cta_enroll_click', { page_type, course_slug, city, variant });
+}
+
+export function trackForm(step: 'start' | 'submit' | 'error', extra: GAParams = {}) {
+  track(`lead_form_${step}`, extra);
+}

@@ -1,4 +1,6 @@
+"use client";
 import React from 'react';
+import { track } from '@/lib/analytics';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost';
@@ -7,6 +9,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   href?: string;
   target?: string;
   rel?: string;
+  event?: string;                // analytics event name
+  eventParams?: Record<string, unknown>; // analytics params
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -17,6 +21,8 @@ const Button: React.FC<ButtonProps> = ({
   target,
   rel,
   className = '',
+  event,
+  eventParams,
   ...props
 }) => {
   const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
@@ -35,16 +41,29 @@ const Button: React.FC<ButtonProps> = ({
 
   const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
 
+  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
+    if (event) {
+      try { track(event, eventParams || {}); } catch { /* no-op */ }
+    }
+    if (props.onClick) props.onClick(e as React.MouseEvent<HTMLButtonElement>);
+  };
+
   if (href) {
     return (
-      <a href={href} className={classes} target={target} rel={rel}>
+      <a
+        href={href}
+        className={classes}
+        target={target}
+        rel={rel}
+        onClick={handleClick}
+      >
         {children}
       </a>
     );
   }
 
   return (
-    <button className={classes} {...props}>
+    <button className={classes} onClick={handleClick} {...props}>
       {children}
     </button>
   );
