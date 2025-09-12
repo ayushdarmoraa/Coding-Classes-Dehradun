@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
+import TrackedLink from "@/components/analytics/TrackedLink";
 import { notFound } from "next/navigation";
 
 import { getCourseBySlug } from "@/lib/courses";
@@ -309,13 +310,14 @@ export default async function CoursePage({ params }: Props) {
         <h1 className="text-3xl md:text-4xl font-extrabold mb-3">{course.title}</h1>
         <p className="text-gray-700 max-w-3xl">
           {course.description}{" "}
-          {/* Inline cross-link to online variant (fallback full-stack) */}
-          <Link
+          <TrackedLink
             href={(ONLINE_TARGETS[slug] ?? "/online-courses/full-stack")}
+            event="cta_enroll_click"
+            eventParams={{ page_type: 'offline_course', course_slug: course.slug, city: 'dehradun', variant: 'inline_online_crosslink' }}
             className="underline text-blue-700 hover:text-blue-800"
           >
             Learn this track online (live cohort)
-          </Link>
+          </TrackedLink>
         </p>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -324,24 +326,34 @@ export default async function CoursePage({ params }: Props) {
         </div>
 
         <div className="mt-4 flex flex-wrap gap-3">
-          <a
+          <Button
             href="/contact"
+            event="cta_enroll_click"
+            eventParams={{ page_type: 'offline_course', course_slug: course.slug, city: 'dehradun', variant: 'hero_consultation' }}
             className="inline-flex items-center rounded-xl bg-blue-700 px-4 py-2 text-white text-sm font-semibold shadow-sm hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-blue-700/30"
           >
             Get a free consultation
-          </a>
-          <a
-            href="https://wa.me/917037905464?text=Hi%2C%20I%27m%20interested%20in%20the%20{{course}}%20course"
+          </Button>
+          <Button
+            href="https://wa.me/917037905464?text=Hi%2C%20I%27m%20interested%20in%20the%20${course.slug}%20course"
+            event="lead_contact_click"
+            eventParams={{ channel: 'whatsapp', page_type: 'offline_course', course_slug: course.slug, city: 'dehradun', variant: 'hero_whatsapp' }}
             className="inline-flex items-center rounded-xl border border-blue-700 px-4 py-2 text-blue-700 text-sm font-semibold hover:bg-blue-700/5 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
           >
             Chat on WhatsApp
-          </a>
+          </Button>
         </div>
 
         {/* Offline → Online cross-link (per SEO plan) */}
         {ONLINE_TARGETS[slug] ? (
           <div className="mt-3">
-            <Button href={ONLINE_TARGETS[slug]} variant="secondary" size="lg">
+            <Button
+              href={ONLINE_TARGETS[slug]}
+              variant="secondary"
+              size="lg"
+              event="cta_enroll_click"
+              eventParams={{ page_type: 'offline_course', course_slug: course.slug, city: 'dehradun', variant: 'hero_online_crosslink_button' }}
+            >
               Not in Dehradun? Learn Online (Live + Projects)
             </Button>
           </div>
@@ -469,9 +481,14 @@ export default async function CoursePage({ params }: Props) {
 
           {/* Compare with online block */}
           <div className="mt-6">
-            <Link href="/online-courses/full-stack" className="text-blue-700 hover:underline font-medium">
+            <TrackedLink
+              href="/online-courses/full-stack"
+              className="text-blue-700 hover:underline font-medium"
+              event="cta_enroll_click"
+              eventParams={{ page_type: 'offline_course', course_slug: 'full-stack', city: 'dehradun', variant: 'curriculum_online_compare' }}
+            >
               Prefer online? See the Live Full-Stack cohort →
-            </Link>
+            </TrackedLink>
           </div>
         </section>
       )}
@@ -548,9 +565,14 @@ export default async function CoursePage({ params }: Props) {
           </div>
 
           <div className="mt-6">
-            <Link href="/online-courses/data-science" className="text-blue-700 hover:underline font-medium">
+            <TrackedLink
+              href="/online-courses/data-science"
+              className="text-blue-700 hover:underline font-medium"
+              event="cta_enroll_click"
+              eventParams={{ page_type: 'offline_course', course_slug: 'data-science', city: 'dehradun', variant: 'curriculum_online_compare' }}
+            >
               Compare with the Online Data Science cohort →
-            </Link>
+            </TrackedLink>
           </div>
         </section>
       )}
@@ -643,9 +665,14 @@ export default async function CoursePage({ params }: Props) {
           </div>
 
           <div className="mt-6">
-            <Link href="/online-courses/java" className="text-blue-700 hover:underline font-medium">
+            <TrackedLink
+              href="/online-courses/java"
+              className="text-blue-700 hover:underline font-medium"
+              event="cta_enroll_click"
+              eventParams={{ page_type: 'offline_course', course_slug: 'java', city: 'dehradun', variant: 'curriculum_online_compare' }}
+            >
               Compare with the Online Java cohort →
-            </Link>
+            </TrackedLink>
           </div>
         </section>
       )}
