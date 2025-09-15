@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
+import { trackEnrollClick, trackLeadClick } from "@/lib/analytics";
 
 const RAW = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 const HTTPS = RAW.replace(/^http:\/\//, "https://");
@@ -153,11 +154,33 @@ export default function Page() {
 
       {/* CTAs */}
       <div className="mt-8 flex flex-wrap gap-3">
-        <Button href="/online-courses/full-stack" size="lg" variant="primary">
+        <Button
+          href="/online-courses/full-stack"
+          size="lg"
+          variant="primary"
+          onClick={() =>
+            trackEnrollClick({ page_type: "vs_page", course_slug: "full-stack", variant: "body_primary" })
+          }
+        >
           Start Online Full-Stack (Live + Projects)
         </Button>
-        <Button href="/blog/best-full-stack-course-dehradun-2025" size="lg" variant="secondary">
+        <Button
+          href="/blog/best-full-stack-course-dehradun-2025"
+          size="lg"
+          variant="secondary"
+          onClick={() => trackEnrollClick({ page_type: "vs_page", course_slug: "full-stack", variant: "body_secondary" })}
+        >
           Read the Full-Stack Guide
+        </Button>
+        <Button
+          href="https://wa.me/917037905464?text=I%20want%20to%20know%20more%20about%20DCA%20Full-Stack"
+          size="lg"
+          variant="ghost"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => trackLeadClick("whatsapp")}
+        >
+          Message on WhatsApp
         </Button>
       </div>
 
@@ -172,7 +195,14 @@ export default function Page() {
           Want to visit first? <Link href="/locations/dehradun" className="underline text-blue-700">See the Dehradun campus</Link>.
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Button href="/courses/full-stack" size="lg" variant="primary">Explore Full-Stack Bootcamp</Button>
+          <Button
+            href="/courses/full-stack"
+            size="lg"
+            variant="primary"
+            onClick={() => trackEnrollClick({ page_type: "vs_page", course_slug: "full-stack", variant: "conclusion" })}
+          >
+            Explore Full-Stack Bootcamp
+          </Button>
         </div>
       </section>
 

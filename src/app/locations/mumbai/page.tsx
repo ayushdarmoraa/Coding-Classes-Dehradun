@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { breadcrumbLd } from "@/lib/seo";
+import Button from "@/components/ui/Button";
+import { trackLeadClick, trackEnrollClick } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "Coding Classes in Mumbai (Online) – Doon Coding Academy",
@@ -53,6 +55,26 @@ export default function Page() {
             ; Mumbai learners study online.
           </p>
         </header>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Button
+            href="/online-courses/full-stack"
+            variant="primary"
+            onClick={() =>
+              trackEnrollClick({ page_type: "location_page", course_slug: "full-stack", city: "india", variant: "hero_online" })
+            }
+          >
+            Explore Online Full-Stack
+          </Button>
+          <Button
+            href="https://wa.me/917037905464?text=Hi%2C%20I%20am%20from%20Mumbai%20and%20want%20course%20details"
+            variant="secondary"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackLeadClick("whatsapp", { page_type: "location_page", city: "india" })}
+          >
+            WhatsApp Us
+          </Button>
+        </div>
 
         {/* Why Mumbai (online with DCA) */}
         <section className="space-y-3 mb-10">
@@ -208,7 +230,7 @@ export default function Page() {
 
         {/* CTA (reuse Noida/Bangalore links) */}
         <section className="mb-2">
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 items-center">
             <Link href="/online-courses" className="text-blue-700 hover:underline">
               Explore Online Courses
             </Link>
@@ -230,6 +252,16 @@ export default function Page() {
             <Link href="/faq" className="text-blue-700 hover:underline">
               Read FAQs
             </Link>
+            <span className="text-gray-400">•</span>
+            <Button
+              href="https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9"
+              variant="ghost"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackLeadClick("directions", { page_type: "location_page", city: "india" })}
+            >
+              Directions
+            </Button>
           </div>
         </section>
       </main>

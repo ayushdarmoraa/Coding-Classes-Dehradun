@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { breadcrumbLd } from "@/lib/seo";
+import Button from "@/components/ui/Button";
+import { trackLeadClick, trackEnrollClick } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "Coding Classes in Noida (Online) – Doon Coding Academy",
@@ -28,7 +30,7 @@ export default function Page() {
   ]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+  <div className="min-h-screen bg-gray-50">
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
@@ -53,6 +55,26 @@ export default function Page() {
             </Link>
             ; Noida learners study online.
           </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Button
+              href="/online-courses/full-stack"
+              variant="primary"
+              onClick={() =>
+                trackEnrollClick({ page_type: "location_page", course_slug: "full-stack", city: "india", variant: "hero_online" })
+              }
+            >
+              Explore Online Full-Stack
+            </Button>
+            <Button
+              href="https://wa.me/917037905464?text=Hi%2C%20I%20am%20from%20Noida%20and%20want%20course%20details"
+              variant="secondary"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackLeadClick("whatsapp", { page_type: "location_page", city: "india" })}
+            >
+              WhatsApp Us
+            </Button>
+          </div>
         </header>
 
         {/* Why Noida (online with DCA) */}
@@ -210,7 +232,7 @@ export default function Page() {
 
         {/* CTA */}
         <section className="mb-2">
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 items-center">
             <Link href="/online-courses" className="text-blue-700 hover:underline">
               Explore Online Courses
             </Link>
@@ -226,6 +248,16 @@ export default function Page() {
             <Link href="/faq" className="text-blue-700 hover:underline">
               Read FAQs
             </Link>
+            <span className="text-gray-400">•</span>
+            <Button
+              href="https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9"
+              variant="ghost"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackLeadClick("directions", { page_type: "location_page", city: "india" })}
+            >
+              Directions
+            </Button>
           </div>
         </section>
       </main>

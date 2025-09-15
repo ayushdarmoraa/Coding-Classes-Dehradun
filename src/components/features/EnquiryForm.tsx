@@ -5,7 +5,7 @@ import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import Select from '@/components/ui/Select';
 import Card from '@/components/ui/Card';
-import { track, derivePageContext } from '@/lib/analytics';
+import { derivePageContext, trackLeadClick, trackForm } from '@/lib/analytics';
 
 interface FormData {
   name: string;
@@ -49,7 +49,7 @@ const EnquiryForm: React.FC = () => {
   const emitStartOnce = () => {
     if (startedRef.current) return;
     startedRef.current = true;
-    track('lead_form_start', {
+  trackForm('start', {
       page_type: ctx.page_type,
       course_slug: ctx.course_slug || '(none)',
       city: ctx.city,
@@ -102,7 +102,7 @@ const EnquiryForm: React.FC = () => {
     
     if (!validateForm()) {
       // Validation error event
-      track('lead_form_error', {
+  trackForm('error', {
         page_type: ctx.page_type,
         course_slug: ctx.course_slug || '(none)',
         city: ctx.city,
@@ -131,7 +131,7 @@ const EnquiryForm: React.FC = () => {
       if (result.success) {
         setSubmitStatus('success');
         setSubmitMessage(result.message);
-        track('lead_form_submit', {
+  trackForm('submit', {
           page_type: ctx.page_type,
           course_slug: ctx.course_slug || '(none)',
           city: ctx.city,
@@ -151,7 +151,7 @@ const EnquiryForm: React.FC = () => {
         const serverFieldErrors: string[] = Array.isArray(result.errors)
           ? result.errors.map((er: { field?: string }) => er.field).filter(Boolean)
           : [];
-        track('lead_form_error', {
+  trackForm('error', {
           page_type: ctx.page_type,
           course_slug: ctx.course_slug || '(none)',
           city: ctx.city,
@@ -173,7 +173,7 @@ const EnquiryForm: React.FC = () => {
     } catch {
       setSubmitStatus('error');
       setSubmitMessage('Network error. Please check your connection and try again.');
-      track('lead_form_error', {
+  trackForm('error', {
         page_type: ctx.page_type,
         course_slug: ctx.course_slug || '(none)',
         city: ctx.city,
@@ -297,6 +297,9 @@ const EnquiryForm: React.FC = () => {
             size="lg"
             href="https://wa.me/917037905464?text=Hi, I'm interested in your coding courses"
             className="flex-1"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackLeadClick('whatsapp', { page_type: ctx.page_type, course_slug: ctx.course_slug || '(none)', city: ctx.city, page_path: pathname })}
           >
             WhatsApp Us
           </Button>

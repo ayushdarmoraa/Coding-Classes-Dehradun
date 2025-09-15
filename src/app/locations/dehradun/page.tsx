@@ -5,6 +5,7 @@ const GBP_URL =
   process.env.NEXT_PUBLIC_GBP_URL || "https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import { trackLeadClick, trackEnrollClick } from "@/lib/analytics";
 import Badge from "@/components/ui/Badge";
 import { getCourses } from "@/lib/courses";
 
@@ -89,19 +90,30 @@ export default function DehradunLocationPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                href="/contact" 
+              <Button
+                href="/contact"
                 variant="primary"
                 size="lg"
                 className="bg-white text-blue-600 hover:bg-gray-100"
+                onClick={() =>
+                  trackEnrollClick({
+                    page_type: "location_page",
+                    course_slug: "full-stack",
+                    city: "dehradun",
+                    variant: "visit_campus_hero",
+                  })
+                }
               >
                 Visit Our Campus
               </Button>
-              <Button 
+              <Button
                 href="https://wa.me/917037905464?text=Hi, I want to visit your Dehradun campus"
                 variant="secondary"
                 size="lg"
                 className="border-white text-white hover:bg-white hover:text-blue-600"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackLeadClick("whatsapp", { page_type: "location_page", city: "dehradun" })}
               >
                 Get Directions
               </Button>
@@ -193,17 +205,26 @@ export default function DehradunLocationPage() {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
+                <Button
                   href="https://maps.google.com/?q=Near+DR+School+Herbertpur+Dehradun"
                   variant="primary"
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackLeadClick("directions", { page_type: "location_page", city: "dehradun" })}
                 >
                   View on Google Maps
                 </Button>
-                <Button 
+                <Button
                   href="/contact"
                   variant="secondary"
+                  onClick={() =>
+                    trackEnrollClick({
+                      page_type: "location_page",
+                      course_slug: "full-stack",
+                      city: "dehradun",
+                      variant: "schedule_visit",
+                    })
+                  }
                 >
                   Schedule Campus Visit
                 </Button>
@@ -432,11 +453,20 @@ export default function DehradunLocationPage() {
                   >
                     View Details
                   </Button>
-                  <Button 
+                  <Button
                     href={`https://wa.me/917037905464?text=Hi, I'm interested in ${course.title} course in Dehradun`}
                     variant="secondary"
                     size="sm"
                     className="flex-1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() =>
+                      trackLeadClick("whatsapp", {
+                        page_type: "location_page",
+                        city: "dehradun",
+                        course_slug: course.slug,
+                      })
+                    }
                   >
                     Enquire Now
                   </Button>
@@ -517,19 +547,32 @@ export default function DehradunLocationPage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
+            <Button
               href="/contact"
               variant="primary"
               size="lg"
               className="bg-white text-blue-600 hover:bg-gray-100"
+              onClick={() =>
+                trackEnrollClick({
+                  page_type: "location_page",
+                  course_slug: "full-stack",
+                  city: "dehradun",
+                  variant: "visit_campus_footer",
+                })
+              }
             >
               Visit Our Campus
             </Button>
-            <Button 
+            <Button
               href="https://wa.me/917037905464?text=Hi, I want to enroll in coding classes in Dehradun"
               variant="secondary"
               size="lg"
               className="border-white text-white hover:bg-white hover:text-blue-600"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() =>
+                trackLeadClick("whatsapp", { page_type: "location_page", city: "dehradun" })
+              }
             >
               Enroll Now
             </Button>
