@@ -1,5 +1,8 @@
 # Coding Classes Dehradun
 
+<!-- Analytics coverage status -->
+[![Analytics coverage check](https://github.com/ayushdarmoraa/Coding-Classes-Dehradun/actions/workflows/analytics-coverage.yml/badge.svg)](https://github.com/ayushdarmoraa/Coding-Classes-Dehradun/actions/workflows/analytics-coverage.yml)
+
 This repository contains the source code for **Doon Coding Academy's** educational website. The site is built with **Next.js 14** using the **App Router** and is designed to be SEO-friendly and easy to extend.
 
 ## Getting Started
