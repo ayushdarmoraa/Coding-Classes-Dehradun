@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
-import { trackEnrollClick, trackLeadClick } from "@/lib/analytics";
 
 const RAW = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 const HTTPS = RAW.replace(/^http:\/\//, "https://");
@@ -158,9 +157,8 @@ export default function Page() {
           href="/online-courses/full-stack"
           size="lg"
           variant="primary"
-          onClick={() =>
-            trackEnrollClick({ page_type: "vs_page", course_slug: "full-stack", variant: "body_primary" })
-          }
+          event="cta_enroll_click"
+          eventParams={{ page_type: "vs_page", course_slug: "full-stack", variant: "body_primary" }}
         >
           Start Online Full-Stack (Live + Projects)
         </Button>
@@ -168,7 +166,8 @@ export default function Page() {
           href="/blog/best-full-stack-course-dehradun-2025"
           size="lg"
           variant="secondary"
-          onClick={() => trackEnrollClick({ page_type: "vs_page", course_slug: "full-stack", variant: "body_secondary" })}
+          event="cta_enroll_click"
+          eventParams={{ page_type: "vs_page", course_slug: "full-stack", variant: "body_secondary" }}
         >
           Read the Full-Stack Guide
         </Button>
@@ -178,7 +177,8 @@ export default function Page() {
           variant="ghost"
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => trackLeadClick("whatsapp")}
+          event="lead_contact_click"
+          eventParams={{ channel: "whatsapp" }}
         >
           Message on WhatsApp
         </Button>
@@ -199,7 +199,8 @@ export default function Page() {
             href="/courses/full-stack"
             size="lg"
             variant="primary"
-            onClick={() => trackEnrollClick({ page_type: "vs_page", course_slug: "full-stack", variant: "conclusion" })}
+            event="cta_enroll_click"
+            eventParams={{ page_type: "vs_page", course_slug: "full-stack", variant: "conclusion" }}
           >
             Explore Full-Stack Bootcamp
           </Button>

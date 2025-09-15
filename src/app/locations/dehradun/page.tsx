@@ -5,7 +5,6 @@ const GBP_URL =
   process.env.NEXT_PUBLIC_GBP_URL || "https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import { trackLeadClick, trackEnrollClick } from "@/lib/analytics";
 import Badge from "@/components/ui/Badge";
 import { getCourses } from "@/lib/courses";
 
@@ -95,14 +94,8 @@ export default function DehradunLocationPage() {
                 variant="primary"
                 size="lg"
                 className="bg-white text-blue-600 hover:bg-gray-100"
-                onClick={() =>
-                  trackEnrollClick({
-                    page_type: "location_page",
-                    course_slug: "full-stack",
-                    city: "dehradun",
-                    variant: "visit_campus_hero",
-                  })
-                }
+                event="cta_enroll_click"
+                eventParams={{ page_type: "location_page", course_slug: "full-stack", city: "dehradun", variant: "visit_campus_hero" }}
               >
                 Visit Our Campus
               </Button>
@@ -113,7 +106,8 @@ export default function DehradunLocationPage() {
                 className="border-white text-white hover:bg-white hover:text-blue-600"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => trackLeadClick("whatsapp", { page_type: "location_page", city: "dehradun" })}
+                event="lead_contact_click"
+                eventParams={{ channel: "whatsapp", page_type: "location_page", city: "dehradun" }}
               >
                 Get Directions
               </Button>
@@ -210,21 +204,16 @@ export default function DehradunLocationPage() {
                   variant="primary"
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => trackLeadClick("directions", { page_type: "location_page", city: "dehradun" })}
+                  event="lead_contact_click"
+                  eventParams={{ channel: "directions", page_type: "location_page", city: "dehradun" }}
                 >
                   View on Google Maps
                 </Button>
                 <Button
                   href="/contact"
                   variant="secondary"
-                  onClick={() =>
-                    trackEnrollClick({
-                      page_type: "location_page",
-                      course_slug: "full-stack",
-                      city: "dehradun",
-                      variant: "schedule_visit",
-                    })
-                  }
+                  event="cta_enroll_click"
+                  eventParams={{ page_type: "location_page", course_slug: "full-stack", city: "dehradun", variant: "schedule_visit" }}
                 >
                   Schedule Campus Visit
                 </Button>
@@ -460,13 +449,8 @@ export default function DehradunLocationPage() {
                     className="flex-1"
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={() =>
-                      trackLeadClick("whatsapp", {
-                        page_type: "location_page",
-                        city: "dehradun",
-                        course_slug: course.slug,
-                      })
-                    }
+                    event="lead_contact_click"
+                    eventParams={{ channel: "whatsapp", page_type: "location_page", city: "dehradun", course_slug: course.slug }}
                   >
                     Enquire Now
                   </Button>
@@ -552,14 +536,8 @@ export default function DehradunLocationPage() {
               variant="primary"
               size="lg"
               className="bg-white text-blue-600 hover:bg-gray-100"
-              onClick={() =>
-                trackEnrollClick({
-                  page_type: "location_page",
-                  course_slug: "full-stack",
-                  city: "dehradun",
-                  variant: "visit_campus_footer",
-                })
-              }
+              event="cta_enroll_click"
+              eventParams={{ page_type: "location_page", course_slug: "full-stack", city: "dehradun", variant: "visit_campus_footer" }}
             >
               Visit Our Campus
             </Button>
@@ -570,9 +548,8 @@ export default function DehradunLocationPage() {
               className="border-white text-white hover:bg-white hover:text-blue-600"
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() =>
-                trackLeadClick("whatsapp", { page_type: "location_page", city: "dehradun" })
-              }
+              event="lead_contact_click"
+              eventParams={{ channel: "whatsapp", page_type: "location_page", city: "dehradun" }}
             >
               Enroll Now
             </Button>

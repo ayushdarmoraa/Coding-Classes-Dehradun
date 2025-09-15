@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { breadcrumbLd } from "@/lib/seo";
 import Button from "@/components/ui/Button";
-import { trackLeadClick, trackEnrollClick } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "Coding Classes in Bangalore (Online) – Doon Coding Academy",
@@ -59,9 +58,8 @@ export default function Page() {
           <Button
             href="/online-courses/full-stack"
             variant="primary"
-            onClick={() =>
-              trackEnrollClick({ page_type: "location_page", course_slug: "full-stack", city: "india", variant: "hero_online" })
-            }
+            event="cta_enroll_click"
+            eventParams={{ page_type: "location_page", course_slug: "full-stack", city: "india", variant: "hero_online" }}
           >
             Explore Online Full-Stack
           </Button>
@@ -70,7 +68,8 @@ export default function Page() {
             variant="secondary"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => trackLeadClick("whatsapp", { page_type: "location_page", city: "india" })}
+            event="lead_contact_click"
+            eventParams={{ channel: "whatsapp", page_type: "location_page", city: "india" }}
           >
             WhatsApp Us
           </Button>
@@ -258,7 +257,8 @@ export default function Page() {
               variant="ghost"
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => trackLeadClick("directions", { page_type: "location_page", city: "india" })}
+              event="lead_contact_click"
+              eventParams={{ channel: "directions", page_type: "location_page", city: "india" }}
             >
               Directions
             </Button>
