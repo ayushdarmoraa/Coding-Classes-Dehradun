@@ -3,21 +3,8 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Script from "next/script";
-import { Inter, Poppins } from "next/font/google";
 
-// Self-hosted Google Fonts via next/font (preloaded; font-display: swap)
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "600", "700"], // Only Regular, Semi-bold, Bold
-  variable: "--font-inter",
-});
-const poppins = Poppins({
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "600", "700"], // Only Regular, Semi-bold, Bold
-  variable: "--font-poppins",
-});
+// Using system fonts for maximum performance
 
 // Build a single, normalized site URL we can reuse everywhere (force https, strip trailing slash, drop www)
 const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "https://dooncodingacademy.in").replace(/\/$/, "");
@@ -60,9 +47,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
+    <html lang="en">
       <head>
-        {/* Fonts are self-hosted via next/font - NO preconnect needed */}
+        {/* Using system fonts - no external font preconnects needed */}
       </head>
       <body>
         <Header />
@@ -72,10 +59,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* GA4 (gated by env var; no-op if env is missing) */}
         {process.env.NEXT_PUBLIC_GA_ID ? (
           <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-              strategy="afterInteractive"
-            />
+            <Script id="ga4-loader" strategy="afterInteractive">
+              {`
+                // Load GA after the page is interactive without adding a <link rel=preload>
+                (function(){
+                  try {
+                    var s = document.createElement('script');
+                    s.async = true;
+                    s.src = 'https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}';
+                    // Insert late in the body to avoid head preloads
+                    (document.body || document.head || document.documentElement).appendChild(s);
+                  } catch(_) {}
+                })();
+              `}
+            </Script>
             <Script id="ga4-init" strategy="afterInteractive">
               {`
                 window.dataLayer = window.dataLayer || [];
