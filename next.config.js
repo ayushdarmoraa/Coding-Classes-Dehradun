@@ -8,10 +8,37 @@ const nextConfig = {
     optimizeCss: true,
   },
 
+  // Prefer modern image formats where available
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
+
   async headers() {
     return [
+      // Long-term cache for Next.js build assets
       {
-        source: "/:path*",
+        source: "/_next/static/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      // Cache optimized images
+      {
+        source: "/_next/image",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      // Cache public images (if updated, filenames should change)
+      {
+        source: "/images/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      // Optionally cache other static assets
+      {
+        source: "/favicon.ico",
         headers: [
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],

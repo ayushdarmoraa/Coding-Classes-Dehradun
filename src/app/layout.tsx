@@ -61,15 +61,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <>
             <Script id="ga4-loader" strategy="afterInteractive">
               {`
-                // Load GA after the page is interactive without adding a <link rel=preload>
+                // Load GA on browser idle (with fallback) to avoid competing with LCP
                 (function(){
-                  try {
-                    var s = document.createElement('script');
-                    s.async = true;
-                    s.src = 'https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}';
-                    // Insert late in the body to avoid head preloads
-                    (document.body || document.head || document.documentElement).appendChild(s);
-                  } catch(_) {}
+                  function loadGA(){
+                    try {
+                      var s = document.createElement('script');
+                      s.async = true;
+                      s.src = 'https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}';
+                      (document.body || document.head || document.documentElement).appendChild(s);
+                    } catch(_) {}
+                  }
+                  if ('requestIdleCallback' in window) {
+                    try { (window as any).requestIdleCallback(loadGA, { timeout: 4000 }); } catch (_) { setTimeout(loadGA, 3000); }
+                  } else {
+                    setTimeout(loadGA, 3000);
+                  }
                 })();
               `}
             </Script>
@@ -77,8 +83,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {`
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', { anonymize_ip: true, transport_type: 'beacon' });
+                // Initialize GA slightly later to align with loader timing
+                setTimeout(function(){
+                  try {
+                    gtag('js', new Date());
+                    gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', { anonymize_ip: true, transport_type: 'beacon' });
+                  } catch(_) {}
+                }, 3200);
               `}
             </Script>
 
