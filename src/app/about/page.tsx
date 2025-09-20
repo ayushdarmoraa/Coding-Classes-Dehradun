@@ -84,6 +84,7 @@ export default function AboutPage() {
               fill
               className="object-cover"
               priority
+              fetchPriority="high"
             />
           </div>
         </div>

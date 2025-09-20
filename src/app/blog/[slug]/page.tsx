@@ -213,6 +213,7 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
             width={1200}
             height={630}
             priority
+            fetchPriority="high"
             sizes="(max-width: 768px) 100vw, 960px"
             className="h-auto w-full object-cover"
           />
@@ -311,7 +312,7 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
       </div>
 
       {/* Conversion CTA: separate online/offline course links + FAQs */}
-      <section className="mt-10 rounded-2xl border border-blue-700/20 bg-blue-600/5 p-5">
+  <section className="mt-10 rounded-2xl border border-blue-700/20 bg-blue-600/5 p-5 defer-visibility">
         {(() => {
           const key = pickCourseKey(post);
           const utm = `utm_source=blog&utm_medium=cta&utm_campaign=blog_to_course&utm_content=${encodeURIComponent(post.slug)}`;
@@ -347,7 +348,7 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
 
       {/* HowTo steps (render only when provided) */}
       {post.howtoSteps && post.howtoSteps.length > 0 ? (
-        <section className="mt-10">
+        <section className="mt-10 defer-visibility">
           <h2 className="text-2xl font-semibold mb-3">Step-by-step guide</h2>
           {(post.howtoTotalTime || post.howtoEstimatedCost || post.howtoTools?.length || post.howtoSupplies?.length) && (
             <div className="mb-4 flex flex-wrap gap-2 text-sm">
@@ -405,7 +406,7 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
 
       {/* FAQs */}
       {post.faqs && post.faqs.length > 0 ? (
-        <section className="mt-10" aria-labelledby="faqs">
+        <section className="mt-10 defer-visibility" aria-labelledby="faqs">
           <h2 id="faqs" className="text-2xl font-semibold mb-3">Frequently asked questions</h2>
           <dl className="divide-y divide-gray-200 rounded-2xl border">
             {post.faqs.map((f, i) => (
@@ -419,7 +420,7 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
       ) : null}
 
       {/* Prev/Next */}
-      <nav className="mt-10 flex justify-between gap-4">
+  <nav className="mt-10 flex justify-between gap-4 defer-visibility">
         {prev ? (
           <Link href={`/blog/${prev.slug}`} className="text-blue-700 hover:underline">
             ← {prev.title}
@@ -434,7 +435,7 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
 
       {/* Related */}
       {related.length > 0 && (
-        <section className="mt-10">
+        <section className="mt-10 defer-visibility">
           <h2 className="text-2xl font-semibold mb-3">Related posts</h2>
           <ul className="list-disc ml-6 space-y-1">
             {related.map((p) => (

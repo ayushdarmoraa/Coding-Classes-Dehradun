@@ -144,7 +144,7 @@ export async function generateMetadata({
 
       {/* Featured strip (only on default view + if we have featured) */}
       {isDefaultView && featured.length > 0 && (
-        <section aria-label="Featured posts" className="mb-8">
+        <section aria-label="Featured posts" className="mb-8 defer-visibility">
           <div className="mb-2 flex items-center gap-2">
             <h2 className="text-xl font-semibold">Featured</h2>
             <span className="text-xs text-gray-500">Editor’s picks</span>
@@ -276,7 +276,7 @@ export async function generateMetadata({
       {items.length === 0 ? (
         <p className="text-lg text-gray-700">No posts found.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 defer-visibility">
           {items.map((post) => (
             <article key={post.slug} className="border rounded-lg p-4 shadow-sm flex flex-col">
               {post.image ? (
@@ -337,7 +337,7 @@ export async function generateMetadata({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="mt-8 flex justify-center gap-2">
+        <div className="mt-8 flex justify-center gap-2 defer-visibility">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => {
             const query = new URLSearchParams();
             if (category) query.set("category", category);

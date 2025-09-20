@@ -28,6 +28,15 @@
 				"$tsc"
 			],
 			"group": "build"
+		},
+		{
+			"label": "Build after perf deferrals",
+			"type": "shell",
+			"command": "npm run build",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
 		}
 	]
 }

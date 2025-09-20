@@ -133,10 +133,12 @@ export default function HomePage() {
 
 
   {/* FAQ (Home) — compact accordion, one-open-at-a-time */}
-  <HomeFAQ />
+  <div className="defer-visibility">
+    <HomeFAQ />
+  </div>
 
       {/* Trust Signals */}
-      <section className="py-16 bg-gray-50">
+  <section className="py-16 bg-gray-50 defer-visibility">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -182,7 +184,7 @@ export default function HomePage() {
       </section>
 
       {/* Why Online with DCA (Home) */}
-      <section className="py-16">
+  <section className="py-16 defer-visibility">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -263,7 +265,7 @@ export default function HomePage() {
       </section>
 
       {/* Snapshot: Modes, Duration, Fees & Outcomes */}
-      <section className="py-12">
+  <section className="py-12 defer-visibility">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
             Snapshot: Modes, Duration, Fees & Outcomes
@@ -344,7 +346,7 @@ export default function HomePage() {
       </section>
 
       {/* Featured Courses */}
-      <section className="py-16">
+  <section className="py-16 defer-visibility">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -374,7 +376,7 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 bg-gray-50">
+  <section className="py-16 bg-gray-50 defer-visibility">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">

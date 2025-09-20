@@ -24,6 +24,12 @@ html {
   @apply max-w-6xl mx-auto px-4;
 }
 
+/* Defer rendering for below-the-fold sections to reduce initial rendering cost */
+.defer-visibility {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 1000px; /* reserve space to avoid layout shift */
+}
+
 /* WhatsApp floating button */
 .whatsapp-float {
   position: fixed;
