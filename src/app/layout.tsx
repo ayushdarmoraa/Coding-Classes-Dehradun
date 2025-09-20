@@ -4,6 +4,8 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Script from "next/script";
 
+// Using system fonts for maximum performance
+
 // Build a single, normalized site URL we can reuse everywhere (force https, strip trailing slash, drop www)
 const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "https://dooncodingacademy.in").replace(/\/$/, "");
 const siteUrl = rawBase
@@ -47,9 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        {/* CWV: preconnect for Google Fonts */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        {/* Using system fonts - no external font preconnects needed */}
       </head>
       <body>
         <Header />
@@ -59,10 +59,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* GA4 (gated by env var; no-op if env is missing) */}
         {process.env.NEXT_PUBLIC_GA_ID ? (
           <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-              strategy="afterInteractive"
-            />
+            <Script id="ga4-loader" strategy="afterInteractive">
+              {`
+                // Load GA after the page is interactive without adding a <link rel=preload>
+                (function(){
+                  try {
+                    var s = document.createElement('script');
+                    s.async = true;
+                    s.src = 'https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}';
+                    // Insert late in the body to avoid head preloads
+                    (document.body || document.head || document.documentElement).appendChild(s);
+                  } catch(_) {}
+                })();
+              `}
+            </Script>
             <Script id="ga4-init" strategy="afterInteractive">
               {`
                 window.dataLayer = window.dataLayer || [];

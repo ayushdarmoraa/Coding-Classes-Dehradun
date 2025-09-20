@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable font optimization (noop for next/font, but keeps Google Fonts link optimization on if present)
+  optimizeFonts: true,
+
   async headers() {
     return [
       {
@@ -11,8 +14,6 @@ const nextConfig = {
     ];
   },
   async redirects() {
-    // Empty on purpose: www→apex is handled at the edge via vercel.json
-    // Vercel enforces apex http→https (308).
     return [];
   },
 };
