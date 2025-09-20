@@ -19,6 +19,15 @@
 				"$tsc"
 			],
 			"group": "build"
+		},
+		{
+			"label": "Build after CSS+JS optimizations",
+			"type": "shell",
+			"command": "npm run build",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
 		}
 	]
 }

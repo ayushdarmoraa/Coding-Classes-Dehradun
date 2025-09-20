@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable font optimization (noop for next/font, but keeps Google Fonts link optimization on if present)
+  // Keep font optimization on (harmless with system fonts, useful if any webfonts reappear)
   optimizeFonts: true,
+
+  // Experimental CSS optimization to reduce render-blocking by inlining/optimizing critical CSS
+  experimental: {
+    optimizeCss: true,
+  },
 
   async headers() {
     return [
