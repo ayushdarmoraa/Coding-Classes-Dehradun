@@ -86,14 +86,86 @@ function readOne(name: string): BlogPost {
   const words = content.trim().split(/\s+/).length;
   const readingTime = Math.max(1, Math.ceil(words / 200));
 
-  // Ensure boolean normalization for frontmatter flags that affect SEO/visibility
-  const fm = (data as Partial<BlogPost>) || {};
+  // ---- Normalize front-matter (defensive) ----
+  const fm = (data as Partial<BlogPost> & {
+    tags?: string[];
+    coverImage?: string;
+    publishDate?: string;
+    publishedAt?: string;
+  }) || {};
+  const slug = name.replace(/\.mdx?$/, "");
+
+  // Title fallback: humanize slug if missing
+  const title =
+    (fm.title && String(fm.title).trim()) ||
+    slug.replace(/-/g, " ").replace(/\b\w/g, (m: string) => m.toUpperCase());
+
+  // Date: accept fm.date/publishedAt; coerce to ISO YYYY-MM-DD; fallback to file mtime
+  const rawDate = (fm.date || fm.publishedAt || fm.publishDate || "").toString().trim();
+  let isoDate: string | undefined;
+  if (rawDate) {
+    const d = new Date(rawDate);
+    if (!Number.isNaN(d.getTime())) {
+      isoDate = d.toISOString().slice(0, 10); // keep YYYY-MM-DD
+    }
+  }
+  if (!isoDate) {
+    try {
+      const fsPath = fs.existsSync(path.join(process.cwd(), "src/content/blog", `${slug}.mdx`))
+        ? path.join(process.cwd(), "src/content/blog", `${slug}.mdx`)
+        : path.join(process.cwd(), "src/content/blog", `${slug}.md`);
+      const stat = fs.statSync(fsPath);
+      isoDate = new Date(stat.mtime).toISOString().slice(0, 10);
+    } catch {
+      isoDate = new Date().toISOString().slice(0, 10);
+    }
+  }
+
+  // Image: treat empty strings as undefined; accept coverImage alias
+  const imageRaw = (fm.image ?? fm.coverImage ?? "").toString().trim();
+  const image = imageRaw.length ? imageRaw : undefined;
+  const imageAlt = (fm.imageAlt || "").toString().trim() || undefined;
+
+  // Keywords: accept `keywords` or fallback to `tags`
+  const keywords =
+    Array.isArray(fm.keywords) && fm.keywords.length
+      ? fm.keywords
+      : Array.isArray(fm.tags)
+      ? fm.tags
+      : [];
+
+  // Category: empty string → undefined
+  const category =
+    (fm.category && String(fm.category).trim()) || undefined;
+
+  // Flags (strict booleans)
+  const featured = fm.featured === true;
+  const draft = fm.draft === true;
+  const noindex = fm.noindex === true;
 
   return {
-    slug: name.replace(/\.mdx?$/, ""),
-    ...(data as Omit<BlogPost, "slug" | "content" | "readingTime">),
-    // Explicitly normalize to strict boolean to avoid string/undefined pitfalls
-    noindex: fm.noindex === true,
+    slug,
+    title,
+    description: (fm.description || "").toString(),
+    date: isoDate,
+    category,
+    keywords,
+    image,
+    imageAlt,
+    featured,
+    authorName: fm.authorName || undefined,
+    authorUrl: fm.authorUrl || undefined,
+    draft,
+    noindex,
+    faqs: Array.isArray(fm.faqs) ? fm.faqs : undefined,
+    series: fm.series || undefined,
+    seriesOrder: typeof fm.seriesOrder === "number" ? fm.seriesOrder : undefined,
+    howtoSteps: Array.isArray(fm.howtoSteps) ? fm.howtoSteps : undefined,
+    howtoTools: Array.isArray(fm.howtoTools) ? fm.howtoTools : undefined,
+    howtoSupplies: Array.isArray(fm.howtoSupplies) ? fm.howtoSupplies : undefined,
+    howtoTotalTime: fm.howtoTotalTime || undefined,
+    howtoEstimatedCost: fm.howtoEstimatedCost || undefined,
+    lastModified: fm.lastModified || undefined,
     content,
     readingTime,
   } as BlogPost;
@@ -115,7 +187,10 @@ export function getAllBlogPosts(): BlogPost[] {
     const fa = a.featured ? 1 : 0;
     const fb = b.featured ? 1 : 0;
     if (fa !== fb) return fb - fa; // featured first
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
+    // dates are normalized above; guard against any edge case
+    const tb = new Date(b.date).getTime() || 0;
+    const ta = new Date(a.date).getTime() || 0;
+    return tb - ta;
   });
 }
 
