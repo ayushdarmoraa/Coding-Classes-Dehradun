@@ -81,7 +81,7 @@ export default function AboutPage() {
 
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl ring-1 ring-gray-200">
             <Image
-              src="/images/about-hero.jpg"
+              src="/images/about-hero-optimized.webp"
               alt=""
               aria-hidden="true"
               role="presentation"
