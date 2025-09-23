@@ -7,6 +7,7 @@ import CourseCard from "@/components/features/CourseCard";
 import Badge from "@/components/ui/Badge";
 import Script from "next/script";
 import Link from "next/link";
+import CourseSnapshotMobile from "@/components/features/CourseSnapshotMobile";
 
 // ⬇️ TOP-LEVEL (outside any function)
 const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
@@ -211,13 +212,29 @@ export default function CoursesPage() {
         </div>
       </section>
 
+      {/* Mobile snapshot (stacked cards) */}
+      <section className="py-8 bg-white md:hidden" aria-label="Course snapshot (mobile)">
+        <div className="max-w-6xl mx-auto px-4">
+          <CourseSnapshotMobile
+            rows={courses.map((c) => ({
+              name: c.title,
+              mode: "On-Campus / Online",
+              duration: c.duration,
+              fees: c.price,
+              outcome: c.outcomes?.[0],
+              ctaHref: `/courses/${c.slug}`,
+            }))}
+          />
+        </div>
+      </section>
+
       {/* Course Comparison */}
       <section className="py-12 bg-white" id="comparison">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold">Course Comparison</h2>
           <p className="mt-1 text-gray-600">Glance at duration, pricing, and typical outcomes.</p>
 
-          <div className="mt-6 overflow-x-auto">
+          <div className="mt-6 overflow-x-auto hidden md:block">
             <table className="w-full bg-white rounded-lg shadow-sm overflow-hidden">
               <thead className="bg-blue-600 text-white">
                 <tr>

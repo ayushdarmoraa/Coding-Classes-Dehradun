@@ -3,6 +3,35 @@ import Link from "next/link";
 import { breadcrumbLd } from "@/lib/seo";
 import Button from "@/components/ui/Button";
 
+// Noida service areas and local FAQ
+const SERVICE_AREAS_NOIDA = [
+  "Sector 15",
+  "Sector 18",
+  "Sector 62",
+  "Greater Noida",
+  "Ghaziabad",
+  "Nearby regions",
+];
+
+const LOCAL_FAQ_NOIDA = [
+  {
+    q: "Do you provide offline classes in Noida?",
+    a: "Currently, our physical campus operates in Dehradun. Learners from Noida can join our live online classes with the same curriculum and mentorship.",
+  },
+  {
+    q: "Are the online courses interactive?",
+    a: "Yes. Our online classes include live coding, Q&A, and 1:1 mentor support to ensure the same experience as offline training.",
+  },
+  {
+    q: "What are the batch timings?",
+    a: "We offer evening and weekend batches to accommodate college students and working professionals from Noida and NCR.",
+  },
+  {
+    q: "Is placement support available for Noida students?",
+    a: "Yes. All students, whether studying online or on-campus, receive career guidance and placement assistance.",
+  },
+];
+
 export const metadata: Metadata = {
   title: "Coding Classes in Noida (Online) – Doon Coding Academy",
   description:
@@ -76,6 +105,32 @@ export default function Page() {
           </div>
         </header>
 
+        {/* Service Areas (Noida) */}
+        <section className="mt-8">
+          <h2 className="text-xl md:text-2xl font-semibold">Service Areas</h2>
+          <p className="mt-2 text-gray-700">
+            We serve learners across {SERVICE_AREAS_NOIDA.slice(0, -1).join(", ")} and {SERVICE_AREAS_NOIDA.at(-1)} through our online live programs. {" "}
+            Check out our detailed courses: {" "}
+            <Link href="/courses/full-stack" className="underline">Full-Stack</Link>,{" "}
+            <Link href="/courses/data-science" className="underline">Data Science</Link>,{" "}
+            <Link href="/courses/python" className="underline">Python</Link>,{" "}
+            <Link href="/courses/java" className="underline">Java</Link>.
+          </p>
+        </section>
+
+        {/* Local FAQs (Noida) */}
+        <section className="mt-10">
+          <h2 className="text-xl md:text-2xl font-semibold">FAQs (Noida)</h2>
+          <div className="mt-3 space-y-3">
+            {LOCAL_FAQ_NOIDA.map((item) => (
+              <details key={item.q} className="rounded-xl border p-4">
+                <summary className="cursor-pointer font-medium">{item.q}</summary>
+                <p className="mt-2 text-gray-700">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
         {/* Why Noida (online with DCA) */}
         <section className="space-y-3 mb-10">
           <h2 className="text-2xl font-semibold">Why learners in Noida pick DCA</h2>
@@ -140,6 +195,36 @@ export default function Page() {
           {/* Pruned extra comparison links for density */}
         </section>
 
+        {/* Popular DCA courses (detail pages) */}
+        <section className="mb-10">
+          <h2 className="text-2xl font-semibold">Popular DCA courses (details)</h2>
+          <p className="text-gray-700 mt-2">
+            Comparing tracks? Review the full details, curriculum, and outcomes on these pages:
+          </p>
+          <ul className="list-disc pl-6 mt-3 space-y-2">
+            <li>
+              <Link href="/courses/full-stack" className="text-blue-700 hover:underline">
+                Full-Stack Course (MERN + Gen AI)
+              </Link>
+            </li>
+            <li>
+              <Link href="/courses/data-science" className="text-blue-700 hover:underline">
+                Data Science Course (Python, ML foundations)
+              </Link>
+            </li>
+            <li>
+              <Link href="/courses/python" className="text-blue-700 hover:underline">
+                Python Course (beginner-friendly)
+              </Link>
+            </li>
+            <li>
+              <Link href="/courses/java" className="text-blue-700 hover:underline">
+                Java Course (OOP and backend basics)
+              </Link>
+            </li>
+          </ul>
+        </section>
+
         {/* Job market context */}
         <section className="mb-10">
           <h2 className="text-2xl font-semibold">Noida job market snapshot</h2>
@@ -187,7 +272,7 @@ export default function Page() {
           </div>
         </section>
 
-        {/* FAQPage JSON-LD for Noida */}
+        {/* FAQPage JSON-LD for Noida (generated from LOCAL_FAQ_NOIDA) */}
         <script
           id="faq-noida"
           type="application/ld+json"
@@ -196,35 +281,11 @@ export default function Page() {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "FAQPage",
-              mainEntity: [
-                {
-                  "@type": "Question",
-                  name: "Is there a DCA center in Noida?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text:
-                      "No. We serve Noida learners via live online cohorts. Our only physical campus is in Dehradun.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "What’s the class schedule?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text:
-                      "Evening slots on weekdays plus weekend mentor hours. Recordings are provided for revision.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "Do you provide placement support for Noida learners?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text:
-                      "Yes. You’ll get project reviews, resume prep, mock interviews, and guidance on targeting NCR roles.",
-                  },
-                },
-              ],
+              mainEntity: LOCAL_FAQ_NOIDA.map((f) => ({
+                "@type": "Question",
+                name: f.q,
+                acceptedAnswer: { "@type": "Answer", text: f.a },
+              })),
             }),
           }}
         />

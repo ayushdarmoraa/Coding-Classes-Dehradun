@@ -8,15 +8,39 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { getCourses } from "@/lib/courses";
 
+const SERVICE_AREAS = [
+  "Herbertpur",
+  "Vikasnagar",
+  "Prem Nagar",
+  "Clement Town",
+  "Dehradun city",
+  "Nearby regions",
+];
+
+const LOCAL_FAQ = [
+  {
+    q: "Do you offer offline classes in Herbertpur/Dehradun?",
+    a: "Yes. We run on-campus batches in Herbertpur (Dehradun district) with small groups and project-first learning.",
+  },
+  {
+    q: "How big are the batches?",
+    a: "We cap batches at 15 students for personal attention and hands-on practice.",
+  },
+  {
+    q: "What are the class timings?",
+    a: "Weekday and weekend options are available. See the Courses page or contact us for the current schedule.",
+  },
+];
+
 export const metadata: Metadata = {
   title: "Coding Classes in Dehradun (On-Campus & Hybrid)",
   description:
-    "Join DCA in Dehradun for Full-Stack, Data Science, Python & Java. Small batches, mentor hours, real projects, and placement support—plus online cohorts for non-locals.",
+    "Join Doon Coding Academy (DCA) in Dehradun for Full-Stack, Data Science, Python & Java. Small batches, mentor hours, real projects, and placement support—plus online cohorts for non-locals.",
   alternates: { canonical: "https://dooncodingacademy.in/locations/dehradun" },
   openGraph: {
     title: "Coding Classes in Dehradun (On-Campus & Hybrid)",
     description:
-      "Join DCA in Dehradun for Full-Stack, Data Science, Python & Java. Small batches, mentor hours, real projects, and placement support—plus online cohorts for non-locals.",
+      "Join Doon Coding Academy (DCA) in Dehradun for Full-Stack, Data Science, Python & Java. Small batches, mentor hours, real projects, and placement support—plus online cohorts for non-locals.",
     url: "https://dooncodingacademy.in/locations/dehradun",
     type: "website",
     siteName: "Doon Coding Academy",
@@ -25,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Coding Classes in Dehradun (On-Campus & Hybrid)",
     description:
-      "Join DCA in Dehradun for Full-Stack, Data Science, Python & Java. Small batches, mentor hours, real projects, and placement support—plus online cohorts for non-locals.",
+      "Join Doon Coding Academy (DCA) in Dehradun for Full-Stack, Data Science, Python & Java. Small batches, mentor hours, real projects, and placement support—plus online cohorts for non-locals.",
   },
 };
 
@@ -76,7 +100,7 @@ export default function DehradunLocationPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
             <Badge variant="success" className="mb-4 bg-green-500 text-white">
-              📍 Located in Herbertpur, Dehradun
+              📍 Located in Herbertpur (Dehradun district)
             </Badge>
             
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -169,7 +193,7 @@ export default function DehradunLocationPage() {
                   <span className="text-blue-600 text-xl">📍</span>
                   <div>
                     <h3 className="font-semibold text-gray-900">Address</h3>
-                    <p className="text-gray-600">Near DR School, Herbertpur, Dehradun, PIN 248142</p>
+                    <p className="text-gray-600">Near DR School, Herbertpur (Dehradun district), PIN 248142</p>
                   </div>
                 </div>
                 
@@ -218,6 +242,17 @@ export default function DehradunLocationPage() {
                   Schedule Campus Visit
                 </Button>
               </div>
+
+              {/* Lightweight Map Embed */}
+              <div className="mt-6 aspect-video overflow-hidden rounded-xl ring-1 ring-gray-200">
+                <iframe
+                  title="Doon Coding Academy map (Herbertpur, Dehradun district)"
+                  src="https://www.google.com/maps?q=Near+DR+School,+Herbertpur+(Dehradun+district)&output=embed"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="h-full w-full"
+                />
+              </div>
             </div>
             
             <Card className="p-8">
@@ -258,6 +293,25 @@ export default function DehradunLocationPage() {
             Need flexibility? Use our <strong>hybrid</strong> option—attend in person when you can and keep progressing with
             recorded sessions, doubt-clearing hours, and weekly project reviews.
           </p>
+
+          <section className="mt-8">
+            <h2 className="text-xl md:text-2xl font-semibold">Service Areas</h2>
+            <p className="mt-2 text-gray-700">
+              We serve students across {SERVICE_AREAS.slice(0, -1).join(", ")} and {SERVICE_AREAS.at(-1)}.
+            </p>
+          </section>
+
+          <section className="mt-10">
+            <h2 className="text-xl md:text-2xl font-semibold">FAQs (Dehradun)</h2>
+            <div className="mt-3 space-y-3">
+              {LOCAL_FAQ.map((item) => (
+                <details key={item.q} className="rounded-xl border p-4">
+                  <summary className="cursor-pointer font-medium">{item.q}</summary>
+                  <p className="mt-2 text-gray-700">{item.a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
 
           <div className="grid md:grid-cols-3 gap-8 mb-10">
             <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
@@ -488,7 +542,7 @@ export default function DehradunLocationPage() {
                 <div>
                   <div className="font-semibold text-gray-900">Rohit Sharma</div>
                   <div className="text-sm text-gray-600">Software Developer at DAStek Softwares</div>
-                  <div className="text-xs text-gray-500">From Herbertpur, Dehradun</div>
+                  <div className="text-xs text-gray-500">From Herbertpur (Dehradun district)</div>
                 </div>
               </div>
               <p className="text-gray-700 italic">
@@ -556,7 +610,7 @@ export default function DehradunLocationPage() {
           </div>
           
           <div className="mt-8 text-blue-200 text-sm">
-            <p>📍 Near DR School, Herbertpur, Dehradun | 📞 +91 7037905464</p>
+            <p>📍 Near DR School, Herbertpur (Dehradun district) | 📞 +91 7037905464</p>
           </div>
         </div>
       </section>
@@ -566,6 +620,21 @@ export default function DehradunLocationPage() {
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }}
+      />
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: LOCAL_FAQ.map((f) => ({
+              "@type": "Question",
+              name: f.q,
+              acceptedAnswer: { "@type": "Answer", text: f.a },
+            })),
+          }),
+        }}
       />
     </div>
   );

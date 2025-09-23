@@ -3,6 +3,9 @@ import Script from "next/script";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
 import Card from "@/components/ui/Card";
+import { getCourseBySlug } from "@/lib/courses";
+import { getCourseJsonLd } from "@/lib/schema";
+import { breadcrumbLd } from "@/lib/seo";
 
 // Build apex base URL: https + no trailing slash + drop www
 const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
@@ -33,28 +36,10 @@ export const metadata: Metadata = {
 };
 
 export default function JavaOnlinePage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Course",
-    name: "Online Java Course (Live + Projects)",
-    description:
-      "Live online Java for India-wide learners. Small batches, hands-on projects, recordings, mentor hours, and career support.",
-    provider: {
-      "@type": "Organization",
-      name: "Doon Coding Academy",
-      url: "https://dooncodingacademy.in",
-    },
-    offers: {
-      "@type": "Offer",
-      price: "12000",
-      priceCurrency: "INR",
-    },
-    hasCourseInstance: {
-      "@type": "CourseInstance",
-      courseMode: "Online",
-      instructor: { "@type": "Person", name: "Ayush Darmora" },
-    },
-  };
+  const course = getCourseBySlug("java");
+  const jsonLd = course
+    ? getCourseJsonLd(course, { variant: "online", pathPrefix: "online-courses" })
+    : undefined;
 
   return (
     <div className="min-h-screen">
@@ -102,26 +87,27 @@ export default function JavaOnlinePage() {
         </div>
       </section>
 
-      <Script
-        id="jsonld-course-java-online"
-        type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {jsonLd && (
+        <Script
+          id="jsonld-course-java-online"
+          type="application/ld+json"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
 
-      <script
+      <Script
         id="breadcrumbs-online-courses-java"
         type="application/ld+json"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Home", item: "https://dooncodingacademy.in" },
-              { "@type": "ListItem", position: 2, name: "Online Courses", item: "https://dooncodingacademy.in/online-courses" },
-              { "@type": "ListItem", position: 3, name: "Online Java Course in India (Live + Projects)", item: "https://dooncodingacademy.in/online-courses/java" }
-            ]
-          })
+          __html: JSON.stringify(
+            breadcrumbLd([
+              { name: "Home", url: APEX },
+              { name: "Online Courses", url: `${APEX}/online-courses` },
+              { name: "Online Java Course in India (Live + Projects)", url: PAGE_URL },
+            ])
+          ),
         }}
       />
       <div className="mt-8 text-center pb-12">

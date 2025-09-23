@@ -2,6 +2,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import InstructorsGrid from "@/components/features/InstructorsGrid";
+import { INSTRUCTORS } from "@/lib/instructors";
 
 const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
@@ -24,7 +26,7 @@ export default function AboutPage() {
         <div className="grid gap-8 lg:grid-cols-2 items-center">
           <div>
             <p className="inline-block rounded-full bg-blue-600/10 text-blue-700 dark:text-blue-600 px-3 py-1 text-xs font-medium ring-1 ring-blue-600/20">
-              Herbertpur · Dehradun
+              Herbertpur (Dehradun district)
             </p>
             <h1 className="mt-4 text-3xl/tight sm:text-4xl/tight font-extrabold">
               About <span className="text-blue-700">Doon Coding Academy</span>
@@ -53,8 +55,8 @@ export default function AboutPage() {
             </div>
 
             <p className="mt-3 text-sm text-gray-600">
-              Looking for city or online options?{' '}
-              <Link href="/locations" className="text-blue-700 hover:underline">See Locations</Link>.
+              Looking for city-specific information? Visit our {""}
+              <Link href="/locations" className="text-blue-700 hover:underline">Locations</Link> page.
             </p>
 
             <ul className="mt-6 grid gap-3 sm:grid-cols-2 text-sm text-gray-700">
@@ -80,7 +82,9 @@ export default function AboutPage() {
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl ring-1 ring-gray-200">
             <Image
               src="/images/about-hero.jpg"
-              alt="Branded illustration of Doon Coding Academy"
+              alt=""
+              aria-hidden="true"
+              role="presentation"
               fill
               className="object-cover"
               priority
@@ -113,7 +117,7 @@ export default function AboutPage() {
               <div className="rounded-2xl p-5 ring-1 ring-gray-200">
                 <h3 className="font-semibold">Local & Personal</h3>
                 <p className="mt-2 text-gray-700">
-                  In-person doubt resolution and mentorship at our Herbertpur campus—plus
+                  In-person doubt resolution and mentorship at our Herbertpur (Dehradun district) campus—plus
                   accountability, reviews, and guidance tailored to your pace.
                 </p>
               </div>
@@ -193,13 +197,18 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Instructors */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 mt-14">
+        <InstructorsGrid />
+      </section>
+
       {/* Location & Contact */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 mt-14 mb-16">
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="rounded-2xl ring-1 ring-gray-200 p-6">
             <h2 className="text-2xl font-bold">Visit Us</h2>
             <p className="mt-3 text-gray-700">
-              Near DR School, Herbertpur, Dehradun, PIN 248142
+              Near DR School, Herbertpur (Dehradun district), PIN 248142
             </p>
             <div className="mt-4 grid gap-2 text-sm">
               <a
@@ -238,12 +247,50 @@ export default function AboutPage() {
               <div className="mt-3 text-sm text-gray-700">
                 <p>Full-Stack with Gen AI: 6 months · ₹25,000 (or ₹5,000/month)</p>
                 <p>Data Science: 6 months · ₹30,000 (or ₹6,000/month)</p>
-                <p>Full-Stack: 4 months · ₹6,000 (or ₹2,000/month)</p>
               </div>
             </details>
           </div>
         </div>
       </section>
+      
+      {/* Outbound citations for trust/backlinks */}
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <h2 className="text-xl font-semibold">As listed on</h2>
+        <ul className="list-disc pl-5 mt-3 space-y-1">
+          <li>
+            <a
+              href="https://g.page/r/CTASnGJ45opuEBM/review"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              Google Maps / Reviews
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.justdial.com/Dehradun/Coding-Classes"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              Justdial – Coding Classes in Dehradun
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.sulekha.com/coding-classes/dehradun"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              Sulekha – Coding Classes Dehradun
+            </a>
+          </li>
+        </ul>
+      </section>
+      {/* JSON-LD for Instructors */}
+      <InstructorsJsonLd />
     </main>
   );
 }
@@ -286,5 +333,27 @@ function Stat({ label, value }: { label: string; value: string }) {
       <div className="text-2xl font-extrabold">{value}</div>
       <div className="text-sm text-gray-600">{label}</div>
     </div>
+  );
+}
+
+// JSON-LD publisher for instructors (People)
+function InstructorsJsonLd() {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: INSTRUCTORS.map((i) => ({
+      "@type": "Person",
+      name: i.name,
+      jobTitle: i.title,
+      description: i.bio,
+      ...(i.linkedin ? { sameAs: [i.linkedin] } : {}),
+    })),
+  };
+  return (
+    <script
+      type="application/ld+json"
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
   );
 }

@@ -1,0 +1,139 @@
+{
+  "generatedAt": "2025-09-22T11:59:47.480Z",
+  "base": "https://dooncodingacademy.in",
+  "strategy": "mobile",
+  "results": [
+    {
+      "route": "/",
+      "url": "https://dooncodingacademy.in/",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/"
+    },
+    {
+      "route": "/courses",
+      "url": "https://dooncodingacademy.in/courses",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/courses"
+    },
+    {
+      "route": "/online-courses",
+      "url": "https://dooncodingacademy.in/online-courses",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/online-courses"
+    },
+    {
+      "route": "/blog",
+      "url": "https://dooncodingacademy.in/blog",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/blog"
+    },
+    {
+      "route": "/contact",
+      "url": "https://dooncodingacademy.in/contact",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/contact"
+    },
+    {
+      "route": "/locations",
+      "url": "https://dooncodingacademy.in/locations",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/locations"
+    },
+    {
+      "route": "/faq",
+      "url": "https://dooncodingacademy.in/faq",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/faq"
+    },
+    {
+      "route": "/blog/best-full-stack-course-dehradun-2025",
+      "url": "https://dooncodingacademy.in/blog/best-full-stack-course-dehradun-2025",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/blog/best-full-stack-course-dehradun-2025"
+    },
+    {
+      "route": "/blog/best-online-data-science-courses-india",
+      "url": "https://dooncodingacademy.in/blog/best-online-data-science-courses-india",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/blog/best-online-data-science-courses-india"
+    },
+    {
+      "route": "/blog/coding-classes-dehradun-complete-guide-2025",
+      "url": "https://dooncodingacademy.in/blog/coding-classes-dehradun-complete-guide-2025",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/blog/coding-classes-dehradun-complete-guide-2025"
+    },
+    {
+      "route": "/blog/coding-jobs-in-dehradun-2025",
+      "url": "https://dooncodingacademy.in/blog/coding-jobs-in-dehradun-2025",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/blog/coding-jobs-in-dehradun-2025"
+    },
+    {
+      "route": "/blog/data-science-course-dehradun-2025",
+      "url": "https://dooncodingacademy.in/blog/data-science-course-dehradun-2025",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/blog/data-science-course-dehradun-2025"
+    },
+    {
+      "route": "/blog/java-course-dehradun-2025",
+      "url": "https://dooncodingacademy.in/blog/java-course-dehradun-2025",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/blog/java-course-dehradun-2025"
+    }
+  ],
+  "summary": [
+    {
+      "route": "/",
+      "url": "https://dooncodingacademy.in/",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/"
+    },
+    {
+      "route": "/courses",
+      "url": "https://dooncodingacademy.in/courses",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/courses"
+    },
+    {
+      "route": "/online-courses",
+      "url": "https://dooncodingacademy.in/online-courses",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/online-courses"
+    },
+    {
+      "route": "/blog",
+      "url": "https://dooncodingacademy.in/blog",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/blog"
+    },
+    {
+      "route": "/contact",
+      "url": "https://dooncodingacademy.in/contact",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/contact"
+    },
+    {
+      "route": "/locations",
+      "url": "https://dooncodingacademy.in/locations",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/locations"
+    },
+    {
+      "route": "/faq",
+      "url": "https://dooncodingacademy.in/faq",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/faq"
+    },
+    {
+      "route": "/blog/best-full-stack-course-dehradun-2025",
+      "url": "https://dooncodingacademy.in/blog/best-full-stack-course-dehradun-2025",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/blog/best-full-stack-course-dehradun-2025"
+    },
+    {
+      "route": "/blog/best-online-data-science-courses-india",
+      "url": "https://dooncodingacademy.in/blog/best-online-data-science-courses-india",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/blog/best-online-data-science-courses-india"
+    },
+    {
+      "route": "/blog/coding-classes-dehradun-complete-guide-2025",
+      "url": "https://dooncodingacademy.in/blog/coding-classes-dehradun-complete-guide-2025",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/blog/coding-classes-dehradun-complete-guide-2025"
+    },
+    {
+      "route": "/blog/coding-jobs-in-dehradun-2025",
+      "url": "https://dooncodingacademy.in/blog/coding-jobs-in-dehradun-2025",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/blog/coding-jobs-in-dehradun-2025"
+    },
+    {
+      "route": "/blog/data-science-course-dehradun-2025",
+      "url": "https://dooncodingacademy.in/blog/data-science-course-dehradun-2025",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/blog/data-science-course-dehradun-2025"
+    },
+    {
+      "route": "/blog/java-course-dehradun-2025",
+      "url": "https://dooncodingacademy.in/blog/java-course-dehradun-2025",
+      "error": "PSI request failed (403) for https://dooncodingacademy.in/blog/java-course-dehradun-2025"
+    }
+  ]
+}

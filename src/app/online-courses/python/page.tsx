@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
+import { getCourseBySlug } from "@/lib/courses";
+import { getCourseJsonLd } from "@/lib/schema";
+import { breadcrumbLd } from "@/lib/seo";
 
 const RAW = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 const SITE = RAW.replace(/^http:\/\//, "https://").replace(/^https:\/\/www\./, "https://");
@@ -29,20 +32,10 @@ export const metadata: Metadata = {
 };
 
 export default function OnlinePythonPage() {
-  const ld = {
-    "@context": "https://schema.org",
-    "@type": "Course",
-    name: "Online Python Programming (Live)",
-    description:
-      "Live online Python program with projects, mentor hours, recordings, and placement support for India-wide learners.",
-    provider: { "@type": "Organization", name: "Doon Coding Academy", url: SITE },
-    offers: { "@type": "Offer", price: "12000", priceCurrency: "INR" },
-    hasCourseInstance: {
-      "@type": "CourseInstance",
-      courseMode: "Online",
-      instructor: { "@type": "Person", name: "Ayush Darmora" },
-    },
-  };
+  const course = getCourseBySlug("python");
+  const ld = course
+    ? getCourseJsonLd(course, { variant: "online", pathPrefix: "online-courses" })
+    : undefined;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
@@ -60,26 +53,27 @@ export default function OnlinePythonPage() {
         <Button href="/courses/python" size="lg" variant="secondary">On-Campus (Dehradun)</Button>
       </div>
 
-      <Script
-        id="ld-course-python"
-        type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
-      />
+      {ld && (
+        <Script
+          id="ld-course-python"
+          type="application/ld+json"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+        />
+      )}
 
-      <script
+      <Script
         id="breadcrumbs-online-courses-python"
         type="application/ld+json"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Home", item: "https://dooncodingacademy.in" },
-              { "@type": "ListItem", position: 2, name: "Online Courses", item: "https://dooncodingacademy.in/online-courses" },
-              { "@type": "ListItem", position: 3, name: "Online Python Course in India (Live + Projects)", item: "https://dooncodingacademy.in/online-courses/python" }
-            ]
-          })
+          __html: JSON.stringify(
+            breadcrumbLd([
+              { name: "Home", url: SITE },
+              { name: "Online Courses", url: `${SITE}/online-courses` },
+              { name: "Online Python Course in India (Live + Projects)", url: `${SITE}/online-courses/python` },
+            ])
+          ),
         }}
       />
       <div className="mt-10 text-center">

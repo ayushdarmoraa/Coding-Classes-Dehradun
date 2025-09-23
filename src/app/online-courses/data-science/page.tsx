@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
+import { getCourseBySlug } from "@/lib/courses";
+import { getCourseJsonLd } from "@/lib/schema";
+import { breadcrumbLd } from "@/lib/seo";
 
 // Build apex base URL (https, no trailing slash, no www)
 const RAW = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
@@ -31,28 +34,10 @@ export const metadata: Metadata = {
 };
 
 export default function OnlineDataSciencePage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Course",
-    name: "Online Data Science & AI (Live)",
-    description:
-      "Live online Data Science program with projects, mentor hours, recordings, and placement support for India-wide learners.",
-    provider: {
-      "@type": "Organization",
-      name: "Doon Coding Academy",
-      url: APEX,
-    },
-    offers: {
-      "@type": "Offer",
-      price: "30000",
-      priceCurrency: "INR",
-    },
-    hasCourseInstance: {
-      "@type": "CourseInstance",
-      courseMode: "Online",
-      instructor: { "@type": "Person", name: "Ayush Darmora" },
-    },
-  };
+  const course = getCourseBySlug("data-science");
+  const jsonLd = course
+    ? getCourseJsonLd(course, { variant: "online", pathPrefix: "online-courses" })
+    : undefined;
 
   return (
     <div className="min-h-screen">
@@ -117,23 +102,24 @@ export default function OnlineDataSciencePage() {
       </section>
 
       {/* JSON-LD */}
-      <Script id="course-jsonld-data-science" type="application/ld+json" strategy="afterInteractive">
-        {JSON.stringify(jsonLd)}
-      </Script>
+      {jsonLd && (
+        <Script id="course-jsonld-data-science" type="application/ld+json" strategy="afterInteractive">
+          {JSON.stringify(jsonLd)}
+        </Script>
+      )}
 
-      <script
+      <Script
         id="breadcrumbs-online-courses-data-science"
         type="application/ld+json"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Home", item: "https://dooncodingacademy.in" },
-              { "@type": "ListItem", position: 2, name: "Online Courses", item: "https://dooncodingacademy.in/online-courses" },
-              { "@type": "ListItem", position: 3, name: "Online Data Science & AI Live + Projects", item: "https://dooncodingacademy.in/online-courses/data-science" }
-            ]
-          })
+          __html: JSON.stringify(
+            breadcrumbLd([
+              { name: "Home", url: APEX },
+              { name: "Online Courses", url: `${APEX}/online-courses` },
+              { name: "Online Data Science & AI Live + Projects", url: `${APEX}/online-courses/data-science` },
+            ])
+          ),
         }}
       />
     </div>

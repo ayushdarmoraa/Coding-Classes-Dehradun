@@ -46,7 +46,27 @@ const nextConfig = {
     ];
   },
   async redirects() {
-    return [];
+    return [
+      // www → apex (force non-www for primary domain)
+      {
+        source: "/:path*",
+        has: [
+          { type: "host", value: "www.dooncodingacademy.in" },
+        ],
+        destination: "https://dooncodingacademy.in/:path*",
+        permanent: true,
+      },
+      // http → https for apex (avoid loop by checking forwarded protocol)
+      {
+        source: "/:path*",
+        has: [
+          { type: "host", value: "dooncodingacademy.in" },
+          { type: "header", key: "x-forwarded-proto", value: "http" },
+        ],
+        destination: "https://dooncodingacademy.in/:path*",
+        permanent: true,
+      },
+    ];
   },
 };
 

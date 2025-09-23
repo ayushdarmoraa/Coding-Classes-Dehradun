@@ -6,43 +6,39 @@ import Script from "next/script";
 
 // Using system fonts for maximum performance
 
-// Build a single, normalized site URL we can reuse everywhere (force https, strip trailing slash, drop www)
-const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "https://dooncodingacademy.in").replace(/\/$/, "");
-const siteUrl = rawBase
-  .replace(/^http:\/\//, "https://")
-  .replace(/^https:\/\/www\./, "https://");
+// Site-wide metadata: force https + non-www canonical via metadataBase, standardize brand
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://dooncodingacademy.in").replace(/\/$/, "").replace(/^http:\/\//, "https://").replace(/^https:\/\/www\./, "https://");
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy";
+const SITE_DESC =
+  process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
+  "Leading coding institute in Dehradun – Full Stack with Gen AI, Data Science, Python, Java.";
 
 export const metadata: Metadata = {
-  // Global canonical base for all routes (remains env-driven)
-  metadataBase: new URL(siteUrl),
-
-  // ↓ Updated defaults
-  title: { default: "DCA – Coding & Data Science Courses", template: "%s | DCA" },
-  description:
-    process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
-    "Leading coding institute in Dehradun — Full Stack with Gen AI, Data Science, Python, Java.",
-
-  // NEW: Open Graph defaults
-  openGraph: {
-    type: "website",
-    siteName: "Doon Coding Academy",
-  images: [{ url: "/images/og-image.png", width: 1200, height: 630 }],
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
   },
-
-  // NEW: Twitter defaults
+  description: SITE_DESC,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESC,
+    type: "website",
+    locale: "en_IN",
+  },
   twitter: {
     card: "summary_large_image",
-  images: ["/images/og-image.png"],
-    // creator: "@your_handle" // (optional) add if/when you have one
+    title: SITE_NAME,
+    description: SITE_DESC,
   },
-
-  // GSC verification (unchanged)
   verification: process.env.NEXT_PUBLIC_GSC_VERIFICATION
     ? { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION }
     : undefined,
-
-  // IMPORTANT: do NOT set a root-level canonical here.
-  // Per-page files can define `alternates.canonical` when needed.
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -213,12 +209,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              "@id": `${siteUrl.replace(/\/$/, "")}/#website`,
+              "@id": `${SITE_URL.replace(/\/$/, "")}/#website`,
               name: process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy",
-              url: siteUrl,
+              url: SITE_URL,
               potentialAction: {
                 "@type": "SearchAction",
-                target: `${siteUrl.replace(/\/$/, "")}/blog?q={search_term_string}`,
+                target: `${SITE_URL.replace(/\/$/, "")}/blog?q={search_term_string}`,
                 "query-input": "required name=search_term_string",
               },
             }),
@@ -234,9 +230,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "EducationalOrganization",
-              "@id": `${siteUrl.replace(/\/$/, "")}/#organization`,
+              "@id": `${SITE_URL.replace(/\/$/, "")}/#organization`,
               name: process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy",
-              url: siteUrl,
+              url: SITE_URL,
               email: "dooncodingacademy@gmail.com",
               foundingDate: "2019-01-01",
               founder: {
@@ -306,7 +302,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify((() => {
-              const base = siteUrl.replace(/\/$/, "");
+              const base = SITE_URL.replace(/\/$/, "");
               const sameAs = [
                 process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,
                 process.env.NEXT_PUBLIC_INSTAGRAM_URL || undefined,
@@ -329,17 +325,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 url: base,
                 image: [`${base}/images/Doon-Coding-Academy-Logo.png`],
                 ...(sameAs.length ? { sameAs } : {}),
-                telephone: process.env.NEXT_PUBLIC_CONTACT_PHONE || "+917037905464",
-                email: "dooncodingacademy@gmail.com",
+                telephone: process.env.NEXT_PUBLIC_PHONE ? `+${process.env.NEXT_PUBLIC_PHONE.replace(/\D/g, '')}` : "+917037905464",
+                email: process.env.CONTACT_EMAIL || "dooncodingacademy@gmail.com",
                 hasMap: process.env.NEXT_PUBLIC_GBP_URL || "https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9",
                 priceRange: "₹2000–₹30000",
                 paymentAccepted: "Cash, UPI, Debit Card, Credit Card, Net Banking, Wallets (Paytm, PhonePe, GPay), EMI",
                 address: {
                   "@type": "PostalAddress",
-                  streetAddress: "Near DR School, Herbertpur",
-                  addressLocality: "Dehradun",
-                  addressRegion: "Uttarakhand",
-                  postalCode: "248142",
+                  streetAddress: process.env.NEXT_PUBLIC_ADDRESS_STREET || "Ambala - Dehradun Rd, near D.R School, Herbertpur",
+                  addressLocality: process.env.NEXT_PUBLIC_ADDRESS_LOCALITY || "Dehradun",
+                  addressRegion: process.env.NEXT_PUBLIC_ADDRESS_REGION || "Uttarakhand",
+                  postalCode: process.env.NEXT_PUBLIC_POSTAL_CODE || "248142",
                   addressCountry: "IN"
                 },
                 areaServed: [

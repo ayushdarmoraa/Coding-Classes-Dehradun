@@ -69,7 +69,7 @@ export default function HomeFAQ() {
       q: "Where is your Dehradun campus?",
       a: (
         <>
-          We’re in Herbertpur, Dehradun (near DR School). Local students can choose on-campus or hybrid; others can
+          We’re in Herbertpur (Dehradun district) (near DR School). Local students can choose on-campus or hybrid; others can
           attend the same cohorts online. See{" "}
           <Link className="text-blue-600 underline underline-offset-2" href="/locations/dehradun">
             directions &amp; details

@@ -53,6 +53,14 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       title: `${post.title} | Doon Coding Academy`,
       description,
       alternates: { canonical: url },
+      robots: {
+        index: post.noindex ? false : true,
+        follow: true,
+        googleBot: {
+          index: post.noindex ? false : true,
+          follow: true,
+        },
+      },
       openGraph: {
         title: post.title,
         description,
@@ -290,6 +298,14 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
           <div className="dca-prose">
             {/* eslint-disable-next-line react/no-danger */}
             <article className="prose lg:prose-xl max-w-none" dangerouslySetInnerHTML={{ __html: post.html }} />
+          </div>
+          <div className="mt-8">
+            <Link
+              href="/courses"
+              className="text-blue-600 underline font-medium"
+            >
+              ← Back to Courses
+            </Link>
           </div>
         </div>
 

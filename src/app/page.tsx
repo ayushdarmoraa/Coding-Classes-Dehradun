@@ -6,6 +6,7 @@ import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import HomeFAQ from "@/components/faq/HomeFAQ";
+import CourseSnapshotMobile from "@/components/features/CourseSnapshotMobile";
 
 const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
@@ -15,13 +16,13 @@ const APEX = BASE.replace(/^https:\/\/www\./, "https://");
 export const metadata: Metadata = {
   title: "Coding Courses in Dehradun & Online in India",
   description:
-    "Join DCA for Full-Stack, Data Science, Python & Java—live in Dehradun and online across India. Small batches, projects, recordings & mentor support.",
+    "Join Doon Coding Academy (DCA) for Full-Stack, Data Science, Python & Java—live in Dehradun and online across India. Small batches, projects, recordings & mentor support.",
   // ✅ Canonical to apex (trailing slash)
   alternates: { canonical: APEX + "/" },
   openGraph: {
     title: "Coding Courses in Dehradun & Online in India",
     description:
-      "Join DCA for Full-Stack, Data Science, Python & Java—live in Dehradun and online across India. Small batches, projects, recordings & mentor support.",
+      "Join Doon Coding Academy (DCA) for Full-Stack, Data Science, Python & Java—live in Dehradun and online across India. Small batches, projects, recordings & mentor support.",
     // ✅ OG url to apex + add image
     url: APEX + "/",
     type: "website",
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Coding Courses in Dehradun & Online in India",
     description:
-      "Join DCA for Full-Stack, Data Science, Python & Java—live in Dehradun and online across India. Small batches, projects, recordings & mentor support.",
+      "Join Doon Coding Academy (DCA) for Full-Stack, Data Science, Python & Java—live in Dehradun and online across India. Small batches, projects, recordings & mentor support.",
   },
 };
 
@@ -275,72 +276,99 @@ export default function HomePage() {
             mentor hours, and project reviews to keep you progressing every week.
           </p>
 
-          <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
-            <table className="min-w-full text-left text-sm">
-              <thead className="bg-gray-50 text-gray-700">
-                <tr>
-                  <th className="px-4 py-3 font-semibold">Course</th>
-                  <th className="px-4 py-3 font-semibold">Mode</th>
-                  <th className="px-4 py-3 font-semibold">Duration</th>
-                  <th className="px-4 py-3 font-semibold">Fees</th>
-                  <th className="px-4 py-3 font-semibold">Placement rate</th>
-                  <th className="px-4 py-3 font-semibold text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                <tr>
-                  <td className="px-4 py-3">Full-Stack Development (MERN + Gen AI)</td>
-                  <td className="px-4 py-3">Online / Hybrid</td>
-                  <td className="px-4 py-3">6 months</td>
-                  <td className="px-4 py-3">
-                    ₹25,000 <span className="text-gray-500 text-xs">(₹5,000/month)</span>
-                  </td>
-                  <td className="px-4 py-3">85%</td>
-                  <td className="px-4 py-3 text-right">
-                    <Button href="/courses/full-stack" size="sm">View</Button>
-                  </td>
-                </tr>
+          {/* Mobile cards */}
+          <CourseSnapshotMobile
+            rows={[
+              {
+                name: "Full-Stack (with Gen AI)",
+                mode: "On-Campus / Online",
+                duration: "6 months",
+                fees: "₹25,000",
+                outcome: "Job-ready projects & placement prep",
+                ctaHref: "/courses/full-stack",
+              },
+              {
+                name: "Data Science",
+                mode: "On-Campus / Online",
+                duration: "6 months",
+                fees: "₹30,000",
+                outcome: "ML foundations, real datasets",
+                ctaHref: "/courses/data-science",
+              },
+              { name: "Python", mode: "On-Campus / Online", duration: "4 months", fees: "₹12,000", ctaHref: "/courses/python" },
+              { name: "Java",   mode: "On-Campus / Online", duration: "4 months", fees: "₹12,000", ctaHref: "/courses/java"   },
+            ]}
+          />
 
-                <tr>
-                  <td className="px-4 py-3">Data Science &amp; AI</td>
-                  <td className="px-4 py-3">Online / Hybrid</td>
-                  <td className="px-4 py-3">6 months</td>
-                  <td className="px-4 py-3">
-                    ₹30,000 <span className="text-gray-500 text-xs">(₹6,000/month)</span>
-                  </td>
-                  <td className="px-4 py-3">85%</td>
-                  <td className="px-4 py-3 text-right">
-                    <Button href="/courses/data-science" size="sm">View</Button>
-                  </td>
-                </tr>
+          {/* Desktop table (existing) */}
+          <div className="hidden md:block">
+            <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+              <table className="min-w-full text-left text-sm">
+                <thead className="bg-gray-50 text-gray-700">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold">Course</th>
+                    <th className="px-4 py-3 font-semibold">Mode</th>
+                    <th className="px-4 py-3 font-semibold">Duration</th>
+                    <th className="px-4 py-3 font-semibold">Fees</th>
+                    <th className="px-4 py-3 font-semibold">Placement rate</th>
+                    <th className="px-4 py-3 font-semibold text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  <tr>
+                    <td className="px-4 py-3">Full-Stack Development (MERN + Gen AI)</td>
+                    <td className="px-4 py-3">Online / Hybrid</td>
+                    <td className="px-4 py-3">6 months</td>
+                    <td className="px-4 py-3">
+                      ₹25,000 <span className="text-gray-500 text-xs">(₹5,000/month)</span>
+                    </td>
+                    <td className="px-4 py-3">85%</td>
+                    <td className="px-4 py-3 text-right">
+                      <Button href="/courses/full-stack" size="sm">View</Button>
+                    </td>
+                  </tr>
 
-                <tr>
-                  <td className="px-4 py-3">Python Programming</td>
-                  <td className="px-4 py-3">Online / Hybrid</td>
-                  <td className="px-4 py-3">4 months</td>
-                  <td className="px-4 py-3">
-                    ₹12,000 <span className="text-gray-500 text-xs">(₹4,000/month)</span>
-                  </td>
-                  <td className="px-4 py-3">85%</td>
-                  <td className="px-4 py-3 text-right">
-                    <Button href="/courses/python" size="sm">View</Button>
-                  </td>
-                </tr>
+                  <tr>
+                    <td className="px-4 py-3">Data Science &amp; AI</td>
+                    <td className="px-4 py-3">Online / Hybrid</td>
+                    <td className="px-4 py-3">6 months</td>
+                    <td className="px-4 py-3">
+                      ₹30,000 <span className="text-gray-500 text-xs">(₹6,000/month)</span>
+                    </td>
+                    <td className="px-4 py-3">85%</td>
+                    <td className="px-4 py-3 text-right">
+                      <Button href="/courses/data-science" size="sm">View</Button>
+                    </td>
+                  </tr>
 
-                <tr>
-                  <td className="px-4 py-3">Java Programming</td>
-                  <td className="px-4 py-3">Online / Hybrid</td>
-                  <td className="px-4 py-3">4 months</td>
-                  <td className="px-4 py-3">
-                    ₹12,000 <span className="text-gray-500 text-xs">(₹4,000/month)</span>
-                  </td>
-                  <td className="px-4 py-3">85%</td>
-                  <td className="px-4 py-3 text-right">
-                    <Button href="/courses/java" size="sm">View</Button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  <tr>
+                    <td className="px-4 py-3">Python Programming</td>
+                    <td className="px-4 py-3">Online / Hybrid</td>
+                    <td className="px-4 py-3">4 months</td>
+                    <td className="px-4 py-3">
+                      ₹12,000 <span className="text-gray-500 text-xs">(₹4,000/month)</span>
+                    </td>
+                    <td className="px-4 py-3">85%</td>
+                    <td className="px-4 py-3 text-right">
+                      <Button href="/courses/python" size="sm">View</Button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td className="px-4 py-3">Java Programming</td>
+                    <td className="px-4 py-3">Online / Hybrid</td>
+                    <td className="px-4 py-3">4 months</td>
+                    <td className="px-4 py-3">
+                      ₹12,000 <span className="text-gray-500 text-xs">(₹4,000/month)</span>
+                    </td>
+                    <td className="px-4 py-3">85%</td>
+                    <td className="px-4 py-3 text-right">
+                      <Button href="/courses/java" size="sm">View</Button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>

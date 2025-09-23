@@ -86,9 +86,14 @@ function readOne(name: string): BlogPost {
   const words = content.trim().split(/\s+/).length;
   const readingTime = Math.max(1, Math.ceil(words / 200));
 
+  // Ensure boolean normalization for frontmatter flags that affect SEO/visibility
+  const fm = (data as Partial<BlogPost>) || {};
+
   return {
     slug: name.replace(/\.mdx?$/, ""),
     ...(data as Omit<BlogPost, "slug" | "content" | "readingTime">),
+    // Explicitly normalize to strict boolean to avoid string/undefined pitfalls
+    noindex: fm.noindex === true,
     content,
     readingTime,
   } as BlogPost;

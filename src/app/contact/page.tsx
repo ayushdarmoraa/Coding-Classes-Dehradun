@@ -1,11 +1,3 @@
-const GBP_URL = process.env.NEXT_PUBLIC_GBP_URL || "https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9";
-      <li>
-        Directions:{" "}
-        <a href={GBP_URL} target="_blank" rel="noopener" className="text-blue-700 hover:underline">
-          Open in Google Maps
-        </a>
-      </li>
-
 import type { Metadata } from "next";
 import EnquiryForm from "@/components/features/EnquiryForm";
 import Card from "@/components/ui/Card";
@@ -17,37 +9,49 @@ const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
 export const metadata: Metadata = {
   title: "Contact Us - Doon Coding Academy",
   description: "Get in touch with Doon Coding Academy. Contact us for course enquiries, admissions, and more information about our coding programs in Dehradun.",
-  alternates: { canonical: BASE + "/contact" },
+  alternates: { canonical: "/contact" },
   openGraph: {
     url: BASE + "/contact",
   },
 };
 
+// NAP (Name-Address-Phone) from env for authoritative consistency
+const PHONE_DISPLAY = process.env.NEXT_PUBLIC_PHONE || "+91 7037905464";
+const PHONE_TEL = `tel:${(PHONE_DISPLAY || '').replace(/\s+/g, '')}`;
+const EMAIL = process.env.CONTACT_EMAIL || "dooncodingacademy@gmail.com";
+const STREET = process.env.NEXT_PUBLIC_ADDRESS_STREET || "Ambala - Dehradun Rd, near D.R School, Herbertpur";
+const LOCALITY = process.env.NEXT_PUBLIC_ADDRESS_LOCALITY || "Dehradun";
+const REGION = process.env.NEXT_PUBLIC_ADDRESS_REGION || "Uttarakhand";
+const POSTAL = process.env.NEXT_PUBLIC_POSTAL_CODE || "248142";
+const VISIBLE_LOCALITY = process.env.NEXT_PUBLIC_VISIBLE_LOCALITY || "Herbertpur (Dehradun district)";
+const ADDRESS_DISPLAY = `${STREET}, ${VISIBLE_LOCALITY}, PIN ${POSTAL}`;
+const MAP_Q = encodeURIComponent(`${STREET} ${LOCALITY} ${REGION} ${POSTAL}`);
+
 const contactInfo = [
   {
     icon: "📞",
     title: "Phone & WhatsApp",
-    details: "+91 7037905464",
-    action: "tel:+917037905464"
+    details: PHONE_DISPLAY,
+    action: PHONE_TEL,
   },
   {
     icon: "✉️",
     title: "Email",
-    details: "dooncodingacademy@gmail.com",
-    action: "mailto:dooncodingacademy@gmail.com"
+    details: EMAIL,
+    action: `mailto:${EMAIL}`,
   },
   {
     icon: "📍",
     title: "Address",
-    details: "Near DR School, Herbertpur, Dehradun, PIN 248142",
-    action: "https://maps.google.com/?q=Near+DR+School+Herbertpur+Dehradun"
+    details: ADDRESS_DISPLAY,
+    action: `https://maps.google.com/?q=${MAP_Q}`,
   },
   {
     icon: "🕒",
     title: "Office Hours",
     details: "Mon-Sat: 9:00 AM - 7:00 PM\nSunday: By Appointment",
-    action: null
-  }
+    action: null,
+  },
 ];
 
 export default function ContactPage() {
@@ -101,6 +105,17 @@ export default function ContactPage() {
                     </div>
                   </Card>
                 ))}
+
+                {/* Lightweight Map Embed */}
+                <div className="mt-4 aspect-video overflow-hidden rounded-xl ring-1 ring-gray-200">
+                  <iframe
+                    title="Doon Coding Academy map (Herbertpur, Dehradun district)"
+                    src="https://www.google.com/maps?q=Near+DR+School,+Herbertpur+(Dehradun+district)&output=embed"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="h-full w-full"
+                  />
+                </div>
               </div>
             </div>
 

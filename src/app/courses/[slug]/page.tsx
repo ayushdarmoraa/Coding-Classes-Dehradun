@@ -9,8 +9,17 @@ import { getAllBlogPosts } from "@/lib/blog";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+import { getCourseJsonLd } from "@/lib/schema";
 
 type Props = { params: { slug: string } };
+
+// Map course slugs → featured blog slugs (always show these first in Further reading)
+const featuredPostsByCourse: Record<string, string[]> = {
+  "full-stack": ["best-full-stack-course-dehradun-2025"],
+  "data-science": ["data-science-course-dehradun-2025"],
+  python: ["python-course-dehradun-fees-syllabus-jobs-2025"],
+  java: ["java-course-dehradun-2025"],
+};
 
 /* --------------------------- METADATA (per course) -------------------------- */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -228,78 +237,13 @@ export default async function CoursePage({ params }: Props) {
         type="application/ld+json"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify((() => {
-            const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-            const url = `${base}/courses/${course.slug}`;
-
-            // Parse price to number if present
-            const priceNum = (() => {
-              if (!course.price) return undefined;
-              const cleaned = String(course.price).replace(/[^\d.]/g, "");
-              return cleaned ? Number(cleaned) : undefined;
-            })();
-
-            // Optional ISO 8601 duration, e.g., "6 months" => "P6M"
-            const timeRequired = (() => {
-              if (!course.duration) return undefined;
-              const txt = String(course.duration).toLowerCase();
-              const range = txt.match(/(\d+)\s*[–-]\s*(\d+)\s*month/);
-              if (range) return `P${parseInt(range[2], 10) || 1}M`;
-              const single = txt.match(/(\d+)\s*month/);
-              if (single) return `P${parseInt(single[1], 10) || 1}M`;
-              const weeks = txt.match(/(\d+)\s*week/);
-              if (weeks) return `P${(parseInt(weeks[1], 10) || 1) * 7}D`;
-              return undefined;
-            })();
-
-            return {
-              "@context": "https://schema.org",
-              "@type": "Course",
-              "@id": `${url}#course`,
-              name: course.title,
-              description: course.description,
-              url,
-              courseCode: course.slug,
-              ...(timeRequired ? { timeRequired } : {}),
-              provider: {
-                "@type": "EducationalOrganization",
-                name: "Doon Coding Academy",
-                url: base
-              },
-              offers: {
-                "@type": "Offer",
-                url,
-                priceCurrency: "INR",
-                ...(typeof priceNum === "number" ? { price: priceNum } : {}),
-                availability: "https://schema.org/InStock",
-                category: "Paid",
-                eligibleRegion: { "@type": "Country", name: "India" }
-              },
-              hasCourseInstance: [{
-                "@type": "CourseInstance",
-                name: course.title,
-                url,
-                // ✅ Google-friendly text value. Use one of: "Onsite" | "Online" | "Hybrid" | "Full-time" | "Part-time"
-                courseMode: "Onsite",
-                // Optional, but valid ISO 8601 if supplied:
-                // e.g. 45 classroom hours total:
-                courseWorkload: "PT45H",
-                // Helpful for offline courses:
-                location: {
-                  "@type": "Place",
-                  name: "Doon Coding Academy",
-                  address: {
-                    "@type": "PostalAddress",
-                    streetAddress: "Near DR School, Herbertpur",
-                    addressLocality: "Dehradun",
-                    addressRegion: "Uttarakhand",
-                    postalCode: "248142",
-                    addressCountry: "IN"
-                  }
-                }
-              }]
-            };
-          })())
+          __html: JSON.stringify(
+            getCourseJsonLd(course, {
+              variant: "offline",
+              city: "Dehradun",
+              pathPrefix: "courses",
+            })
+          ),
         }}
       />
       <Script id="course-faq-schema" type="application/ld+json" strategy="afterInteractive"
@@ -716,6 +660,13 @@ export default async function CoursePage({ params }: Props) {
       {/* Further reading */}
       {(() => {
         const allPosts = getAllBlogPosts();
+        // Featured first (optional, per-course override); silently skip missing slugs
+        const featuredSlugs = featuredPostsByCourse[course.slug] || [];
+        const featured = featuredSlugs
+          .map((s) => allPosts.find((p) => p.slug === s))
+          .filter(Boolean) as ReturnType<typeof getAllBlogPosts>;
+
+        // Dynamic related posts (de-duped against featured)
         const scored = allPosts
           .map(p => {
             const hay = [
@@ -737,15 +688,17 @@ export default async function CoursePage({ params }: Props) {
               (hay.includes("dehradun") ? 1 : 0);
             return { ...p, _score: score };
           })
-          .filter(p => p._score > 0)
+          .filter(p => p._score > 0 && !featuredSlugs.includes(p.slug))
           .sort((a, b) => b._score - a._score)
           .slice(0, 5);
 
-        return scored.length > 0 ? (
+        const combined = [...featured, ...scored];
+
+        return combined.length > 0 ? (
           <section className="mt-12 border-t pt-8">
             <h2 className="text-2xl font-semibold">Further reading</h2>
             <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-              {scored.map(post => (
+              {combined.map(post => (
                 <li key={post.slug} className="rounded-2xl border p-4 hover:shadow-md transition-shadow">
                   <h3 className="text-lg font-medium">
                     <Link href={`/blog/${post.slug}`} className="hover:underline">{post.title}</Link>

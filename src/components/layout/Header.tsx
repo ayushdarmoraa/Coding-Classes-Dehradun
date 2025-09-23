@@ -22,7 +22,7 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
             aria-label="Doon Coding Academy Home"
             title="Doon Coding Academy"
           >
-            <span className="text-xl sm:text-2xl font-extrabold tracking-tight">&lt;DCA/&gt;</span>
+            <span className="text-xl sm:text-2xl font-extrabold tracking-tight">&lt;/&gt;</span>
             {/* hide long text on very small screens to avoid wrapping */}
             <span className="hidden sm:inline text-base sm:text-lg font-semibold tracking-tight whitespace-nowrap leading-tight">
               Doon Coding Academy

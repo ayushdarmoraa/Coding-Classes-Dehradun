@@ -18,7 +18,7 @@ import Script from "next/script";
           {
             "@type": "Question",
             "name": "Where is Doon Coding Academy located?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Near DR School, Herbertpur, Dehradun (PIN 248142)." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Near DR School, Herbertpur (Dehradun district) (PIN 248142)." }
           },
           {
             "@type": "Question",
@@ -103,7 +103,7 @@ export default function FAQPage() {
         acceptedAnswer: {
           "@type": "Answer",
           text:
-            "Near DR School, Herbertpur, Dehradun, PIN 248142. Contact us or WhatsApp for directions and queries.",
+            "Near DR School, Herbertpur (Dehradun district), PIN 248142. Contact us or WhatsApp for directions and queries.",
         },
       },
       {
@@ -112,7 +112,7 @@ export default function FAQPage() {
         acceptedAnswer: {
           "@type": "Answer",
           text:
-            "Affordable with monthly and one-time plans. Full-Stack with Gen AI: 6 months · ₹25,000 (₹5,000/month). Data Science: 6 months · ₹30,000 (₹6,000/month). Full-Stack (4 months): ₹6,000 (₹2,000/month).",
+            "Affordable with monthly and one-time plans. Full-Stack with Gen AI: 6 months · ₹25,000 (₹5,000/month). Data Science: 6 months · ₹30,000 (₹6,000/month). Python: 4 months · ₹12,000 (₹4,000/month). Java: 4 months · ₹12,000 (₹4,000/month).",
         },
       },
       {
@@ -213,7 +213,7 @@ export default function FAQPage() {
               Where are you located?
             </summary>
             <div className="px-5 pb-5 pt-0 text-gray-700">
-              Near DR School, Herbertpur, Dehradun, PIN 248142. For directions or queries,{" "}
+              Near DR School, Herbertpur (Dehradun district), PIN 248142. For directions or queries,{" "}
               <a href="/contact" className="text-blue-700 font-semibold hover:underline">
                 contact us
               </a>{" "}
@@ -235,7 +235,6 @@ export default function FAQPage() {
               <ul className="mt-2 list-disc pl-5 space-y-1">
                 <li>Full-Stack with Gen AI: 6 months · ₹25,000 (or ₹5,000/month)</li>
                 <li>Data Science: 6 months · ₹30,000 (or ₹6,000/month)</li>
-                <li>Full-Stack (4 months): ₹6,000 (or ₹2,000/month)</li>
               </ul>
               For current offers, please{" "}
               <a href="/contact" className="text-blue-700 font-semibold hover:underline">
@@ -338,7 +337,7 @@ export default function FAQPage() {
           </div>
 
           <div className="mt-4 text-sm text-gray-700">
-            Address: Near DR School, Herbertpur, Dehradun, PIN 248142 · Phone:{" "}
+            Address: Near DR School, Herbertpur (Dehradun district), PIN 248142 · Phone:{" "}
             <a href="tel:+917037905464" className="text-blue-700 font-semibold hover:underline">
               +91 7037905464
             </a>{" "}

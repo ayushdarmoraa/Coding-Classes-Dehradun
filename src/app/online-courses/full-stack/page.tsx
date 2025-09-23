@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import Button from "@/components/ui/Button";
-import { trackEnrollClick } from "@/lib/analytics";
 import Card from "@/components/ui/Card";
+import { getCourseBySlug } from "@/lib/courses";
+import { getCourseJsonLd } from "@/lib/schema";
+import { breadcrumbLd } from "@/lib/seo";
 
 // Normalize base URL → https + apex (no trailing slash)
 const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
@@ -34,32 +36,11 @@ export const metadata: Metadata = {
 };
 
 export default function OnlineFullStackPage() {
-  // JSON-LD: Course + CourseInstance (Online) and Breadcrumbs
-  const courseJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Course",
-    name: "Online Full-Stack Development (MERN)",
-    description:
-      "Live online, small batches, weekly projects, recordings, mentor hours, and placement support.",
-    provider: {
-      "@type": "Organization",
-      name: "Doon Coding Academy",
-      url: APEX,
-    },
-    offers: {
-      "@type": "Offer",
-      price: "25000",
-      priceCurrency: "INR",
-      url: CANON,
-      availability: "https://schema.org/InStock",
-    },
-    hasCourseInstance: {
-      "@type": "CourseInstance",
-      courseMode: "Online",
-      startDate: "2025-01-01", // optional placeholder; remove or update when you have real dates
-      instructor: { "@type": "Person", name: "Ayush Darmora" },
-    },
-  };
+  // JSON-LD via centralized helper
+  const course = getCourseBySlug("full-stack");
+  const courseJsonLd = course
+    ? getCourseJsonLd(course, { variant: "online", pathPrefix: "online-courses" })
+    : undefined;
 
   // breadcrumbs injected via inline <script> at the bottom
 
@@ -196,26 +177,27 @@ export default function OnlineFullStackPage() {
       </section>
 
       {/* JSON-LD (Course) */}
-      <Script
-        id="jsonld-course-online-fullstack"
-        type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
-      />
+      {courseJsonLd && (
+        <Script
+          id="jsonld-course-online-fullstack"
+          type="application/ld+json"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
+        />
+      )}
 
-      <script
+      <Script
         id="breadcrumbs-online-courses-full-stack"
         type="application/ld+json"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Home", item: "https://dooncodingacademy.in" },
-              { "@type": "ListItem", position: 2, name: "Online Courses", item: "https://dooncodingacademy.in/online-courses" },
-              { "@type": "ListItem", position: 3, name: "Online Full-Stack Development (MERN) in India", item: "https://dooncodingacademy.in/online-courses/full-stack" }
-            ]
-          })
+          __html: JSON.stringify(
+            breadcrumbLd([
+              { name: "Home", url: APEX },
+              { name: "Online Courses", url: `${APEX}/online-courses` },
+              { name: "Online Full-Stack Development (MERN) in India", url: CANON },
+            ])
+          ),
         }}
       />
     </div>

@@ -3,6 +3,35 @@ import Link from "next/link";
 import { breadcrumbLd } from "@/lib/seo";
 import Button from "@/components/ui/Button";
 
+// Bangalore service areas and local FAQ
+const SERVICE_AREAS_BANGALORE = [
+  "Whitefield",
+  "Koramangala",
+  "Indiranagar",
+  "HSR Layout",
+  "Electronic City",
+  "Nearby suburbs",
+];
+
+const LOCAL_FAQ_BANGALORE = [
+  {
+    q: "Do you offer offline classes in Bangalore?",
+    a: "Currently, our on-campus classes run in Dehradun. Learners from Bangalore can join our interactive live online programs.",
+  },
+  {
+    q: "What are the batch sizes?",
+    a: "Each batch is capped at 15 students for personal attention and hands-on project mentoring.",
+  },
+  {
+    q: "Are classes suitable for working professionals?",
+    a: "Yes. We offer flexible evening and weekend schedules so Bangalore professionals can balance work and learning.",
+  },
+  {
+    q: "Can I visit a local center in Bangalore?",
+    a: "We don’t operate a physical campus in Bangalore yet, but our online support team ensures you get real-time assistance.",
+  },
+];
+
 export const metadata: Metadata = {
   title: "Coding Classes in Bangalore (Online) – Doon Coding Academy",
   description:
@@ -74,6 +103,32 @@ export default function Page() {
             WhatsApp Us
           </Button>
         </div>
+
+        {/* Service Areas (Bangalore) */}
+        <section className="mt-8">
+          <h2 className="text-xl md:text-2xl font-semibold">Service Areas</h2>
+          <p className="mt-2 text-gray-700">
+            We serve learners across {SERVICE_AREAS_BANGALORE.slice(0, -1).join(", ")} and {SERVICE_AREAS_BANGALORE.at(-1)} through our live online classes. {" "}
+            Explore detailed curricula: {" "}
+            <Link href="/courses/full-stack" className="underline">Full-Stack</Link>,{" "}
+            <Link href="/courses/data-science" className="underline">Data Science</Link>,{" "}
+            <Link href="/courses/python" className="underline">Python</Link>,{" "}
+            <Link href="/courses/java" className="underline">Java</Link>.
+          </p>
+        </section>
+
+        {/* Local FAQs (Bangalore) */}
+        <section className="mt-10">
+          <h2 className="text-xl md:text-2xl font-semibold">FAQs (Bangalore)</h2>
+          <div className="mt-3 space-y-3">
+            {LOCAL_FAQ_BANGALORE.map((item) => (
+              <details key={item.q} className="rounded-xl border p-4">
+                <summary className="cursor-pointer font-medium">{item.q}</summary>
+                <p className="mt-2 text-gray-700">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
 
         {/* Why Bangalore (online with DCA) */}
         <section className="space-y-3 mb-10">
@@ -153,6 +208,36 @@ export default function Page() {
           </p>
         </section>
 
+        {/* Popular DCA courses (detail pages) */}
+        <section className="mb-10">
+          <h2 className="text-2xl font-semibold">Popular DCA courses (details)</h2>
+          <p className="text-gray-700 mt-2">
+            Comparing tracks? Review the full details, curriculum, and outcomes on these pages:
+          </p>
+          <ul className="list-disc pl-6 mt-3 space-y-2">
+            <li>
+              <Link href="/courses/full-stack" className="text-blue-700 hover:underline">
+                Full-Stack Course (MERN + Gen AI)
+              </Link>
+            </li>
+            <li>
+              <Link href="/courses/data-science" className="text-blue-700 hover:underline">
+                Data Science Course (Python, ML foundations)
+              </Link>
+            </li>
+            <li>
+              <Link href="/courses/python" className="text-blue-700 hover:underline">
+                Python Course (beginner-friendly)
+              </Link>
+            </li>
+            <li>
+              <Link href="/courses/java" className="text-blue-700 hover:underline">
+                Java Course (OOP and backend basics)
+              </Link>
+            </li>
+          </ul>
+        </section>
+
         {/* FAQs */}
         <section className="mb-10">
           <h2 className="text-2xl font-semibold">FAQs</h2>
@@ -185,7 +270,7 @@ export default function Page() {
           </div>
         </section>
 
-        {/* FAQPage JSON-LD for Bangalore */}
+        {/* FAQPage JSON-LD for Bangalore (generated from LOCAL_FAQ_BANGALORE) */}
         <script
           id="faq-bangalore"
           type="application/ld+json"
@@ -194,35 +279,11 @@ export default function Page() {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "FAQPage",
-              mainEntity: [
-                {
-                  "@type": "Question",
-                  name: "Is there a DCA center in Bangalore?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text:
-                      "No. We serve Bangalore learners via live online cohorts. Our only physical campus is in Dehradun.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "What’s the class schedule?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text:
-                      "Evening slots on weekdays plus weekend mentor hours. Recordings are provided for revision.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "Do you provide placement support for Bangalore learners?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text:
-                      "Yes. You’ll get project reviews, resume prep, mock interviews, and targeted guidance for Bangalore roles.",
-                  },
-                },
-              ],
+              mainEntity: LOCAL_FAQ_BANGALORE.map((f) => ({
+                "@type": "Question",
+                name: f.q,
+                acceptedAnswer: { "@type": "Answer", text: f.a },
+              })),
             }),
           }}
         />

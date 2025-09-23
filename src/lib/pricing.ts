@@ -4,10 +4,11 @@
 export const PRICES = {
   FULL_STACK_GEN_AI: "₹25,000 (₹5,000/month)", // 6 months
   DATA_SCIENCE: "₹30,000 (₹6,000/month)",       // 6 months
-  FULL_STACK: "₹6,000 (₹2,000/month)",          // 4 months
-  // ✅ Updated per instruction:
-  PYTHON: "₹12,000 (₹4,000/month)",             // 4 months
-  JAVA:   "₹12,000 (₹4,000/month)",             // 4 months
+  // Align legacy key with canonical Full-Stack offering
+  FULL_STACK: "₹25,000 (₹5,000/month)",         // 6 months (canonical)
+  // ✅ Canonical: Python and Java are 4 months · ₹12,000
+  PYTHON: "₹12,000 (₹4,000/month)",             // 4 months (canonical)
+  JAVA:   "₹12,000 (₹4,000/month)",             // 4 months (canonical)
 } as const;
 
 // Pricing display utilities

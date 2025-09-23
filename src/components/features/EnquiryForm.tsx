@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
@@ -13,6 +13,7 @@ interface FormData {
   phone: string;
   course: string;
   message: string;
+  website?: string; // honeypot
 }
 
 interface FormErrors {
@@ -33,13 +34,15 @@ const EnquiryForm: React.FC = () => {
     email: '',
     phone: '',
     course: '',
-    message: ''
+    message: '',
+    website: ''
   });
   
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [submitMessage, setSubmitMessage] = useState('');
+  const statusRef = useRef<HTMLDivElement | null>(null);
 
   // --- Analytics context ---
   const startedRef = useRef(false);
@@ -82,15 +85,14 @@ const EnquiryForm: React.FC = () => {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
     }
-    
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!/^\+?[\d\s-()]{10,}$/.test(formData.phone)) {
+    // Phone is optional; if provided, validate format
+    if (formData.phone.trim() && !/^\+?[\d\s-()]{10,}$/.test(formData.phone)) {
       newErrors.phone = 'Please enter a valid phone number';
     }
-    
-    if (!formData.course) {
-      newErrors.course = 'Please select a course';
+    // Course is optional for API; keep free-form/select but no required error
+    // Message is required to align with API
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required';
     }
     
     setErrors(newErrors);
@@ -130,7 +132,7 @@ const EnquiryForm: React.FC = () => {
       
       if (result.success) {
         setSubmitStatus('success');
-        setSubmitMessage(result.message);
+        setSubmitMessage(result.message || 'Thank you! We’ve received your enquiry and will get back shortly.');
   trackForm('submit', {
           page_type: ctx.page_type,
           course_slug: ctx.course_slug || '(none)',
@@ -147,7 +149,7 @@ const EnquiryForm: React.FC = () => {
         });
       } else {
         setSubmitStatus('error');
-        setSubmitMessage(result.message || 'Something went wrong. Please try again.');
+        setSubmitMessage(result.error || result.message || 'Something went wrong. Please try again.');
         const serverFieldErrors: string[] = Array.isArray(result.errors)
           ? result.errors.map((er: { field?: string }) => er.field).filter(Boolean)
           : [];
@@ -186,6 +188,16 @@ const EnquiryForm: React.FC = () => {
     }
   };
 
+  // Move focus to status banner when it appears
+  useEffect(() => {
+    if (submitStatus !== 'idle' && statusRef.current) {
+      try {
+        statusRef.current.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        statusRef.current.focus();
+      } catch {}
+    }
+  }, [submitStatus]);
+
   return (
     <Card className="p-8">
       <div className="mb-6">
@@ -198,16 +210,29 @@ const EnquiryForm: React.FC = () => {
       </div>
 
       {submitStatus === 'success' && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-center">
+        <div ref={statusRef} tabIndex={-1} className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg" role="status" aria-live="polite">
+          <div className="flex items-center mb-2">
             <span className="text-green-500 text-xl mr-3">✓</span>
             <p className="text-green-800">{submitMessage}</p>
+          </div>
+          {/* Google Review CTA */}
+          <div className="mt-2">
+            <a
+              href="https://g.page/r/CQkQwQwQwQwQEAI/review" // Replace with actual GBP review link
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition"
+              aria-label="Leave a Google review for Doon Coding Academy (opens in a new tab)"
+            >
+              ⭐ Leave a Google Review
+            </a>
+            <span className="sr-only">Opens in a new tab</span>
           </div>
         </div>
       )}
 
       {submitStatus === 'error' && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div ref={statusRef} tabIndex={-1} className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg" role="alert" aria-live="assertive">
           <div className="flex items-center">
             <span className="text-red-500 text-xl mr-3">⚠</span>
             <p className="text-red-800">{submitMessage}</p>
@@ -226,6 +251,7 @@ const EnquiryForm: React.FC = () => {
       >
         <div className="grid md:grid-cols-2 gap-6">
           <Input
+            id="name"
             label="Full Name"
             name="name"
             value={formData.name}
@@ -236,6 +262,7 @@ const EnquiryForm: React.FC = () => {
           />
           
           <Input
+            id="email"
             label="Email Address"
             name="email"
             type="email"
@@ -244,51 +271,70 @@ const EnquiryForm: React.FC = () => {
             error={errors.email}
             required
             placeholder="your.email@example.com"
+            aria-describedby="email-help"
           />
+          {/* Helper text for email */}
+          {/* This helper is visually subtle but screen-readable */}
+          <p id="email-help" className="sr-only">We’ll only use your email to respond to your enquiry.</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
           <Input
+            id="phone"
             label="Phone Number"
             name="phone"
             type="tel"
             value={formData.phone}
             onChange={handleChange}
             error={errors.phone}
-            required
             placeholder="+91 9876543210"
           />
           
           <Select
+            id="course"
             label="Course of Interest"
             name="course"
             value={formData.course}
             onChange={handleChange}
             error={errors.course}
-            required
             options={courseOptions}
             placeholder="Select a course"
           />
         </div>
 
         <Textarea
-          label="Message (Optional)"
+          id="message"
+          label="Message"
           name="message"
           value={formData.message}
           onChange={handleChange}
           placeholder="Tell us about your background, goals, or any questions you have..."
           rows={4}
+          required
+          error={errors.message}
         />
 
         <div className="flex flex-col sm:flex-row gap-4">
+          {/* Honeypot field: hidden from users, caught by bots */}
+          <input
+            type="text"
+            name="website"
+            value={formData.website || ''}
+            onChange={handleChange}
+            autoComplete="off"
+            tabIndex={-1}
+            className="hidden"
+            aria-hidden="true"
+          />
           <Button
             type="submit"
             variant="primary"
             size="lg"
             disabled={isSubmitting}
+            aria-label="Submit enquiry form"
             className="flex-1"
           >
-            {isSubmitting ? 'Submitting...' : 'Send Enquiry'}
+            {isSubmitting ? 'Sending...' : 'Send Enquiry'}
           </Button>
           
           <Button

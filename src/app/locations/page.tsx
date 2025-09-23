@@ -4,16 +4,16 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 
 export const metadata = {
-  title: "Locations – Learn Online or Visit Dehradun | DCA",
+  title: "Locations – Learn Online or Visit Dehradun | Doon Coding Academy (DCA)",
   description:
-    "Choose your path with Doon Coding Academy: visit our Dehradun campus for on-campus classes or join our live online cohorts from cities like Noida and Bangalore.",
+    "Choose your path with Doon Coding Academy (DCA): visit our Dehradun campus for on-campus classes or join our live online cohorts from cities like Noida and Bangalore.",
   alternates: {
     canonical: "https://dooncodingacademy.in/locations",
   },
   openGraph: {
-    title: "Locations – Learn Online or Visit Dehradun | DCA",
+    title: "Locations – Learn Online or Visit Dehradun | Doon Coding Academy (DCA)",
     description:
-      "Explore DCA locations and online cohorts. On-campus in Dehradun, live online from anywhere in India including Noida and Bangalore.",
+      "Explore Doon Coding Academy (DCA) locations and online cohorts. On-campus in Dehradun, live online from anywhere in India including Noida and Bangalore.",
     url: "https://dooncodingacademy.in/locations",
     type: "website",
     siteName: "Doon Coding Academy",
@@ -101,6 +101,36 @@ export default function LocationsIndexPage() {
             .
           </p>
         </header>
+
+        {/* Popular courses (details) — internal links for SEO + UX */}
+        <section className="mt-10">
+          <h2 className="text-2xl font-semibold tracking-tight mb-4">
+            Popular DCA courses (details)
+          </h2>
+
+          <ul className="list-disc pl-6 space-y-2">
+            <li>
+              <Link href="/courses/full-stack" className="underline hover:no-underline">
+                Full-Stack Development (with Gen AI)
+              </Link>
+            </li>
+            <li>
+              <Link href="/courses/data-science" className="underline hover:no-underline">
+                Data Science & AI
+              </Link>
+            </li>
+            <li>
+              <Link href="/courses/python" className="underline hover:no-underline">
+                Python Programming
+              </Link>
+            </li>
+            <li>
+              <Link href="/courses/java" className="underline hover:no-underline">
+                Java & Spring Boot
+              </Link>
+            </li>
+          </ul>
+        </section>
 
         {/* Choose Your Path */}
         <section aria-labelledby="choose-path" className="mb-10">

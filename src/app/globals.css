@@ -19,6 +19,12 @@ html {
   scroll-padding-top: 5rem; /* keep anchors below sticky header */
 }
 
+/* Accessible focus outlines */
+:where(a, button, [role="button"], input, select, textarea):focus-visible {
+  outline: 2px solid #2563eb; /* blue-600 */
+  outline-offset: 2px;
+}
+
 /* Custom utilities */
 .container {
   @apply max-w-6xl mx-auto px-4;
