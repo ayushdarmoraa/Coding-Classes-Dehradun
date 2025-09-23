@@ -428,8 +428,8 @@ export default async function CoursePage({ params }: Props) {
             <TrackedLink
               href="/online-courses/full-stack"
               className="text-blue-700 hover:underline font-medium"
-              event="cta_enroll_click"
-              eventParams={{ page_type: 'offline_course', course_slug: 'full-stack', city: 'dehradun', variant: 'curriculum_online_compare' }}
+              event="cta_fullstack_prefer_online"
+              eventParams={{ location: 'course_detail', course_slug: course.slug }}
             >
               Prefer online? See the Live Full-Stack cohort →
             </TrackedLink>

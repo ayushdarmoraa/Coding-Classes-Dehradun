@@ -95,6 +95,8 @@ export default function HomePage() {
               variant="primary"
               size="lg"
               className="bg-yellow-400 text-blue-900 font-semibold hover:bg-yellow-500"
+              event="cta_home_explore_courses"
+              eventParams={{ location: "home_hero" }}
             >
               Explore Courses
             </Button>
@@ -255,7 +257,14 @@ export default function HomePage() {
           </p>
 
           <div className="text-center mt-10">
-            <Button href="/courses" size="lg" variant="primary" className="mr-3">
+            <Button
+              href="/courses"
+              size="lg"
+              variant="primary"
+              className="mr-3"
+              event="cta_home_explore_courses"
+              eventParams={{ location: "home_mid" }}
+            >
               Explore Courses
             </Button>
             <Button href="/contact" size="lg" variant="ghost">
@@ -324,7 +333,14 @@ export default function HomePage() {
                     </td>
                     <td className="px-4 py-3">85%</td>
                     <td className="px-4 py-3 text-right">
-                      <Button href="/courses/full-stack" size="sm">View</Button>
+                      <Button
+                        href="/courses/full-stack"
+                        size="sm"
+                        event="cta_home_table_view_course"
+                        eventParams={{ location: "home_table", course_slug: "full-stack" }}
+                      >
+                        View
+                      </Button>
                     </td>
                   </tr>
 
@@ -337,7 +353,14 @@ export default function HomePage() {
                     </td>
                     <td className="px-4 py-3">85%</td>
                     <td className="px-4 py-3 text-right">
-                      <Button href="/courses/data-science" size="sm">View</Button>
+                      <Button
+                        href="/courses/data-science"
+                        size="sm"
+                        event="cta_home_table_view_course"
+                        eventParams={{ location: "home_table", course_slug: "data-science" }}
+                      >
+                        View
+                      </Button>
                     </td>
                   </tr>
 
@@ -350,7 +373,14 @@ export default function HomePage() {
                     </td>
                     <td className="px-4 py-3">85%</td>
                     <td className="px-4 py-3 text-right">
-                      <Button href="/courses/python" size="sm">View</Button>
+                      <Button
+                        href="/courses/python"
+                        size="sm"
+                        event="cta_home_table_view_course"
+                        eventParams={{ location: "home_table", course_slug: "python" }}
+                      >
+                        View
+                      </Button>
                     </td>
                   </tr>
 
@@ -363,7 +393,14 @@ export default function HomePage() {
                     </td>
                     <td className="px-4 py-3">85%</td>
                     <td className="px-4 py-3 text-right">
-                      <Button href="/courses/java" size="sm">View</Button>
+                      <Button
+                        href="/courses/java"
+                        size="sm"
+                        event="cta_home_table_view_course"
+                        eventParams={{ location: "home_table", course_slug: "java" }}
+                      >
+                        View
+                      </Button>
                     </td>
                   </tr>
                 </tbody>
@@ -396,7 +433,13 @@ export default function HomePage() {
           </div>
           
           <div className="text-center mt-12">
-            <Button href="/courses" variant="secondary" size="lg">
+            <Button
+              href="/courses"
+              variant="secondary"
+              size="lg"
+              event="cta_home_view_all_courses"
+              eventParams={{ location: "home_mid" }}
+            >
               View All Courses
             </Button>
           </div>
