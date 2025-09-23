@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
+import { breadcrumbLd } from "@/lib/seo";
 import Image from "next/image";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import {
@@ -146,28 +147,12 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
     image: [img],
   };
 
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "@id": `${url}#breadcrumb`,
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        item: { "@type": "WebPage", "@id": `${base}/`, name: "Home" }
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        item: { "@type": "WebPage", "@id": `${base}/blog`, name: "Blog" }
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        item: { "@type": "WebPage", "@id": url, name: post.title }
-      }
-    ],
-  };
+  // Build resilient breadcrumb via shared helper (adds top-level name and nested item.name)
+  const breadcrumbJsonLd = breadcrumbLd([
+    { name: "Home", url: `${base}/` },
+    { name: "Blog", url: `${base}/blog` },
+    { name: post.title || "Blog Post", url },
+  ]);
   const faqJsonLd = post.faqs && post.faqs.length > 0
     ? {
         "@context": "https://schema.org",
