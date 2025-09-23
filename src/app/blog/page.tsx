@@ -77,6 +77,21 @@ export async function generateMetadata({
 
   const { items, totalPages } = paginate(visibleList, page, 6);
 
+  // Helpers
+  const fmtDate = (iso?: string) => {
+    if (!iso) return null;
+    const d = new Date(iso);
+    return Number.isNaN(d.getTime()) ? null : d.toLocaleDateString("en-IN");
+  };
+  const fallbackDesc = (title?: string) => {
+    const t = (title || "").trim();
+    if (!t) return undefined;
+    const base = `${t} — insights from Doon Coding Academy (Dehradun).`;
+    const extra = " Compare options, syllabus, fees, and outcomes. Updated 2025.";
+    const v = base + extra;
+    return v.length > 160 ? v.slice(0, 157) + "…" : v;
+  };
+
   // prev/next rel URLs
   const makeUrl = (n: number) => {
     const query = new URLSearchParams();
@@ -192,7 +207,10 @@ export async function generateMetadata({
                           </Link>
                         </h3>
                         <p className="text-gray-600 text-sm mt-1">
-                          {new Date(p.date).toLocaleDateString()} • {p.readingTime} min read
+                          {(() => {
+                            const ds = fmtDate(p.date);
+                            return ds ? `${ds} • ${p.readingTime} min read` : `${p.readingTime} min read`;
+                          })()}
                           {p.authorName ? (
                             <>
                               {" "}• By{" "}
@@ -207,12 +225,14 @@ export async function generateMetadata({
                         <p className="text-gray-700 mt-2 line-clamp-3">{p.description}</p>
 
                         <div className="mt-3 flex flex-wrap gap-2">
-                          <Link
-                            href={`/blog/category/${encodeURIComponent(p.category)}`}
-                            className="rounded-md border px-2 py-1 text-xs text-blue-700 border-blue-700"
-                          >
-                            {p.category}
-                          </Link>
+                          {p.category && p.category.trim().length > 0 ? (
+                            <Link
+                              href={`/blog/category/${encodeURIComponent(p.category)}`}
+                              className="rounded-md border px-2 py-1 text-xs text-blue-700 border-blue-700"
+                            >
+                              {p.category}
+                            </Link>
+                          ) : null}
                         </div>
 
                         <Link
@@ -283,7 +303,7 @@ export async function generateMetadata({
                 <div className="relative mb-3 -mx-4 -mt-4 h-40">
                   <Image
                     src={post.image}
-                    alt={post.imageAlt || post.title}
+                    alt={post.imageAlt || post.title || post.slug}
                     fill
                     sizes="(max-width: 768px) 100vw, 400px"
                     className="object-cover rounded-t-lg"
@@ -293,7 +313,7 @@ export async function generateMetadata({
               <div className="flex items-center gap-2 mb-1">
                 <h2 className="text-xl font-semibold">
                   <Link href={`/blog/${post.slug}`} className="hover:underline">
-                    {post.title}
+                    {(post.title || post.slug).trim()}
                   </Link>
                 </h2>
                 {post.featured && (
@@ -303,7 +323,10 @@ export async function generateMetadata({
                 )}
               </div>
               <p className="text-gray-600 text-sm">
-                {new Date(post.date).toLocaleDateString()} • {post.readingTime} min read
+                {(() => {
+                  const ds = fmtDate(post.date);
+                  return ds ? `${ds} • ${post.readingTime} min read` : `${post.readingTime} min read`;
+                })()}
                 {post.authorName ? (
                   <>
                     {" "}• By{" "}
@@ -315,14 +338,21 @@ export async function generateMetadata({
                   </>
                 ) : null}
               </p>
-              <p className="text-gray-700 mt-2 line-clamp-4">{post.description}</p>
+              {(() => {
+                const desc = (post.description || "").trim() || fallbackDesc(post.title);
+                return desc ? (
+                  <p className="text-gray-700 mt-2 line-clamp-4">{desc}</p>
+                ) : null;
+              })()}
               <div className="mt-3 flex flex-wrap gap-2">
-                <Link
-                  href={`/blog/category/${encodeURIComponent(post.category)}`}
-                  className="rounded-md border px-2 py-1 text-xs text-blue-700 border-blue-700"
-                >
-                  {post.category}
-                </Link>
+                {post.category && post.category.trim().length > 0 ? (
+                  <Link
+                    href={`/blog/category/${encodeURIComponent(post.category)}`}
+                    className="rounded-md border px-2 py-1 text-xs text-blue-700 border-blue-700"
+                  >
+                    {post.category}
+                  </Link>
+                ) : null}
               </div>
               <Link
                 href={`/blog/${post.slug}`}
