@@ -194,7 +194,8 @@ export function getAllBlogPosts(): BlogPost[] {
   const posts = filenames.map(readOne);
 
   // filter out drafts from public listings
-  const published = posts.filter((p) => !p.draft);
+  const EXCLUDE_SLUGS = new Set(["sample-1", "sample-2"]);
+  const published = posts.filter((p) => !p.draft && !EXCLUDE_SLUGS.has(p.slug));
 
   // Sort: featured first, then newest → oldest
   return published.sort((a, b) => {
