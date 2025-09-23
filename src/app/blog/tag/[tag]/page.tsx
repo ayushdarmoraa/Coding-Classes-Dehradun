@@ -6,7 +6,8 @@ import { getAllBlogPosts, paginate, listTags } from "@/lib/blog";
 type Params = { tag: string };
 
 export function generateStaticParams() {
-  return listTags().map((t) => ({ tag: encodeURIComponent(t) }));
+  // Return raw tag labels; Next will handle encoding in the route segment
+  return listTags().map((t) => ({ tag: t }));
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
@@ -16,7 +17,10 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return {
     title: `Posts tagged “${tag}” | Doon Coding Academy`,
     description: `Blog posts tagged with “${tag}”.`,
-    alternates: { canonical: url },
+    // Noindex tag archives (keep follow)
+    robots: { index: false, follow: true },
+    // Prefer relative canonical per repo contract
+    alternates: { canonical: `/blog/tag/${encodeURIComponent(tag)}` },
     openGraph: { title: `Posts tagged “${tag}” | Doon Coding Academy`, description: `Posts with tag ${tag}.`, url, type: "website" },
   };
 }
