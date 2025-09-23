@@ -121,9 +121,23 @@ function readOne(name: string): BlogPost {
     }
   }
 
+  // lastModified: use fm.lastModified or fallback to file mtime (ISO)
+  let lastModified: string | undefined = (fm.lastModified || "").toString().trim() || undefined;
+  if (!lastModified) {
+    try {
+      const fsPath = fs.existsSync(path.join(process.cwd(), "src/content/blog", `${slug}.mdx`))
+        ? path.join(process.cwd(), "src/content/blog", `${slug}.mdx`)
+        : path.join(process.cwd(), "src/content/blog", `${slug}.md`);
+      const stat = fs.statSync(fsPath);
+      lastModified = new Date(stat.mtime).toISOString();
+    } catch {}
+  }
+
   // Image: treat empty strings as undefined; accept coverImage alias
   const imageRaw = (fm.image ?? fm.coverImage ?? "").toString().trim();
-  const image = imageRaw.length ? imageRaw : undefined;
+  const image = imageRaw.length
+    ? (imageRaw.startsWith("http") || imageRaw.startsWith("/") ? imageRaw : `/${imageRaw}`)
+    : undefined;
   const imageAlt = (fm.imageAlt || "").toString().trim() || undefined;
 
   // Keywords: accept `keywords` or fallback to `tags`
@@ -165,7 +179,7 @@ function readOne(name: string): BlogPost {
     howtoSupplies: Array.isArray(fm.howtoSupplies) ? fm.howtoSupplies : undefined,
     howtoTotalTime: fm.howtoTotalTime || undefined,
     howtoEstimatedCost: fm.howtoEstimatedCost || undefined,
-    lastModified: fm.lastModified || undefined,
+    lastModified,
     content,
     readingTime,
   } as BlogPost;

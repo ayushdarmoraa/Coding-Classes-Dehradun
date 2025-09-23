@@ -38,8 +38,9 @@ export async function generateMetadata({
     description:
       "In-depth guides for Dehradun students: Full-Stack (Gen AI), Data Science, Python & Java—fees, syllabus, placements, roadmaps, and tutorials.",
     robots,
-    // Canonical: /blog (search) OR /blog?page=n (pagination) OR /blog (page 1)
-    alternates: { canonical: BASE + "/blog" },
+  // Canonical: /blog (search) OR /blog?page=n (pagination) OR /blog (page 1)
+  // Per repo guardrails, prefer relative canonical hints; metadataBase in layout handles host
+  alternates: { canonical: "/blog" },
     openGraph: {
       title: "Blog – Coding & Career Guides (Dehradun)",
       description:
@@ -209,7 +210,12 @@ export async function generateMetadata({
                         <p className="text-gray-600 text-sm mt-1">
                           {(() => {
                             const ds = fmtDate(p.date);
-                            return ds ? `${ds} • ${p.readingTime} min read` : `${p.readingTime} min read`;
+                            const lm = p.lastModified ? new Date(p.lastModified) : null;
+                            const ld = lm && !Number.isNaN(lm.getTime()) ? lm : null;
+                            const showUpdated = ld && p.date && ld.getTime() > new Date(p.date).getTime();
+                            const updatedStr = showUpdated ? ` • Updated ${fmtDate(ld!.toISOString())}` : "";
+                            const dateStr = ds ? ds : "";
+                            return `${dateStr}${updatedStr} • ${p.readingTime} min read`;
                           })()}
                           {p.authorName ? (
                             <>
@@ -325,7 +331,12 @@ export async function generateMetadata({
               <p className="text-gray-600 text-sm">
                 {(() => {
                   const ds = fmtDate(post.date);
-                  return ds ? `${ds} • ${post.readingTime} min read` : `${post.readingTime} min read`;
+                  const lm = post.lastModified ? new Date(post.lastModified) : null;
+                  const ld = lm && !Number.isNaN(lm.getTime()) ? lm : null;
+                  const showUpdated = ld && post.date && ld.getTime() > new Date(post.date).getTime();
+                  const updatedStr = showUpdated ? ` • Updated ${fmtDate(ld!.toISOString())}` : "";
+                  const dateStr = ds ? ds : "";
+                  return `${dateStr}${updatedStr} • ${post.readingTime} min read`;
                 })()}
                 {post.authorName ? (
                   <>
