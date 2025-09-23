@@ -117,37 +117,6 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
                 Blog
               </Link>
             </li>
-
-            <li>
-              <Link
-                href="/faq"
-                className={`transition-colors duration-200 hover:text-yellow-300 ${
-                  isActive("/faq") ? "font-semibold underline underline-offset-4" : ""
-                }`}
-              >
-                FAQ
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/testimonials"
-                className={`transition-colors duration-200 hover:text-yellow-300 ${
-                  isActive("/testimonials") ? "font-semibold underline underline-offset-4" : ""
-                }`}
-              >
-                Testimonials
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/contact"
-                className={`transition-colors duration-200 hover:text-yellow-300 ${
-                  isActive("/contact") ? "font-semibold underline underline-offset-4" : ""
-                }`}
-              >
-                Contact
-              </Link>
-            </li>
           </ul>
 
           {/* Hamburger (mobile only) */}
