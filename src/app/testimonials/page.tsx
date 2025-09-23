@@ -114,11 +114,12 @@ export default function TestimonialsPage() {
       {featured && (
         <section className="mb-6">
           <article className="rounded-xl border bg-white p-6 shadow-sm">
-            <p className="text-lg italic text-gray-800">
-              &quot;{featured.text}&quot;
-            </p>
+            {/* Featured quote: semantic markup */}
+            <blockquote className="border-l-4 pl-4 italic text-gray-800">
+              <p>&quot;{featured.text}&quot;</p>
+            </blockquote>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-              <p className="font-semibold">— {featured.author}</p>
+              <cite className="not-italic font-semibold">— {featured.author}</cite>
               <div className="flex items-center gap-2 text-sm">
                 {featured.course && (() => {
                   const href = courseHref(featured.course);
@@ -153,9 +154,12 @@ export default function TestimonialsPage() {
             key={i}
             className="rounded-xl border bg-white p-6 shadow-sm"
           >
-            <p className="italic text-gray-800">&quot;{t.text}&quot;</p>
+            {/* Individual quote: semantic markup */}
+            <blockquote className="border-l-4 pl-4 italic text-gray-800">
+              <p>&quot;{t.text}&quot;</p>
+            </blockquote>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-              <p className="font-semibold">— {t.author}</p>
+              <cite className="not-italic font-semibold">— {t.author}</cite>
               <div className="flex items-center gap-2 text-sm">
                 {t.course && (() => {
                   const href = courseHref(t.course);
