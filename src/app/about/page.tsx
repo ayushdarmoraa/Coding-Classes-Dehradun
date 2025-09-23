@@ -247,6 +247,8 @@ export default function AboutPage() {
               <div className="mt-3 text-sm text-gray-700">
                 <p>Full-Stack with Gen AI: 6 months · ₹25,000 (or ₹5,000/month)</p>
                 <p>Data Science: 6 months · ₹30,000 (or ₹6,000/month)</p>
+                <p>Python: 4 months · ₹12,000 (or ₹4,000/month)</p>
+                <p>Java: 4 months · ₹12,000 (or ₹4,000/month)</p>
               </div>
             </details>
           </div>

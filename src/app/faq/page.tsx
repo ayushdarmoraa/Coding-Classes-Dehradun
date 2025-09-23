@@ -235,6 +235,8 @@ export default function FAQPage() {
               <ul className="mt-2 list-disc pl-5 space-y-1">
                 <li>Full-Stack with Gen AI: 6 months · ₹25,000 (or ₹5,000/month)</li>
                 <li>Data Science: 6 months · ₹30,000 (or ₹6,000/month)</li>
+                <li>Python: 4 months · ₹12,000 (or ₹4,000/month)</li>
+                <li>Java: 4 months · ₹12,000 (or ₹4,000/month)</li>
               </ul>
               For current offers, please{" "}
               <a href="/contact" className="text-blue-700 font-semibold hover:underline">
