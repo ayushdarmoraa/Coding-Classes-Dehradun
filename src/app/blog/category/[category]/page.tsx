@@ -6,7 +6,8 @@ import { filterPosts, listCategories, paginate } from "@/lib/blog";
 type Params = { category: string };
 
 export function generateStaticParams() {
-  return listCategories().map((c) => ({ category: encodeURIComponent(c) }));
+  // Return raw labels; Next will handle encoding for the segment
+  return listCategories().map((c) => ({ category: c }));
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
@@ -16,7 +17,10 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return {
     title: `${category} Articles | Doon Coding Academy`,
     description: `Blog posts in the ${category} category from Doon Coding Academy.`,
-    alternates: { canonical: url },
+    // Noindex category archives (keep follow)
+    robots: { index: false, follow: true },
+    // Prefer relative canonical per repo contract
+    alternates: { canonical: `/blog/category/${encodeURIComponent(category)}` },
     openGraph: { title: `${category} Articles | Doon Coding Academy`, description: `Posts about ${category}.`, url, type: "website" },
   };
 }
@@ -35,6 +39,7 @@ export default function CategoryPage({
   const posts = filterPosts({ category, q });
   const { items, totalPages } = paginate(posts, page, 6);
   const categories = listCategories();
+  const displayCategory = categories.find((c) => c.toLowerCase() === category.toLowerCase()) || category;
 
   return (
     <div className="container mx-auto p-4">
@@ -43,7 +48,7 @@ export default function CategoryPage({
         <span className="text-gray-700 font-semibold">{category}</span>
       </nav>
 
-      <h1 className="text-3xl font-bold mb-6">{category}</h1>
+  <h1 className="text-3xl font-bold mb-6">{displayCategory}</h1>
 
       {/* Filters/Search */}
       <form className="mb-6 flex flex-wrap gap-3 items-center">
@@ -54,7 +59,7 @@ export default function CategoryPage({
               key={c}
               href={`/blog/category/${encodeURIComponent(c)}`}
               className={`rounded-xl px-3 py-1.5 text-sm border ${
-                c === category ? "bg-blue-700 text-white border-blue-700" : "text-blue-700 border-blue-700"
+                c.toLowerCase() === category.toLowerCase() ? "bg-blue-700 text-white border-blue-700" : "text-blue-700 border-blue-700"
               }`}
             >
               {c}
