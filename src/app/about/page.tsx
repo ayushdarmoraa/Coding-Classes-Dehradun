@@ -7,6 +7,8 @@ import { INSTRUCTORS } from "@/lib/instructors";
 
 const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
+// Temporary toggle to hide instructors section while no teachers are available
+const SHOW_INSTRUCTORS = false;
 
 export const metadata: Metadata = {
   title: "About Doon Coding Academy | Learn Full-Stack, Data Science, Python, Java in Dehradun",
@@ -197,10 +199,12 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Instructors */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 mt-14">
-        <InstructorsGrid />
-      </section>
+      {/* Instructors (temporarily hidden via SHOW_INSTRUCTORS flag) */}
+      {SHOW_INSTRUCTORS && (
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 mt-14">
+          <InstructorsGrid />
+        </section>
+      )}
 
       {/* Location & Contact */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 mt-14 mb-16">
@@ -291,8 +295,8 @@ export default function AboutPage() {
           </li>
         </ul>
       </section>
-      {/* JSON-LD for Instructors */}
-      <InstructorsJsonLd />
+  {/* JSON-LD for Instructors (hidden when instructors are hidden) */}
+  {SHOW_INSTRUCTORS && <InstructorsJsonLd />}
     </main>
   );
 }
