@@ -434,6 +434,16 @@ export default async function CoursePage({ params }: Props) {
               Prefer online? See the Live Full-Stack cohort →
             </TrackedLink>
           </div>
+
+          {course.slug === "full-stack" && (
+            <div className="mt-8 space-y-2 text-sm">
+              <p className="font-semibold">Compare with other institutes:</p>
+              <ul className="list-disc list-inside">
+                <li><Link href="/vs/coding-ninjas" className="text-blue-700 hover:underline">DCA vs Coding Ninjas</Link></li>
+                <li><Link href="/vs/scaler" className="text-blue-700 hover:underline">DCA vs Scaler</Link></li>
+              </ul>
+            </div>
+          )}
         </section>
       )}
 
