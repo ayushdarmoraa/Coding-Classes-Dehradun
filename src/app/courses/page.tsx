@@ -16,12 +16,12 @@ const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
 export const metadata: Metadata = {
   title: "Courses | Doon Coding Academy",
   description:
-    "Explore all coding, data science, Python, and Java courses at Doon Coding Academy, Dehradun. Compare curriculum, fees, and outcomes. Small batches, hands-on projects, and career support.",
+    "Explore coding, data science, Python, and Java courses at Doon Coding Academy in Dehradun. Compare curriculum, duration, and fees.",
   alternates: { canonical: BASE + "/courses" },
   openGraph: {
     title: "Courses | Doon Coding Academy",
     description:
-      "Browse all Full Stack, Data Science, Python, and Java courses in Dehradun. See curriculum, fees, and outcomes. Small batches, real projects, and career support.",
+      "Browse Full-Stack, Data Science, Python, and Java courses in Dehradun. See curriculum, duration, and fees.",
     url: BASE + "/courses",
     type: "website",
     siteName: "Doon Coding Academy",
@@ -83,7 +83,7 @@ export default function CoursesPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <p className="mt-2 max-w-2xl text-gray-700">
-        Pick a program that fits your goals. Small batches, hands-on projects, and support included.
+        Compare course options, curriculum, duration, and fees to find a program that fits your goals.
       </p>
       <p className="mt-2 text-sm text-gray-600">
         Need city / online context? Visit our{' '}
@@ -197,10 +197,10 @@ export default function CoursesPage() {
 
           <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: "👨‍🏫", title: "Expert Mentors", text: "Instructors with 6+ years of industry experience." },
+            { icon: "📚", title: "Course Details", text: "Compare program information, duration, and fees on course pages." },
               { icon: "🧱", title: "Project-First", text: "Portfolio projects in every track—learn by building." },
               { icon: "🎯", title: "Job-Ready Skills", text: "Modern stack + interview prep and guidance." },
-              { icon: "🤝", title: "Local Support", text: "Small batches, personalized feedback, community." },
+            { icon: "📍", title: "Campus Location", text: "Find on-campus course information for Herbertpur, Dehradun." },
             ].map((f) => (
               <div key={f.title} className="rounded-2xl bg-gray-50 p-5 ring-1 ring-gray-200">
                 <div className="text-3xl">{f.icon}</div>
@@ -370,4 +370,3 @@ export default function CoursesPage() {
     </div>
   );
 }
-

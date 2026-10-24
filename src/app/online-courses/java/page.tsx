@@ -17,12 +17,12 @@ const PAGE_URL = `${APEX}/online-courses/java`;
 export const metadata: Metadata = {
   title: "Online Java Course in India (Live + Projects)",
   description:
-    "Live online Java for India-wide learners. Small batches, hands-on projects, recordings, mentor hours, and career support.",
+    "Explore the live online Java curriculum, duration, and program details.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     title: "Online Java Course in India (Live + Projects)",
     description:
-      "Live online Java for India-wide learners. Small batches, hands-on projects, recordings, mentor hours, and career support.",
+      "Explore the live online Java curriculum, duration, and program details.",
     url: PAGE_URL,
     type: "website",
     siteName: "Doon Coding Academy",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Online Java Course in India (Live + Projects)",
     description:
-      "Live online Java for India-wide learners. Small batches, hands-on projects, recordings, mentor hours, and career support.",
+      "Explore the live online Java curriculum, duration, and program details.",
   },
 };
 

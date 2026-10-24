@@ -7,9 +7,12 @@ export interface Testimonial {
   image?: string; // Added image field for photo
   altText?: string; // Added altText for image
   datePublished?: string; // Added datePublished field
+  verified: boolean;
+  consentVerified: boolean;
+  sourceUrl?: string;
 }
 
-export const testimonials: Testimonial[] = [
+const testimonialRecords: Testimonial[] = [
   {
     author: "Priya Sharma",
     text: "Doon Coding Academy provided me with the best learning experience. The Full-Stack with Gen AI course was comprehensive and the instructors were very supportive. I landed a great job thanks to their training!",
@@ -19,6 +22,8 @@ export const testimonials: Testimonial[] = [
     image: "/images/testimonials/priya_sharma.jpg",
     altText: "Priya Sharma, a student of Full-Stack with Gen AI course",
     datePublished: "2025-08-15",
+    verified: false,
+    consentVerified: false,
   },
   {
     author: "Rahul Singh",
@@ -29,6 +34,8 @@ export const testimonials: Testimonial[] = [
     image: "/images/testimonials/rahul_singh.jpg",
     altText: "Rahul Singh, a student of Data Science & AI course",
     datePublished: "2025-07-20",
+    verified: false,
+    consentVerified: false,
   },
   {
     author: "Anjali Verma",
@@ -39,6 +46,8 @@ export const testimonials: Testimonial[] = [
     image: "/images/testimonials/anjali_verma.jpg",
     altText: "Anjali Verma, a student of Python Programming course",
     datePublished: "2025-06-10",
+    verified: false,
+    consentVerified: false,
   },
   {
     author: "Vikram Kumar",
@@ -49,6 +58,8 @@ export const testimonials: Testimonial[] = [
     image: "/images/testimonials/vikram_kumar.jpg",
     altText: "Vikram Kumar, a student of Java Programming course",
     datePublished: "2025-05-01",
+    verified: false,
+    consentVerified: false,
   },
   {
     author: "Sneha Gupta",
@@ -59,7 +70,11 @@ export const testimonials: Testimonial[] = [
     image: "/images/testimonials/sneha_gupta.jpg",
     altText: "Sneha Gupta, a student of Full-Stack Development course",
     datePublished: "2025-04-25",
+    verified: false,
+    consentVerified: false,
   },
 ];
 
-
+export const testimonials = testimonialRecords.filter(
+  (testimonial) => testimonial.verified && testimonial.consentVerified
+);

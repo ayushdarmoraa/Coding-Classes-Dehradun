@@ -33,7 +33,7 @@ import Script from "next/script";
           {
             "@type": "Question",
             "name": "What are the batch sizes?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Small batches (max 15) for personal attention." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Contact us for current class-size details." }
           },
           {
             "@type": "Question",
@@ -138,8 +138,7 @@ export default function FAQPage() {
         name: "What is the class format and batch size?",
         acceptedAnswer: {
           "@type": "Answer",
-          text:
-            "Instructor-led sessions with hands-on practice, doubt-clearing, and reviews. Small batches for personal attention.",
+          text: "Contact us for current class-format and class-size details.",
         },
       },
       {
@@ -274,8 +273,7 @@ export default function FAQPage() {
               What is the class format and batch size?
             </summary>
             <div className="px-5 pb-5 pt-0 text-gray-700">
-              Instructor-led sessions with hands-on practice, doubt-clearing, and reviews. Batch sizes are kept small for{" "}
-              <span className="font-semibold">personal attention</span>.
+              Contact us for current class-format and class-size details.
             </div>
           </details>
 
@@ -362,5 +360,3 @@ export default function FAQPage() {
     </main>
   );
 }
-
-

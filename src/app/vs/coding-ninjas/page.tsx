@@ -70,7 +70,7 @@ export default function Page() {
               </tr>
               <tr>
                 <td>Batch Size</td>
-                <td>Small batches (target ≤ 15) for personalized attention.</td>
+                <td>Contact DCA for current class-size details.</td>
                 <td>Typically larger national cohorts (varies by batch).</td>
               </tr>
               <tr>
@@ -145,7 +145,7 @@ export default function Page() {
           <li>
             Prefer on-campus learning? Explore{" "}
             <Link href="/courses/full-stack" className="text-blue-700 hover:underline">
-              Full-Stack in Dehradun (On-Campus/Hybrid)
+              Full-Stack in Dehradun (On-Campus)
             </Link>.
           </li>
         </ul>

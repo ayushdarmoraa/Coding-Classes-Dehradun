@@ -45,7 +45,7 @@ export default function LocationsIndexPage() {
       badge: "On-Campus",
       href: "/locations/dehradun",
       blurb:
-        "Visit our physical campus for on-campus/hybrid classes with mentors and labs. Prefer classroom learning? Start here.",
+        "Visit our physical campus in Dehradun or explore the on-campus courses offered there.",
       primaryHref: "/courses/full-stack",
       primaryText: "View On-Campus Courses",
       secondaryHref: "/blog/visit-dca-campus-dehradun-guide",
@@ -67,7 +67,7 @@ export default function LocationsIndexPage() {
       badge: "Online",
       href: "/locations/bangalore",
       blurb:
-        "In India’s tech capital? Build a job-ready portfolio via live online cohorts—small batches and interview prep.",
+        "In India’s tech capital? Explore live online course options and interview preparation.",
       primaryHref: "/online-courses",
       primaryText: "Explore Online Courses",
       secondaryHref: "/blog/live-vs-recorded-coding-classes-india",

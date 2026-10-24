@@ -90,8 +90,6 @@ function readOne(name: string): BlogPost {
   const fm = (data as Partial<BlogPost> & {
     tags?: string[];
     coverImage?: string;
-    publishDate?: string;
-    publishedAt?: string;
   }) || {};
   const slug = name.replace(/\.mdx?$/, "");
 
@@ -100,25 +98,12 @@ function readOne(name: string): BlogPost {
     (fm.title && String(fm.title).trim()) ||
     slug.replace(/-/g, " ").replace(/\b\w/g, (m: string) => m.toUpperCase());
 
-  // Date: accept fm.date/publishedAt; coerce to ISO YYYY-MM-DD; fallback to file mtime
-  const rawDate = (fm.date || fm.publishedAt || fm.publishDate || "").toString().trim();
-  let isoDate: string | undefined;
-  if (rawDate) {
-    const d = new Date(rawDate);
-    if (!Number.isNaN(d.getTime())) {
-      isoDate = d.toISOString().slice(0, 10); // keep YYYY-MM-DD
-    }
-  }
-  if (!isoDate) {
-    try {
-      const fsPath = fs.existsSync(path.join(process.cwd(), "src/content/blog", `${slug}.mdx`))
-        ? path.join(process.cwd(), "src/content/blog", `${slug}.mdx`)
-        : path.join(process.cwd(), "src/content/blog", `${slug}.md`);
-      const stat = fs.statSync(fsPath);
-      isoDate = new Date(stat.mtime).toISOString().slice(0, 10);
-    } catch {
-      isoDate = new Date().toISOString().slice(0, 10);
-    }
+  const rawDate = typeof fm.date === "string" ? fm.date.trim() : "";
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(rawDate)
+    ? new Date(`${rawDate}T00:00:00.000Z`)
+    : undefined;
+  if (!date || Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== rawDate) {
+    throw new Error(`Missing or invalid publication date in ${name}`);
   }
 
   // lastModified: use fm.lastModified or fallback to file mtime (ISO)
@@ -161,7 +146,7 @@ function readOne(name: string): BlogPost {
     slug,
     title,
     description: (fm.description || "").toString(),
-    date: isoDate,
+    date: rawDate,
     category,
     keywords,
     image,
@@ -478,5 +463,4 @@ export function nextPrevInSeries(
     nextInSeries: idx >= 0 && idx < seq.length - 1 ? seq[idx + 1] : undefined,
   };
 }
-
 

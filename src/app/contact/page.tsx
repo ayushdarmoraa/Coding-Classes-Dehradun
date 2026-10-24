@@ -184,7 +184,7 @@ export default function ContactPage() {
                   What are the batch sizes?
                 </h3>
                 <p className="text-gray-600 text-sm mb-4">
-                  We maintain small batch sizes of maximum 15 students to ensure personalized attention and better learning outcomes.
+                  Contact us for current class-size details.
                 </p>
                 
                 <h3 className="font-semibold text-gray-900 mb-2">
@@ -223,4 +223,3 @@ export default function ContactPage() {
     </div>
   );
 }
-

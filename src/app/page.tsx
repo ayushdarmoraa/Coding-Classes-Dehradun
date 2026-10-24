@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getCourses } from "@/lib/courses";
 import CourseCard from "@/components/features/CourseCard";
-import TestimonialCard from "@/components/features/TestimonialCard";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import HomeFAQ from "@/components/faq/HomeFAQ";
 import CourseSnapshotMobile from "@/components/features/CourseSnapshotMobile";
+import { testimonials } from "@/lib/testimonials";
 
 const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
@@ -16,13 +17,13 @@ const APEX = BASE.replace(/^https:\/\/www\./, "https://");
 export const metadata: Metadata = {
   title: "Coding Courses in Dehradun & Online in India",
   description:
-    "Join Doon Coding Academy (DCA) for Full-Stack, Data Science, Python & Java—live in Dehradun and online across India. Small batches, projects, recordings & mentor support.",
+    "Explore Full-Stack, Data Science, Python, and Java courses in Dehradun and online across India.",
   // ✅ Canonical to apex (trailing slash)
   alternates: { canonical: APEX + "/" },
   openGraph: {
     title: "Coding Courses in Dehradun & Online in India",
     description:
-      "Join Doon Coding Academy (DCA) for Full-Stack, Data Science, Python & Java—live in Dehradun and online across India. Small batches, projects, recordings & mentor support.",
+      "Explore Full-Stack, Data Science, Python, and Java courses in Dehradun and online across India.",
     // ✅ OG url to apex + add image
     url: APEX + "/",
     type: "website",
@@ -33,37 +34,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Coding Courses in Dehradun & Online in India",
     description:
-      "Join Doon Coding Academy (DCA) for Full-Stack, Data Science, Python & Java—live in Dehradun and online across India. Small batches, projects, recordings & mentor support.",
+      "Explore Full-Stack, Data Science, Python, and Java courses in Dehradun and online across India.",
   },
 };
-
-const testimonials = [
-  {
-    name: "Priya Sharma",
-    role: "Software Developer",
-    company: "TechCorp",
-    quote: "The Full Stack course with Gen AI was exactly what I needed to transition into tech. The instructors are amazing and the projects are industry-relevant."
-  },
-  {
-    name: "Rahul Gupta",
-    role: "Data Analyst",
-    company: "DataFlow Solutions",
-    quote: "Best investment I made for my career. The Data Science course gave me practical skills that I use every day at work."
-  },
-  {
-    name: "Anjali Verma",
-    role: "Frontend Developer",
-    company: "StartupXYZ",
-    quote: "Small batch sizes mean personalized attention. I got my first tech job within 3 months of completing the course!"
-  }
-];
-
-const stats = [
-  { number: "500+", label: "Students Trained" },
-  { number: "85%", label: "Placement Rate" },
-  { number: "15", label: "Max Batch Size" },
-  { number: "6+", label: "Years Experience" }
-];
 
 export default function HomePage() {
   const courses = getCourses();
@@ -118,18 +91,25 @@ export default function HomePage() {
             page.
           </p>
           
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-yellow-300 mb-2">
-                  {stat.number}
-                </div>
-                <div className="text-blue-200 text-sm md:text-base">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
+          <div className="grid gap-3 sm:grid-cols-2 max-w-3xl mx-auto mt-8 text-left">
+            <Link
+              href="/courses"
+              className="rounded-xl border border-white/25 bg-white/10 p-4 transition hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              <span className="font-semibold text-white">Structured course pathways</span>
+              <span className="mt-1 block text-sm text-blue-100">
+                Full-Stack, Data Science, Python, and Java
+              </span>
+            </Link>
+            <Link
+              href="/blog"
+              className="rounded-xl border border-white/25 bg-white/10 p-4 transition hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              <span className="font-semibold text-white">Guides for learners</span>
+              <span className="mt-1 block text-sm text-blue-100">
+                Browse coding guides and learning roadmaps
+              </span>
+            </Link>
           </div>
         </div>
       </section>
@@ -167,9 +147,9 @@ export default function HomePage() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">👥</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Small Batches</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Course Details</h3>
               <p className="text-gray-600">
-                Maximum 15 students per batch ensures personalized attention and better learning outcomes.
+                Review each course’s curriculum, prerequisites, and project work before choosing a program.
               </p>
             </Card>
             
@@ -235,10 +215,9 @@ export default function HomePage() {
             </Card>
 
             <Card className="p-6 h-full">
-              <h3 className="text-xl font-semibold mb-2">Accountability &amp; community</h3>
+              <h3 className="text-xl font-semibold mb-2">Learning Guides</h3>
               <p className="text-gray-600">
-                Small batches, stand-ups, peer reviews, and challenge streaks keep you consistent.
-                Learn together, grow faster.
+                Browse published coding guides and learning roadmaps in the Guides section.
               </p>
             </Card>
 
@@ -252,8 +231,7 @@ export default function HomePage() {
           </div>
 
           <p className="text-lg text-gray-700 max-w-4xl mx-auto mt-8 text-center">
-            Prefer a campus vibe? You can attend hybrid sessions in Dehradun when convenient—your cohort
-            progress and support remain the same.
+            Explore on-campus courses in Dehradun or online course options for learners across India.
           </p>
 
           <div className="text-center mt-10">
@@ -319,19 +297,17 @@ export default function HomePage() {
                     <th className="px-4 py-3 font-semibold">Mode</th>
                     <th className="px-4 py-3 font-semibold">Duration</th>
                     <th className="px-4 py-3 font-semibold">Fees</th>
-                    <th className="px-4 py-3 font-semibold">Placement rate</th>
                     <th className="px-4 py-3 font-semibold text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   <tr>
                     <td className="px-4 py-3">Full-Stack Development (MERN + Gen AI)</td>
-                    <td className="px-4 py-3">Online / Hybrid</td>
+                    <td className="px-4 py-3">On-Campus / Online</td>
                     <td className="px-4 py-3">6 months</td>
                     <td className="px-4 py-3">
                       ₹25,000 <span className="text-gray-500 text-xs">(₹5,000/month)</span>
                     </td>
-                    <td className="px-4 py-3">85%</td>
                     <td className="px-4 py-3 text-right">
                       <Button
                         href="/courses/full-stack"
@@ -346,12 +322,11 @@ export default function HomePage() {
 
                   <tr>
                     <td className="px-4 py-3">Data Science &amp; AI</td>
-                    <td className="px-4 py-3">Online / Hybrid</td>
+                    <td className="px-4 py-3">On-Campus / Online</td>
                     <td className="px-4 py-3">6 months</td>
                     <td className="px-4 py-3">
                       ₹30,000 <span className="text-gray-500 text-xs">(₹6,000/month)</span>
                     </td>
-                    <td className="px-4 py-3">85%</td>
                     <td className="px-4 py-3 text-right">
                       <Button
                         href="/courses/data-science"
@@ -366,12 +341,11 @@ export default function HomePage() {
 
                   <tr>
                     <td className="px-4 py-3">Python Programming</td>
-                    <td className="px-4 py-3">Online / Hybrid</td>
+                    <td className="px-4 py-3">On-Campus / Online</td>
                     <td className="px-4 py-3">4 months</td>
                     <td className="px-4 py-3">
                       ₹12,000 <span className="text-gray-500 text-xs">(₹4,000/month)</span>
                     </td>
-                    <td className="px-4 py-3">85%</td>
                     <td className="px-4 py-3 text-right">
                       <Button
                         href="/courses/python"
@@ -386,12 +360,11 @@ export default function HomePage() {
 
                   <tr>
                     <td className="px-4 py-3">Java Programming</td>
-                    <td className="px-4 py-3">Online / Hybrid</td>
+                    <td className="px-4 py-3">On-Campus / Online</td>
                     <td className="px-4 py-3">4 months</td>
                     <td className="px-4 py-3">
                       ₹12,000 <span className="text-gray-500 text-xs">(₹4,000/month)</span>
                     </td>
-                    <td className="px-4 py-3">85%</td>
                     <td className="px-4 py-3 text-right">
                       <Button
                         href="/courses/java"
@@ -446,21 +419,26 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-  <section className="py-16 bg-gray-50 defer-visibility">
+      {testimonials.length > 0 && (
+        <section className="py-16 bg-gray-50 defer-visibility">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               What Our Students Say
             </h2>
             <p className="text-xl text-gray-600">
-              Real success stories from our graduates
+              Verified learner experiences shared with permission
             </p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <TestimonialCard key={index} {...testimonial} />
+            {testimonials.map((testimonial) => (
+              <Card key={testimonial.author} className="p-6 h-full">
+                <blockquote className="text-gray-700 leading-relaxed italic">
+                  “{testimonial.text}”
+                </blockquote>
+                <p className="mt-4 font-semibold text-gray-900">{testimonial.author}</p>
+              </Card>
             ))}
           </div>
           
@@ -470,7 +448,8 @@ export default function HomePage() {
             </Button>
           </div>
         </div>
-      </section>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
@@ -479,8 +458,7 @@ export default function HomePage() {
             Ready to Start Your Tech Journey?
           </h2>
           <p className="text-xl mb-8 text-blue-100">
-            Join hundreds of students who have transformed their careers with us.
-            Next batch starts soon!
+            Explore the course programs and contact us for current enrollment details.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -504,4 +482,3 @@ export default function HomePage() {
     </div>
   );
 }
-

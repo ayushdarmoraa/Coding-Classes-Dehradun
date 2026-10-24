@@ -10,11 +10,11 @@ const APEX = BASE.replace(/^https:\/\/www\./, "https://");
 export const metadata: Metadata = {
   title: "Online Coding Courses in India (Live + Projects)",
   description:
-    "Live online Full-Stack, Data Science, Python & Java for India-wide learners. Small batches, projects, recordings & mentor support.",
+    "Explore online Full-Stack, Data Science, Python, and Java courses for learners across India.",
   openGraph: {
     title: "Online Coding Courses in India (Live + Projects)",
     description:
-      "Live online Full-Stack, Data Science, Python & Java for India-wide learners. Small batches, projects, recordings & mentor support.",
+      "Explore online Full-Stack, Data Science, Python, and Java courses for learners across India.",
     url: APEX + "/online-courses",
     type: "website",
     siteName: "Doon Coding Academy",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Online Coding Courses in India (Live + Projects)",
     description:
-      "Live online Full-Stack, Data Science, Python & Java for India-wide learners. Small batches, projects, recordings & mentor support.",
+      "Explore online Full-Stack, Data Science, Python, and Java courses for learners across India.",
   },
   alternates: { canonical: APEX + "/online-courses" },
 };

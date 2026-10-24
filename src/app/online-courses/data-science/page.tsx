@@ -13,7 +13,7 @@ const APEX = SITE.replace(/^https:\/\/www\./, "https://");
 
 const TITLE = "Online Data Science Course in India (Live + Projects)";
 const DESC =
-  "Live online Data Science & AI for learners across India. Small batches, hands-on projects, recordings, mentor hours, and career support.";
+  "Explore the live online Data Science & AI curriculum, duration, and program details.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -63,7 +63,7 @@ export default function OnlineDataSciencePage() {
               size="lg"
               className="!bg-transparent border-2 border-white text-white font-semibold hover:bg-white hover:text-blue-600 transition"
             >
-              View Offline/Hybrid Syllabus
+              View On-Campus Course
             </Button>
           </div>
         </div>
@@ -87,7 +87,7 @@ export default function OnlineDataSciencePage() {
           <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
             <h2 className="text-xl font-semibold mb-2">Cohort format</h2>
             <p className="text-gray-700">
-              6 months · small batches · live + recordings · weekly mentor hours · project reviews · placement help.
+              6 months · live classes · recordings · weekly mentor hours · project reviews · placement help.
             </p>
           </div>
         </div>

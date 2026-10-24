@@ -198,17 +198,22 @@ export function generateFAQPageSchema(faqs: { question: string; answer: string }
 }
 
 export function generateTestimonialSchema(testimonials: Testimonial[]) {
+  const verifiedTestimonials = testimonials.filter(
+    (testimonial) => testimonial.verified && testimonial.consentVerified
+  );
+  if (verifiedTestimonials.length === 0) return null;
+
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    itemListElement: testimonials.map((testimonial, index) => ({
+    itemListElement: verifiedTestimonials.map((testimonial, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {
         "@context": "https://schema.org",
         "@type": "Review",
         author: { "@type": "Person", name: testimonial.author },
-        datePublished: testimonial.datePublished || new Date().toISOString().split("T")[0], // Use provided date or current date
+        ...(testimonial.datePublished ? { datePublished: testimonial.datePublished } : {}),
         reviewBody: testimonial.text,
         name: testimonial.course || "Student Testimonial", // Use course name or generic
         reviewRating: testimonial.rating ? { "@type": "Rating", ratingValue: String(testimonial.rating), bestRating: "5" } : undefined,
@@ -221,5 +226,3 @@ export function generateTestimonialSchema(testimonials: Testimonial[]) {
     })),
   };
 }
-
-
