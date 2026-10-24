@@ -13,7 +13,7 @@ const SHOW_INSTRUCTORS = false;
 export const metadata: Metadata = {
   title: "About Doon Coding Academy | Learn Full-Stack, Data Science, Python, Java in Dehradun",
   description:
-    "Doon Coding Academy is a modern, SEO-first coding institute in Dehradun offering Full-Stack with Gen AI, Data Science, Python, and Java. Practical projects, local support, flexible plans.",
+    "Doon Coding Academy offers Full-Stack with Gen AI, Data Science, Python, and Java courses in Dehradun, with practical projects and local support.",
   alternates: { canonical: BASE + "/about" },
   openGraph: {
     url: BASE + "/about",
@@ -34,11 +34,9 @@ export default function AboutPage() {
               About <span className="text-blue-700">Doon Coding Academy</span>
             </h1>
             <p className="mt-4 text-gray-700">
-              We’re building Dehradun’s most practical, industry-aligned coding institute—focused on
-              <span className="font-semibold"> outcomes, portfolios,</span> and{" "}
-              <span className="font-semibold">local career growth</span>. Our curriculum blends solid
-              fundamentals with the latest tools (including Gen AI) so beginners and upskillers can
-              move confidently from <em>learning</em> to <em>doing</em>.
+              Doon Coding Academy offers Full-Stack, Data Science, Python, and Java courses in
+              Herbertpur. Explore each course’s curriculum and details to choose a program that
+              matches your learning goals.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -76,7 +74,7 @@ export default function AboutPage() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-1 h-2 w-2 rounded-full bg-yellow-400"></span>
-                SEO-first site for transparency
+                Clear and transparent learning
               </li>
             </ul>
           </div>
@@ -131,10 +129,10 @@ export default function AboutPage() {
                 </p>
               </div>
               <div className="rounded-2xl p-5 ring-1 ring-gray-200">
-                <h3 className="font-semibold">Transparent & SEO-First</h3>
+                <h3 className="font-semibold">Clear & Transparent Learning</h3>
                 <p className="mt-2 text-gray-700">
-                  Clear pricing, outcomes, and curriculum. Our site is optimized so you can easily
-                  find everything you need before enrolling.
+                  Clear information about pricing, outcomes, and curriculum helps you decide before
+                  enrolling.
                 </p>
               </div>
             </div>

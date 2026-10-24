@@ -136,7 +136,7 @@ export default function Page() {
           <h2 className="text-2xl font-semibold">Why learners in Noida pick DCA</h2>
           <ul className="list-disc pl-6 space-y-2">
             <li>Live, interactive classes + recordings for revision</li>
-            <li>Small batches with doubt-clearing and mentor hours</li>
+            <li>Contact us for current class-size and support details</li>
             <li>Project-first curriculum with portfolio outcomes</li>
             <li>Career support: resume, mock interviews, referrals</li>
           </ul>

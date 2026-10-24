@@ -235,11 +235,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               url: SITE_URL,
               email: "dooncodingacademy@gmail.com",
               foundingDate: "2019-01-01",
-              founder: {
-                "@type": "Person",
-                name: "Ayush Darmora",
-                jobTitle: "Founder & Instructor",
-              },
               // Social profiles (env-gated, filtered for presence)
               sameAs: [
                 process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,
@@ -358,11 +353,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   }
                 ],
                 foundingDate: "2019",
-                founder: {
-                  "@type": "Person",
-                  name: "Ayush Darmora",
-                  jobTitle: "Founder & Instructor"
-                },
                 geo: {
                   "@type": "GeoCoordinates",
                   latitude: 30.43859,

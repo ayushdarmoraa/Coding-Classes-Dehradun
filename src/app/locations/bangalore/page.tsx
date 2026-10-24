@@ -20,7 +20,7 @@ const LOCAL_FAQ_BANGALORE = [
   },
   {
     q: "What are the batch sizes?",
-    a: "Each batch is capped at 15 students for personal attention and hands-on project mentoring.",
+    a: "Contact us for current class-size details.",
   },
   {
     q: "Are classes suitable for working professionals?",
@@ -135,7 +135,7 @@ export default function Page() {
           <h2 className="text-2xl font-semibold">Why learners in Bangalore pick DCA</h2>
           <ul className="list-disc pl-6 space-y-2">
             <li>Live, interactive classes + recordings for revision</li>
-            <li>Small batches with doubt-clearing and mentor hours</li>
+            <li>Contact us for current class-size and support details</li>
             <li>Project-first curriculum and portfolio building</li>
             <li>Career support: resume, mock interviews, referrals</li>
           </ul>

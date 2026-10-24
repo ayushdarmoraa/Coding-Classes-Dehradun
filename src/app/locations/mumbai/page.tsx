@@ -25,7 +25,7 @@ const LOCAL_FAQ_MUMBAI = [
   },
   {
     q: "What is the batch size and support?",
-    a: "Batches are capped at 15 students with project-first learning and doubt-solving support.",
+    a: "Contact us for current class-size and support details.",
   },
   {
     q: "Can I switch from online to on-campus later?",
@@ -136,7 +136,7 @@ export default function Page() {
           <h2 className="text-2xl font-semibold">Why learners in Mumbai pick DCA</h2>
           <ul className="list-disc pl-6 space-y-2">
             <li>Live, interactive classes + recordings for revision</li>
-            <li>Small batches with doubt-clearing and mentor hours</li>
+            <li>Contact us for current class-size and support details</li>
             <li>Project-first curriculum and portfolio building</li>
             <li>Career support: resume, mock interviews, referrals</li>
           </ul>

@@ -17,12 +17,12 @@ const CANON = `${APEX}/online-courses/full-stack`;
 export const metadata: Metadata = {
   title: "Online Full-Stack Development (MERN) in India (Live + Projects)",
   description:
-    "Live online Full-Stack (MERN) for India-wide learners. Small batches, projects, recordings & mentor support. 6 months · ₹25,000 · Placement help.",
+    "Explore the live online Full-Stack (MERN) curriculum, duration, and program details.",
   alternates: { canonical: CANON },
   openGraph: {
     title: "Online Full-Stack Development (MERN) in India (Live + Projects)",
     description:
-      "Live online Full-Stack (MERN) for India-wide learners. Small batches, projects, recordings & mentor support. 6 months · ₹25,000 · Placement help.",
+      "Explore the live online Full-Stack (MERN) curriculum, duration, and program details.",
     url: CANON,
     type: "website",
     siteName: "Doon Coding Academy",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Online Full-Stack Development (MERN) in India (Live + Projects)",
     description:
-      "Live online Full-Stack (MERN) for India-wide learners. Small batches, projects, recordings & mentor support. 6 months · ₹25,000 · Placement help.",
+      "Explore the live online Full-Stack (MERN) curriculum, duration, and program details.",
   },
 };
 
@@ -54,8 +54,7 @@ export default function OnlineFullStackPage() {
           </h1>
           <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto">
             Live, cohort-based training with <strong>projects</strong>, <strong>recordings</strong>,
-            and <strong>mentor hours</strong>. Small batches, hands-on reviews, and placement
-            support—fully online. {" "}
+            and <strong>mentor hours</strong>. Review the course page for program details. {" "}
             <Link href="/courses/full-stack" className="underline text-yellow-200 hover:text-white">
               Prefer on-campus? See Dehradun Full-Stack
             </Link>
@@ -83,7 +82,6 @@ export default function OnlineFullStackPage() {
           <div className="mt-6 text-sm text-blue-200">
             <span className="inline-block px-3 py-1 rounded-full bg-white/10 mr-2">Duration: 6 months</span>
             <span className="inline-block px-3 py-1 rounded-full bg-white/10 mr-2">Fees: ₹25,000</span>
-            <span className="inline-block px-3 py-1 rounded-full bg-white/10">Placement Rate: 85%</span>
           </div>
         </div>
       </section>

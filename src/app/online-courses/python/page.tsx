@@ -13,12 +13,12 @@ const CANONICAL = `${SITE}/online-courses/python`;
 export const metadata: Metadata = {
   title: "Online Python Course in India (Live + Projects)",
   description:
-    "Live online Python for India-wide learners. Small batches, hands-on projects, recordings, mentor hours, and career support.",
+    "Explore the live online Python curriculum, duration, and program details.",
   alternates: { canonical: CANONICAL },
   openGraph: {
     title: "Online Python Course in India (Live + Projects)",
     description:
-      "Live online Python for India-wide learners. Small batches, hands-on projects, recordings, mentor hours, and career support.",
+      "Explore the live online Python curriculum, duration, and program details.",
     url: CANONICAL,
     type: "website",
     siteName: "Doon Coding Academy",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Online Python Course in India (Live + Projects)",
     description:
-      "Live online Python for India-wide learners. Small batches, hands-on projects, recordings, mentor hours, and career support.",
+      "Explore the live online Python curriculum, duration, and program details.",
   },
 };
 
@@ -43,8 +43,7 @@ export default function OnlinePythonPage() {
         Online Python Course in India (Live + Projects)
       </h1>
       <p className="text-lg text-gray-700 mb-6">
-        Learn Python live online from anywhere in India. Small batches, weekly projects,
-        mentor hours, and recordings so you never fall behind. {" "}
+        Learn about the online Python course and review its program details. {" "}
         <Link href="/courses/python" className="underline text-blue-700">Prefer on-campus? See Dehradun Python</Link>
       </p>
 

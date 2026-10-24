@@ -7,6 +7,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { getCourses } from "@/lib/courses";
+import { testimonials } from "@/lib/testimonials";
 
 const SERVICE_AREAS = [
   "Herbertpur",
@@ -20,11 +21,11 @@ const SERVICE_AREAS = [
 const LOCAL_FAQ = [
   {
     q: "Do you offer offline classes in Herbertpur/Dehradun?",
-    a: "Yes. We run on-campus batches in Herbertpur (Dehradun district) with small groups and project-first learning.",
+    a: "Yes. On-campus courses are available in Herbertpur (Dehradun district).",
   },
   {
     q: "How big are the batches?",
-    a: "We cap batches at 15 students for personal attention and hands-on practice.",
+    a: "Contact us for current class-size details.",
   },
   {
     q: "What are the class timings?",
@@ -33,57 +34,52 @@ const LOCAL_FAQ = [
 ];
 
 export const metadata: Metadata = {
-  title: "Coding Classes in Dehradun (On-Campus & Hybrid)",
+  title: "Coding Classes in Dehradun | Doon Coding Academy",
   description:
-    "Join Doon Coding Academy (DCA) in Dehradun for Full-Stack, Data Science, Python & Java. Small batches, mentor hours, real projects, and placement support—plus online cohorts for non-locals.",
+    "Explore Full-Stack, Data Science, Python, and Java courses at Doon Coding Academy in Herbertpur, Dehradun.",
   alternates: { canonical: "https://dooncodingacademy.in/locations/dehradun" },
   openGraph: {
-    title: "Coding Classes in Dehradun (On-Campus & Hybrid)",
+    title: "Coding Classes in Dehradun | Doon Coding Academy",
     description:
-      "Join Doon Coding Academy (DCA) in Dehradun for Full-Stack, Data Science, Python & Java. Small batches, mentor hours, real projects, and placement support—plus online cohorts for non-locals.",
+      "Explore Full-Stack, Data Science, Python, and Java courses at Doon Coding Academy in Herbertpur, Dehradun.",
     url: "https://dooncodingacademy.in/locations/dehradun",
     type: "website",
     siteName: "Doon Coding Academy",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Coding Classes in Dehradun (On-Campus & Hybrid)",
+    title: "Coding Classes in Dehradun | Doon Coding Academy",
     description:
-      "Join Doon Coding Academy (DCA) in Dehradun for Full-Stack, Data Science, Python & Java. Small batches, mentor hours, real projects, and placement support—plus online cohorts for non-locals.",
+      "Explore Full-Stack, Data Science, Python, and Java courses at Doon Coding Academy in Herbertpur, Dehradun.",
   },
 };
 
 const localFeatures = [
   {
     icon: "🏢",
-    title: "Growing IT Sector",
-    description: "Dehradun's IT industry is expanding with 600+ software jobs available locally"
+    title: "Herbertpur Campus",
+    description: "Find the campus location and directions on this page."
   },
   {
-    icon: "🎓",
-    title: "Educational Hub",
-    description: "Located in Uttarakhand's educational capital with numerous colleges and institutes"
+    icon: "📚",
+    title: "Course Options",
+    description: "Explore Full-Stack, Data Science, Python, and Java courses."
   },
   {
-    icon: "🚗",
-    title: "Easy Accessibility",
-    description: "Conveniently located in Herbertpur, easily accessible from all parts of Dehradun"
+    icon: "🏫",
+    title: "On-Campus Courses",
+    description: "Review course details for learning at the Herbertpur campus."
   },
   {
-    icon: "💼",
-    title: "Local Job Market",
-    description: "Strong placement network with local companies and startups in Dehradun region"
+    icon: "💻",
+    title: "Online Courses",
+    description: "Browse online course options for learners outside Dehradun."
   }
 ];
 
 const nearbyAreas = [
   "Herbertpur", "Vikasnagar", "Clement Town", "Rajpur", "Mussoorie Road",
   "Sahastradhara Road", "Patel Nagar", "Race Course", "Ballupur", "Jakhan"
-];
-
-const localCompanies = [
-  "DAStek Softwares Pvt Ltd", "IT Bytes", "Infinite Computer Solutions",
-  "Dr. Design Pvt. Ltd", "Kushub Media Solution", "J P Research India"
 ];
 
 export default function DehradunLocationPage() {
@@ -104,12 +100,11 @@ export default function DehradunLocationPage() {
             </Badge>
             
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Best Coding Classes in Dehradun
+              Coding Classes in Dehradun
             </h1>
             
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
-              Transform your career with industry-focused coding education right here in Uttarakhand&#39;s capital. 
-              Join Dehradun&#39;s premier coding academy with proven placement success.
+              Explore Full-Stack, Data Science, Python, and Java courses at our Herbertpur campus.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -140,16 +135,15 @@ export default function DehradunLocationPage() {
         </div>
       </section>
 
-      {/* Why Dehradun */}
+      {/* Course and campus information */}
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Why Choose Coding Classes in Dehradun?
+              Explore DCA in Dehradun
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Dehradun is emerging as a significant IT hub in North India, offering excellent opportunities 
-              for aspiring developers and tech professionals.
+              Review the available course options and Herbertpur campus information.
             </p>
           </div>
           
@@ -269,10 +263,18 @@ export default function DehradunLocationPage() {
                 ))}
               </div>
               
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+              <div className="mt-6 rounded-lg bg-blue-50 p-4">
                 <p className="text-blue-800 text-sm">
-                  <strong>Special Offer:</strong> Students from Herbertpur and nearby areas get 10% discount on course fees!
+                  Explore course pages for current program and fee details, or contact us with questions.
                 </p>
+                <div className="mt-3 flex gap-3">
+                  <Link href="/courses" className="text-sm font-medium text-blue-700 hover:underline">
+                    Explore courses
+                  </Link>
+                  <Link href="/contact" className="text-sm font-medium text-blue-700 hover:underline">
+                    Contact us
+                  </Link>
+                </div>
               </div>
             </Card>
           </div>
@@ -283,15 +285,12 @@ export default function DehradunLocationPage() {
       <section className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            Learn Coding in Dehradun (On-Campus & Hybrid)
+            Coding Courses in Dehradun
           </h2>
 
           <p className="text-lg text-gray-700 mb-5">
-            Dehradun is a great place to get job-ready tech skills. At Doon Coding Academy (near DR School, Herbertpur),
-            you’ll learn in <strong>small batches</strong> with <strong>mentor support</strong>, real-world projects, and a
-            schedule that works for students and working professionals alike. Prefer the classroom? Join our <strong>on-campus</strong> sessions.
-            Need flexibility? Use our <strong>hybrid</strong> option—attend in person when you can and keep progressing with
-            recorded sessions, doubt-clearing hours, and weekly project reviews.
+            At Doon Coding Academy near DR School in Herbertpur, explore Full-Stack, Data Science, Python, and Java course
+            options and campus details. On-campus courses are available in Dehradun.
           </p>
 
           <section className="mt-8">
@@ -331,24 +330,19 @@ export default function DehradunLocationPage() {
                 access around the campus area.
               </p>
               <ul className="mt-3 list-disc list-inside text-gray-700 space-y-1">
-                <li>Weekday timings typically <strong>10:00–19:00</strong> (check current batch schedule).</li>
-                <li>Hybrid option for commuters—skip the travel when needed and stay on track.</li>
-                <li>Mentor hours and project check-ins keep you progressing every week.</li>
+                <li>The campus is in Herbertpur, near DR School.</li>
+                <li>Contact us for current class schedules.</li>
               </ul>
             </div>
 
             <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">How the Hybrid Model Works</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Online Course Options</h3>
               <p className="text-gray-700">
-                Every cohort includes live sessions (in person or online), session <strong>recordings</strong>,
-                structured <strong>doubt support</strong>, and <strong>project reviews</strong>. You’ll never be stuck:
-                show your code, get feedback, and move to the next milestone.
+                Browse the available online programs and review their course details.
               </p>
-              <ul className="mt-3 list-disc list-inside text-gray-700 space-y-1">
-                <li>Live + recordings for revision and catch-up.</li>
-                <li>Clear weekly outcomes and checkpoints.</li>
-                <li>Interview prep and placement guidance near graduation.</li>
-              </ul>
+              <Link href="/online-courses" className="mt-3 inline-block text-blue-700 hover:underline">
+                View online courses
+              </Link>
             </div>
           </div>
 
@@ -379,9 +373,7 @@ export default function DehradunLocationPage() {
           <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 mb-8">
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Not in Dehradun?</h3>
             <p className="text-gray-700">
-              Join our <strong>online cohorts</strong>—live classes with recordings, mentor hours, community, and the same
-              project-driven approach, designed for learners across India. It’s the best of structured guidance with
-              flexible access.
+              Review our online course options and program details.
             </p>
           </div>
 
@@ -399,64 +391,6 @@ export default function DehradunLocationPage() {
               See Online Cohorts (Live + Projects)
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Local Job Market */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Thriving Tech Job Market in Dehradun
-            </h2>
-            <p className="text-xl text-gray-600">
-              Our graduates are working at leading companies across Dehradun and Uttarakhand
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <Card className="p-6 text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">600+</div>
-              <div className="text-gray-600">Software Jobs Available</div>
-              <div className="text-sm text-gray-500 mt-1">in Dehradun region</div>
-            </Card>
-            
-            <Card className="p-6 text-center">
-              <div className="text-3xl font-bold text-green-600 mb-2">₹3-8L</div>
-              <div className="text-gray-600">Average Salary Range</div>
-              <div className="text-sm text-gray-500 mt-1">for entry-level developers</div>
-            </Card>
-            
-            <Card className="p-6 text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-2">85%</div>
-              <div className="text-gray-600">Placement Rate</div>
-              <div className="text-sm text-gray-500 mt-1">within 6 months</div>
-            </Card>
-          </div>
-          
-          <Card className="p-8">
-            <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">
-              Our Placement Partners in Dehradun Region
-            </h3>
-            
-            <div className="grid md:grid-cols-3 gap-4">
-              {localCompanies.map((company, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <span className="text-blue-600">🏢</span>
-                  <span className="text-gray-700 text-sm font-medium">{company}</span>
-                </div>
-              ))}
-            </div>
-            
-            <div className="text-center mt-6">
-              <p className="text-gray-600 text-sm mb-4">
-                And many more companies across Uttarakhand, Delhi NCR, and remote opportunities
-              </p>
-              <Button href="/testimonials" variant="ghost">
-                Read Success Stories
-              </Button>
-            </div>
-          </Card>
         </div>
       </section>
 
@@ -521,67 +455,38 @@ export default function DehradunLocationPage() {
         </div>
       </section>
 
-      {/* Local Testimonials */}
-      <section className="py-16 bg-gray-50">
+      {testimonials.length > 0 && (
+        <section className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Success Stories from Dehradun
+              Learner Experiences
             </h2>
             <p className="text-xl text-gray-600">
-              Local students who transformed their careers with us
+              Verified learner experiences shared with permission
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">
-            <Card className="p-6">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
-                  R
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-900">Rohit Sharma</div>
-                  <div className="text-sm text-gray-600">Software Developer at DAStek Softwares</div>
-                  <div className="text-xs text-gray-500">From Herbertpur (Dehradun district)</div>
-                </div>
-              </div>
-              <p className="text-gray-700 italic">
-                &quot;Being a local student, I was looking for quality coding education without leaving Dehradun. 
-                Doon Coding Academy provided exactly that. The instructors understand the local job market 
-                and prepared me well for interviews with Dehradun-based companies.&quot;
-              </p>
-            </Card>
-            
-            <Card className="p-6">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
-                  P
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-900">Priya Negi</div>
-                  <div className="text-sm text-gray-600">Data Analyst at IT Bytes</div>
-                  <div className="text-xs text-gray-500">From Clement Town, Dehradun</div>
-                </div>
-              </div>
-              <p className="text-gray-700 italic">
-                &quot;The Data Science course helped me transition from a non-tech background to a rewarding 
-                career in analytics. The small batch size meant I got personal attention, and the 
-                placement support was excellent for finding opportunities in Dehradun.&quot;
-              </p>
-            </Card>
+            {testimonials.map((testimonial) => (
+              <Card key={testimonial.author} className="p-6">
+                <p className="text-gray-700 italic">&quot;{testimonial.text}&quot;</p>
+                <p className="mt-4 font-semibold text-gray-900">{testimonial.author}</p>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Start Your Tech Career in Dehradun
+            Explore Coding Courses in Dehradun
           </h2>
           <p className="text-xl mb-8 text-blue-100">
-            Join Dehradun&#39;s leading coding academy and become part of Uttarakhand&#39;s growing tech ecosystem. 
-            Next batch starts soon at our Herbertpur campus!
+            Review the available programs and contact us for current enrollment details.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -639,4 +544,3 @@ export default function DehradunLocationPage() {
     </div>
   );
 }
-

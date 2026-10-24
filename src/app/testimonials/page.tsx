@@ -11,12 +11,12 @@ const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
 export const metadata: Metadata = {
   title: "Student Testimonials | Doon Coding Academy",
   description:
-    "Read what our students have to say about Doon Coding Academy and their learning experience.",
+    "Student testimonials are published after their authenticity and permission are verified.",
   alternates: { canonical: BASE + "/testimonials" },
   openGraph: {
     title: "Student Testimonials | Doon Coding Academy",
     description:
-      "Read real experiences from Full-Stack, Data Science, Python, and Java students at Doon Coding Academy.",
+      "Student testimonials are published after their authenticity and permission are verified.",
     url: BASE + "/testimonials",
     type: "article",
     siteName: "Doon Coding Academy",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Student Testimonials | Doon Coding Academy",
     description:
-      "Real student reviews of Full-Stack, Data Science, Python, and Java programs in Dehradun.",
+      "Student testimonials are published after their authenticity and permission are verified.",
   },
 };
 
@@ -92,8 +92,7 @@ export default function TestimonialsPage() {
           Student Testimonials
         </h1>
         <p className="mt-3 max-w-3xl text-gray-600">
-          Real words from learners in our Full-Stack with Gen&nbsp;AI, Data Science,
-          Python, and Java programs. No stock photos, just authentic experiences.
+          Student testimonials are shared only after their authenticity and permission are verified.
         </p>
 
         {/* Stats / Aggregate line (renders only if ratings exist) */}
@@ -110,6 +109,12 @@ export default function TestimonialsPage() {
         })()}
       </header>
 
+      {testimonials.length === 0 ? (
+        <p className="text-gray-600">
+          Verified, permissioned testimonials will appear here when available.
+        </p>
+      ) : (
+        <>
       {/* Featured card */}
       {featured && (
         <section className="mb-6">
@@ -186,6 +191,8 @@ export default function TestimonialsPage() {
           </article>
         ))}
       </section>
+        </>
+      )}
 
       {/* Simple CTA row */}
       <div className="mt-10 flex flex-wrap gap-3">
@@ -210,14 +217,14 @@ export default function TestimonialsPage() {
       </div>
 
       {/* JSON-LD: individual reviews */}
-      <Script
+      {testimonialSchema && <Script
         id="testimonial-jsonld"
         type="application/ld+json"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(testimonialSchema),
         }}
-      />
+      />}
 
       {/* JSON-LD: aggregate rating (if available) */}
       {aggregateSchema && (
@@ -233,5 +240,3 @@ export default function TestimonialsPage() {
     </div>
   );
 }
-
-

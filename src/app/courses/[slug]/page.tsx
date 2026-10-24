@@ -80,12 +80,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
       title: "Python Course in Dehradun (2025) | Beginner to Advanced | Doon Coding Academy",
       description:
-        "Best Python course in Dehradun: fundamentals to OOP, libraries, mini-projects & career guidance. Small batches (max 15), affordable fees.",
+        "Python course in Dehradun covering fundamentals, OOP, libraries, mini-projects, and career guidance.",
       alternates: { canonical: url },
       openGraph: {
         title: "Python Programming Classes in Dehradun",
         description:
-          "Learn Python step-by-step with projects and mentorship. Ideal for beginners switching to tech.",
+          "Learn Python step-by-step with projects and course guidance.",
         url,
         type: "article",
         siteName: "Doon Coding Academy",
@@ -94,7 +94,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         card: "summary",
         title: "Python Course in Dehradun (Beginner → Advanced)",
         description:
-          "Project-based learning, small batches & mentoring.",
+          "Explore the Python course curriculum and program details.",
       },
     };
   }
