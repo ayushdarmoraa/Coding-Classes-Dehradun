@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getCourses, isCourseModeAvailable } from '@/lib/courses'
 import { getAllBlogPosts, getPostLastModified } from '@/lib/blog'
+import { getPublishedChallenges, getChallengePath } from '@/lib/lab/challenges'
 import { SITE } from '@/lib/site-config'
 
 const BASE_URL = SITE.url
@@ -18,6 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/about',
     '/courses',
     '/online-courses',
+    '/lab',
     '/faq',
     '/contact',
     '/testimonials',
@@ -85,6 +87,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       // Fallback lastModified: omit or use new Date() if you prefer freshness signals
       // lastModified: new Date(),
       priority: 0.9,
+    })
+  }
+
+  for (const challenge of getPublishedChallenges()) {
+    entries.push({
+      url: `${BASE_URL}${getChallengePath(challenge)}`,
+      changeFrequency: 'monthly',
+      priority: 0.7,
     })
   }
 

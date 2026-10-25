@@ -21,8 +21,16 @@ function loadTypeScript(relativePath, localModules = {}) {
 }
 
 const mission = loadTypeScript("src/lib/lab/mission.ts");
-const { createSkillMap } = loadTypeScript("src/lib/lab/skill-map.ts", { "./mission": mission });
-const route = readFileSync(path.resolve(root, "src/app/lab/javascript/discount-calculation-bug/page.tsx"), "utf8");
+const challengeRegistry = loadTypeScript("src/lib/lab/challenges.ts", {
+  "./mission": mission,
+  "./types": loadTypeScript("src/lib/lab/types.ts"),
+});
+const { createSkillMap } = loadTypeScript("src/lib/lab/skill-map.ts", {
+  "./mission": mission,
+  "./challenges": challengeRegistry,
+});
+const route = readFileSync(path.resolve(root, "src/app/lab/[track]/[slug]/page.tsx"), "utf8");
+const missionChallenge = challengeRegistry.getChallenge("javascript", mission.MISSION_ID);
 const workspace = readFileSync(path.resolve(root, "src/components/lab/ChallengeWorkspace.tsx"), "utf8");
 const workspacePanels = readFileSync(path.resolve(root, "src/components/lab/ChallengeWorkspacePanels.tsx"), "utf8");
 const skillMapComponent = readFileSync(path.resolve(root, "src/components/lab/SkillMap.tsx"), "utf8");
@@ -34,17 +42,24 @@ const header = readFileSync(path.resolve(root, "src/components/layout/Header.tsx
 const labPage = readFileSync(path.resolve(root, "src/app/lab/page.tsx"), "utf8");
 
 test("mission route presents the approved scenario, metadata, and learning objective", () => {
-  assert.match(route, /Fix the Discount Calculation Bug/);
-  assert.match(route, /An online store has a discount calculator/);
-  assert.match(route, /A product costs ₹800/);
-  assert.match(route, /The discount is 10%/);
-  assert.match(route, /Expected total/);
-  assert.match(route, /₹720/);
-  assert.match(route, /Current output/);
-  assert.match(route, /₹800/);
-  assert.match(route, /calculateTotal/);
-  assert.match(route, /learning objective/i);
-  assert.match(route, /canonical: "\/lab\/javascript\/discount-calculation-bug"/);
+  assert.equal(missionChallenge.title, "Fix the Discount Calculation Bug");
+  assert.match(missionChallenge.mission.scenario.join(" "), /online store has a discount calculator/);
+  assert.match(missionChallenge.mission.scenario.join(" "), /₹800/);
+  assert.match(missionChallenge.mission.scenario.join(" "), /10%/);
+  assert.match(missionChallenge.mission.objective, /calculateTotal/);
+  assert.deepEqual(
+    missionChallenge.tests.map(({ price, discountPercent, expected }) => [
+      price,
+      discountPercent,
+      expected,
+    ]),
+    [[800, 10, 720], [1000, 20, 800], [500, 0, 500], [200, 100, 0]],
+  );
+  assert.match(route, /getChallenge\(params\.track, params\.slug\)/);
+  assert.match(route, /MissionBrief challenge=\{challenge\}/);
+  assert.match(route, /notFound\(\)/);
+  assert.match(route, /alternates: \{ canonical \}/);
+  assert.deepEqual(route.includes("ChallengeWorkspace"), true);
 });
 
 test("starter code is intentionally incorrect and the deterministic cases cover boundaries", () => {
@@ -173,7 +188,7 @@ test("challenge and mentor CTAs point to implemented routes", () => {
   assert.match(header, /Try Free Challenge/);
   assert.match(header, /href="\/contact"/);
   assert.match(header, /Talk to Mentor/);
-  assert.match(labPage, /href="\/lab\/javascript\/discount-calculation-bug"/);
+  assert.match(labPage, /href=\{`\/lab\/\$\{featuredChallenge\.track\}\/\$\{featuredChallenge\.slug\}`\}/);
 });
 
 test("completed mission integrates the limited Skill Map and existing next-step routes", () => {
@@ -202,7 +217,7 @@ test("challenge workspace follows the required mobile content order", () => {
     "<CompletionPanel",
   ];
   const workspaceOffset = route.indexOf("<ChallengeWorkspace");
-  assert.ok(route.indexOf(sections[0]) < workspaceOffset, "Mission brief must precede the workspace");
+  assert.ok(route.indexOf("<MissionBrief") < workspaceOffset, "Mission brief must precede the workspace");
   let previousIndex = -1;
   for (const section of sections.slice(1)) {
     const index = workspace.indexOf(section);

@@ -47,10 +47,11 @@ test("course navigation preserves delivery hubs and individual course routes", (
   );
 });
 
-test("DCA Lab navigation has a real non-indexed destination", () => {
+test("DCA Lab navigation has a real indexable destination", () => {
   const labPage = path.resolve(repositoryRoot, "src/app/lab/page.tsx");
   assert.equal(existsSync(labPage), true);
-  assert.match(readFileSync(labPage, "utf8"), /robots:\s*\{\s*index:\s*false/);
+  assert.match(readFileSync(labPage, "utf8"), /alternates:\s*\{\s*canonical:/);
+  assert.doesNotMatch(readFileSync(labPage, "utf8"), /robots:\s*\{\s*index:\s*false/);
 });
 
 test("navigation destinations resolve to existing routes", () => {
@@ -63,9 +64,14 @@ test("navigation destinations resolve to existing routes", () => {
     const route = href === "/" ? "src/app/page.tsx" : `src/app${href}/page.tsx`;
     const dynamicCourseRoute =
       href.startsWith("/courses/") ? "src/app/courses/[slug]/page.tsx" : undefined;
+    const dynamicLabRoute =
+      href.startsWith("/lab/")
+        ? "src/app/lab/[track]/[slug]/page.tsx"
+        : undefined;
     assert.ok(
       existsSync(path.resolve(repositoryRoot, route)) ||
-        (dynamicCourseRoute && existsSync(path.resolve(repositoryRoot, dynamicCourseRoute))),
+        (dynamicCourseRoute && existsSync(path.resolve(repositoryRoot, dynamicCourseRoute))) ||
+        (dynamicLabRoute && existsSync(path.resolve(repositoryRoot, dynamicLabRoute))),
       `Missing route for ${href}`,
     );
   }
@@ -81,7 +87,15 @@ test("navigation destinations resolve to existing routes", () => {
     "/contact",
     "/lab/javascript/discount-calculation-bug",
   ]) {
-    assert.ok(existsSync(path.resolve(repositoryRoot, `src/app${href}/page.tsx`)), `Missing route for ${href}`);
+    const dynamicChallengeRoute =
+      href.startsWith("/lab/")
+        ? "src/app/lab/[track]/[slug]/page.tsx"
+        : undefined;
+    assert.ok(
+      existsSync(path.resolve(repositoryRoot, `src/app${href}/page.tsx`)) ||
+        (dynamicChallengeRoute && existsSync(path.resolve(repositoryRoot, dynamicChallengeRoute))),
+      `Missing route for ${href}`,
+    );
   }
 });
 

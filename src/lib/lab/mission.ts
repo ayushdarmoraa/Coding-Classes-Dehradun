@@ -4,6 +4,19 @@ export const MISSION_STARTER_CODE = `function calculateTotal(price, discountPerc
   return price;
 }`;
 
+export const MISSION_HINTS = [
+  "Think about what percentage of the price remains after the discount is applied.",
+  "Convert the discount percentage into a fraction of the original price, then subtract that amount.",
+  "The remaining fraction is (100 - discountPercent) / 100. Multiply the price by that fraction.",
+] as const;
+
+export type MissionTestCase = {
+  id: string;
+  price: number;
+  discountPercent: number;
+  expected: number;
+};
+
 export const MISSION_TESTS = [
   { id: "discount-10", price: 800, discountPercent: 10, expected: 720 },
   { id: "discount-20", price: 1000, discountPercent: 20, expected: 800 },
