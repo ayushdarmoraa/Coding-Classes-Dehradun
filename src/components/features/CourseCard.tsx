@@ -3,6 +3,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import type { Course } from '@/lib/courses';
 import { formatCourseDuration, formatCourseModes, formatCoursePrice } from '@/lib/pricing';
+import { SITE } from '@/lib/site-config';
 
 interface CourseCardProps {
   course: Course;
@@ -46,7 +47,9 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, featured = false }) => 
           View Details
         </Button>
         <Button
-          href={`https://wa.me/917037905464?text=Hi, I'm interested in the ${course.title} course`}
+          href={`${SITE.whatsappUrl}?text=${encodeURIComponent(`Hi, I'm interested in the ${course.title} course`)}`}
+          target="_blank"
+          rel="noopener noreferrer"
           className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
         >
           WhatsApp
