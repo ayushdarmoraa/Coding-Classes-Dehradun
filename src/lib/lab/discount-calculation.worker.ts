@@ -1,9 +1,19 @@
-import { MISSION_TESTS, type MissionTestResult, type MissionWorkerRequest, type MissionWorkerResponse } from "./mission";
+import {
+  MAX_MISSION_CODE_LENGTH,
+  MISSION_TESTS,
+  type MissionTestResult,
+  type MissionWorkerRequest,
+  type MissionWorkerResponse,
+} from "./mission";
 import { compileMission, MissionSyntaxError } from "./runner";
 
 self.addEventListener("message", (event: MessageEvent<MissionWorkerRequest>) => {
   if (typeof event.data?.code !== "string") {
     self.postMessage({ type: "error", error: "internal" } satisfies MissionWorkerResponse);
+    return;
+  }
+  if (event.data.code.length > MAX_MISSION_CODE_LENGTH) {
+    self.postMessage({ type: "error", error: "input-too-long" } satisfies MissionWorkerResponse);
     return;
   }
 

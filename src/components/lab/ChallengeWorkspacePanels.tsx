@@ -1,13 +1,10 @@
 import {
+  MAX_MISSION_CODE_LENGTH,
+  MISSION_HINTS,
+  MISSION_TESTS,
   type MissionRunnerError,
   type MissionTestResult,
 } from "@/lib/lab/mission";
-
-const HINTS = [
-  "Think about what percentage of the price remains after the discount is applied.",
-  "Convert the discount percentage into a fraction of the original price, then subtract that amount.",
-  "The remaining fraction is (100 - discountPercent) / 100. Multiply the price by that fraction.",
-] as const;
 
 function formatRupees(value: number | null): string {
   return value === null
@@ -86,6 +83,7 @@ export function MissionResults({ running, hasRun, results, runnerError }: Missio
           {runnerError === "syntax" && "Syntax error: check the function declaration and try again."}
           {runnerError === "runtime" && "Runtime error: the function could not be evaluated."}
           {runnerError === "timeout" && "Execution timed out. The worker was stopped; revise the code and try again."}
+          {runnerError === "input-too-long" && `The submitted code exceeds the ${MAX_MISSION_CODE_LENGTH.toLocaleString()}-character limit.`}
           {runnerError === "internal" && "The challenge runner could not start safely. Please try again later."}
         </p>
       )}
@@ -112,14 +110,15 @@ export function MissionResults({ running, hasRun, results, runnerError }: Missio
 }
 
 export function MissionPreview({ previewResult }: { previewResult: number | null }) {
+  const firstCase = MISSION_TESTS[0];
   return (
     <section aria-labelledby="preview-heading" className="rounded-xl border border-blue-200 bg-blue-50 p-5">
       <h3 id="preview-heading" className="text-lg font-semibold text-gray-900">Trusted preview</h3>
       <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
-        <dt className="text-gray-700">Product price</dt><dd className="font-medium">{formatRupees(800)}</dd>
-        <dt className="text-gray-700">Discount</dt><dd className="font-medium">10%</dd>
-        <dt className="text-gray-700">Current total</dt><dd className="font-medium">{formatRupees(previewResult ?? 800)}</dd>
-        <dt className="text-gray-700">Expected total</dt><dd className="font-medium">{formatRupees(720)}</dd>
+        <dt className="text-gray-700">Product price</dt><dd className="font-medium">{formatRupees(firstCase.price)}</dd>
+        <dt className="text-gray-700">Discount</dt><dd className="font-medium">{firstCase.discountPercent}%</dd>
+        <dt className="text-gray-700">Current total</dt><dd className="font-medium">{formatRupees(previewResult ?? firstCase.price)}</dd>
+        <dt className="text-gray-700">Expected total</dt><dd className="font-medium">{formatRupees(firstCase.expected)}</dd>
       </dl>
     </section>
   );
@@ -135,7 +134,7 @@ export function MissionHints({ highestHintViewed, onShowHint }: MissionHintsProp
     <section aria-labelledby="hints-heading">
       <h3 id="hints-heading" className="text-lg font-semibold text-gray-900">Hints</h3>
       <ol className="mt-3 space-y-2">
-        {HINTS.map((hint, index) => (
+        {MISSION_HINTS.map((hint, index) => (
           <li key={hint}>
             {highestHintViewed > index ? (
               <p className="rounded-lg bg-amber-50 p-3 text-gray-800">

@@ -1,8 +1,22 @@
 export const MISSION_ID = "discount-calculation-bug";
 export const MISSION_STORAGE_KEY = "dca.lab.v1.challenge.javascript.discount-calculation-bug";
+export const MAX_MISSION_CODE_LENGTH = 5000;
 export const MISSION_STARTER_CODE = `function calculateTotal(price, discountPercent) {
   return price;
 }`;
+
+export const MISSION_HINTS = [
+  "Think about what percentage of the price remains after the discount is applied.",
+  "Convert the discount percentage into a fraction of the original price, then subtract that amount.",
+  "The remaining fraction is (100 - discountPercent) / 100. Multiply the price by that fraction.",
+] as const;
+
+export type MissionTestCase = {
+  id: string;
+  price: number;
+  discountPercent: number;
+  expected: number;
+};
 
 export const MISSION_TESTS = [
   { id: "discount-10", price: 800, discountPercent: 10, expected: 720 },
@@ -22,9 +36,14 @@ export type MissionTestResult = {
 
 export type MissionWorkerResponse =
   | { type: "results"; results: MissionTestResult[] }
-  | { type: "error"; error: "syntax" | "runtime" | "internal" };
+  | { type: "error"; error: "syntax" | "runtime" | "internal" | "input-too-long" };
 
-export type MissionRunnerError = "syntax" | "runtime" | "internal" | "timeout";
+export type MissionRunnerError =
+  | "syntax"
+  | "runtime"
+  | "internal"
+  | "timeout"
+  | "input-too-long";
 
 export type MissionWorkerRequest = { code: string };
 
@@ -42,6 +61,7 @@ export function isSavedMissionProgress(value: unknown): value is SavedMissionPro
   const progress = value as Partial<SavedMissionProgress>;
   return (
     typeof progress.code === "string" &&
+    progress.code.length <= MAX_MISSION_CODE_LENGTH &&
     typeof progress.attempts === "number" &&
     Number.isInteger(progress.attempts) &&
     progress.attempts >= 0 &&

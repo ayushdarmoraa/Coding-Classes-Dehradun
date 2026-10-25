@@ -40,6 +40,12 @@ function loadTypeScript(relativePath) {
         getPostLastModified: async () => undefined,
       };
     }
+    if (specifier === "@/lib/lab/challenges") {
+      return loadTypeScript("src/lib/lab/challenges.ts");
+    }
+    if (specifier === "@/lib/lab/challenge-utils") {
+      return loadTypeScript("src/lib/lab/challenge-utils.ts");
+    }
     return nativeRequire(specifier);
   };
 
@@ -326,6 +332,21 @@ test("sitemap includes each course route supported by the canonical modes", asyn
       isCourseModeAvailable(course, "On-Campus"),
     );
   }
+});
+
+test("sitemap includes only published Lab routes from the challenge registry", async () => {
+  const entries = await sitemapModule.default();
+  const urls = new Set(entries.map(({ url }) => url));
+  assert.ok(urls.has("https://dooncodingacademy.in/lab"));
+  assert.ok(
+    urls.has(
+      "https://dooncodingacademy.in/lab/javascript/discount-calculation-bug",
+    ),
+  );
+  assert.equal(
+    [...urls].filter((url) => url.includes("/lab/")).length,
+    1,
+  );
 });
 
 test("course display consumers use structured canonical facts", async () => {

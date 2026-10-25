@@ -97,6 +97,17 @@ function escapeHtml(value) {
 }
 
 function routeExists(href) {
+  if (href.startsWith("/lab/")) {
+    const { getChallenge } = loadLocalModule(
+      path.join(repositoryRoot, "src/lib/lab/challenges.ts"),
+    );
+    const [, , track, slug] = href.split("/");
+    return (
+      existsSync(
+        path.join(repositoryRoot, "src/app/lab/[track]/[slug]/page.tsx"),
+      ) && Boolean(getChallenge(track, slug))
+    );
+  }
   if (href.startsWith("/courses/")) {
     return existsSync(
       path.join(repositoryRoot, "src/app/courses/[slug]/page.tsx"),
@@ -140,6 +151,9 @@ test("homepage lab preview uses the available mission and links to working Lab r
   const mission = loadLocalModule(
     path.join(repositoryRoot, "src/lib/lab/mission.ts"),
   );
+  const { getChallenge } = loadLocalModule(
+    path.join(repositoryRoot, "src/lib/lab/challenges.ts"),
+  );
   assert.match(markup, /Fix the Discount Calculation Bug/);
   assert.match(markup, /₹800/);
   assert.match(markup, /₹720/);
@@ -148,13 +162,12 @@ test("homepage lab preview uses the available mission and links to working Lab r
     internalHrefs.includes("/lab/javascript/discount-calculation-bug"),
   );
   assert.equal(
-    existsSync(
-      path.join(
-        repositoryRoot,
-        "src/app/lab/javascript/discount-calculation-bug/page.tsx",
-      ),
-    ),
+    existsSync(path.join(repositoryRoot, "src/app/lab/[track]/[slug]/page.tsx")),
     true,
+  );
+  assert.equal(
+    getChallenge("javascript", "discount-calculation-bug")?.id,
+    "discount-calculation-bug",
   );
   assert.equal(mission.MISSION_TESTS[0].expected, 720);
 });
