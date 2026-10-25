@@ -1,7 +1,8 @@
 import React from 'react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { Course } from '@/lib/courses';
+import type { Course } from '@/lib/courses';
+import { formatCourseDuration, formatCourseModes, formatCoursePrice } from '@/lib/pricing';
 
 interface CourseCardProps {
   course: Course;
@@ -17,9 +18,20 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, featured = false }) => 
         <h3 className="text-xl font-bold text-gray-900 mb-2">
           {course.title}
         </h3>
-        <span className="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded">
-          {course.duration}
-        </span>
+        <div className="flex flex-wrap gap-2">
+          <span className="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded">
+            {formatCourseDuration(course.duration)}
+          </span>
+          {course.level && (
+            <span className="inline-block bg-gray-100 text-gray-700 text-xs font-semibold px-2 py-1 rounded">
+              {course.level}
+            </span>
+          )}
+        </div>
+        <p className="mt-3 text-sm font-semibold text-gray-800">{formatCoursePrice(course.pricing)}</p>
+        <p className="mt-1 text-xs text-gray-600">
+          Delivery: {formatCourseModes(course)}
+        </p>
         <ul className="mt-3 text-sm text-gray-600 space-y-1">
           {course.curriculum.slice(0, 3).map((item, index) => (
             <li key={index} className="flex items-start">
@@ -45,4 +57,3 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, featured = false }) => 
 };
 
 export default CourseCard;
-

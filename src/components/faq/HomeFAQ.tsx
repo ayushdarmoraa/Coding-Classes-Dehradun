@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import type { Course } from "@/lib/courses";
+import { formatCourseDuration, formatCourseModes, formatCoursePrice } from "@/lib/pricing";
 
 function Chevron({ open }: { open: boolean }) {
   return (
@@ -18,41 +20,18 @@ function Chevron({ open }: { open: boolean }) {
   );
 }
 
-export default function HomeFAQ() {
+export default function HomeFAQ({ courses }: { courses: Course[] }) {
   const faqs = [
     {
-      q: "Do you offer online coding classes across India?",
+      q: "What delivery options are available?",
       a: (
         <>
-          Yes. We run live online cohorts with recordings for{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/online-courses/full-stack"
-          >
-            Full-Stack
-          </Link>
-          ,{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/online-courses/data-science"
-          >
-            Data Science &amp; AI
-          </Link>
-          ,{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/online-courses/python"
-          >
-            Python
-          </Link>
-          , and{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/online-courses/java"
-          >
-            Java
-          </Link>
-          . Join from anywhere in India.
+          {courses.map((course, index) => (
+            <span key={course.id}>
+              {index > 0 ? "; " : ""}
+              {course.shortTitle}: {formatCourseModes(course)}
+            </span>
+          ))}
         </>
       ),
     },
@@ -60,8 +39,7 @@ export default function HomeFAQ() {
       q: "Are classes live or recorded?",
       a: (
         <>
-          Sessions are live with mentors, and every class is recorded so you can revise in your own time. We also run
-          weekly doubt-clearing and project review slots.
+          Contact us to confirm the current class format for the course you are considering.
         </>
       ),
     },
@@ -81,36 +59,15 @@ export default function HomeFAQ() {
       q: "What are the fees for each course?",
       a: (
         <>
-          Typical ranges: Full-Stack ₹25,000; Data Science ₹30,000; Python ₹12,000; Java ₹12,000. See each syllabus for
-          the latest pricing:{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/courses/full-stack"
-          >
-            Full-Stack (On-Campus)
-          </Link>
-          ,{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/courses/data-science"
-          >
-            Data Science (On-Campus)
-          </Link>
-          ,{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/courses/python"
-          >
-            Python (On-Campus)
-          </Link>
-          ,{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/courses/java"
-          >
-            Java (On-Campus)
-          </Link>
-          .
+          {courses.map((course, index) => (
+            <span key={course.id}>
+              {index > 0 ? "; " : ""}
+              <Link className="text-blue-600 underline" href={`/courses/${course.slug}`}>
+                {course.shortTitle}
+              </Link>
+              : {formatCoursePrice(course.pricing)}
+            </span>
+          ))}
         </>
       ),
     },
@@ -118,8 +75,12 @@ export default function HomeFAQ() {
       q: "How long are the programs?",
       a: (
         <>
-          Full-Stack &amp; Data Science ~6 months; Python &amp; Java ~4 months. All tracks include hands-on projects and
-          assessments.
+          {courses.map((course, index) => (
+            <span key={course.id}>
+              {index > 0 ? "; " : ""}
+              {course.shortTitle}: {formatCourseDuration(course.duration)}
+            </span>
+          ))}
         </>
       ),
     },

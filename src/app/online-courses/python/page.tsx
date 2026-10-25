@@ -1,33 +1,34 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Button from "@/components/ui/Button";
+import LearningProgressionNote from "@/components/features/LearningProgressionNote";
 import Link from "next/link";
 import { getCourseBySlug } from "@/lib/courses";
 import { getCourseJsonLd } from "@/lib/schema";
 import { breadcrumbLd } from "@/lib/seo";
+import { formatCourseDuration, formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
 
-const RAW = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const SITE = RAW.replace(/^http:\/\//, "https://").replace(/^https:\/\/www\./, "https://");
-const CANONICAL = `${SITE}/online-courses/python`;
+const CANONICAL = `${SITE.url}/online-courses/python`;
 
 export const metadata: Metadata = {
-  title: "Online Python Course in India (Live + Projects)",
+  title: "Online Python Course in India",
   description:
-    "Explore the live online Python curriculum, duration, and program details.",
+    "Explore the online Python curriculum, duration, and fees.",
   alternates: { canonical: CANONICAL },
   openGraph: {
-    title: "Online Python Course in India (Live + Projects)",
+    title: "Online Python Course in India",
     description:
-      "Explore the live online Python curriculum, duration, and program details.",
+      "Explore the online Python curriculum, duration, and fees.",
     url: CANONICAL,
     type: "website",
     siteName: "Doon Coding Academy",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Online Python Course in India (Live + Projects)",
+    title: "Online Python Course in India",
     description:
-      "Explore the live online Python curriculum, duration, and program details.",
+      "Explore the online Python curriculum, duration, and fees.",
   },
 };
 
@@ -40,12 +41,18 @@ export default function OnlinePythonPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <h1 className="text-3xl md:text-4xl font-bold mb-4">
-        Online Python Course in India (Live + Projects)
+        Online Python Course in India
       </h1>
       <p className="text-lg text-gray-700 mb-6">
         Learn about the online Python course and review its program details. {" "}
         <Link href="/courses/python" className="underline text-blue-700">Prefer on-campus? See Dehradun Python</Link>
       </p>
+      <LearningProgressionNote className="mb-6" />
+      {course && (
+        <p className="text-sm text-gray-600 mb-6">
+          Level: {course.level} · Duration: {formatCourseDuration(course.duration)} · Fees: {formatCoursePrice(course.pricing)}
+        </p>
+      )}
 
       <div className="flex gap-3 mb-10">
         <Button href="/contact" size="lg" variant="primary">Talk to a Mentor</Button>
@@ -68,9 +75,9 @@ export default function OnlinePythonPage() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(
             breadcrumbLd([
-              { name: "Home", url: SITE },
-              { name: "Online Courses", url: `${SITE}/online-courses` },
-              { name: "Online Python Course in India (Live + Projects)", url: `${SITE}/online-courses/python` },
+              { name: "Home", url: SITE.url },
+              { name: "Online Courses", url: `${SITE.url}/online-courses` },
+              { name: "Online Python Course in India", url: `${SITE.url}/online-courses/python` },
             ])
           ),
         }}

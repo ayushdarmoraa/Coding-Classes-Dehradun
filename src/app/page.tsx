@@ -7,25 +7,23 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import HomeFAQ from "@/components/faq/HomeFAQ";
 import CourseSnapshotMobile from "@/components/features/CourseSnapshotMobile";
+import LearningProgressionNote from "@/components/features/LearningProgressionNote";
 import { testimonials } from "@/lib/testimonials";
-
-const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
-// NEW: force apex (strip leading "www.")
-const APEX = BASE.replace(/^https:\/\/www\./, "https://");
+import { formatCourseDuration, formatCourseModes, formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Coding Courses in Dehradun & Online in India",
   description:
     "Explore Full-Stack, Data Science, Python, and Java courses in Dehradun and online across India.",
   // ✅ Canonical to apex (trailing slash)
-  alternates: { canonical: APEX + "/" },
+  alternates: { canonical: SITE.url + "/" },
   openGraph: {
     title: "Coding Courses in Dehradun & Online in India",
     description:
       "Explore Full-Stack, Data Science, Python, and Java courses in Dehradun and online across India.",
     // ✅ OG url to apex + add image
-    url: APEX + "/",
+    url: SITE.url + "/",
     type: "website",
     siteName: "Doon Coding Academy",
   },
@@ -74,7 +72,7 @@ export default function HomePage() {
               Explore Courses
             </Button>
             <Button 
-              href="https://wa.me/917037905464?text=Hi, I want to know more about your courses"
+              href={`${SITE.whatsappUrl}?text=${encodeURIComponent("Hi, I want to know more about your courses")}`}
               size="lg"
               className="bg-transparent border-2 border-white text-white font-semibold hover:bg-white hover:text-blue-600 transition"
             >
@@ -117,7 +115,7 @@ export default function HomePage() {
 
   {/* FAQ (Home) — compact accordion, one-open-at-a-time */}
   <div className="defer-visibility">
-    <HomeFAQ />
+    <HomeFAQ courses={courses} />
   </div>
 
       {/* Trust Signals */}
@@ -252,39 +250,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Snapshot: Modes, Duration, Fees & Outcomes */}
+      {/* Snapshot: canonical course facts */}
   <section className="py-12 defer-visibility">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-            Snapshot: Modes, Duration, Fees & Outcomes
+            Course Snapshot
           </h2>
           <p className="text-gray-600 mb-6">
-            Compare tracks at a glance. All cohorts include live sessions, recordings,
-            mentor hours, and project reviews to keep you progressing every week.
+            Compare course duration, fees, and confirmed On-Campus, Online, and Hybrid options.
           </p>
+          <LearningProgressionNote className="mb-6 text-gray-600" />
 
           {/* Mobile cards */}
           <CourseSnapshotMobile
-            rows={[
-              {
-                name: "Full-Stack (with Gen AI)",
-                mode: "On-Campus / Online",
-                duration: "6 months",
-                fees: "₹25,000",
-                outcome: "Job-ready projects & placement prep",
-                ctaHref: "/courses/full-stack",
-              },
-              {
-                name: "Data Science",
-                mode: "On-Campus / Online",
-                duration: "6 months",
-                fees: "₹30,000",
-                outcome: "ML foundations, real datasets",
-                ctaHref: "/courses/data-science",
-              },
-              { name: "Python", mode: "On-Campus / Online", duration: "4 months", fees: "₹12,000", ctaHref: "/courses/python" },
-              { name: "Java",   mode: "On-Campus / Online", duration: "4 months", fees: "₹12,000", ctaHref: "/courses/java"   },
-            ]}
+            rows={courses.map((course) => ({
+              name: course.shortTitle,
+              level: course.level,
+              mode: formatCourseModes(course),
+              duration: formatCourseDuration(course.duration),
+              fees: formatCoursePrice(course.pricing),
+              ctaHref: `/courses/${course.slug}`,
+            }))}
           />
 
           {/* Desktop table (existing) */}
@@ -294,6 +280,7 @@ export default function HomePage() {
                 <thead className="bg-gray-50 text-gray-700">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Course</th>
+                    <th className="px-4 py-3 font-semibold">Level</th>
                     <th className="px-4 py-3 font-semibold">Mode</th>
                     <th className="px-4 py-3 font-semibold">Duration</th>
                     <th className="px-4 py-3 font-semibold">Fees</th>
@@ -301,81 +288,25 @@ export default function HomePage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  <tr>
-                    <td className="px-4 py-3">Full-Stack Development (MERN + Gen AI)</td>
-                    <td className="px-4 py-3">On-Campus / Online</td>
-                    <td className="px-4 py-3">6 months</td>
-                    <td className="px-4 py-3">
-                      ₹25,000 <span className="text-gray-500 text-xs">(₹5,000/month)</span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <Button
-                        href="/courses/full-stack"
-                        size="sm"
-                        event="cta_home_table_view_course"
-                        eventParams={{ location: "home_table", course_slug: "full-stack" }}
-                      >
-                        View
-                      </Button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td className="px-4 py-3">Data Science &amp; AI</td>
-                    <td className="px-4 py-3">On-Campus / Online</td>
-                    <td className="px-4 py-3">6 months</td>
-                    <td className="px-4 py-3">
-                      ₹30,000 <span className="text-gray-500 text-xs">(₹6,000/month)</span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <Button
-                        href="/courses/data-science"
-                        size="sm"
-                        event="cta_home_table_view_course"
-                        eventParams={{ location: "home_table", course_slug: "data-science" }}
-                      >
-                        View
-                      </Button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td className="px-4 py-3">Python Programming</td>
-                    <td className="px-4 py-3">On-Campus / Online</td>
-                    <td className="px-4 py-3">4 months</td>
-                    <td className="px-4 py-3">
-                      ₹12,000 <span className="text-gray-500 text-xs">(₹4,000/month)</span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <Button
-                        href="/courses/python"
-                        size="sm"
-                        event="cta_home_table_view_course"
-                        eventParams={{ location: "home_table", course_slug: "python" }}
-                      >
-                        View
-                      </Button>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td className="px-4 py-3">Java Programming</td>
-                    <td className="px-4 py-3">On-Campus / Online</td>
-                    <td className="px-4 py-3">4 months</td>
-                    <td className="px-4 py-3">
-                      ₹12,000 <span className="text-gray-500 text-xs">(₹4,000/month)</span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <Button
-                        href="/courses/java"
-                        size="sm"
-                        event="cta_home_table_view_course"
-                        eventParams={{ location: "home_table", course_slug: "java" }}
-                      >
-                        View
-                      </Button>
-                    </td>
-                  </tr>
+                  {courses.map((course) => (
+                    <tr key={course.id}>
+                      <td className="px-4 py-3">{course.shortTitle}</td>
+                      <td className="px-4 py-3">{course.level}</td>
+                      <td className="px-4 py-3">{formatCourseModes(course)}</td>
+                      <td className="px-4 py-3">{formatCourseDuration(course.duration)}</td>
+                      <td className="px-4 py-3">{formatCoursePrice(course.pricing)}</td>
+                      <td className="px-4 py-3 text-right">
+                        <Button
+                          href={`/courses/${course.slug}`}
+                          size="sm"
+                          event="cta_home_table_view_course"
+                          eventParams={{ location: "home_table", course_slug: course.slug }}
+                        >
+                          View
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -470,7 +401,7 @@ export default function HomePage() {
               Explore Courses
             </Button>
             <Button
-              href="https://wa.me/917037905464?text=Hi, I want to know more about your courses"
+              href={`${SITE.whatsappUrl}?text=${encodeURIComponent("Hi, I want to know more about your courses")}`}
               size="lg"
               className="!bg-transparent border-2 border-white text-white font-semibold hover:bg-white hover:text-blue-600 transition"
             >

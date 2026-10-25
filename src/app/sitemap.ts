@@ -1,12 +1,12 @@
 import type { MetadataRoute } from 'next'
-import { getCourses } from '@/lib/courses'
+import { getCourses, isCourseModeAvailable } from '@/lib/courses'
 import { getAllBlogPosts, getPostLastModified } from '@/lib/blog'
+import { SITE } from '@/lib/site-config'
 
-const BASE_URL = 'https://dooncodingacademy.in'
+const BASE_URL = SITE.url
 
 // If you keep these elsewhere, import instead
 const VS_SLUGS = ['coding-ninjas', 'scaler'] as const
-const ONLINE_COURSE_SLUGS = new Set(['full-stack', 'data-science', 'python', 'java'])
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = []
@@ -76,10 +76,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   }
 
-  // --- Online courses (programmatic; limited to the 4 online slugs) ---
+  // --- Online courses (only when the canonical record confirms online delivery) ---
   const courses = await getCourses()
   for (const c of courses) {
-    if (!ONLINE_COURSE_SLUGS.has(c.slug)) continue
+    if (!isCourseModeAvailable(c, 'Online')) continue
     entries.push({
       url: `${BASE_URL}/online-courses/${c.slug}`,
       // Fallback lastModified: omit or use new Date() if you prefer freshness signals
@@ -90,6 +90,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // --- Offline (on-campus) course detail pages /courses/[slug] ---
   for (const c of courses) {
+    if (!isCourseModeAvailable(c, 'On-Campus')) continue
     entries.push({
       url: `${BASE_URL}/courses/${c.slug}`,
       lastModified: now,
@@ -108,5 +109,3 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return entries
 }
-
-

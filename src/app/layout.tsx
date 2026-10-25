@@ -3,6 +3,8 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Script from "next/script";
+import { getCourses } from "@/lib/courses";
+import { formatINR } from "@/lib/pricing";
 
 // Using system fonts for maximum performance
 
@@ -298,6 +300,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{
             __html: JSON.stringify((() => {
               const base = SITE_URL.replace(/\/$/, "");
+              const coursePrices = getCourses().map((course) => course.pricing.packageRate);
               const sameAs = [
                 process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,
                 process.env.NEXT_PUBLIC_INSTAGRAM_URL || undefined,
@@ -323,7 +326,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 telephone: process.env.NEXT_PUBLIC_PHONE ? `+${process.env.NEXT_PUBLIC_PHONE.replace(/\D/g, '')}` : "+917037905464",
                 email: process.env.CONTACT_EMAIL || "dooncodingacademy@gmail.com",
                 hasMap: process.env.NEXT_PUBLIC_GBP_URL || "https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9",
-                priceRange: "₹2000–₹30000",
+                priceRange: `${formatINR(Math.min(...coursePrices))}–${formatINR(Math.max(...coursePrices))}`,
                 paymentAccepted: "Cash, UPI, Debit Card, Credit Card, Net Banking, Wallets (Paytm, PhonePe, GPay), EMI",
                 address: {
                   "@type": "PostalAddress",

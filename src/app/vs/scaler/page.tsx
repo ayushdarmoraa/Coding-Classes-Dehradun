@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
+import { getCourseBySlug } from "@/lib/courses";
+import { formatCoursePrice } from "@/lib/pricing";
 
 const APEX = "https://dooncodingacademy.in";
 
@@ -26,6 +28,7 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
+  const fullStack = getCourseBySlug("full-stack");
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
       <h1 className="text-3xl md:text-4xl font-bold mb-4">
@@ -33,9 +36,9 @@ export default function Page() {
       </h1>
       <p className="text-lg text-gray-700 mb-8">
         Choosing between platforms? Here’s a practical, outcome-focused comparison to help you decide.
-        If you prefer small cohorts with live mentorship and projects, consider{" "}
+        To review the current Full-Stack curriculum and online-course details, see{" "}
         <Link href="/online-courses/full-stack" className="text-blue-700 hover:underline">
-          DCA’s Online Full-Stack (Live + Projects)
+          DCA’s Online Full-Stack course
         </Link>. For general FAQs, see{" "}
         <Link href="/faq" className="text-blue-700 hover:underline">our FAQ</Link>.
       </p>
@@ -58,37 +61,37 @@ export default function Page() {
             </tr>
             <tr>
               <td className="px-4 py-3">Format</td>
-              <td className="px-4 py-3">Live online cohorts + recordings, weekly mentor hours, project reviews</td>
+              <td className="px-4 py-3">See current online-course details for delivery information</td>
               <td className="px-4 py-3">Primarily online; schedule varies by track</td>
             </tr>
             <tr>
               <td className="px-4 py-3">Batch size</td>
-              <td className="px-4 py-3">Small cohorts (≈15) for personal feedback</td>
+              <td className="px-4 py-3">Contact DCA for current class-size details</td>
               <td className="px-4 py-3">Larger cohorts typical of national platforms</td>
             </tr>
             <tr>
               <td className="px-4 py-3">Mentor ratio</td>
-              <td className="px-4 py-3">High touch: instructor + TA support; code reviews</td>
+              <td className="px-4 py-3">Contact DCA for current learner-support details</td>
               <td className="px-4 py-3">Varies; 1:many mentorship</td>
             </tr>
             <tr>
               <td className="px-4 py-3">Projects / portfolio</td>
-              <td className="px-4 py-3">3–5 production-style projects; GitHub + deploys</td>
+              <td className="px-4 py-3">Review the course curriculum and listed outcomes</td>
               <td className="px-4 py-3">Projects present; portfolio depth varies by learner</td>
             </tr>
             <tr>
               <td className="px-4 py-3">Placement support</td>
-              <td className="px-4 py-3">Resume/portfolio, mock interviews, local + remote referrals</td>
+              <td className="px-4 py-3">Contact DCA for current career-support details</td>
               <td className="px-4 py-3">Career services at scale; competitive pipelines</td>
             </tr>
             <tr>
               <td className="px-4 py-3">Fees (indicative)</td>
-              <td className="px-4 py-3">₹25,000 (Full-Stack)</td>
+              <td className="px-4 py-3">{fullStack ? formatCoursePrice(fullStack.pricing) : "See course details"} (Full-Stack)</td>
               <td className="px-4 py-3">Typically higher for comparable tracks</td>
             </tr>
             <tr>
               <td className="px-4 py-3">Best for</td>
-              <td className="px-4 py-3">Learners wanting hands-on guidance, smaller cohorts, faster outcomes</td>
+              <td className="px-4 py-3">Learners comparing the curriculum and current course details</td>
               <td className="px-4 py-3">Learners preferring large networks and brand recognition</td>
             </tr>
           </tbody>
@@ -99,8 +102,8 @@ export default function Page() {
       <div className="mt-8 space-y-4">
         <h2 className="text-xl font-semibold">Who should pick which?</h2>
         <p className="text-gray-700">
-          Pick <strong>DCA</strong> if you want a rigorous, mentor-led build-as-you-learn path with
-          small cohorts and weekly reviews. Pick <strong>Scaler</strong> if you value larger communities
+          Review DCA’s current course curriculum, fees, and delivery information alongside
+          Scaler’s official program details before choosing. Pick <strong>Scaler</strong> if you value larger communities
           and broader brand presence.
         </p>
       </div>
@@ -118,7 +121,7 @@ export default function Page() {
           <li>
             Ready to learn online with mentors and projects? Explore our{" "}
             <Link href="/online-courses/full-stack" className="text-blue-700 hover:underline">
-              Online Full-Stack Course in India
+              Online Full-Stack course details
             </Link>.
           </li>
         </ul>
@@ -128,7 +131,7 @@ export default function Page() {
       <section aria-labelledby="vs-scaler-conclusion" className="mt-10 border-t pt-8">
         <h2 id="vs-scaler-conclusion" className="text-xl font-semibold mb-3">Conclusion</h2>
         <p className="text-gray-700">
-          If you want small cohorts, live mentor feedback, and portfolio-depth projects, our {" "}
+          To review the Full-Stack course curriculum and details, see our{" "}
           <Link href="/courses/full-stack" className="text-blue-700 hover:underline">Full-Stack Bootcamp (On-Campus)</Link> is a focused, project-first path.
         </p>
         <p className="mt-2 text-sm text-gray-600">
@@ -156,7 +159,7 @@ export default function Page() {
           event="cta_enroll_click"
           eventParams={{ page_type: 'comparison', course_slug: 'full-stack', variant: 'post_body_primary_online' }}
         >
-          Start Full-Stack Online (Live + Projects)
+          Explore Full-Stack Online Course
         </Button>
         <Button
           href="/blog/best-full-stack-course-dehradun-2025"
