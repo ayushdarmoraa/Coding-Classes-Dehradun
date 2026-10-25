@@ -65,3 +65,5 @@ jobs:
         with:
           name: lighthouse-results
           path: ${{ steps.lighthouse.outputs.resultsPath }}
+          if-no-files-found: error
+          include-hidden-files: true
