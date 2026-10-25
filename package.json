@@ -13,6 +13,7 @@
     "check:content": "node scripts/content-qa.mjs",
     "test:content": "node --test scripts/content-qa.test.mjs",
     "test:courses": "node --test scripts/course-model.test.mjs",
+    "test:lab": "node --test scripts/lab-foundation.test.mjs scripts/lab-mission.test.mjs scripts/lab-workspace.test.mjs",
     "check:analytics": "node ./scripts/check-analytics.js",
     "gsc:submit": "node scripts/gsc-submit-sitemap.mjs",
     "gsc:submit:domain": "node scripts/gsc-submit-sitemap-domain.mjs"

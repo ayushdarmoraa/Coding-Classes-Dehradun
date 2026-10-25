@@ -60,3 +60,18 @@ export function trackEnrollClick(params: { page_type: string; course_slug?: stri
 export function trackForm(step: 'start' | 'submit' | 'error', extra: GAParams = {}) {
   track(`lead_form_${step}`, extra);
 }
+
+export function trackLabAttempt(challengeId: string): void {
+  track("dca_lab_attempt", { challenge_id: challengeId });
+}
+
+export function trackLabHintView(challengeId: string, hintLevel: number): void {
+  track("dca_lab_hint_view", {
+    challenge_id: challengeId,
+    hint_level: hintLevel,
+  });
+}
+
+export function trackLabCompletion(challengeId: string): void {
+  track("dca_lab_completed", { challenge_id: challengeId });
+}

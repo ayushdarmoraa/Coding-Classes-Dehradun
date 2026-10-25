@@ -73,3 +73,65 @@ export function isSavedMissionProgress(value: unknown): value is SavedMissionPro
     typeof progress.updatedAt === "string"
   );
 }
+
+export function canRevealMissionHint(
+  hintIndex: number,
+  highestHintViewed: number,
+): boolean {
+  return (
+    Number.isInteger(hintIndex) &&
+    hintIndex >= 0 &&
+    hintIndex < MISSION_HINTS.length &&
+    hintIndex <= highestHintViewed
+  );
+}
+
+export function getHighestMissionHintViewed(
+  highestHintViewed: number,
+  hintIndex: number,
+): number {
+  return canRevealMissionHint(hintIndex, highestHintViewed)
+    ? Math.max(highestHintViewed, hintIndex + 1)
+    : highestHintViewed;
+}
+
+export function isMissionWorkerResponse(
+  value: unknown,
+): value is MissionWorkerResponse {
+  if (typeof value !== "object" || value === null) return false;
+
+  const response = value as Record<string, unknown>;
+  if (response.type === "error") {
+    return [
+      "syntax",
+      "runtime",
+      "internal",
+      "input-too-long",
+    ].includes(String(response.error));
+  }
+  if (response.type !== "results" || !Array.isArray(response.results)) {
+    return false;
+  }
+  if (response.results.length !== MISSION_TESTS.length) return false;
+
+  return response.results.every((result: unknown, index: number) => {
+    if (typeof result !== "object" || result === null) return false;
+    const item = result as Record<string, unknown>;
+    const expectedCase = MISSION_TESTS[index];
+    const validStatus =
+      (item.status === "passed" && item.actual === expectedCase.expected) ||
+      (item.status === "incorrect" &&
+        item.actual !== null &&
+        item.actual !== expectedCase.expected) ||
+      (item.status === "runtime-error" && item.actual === null);
+    return (
+      item.id === expectedCase.id &&
+      item.price === expectedCase.price &&
+      item.discountPercent === expectedCase.discountPercent &&
+      item.expected === expectedCase.expected &&
+      (item.actual === null ||
+        (typeof item.actual === "number" && Number.isFinite(item.actual))) &&
+      validStatus
+    );
+  });
+}

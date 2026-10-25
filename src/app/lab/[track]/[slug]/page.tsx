@@ -58,7 +58,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
   if (!challenge) notFound();
 
   return (
-    <main className="container mx-auto max-w-4xl px-4 py-12 sm:py-16">
+    <main className="container mx-auto max-w-7xl px-4 py-12 sm:py-16">
       <nav aria-label="Breadcrumb" className="mb-3">
         <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-700">
           <li>
@@ -94,13 +94,17 @@ export default function ChallengePage({ params }: ChallengePageProps) {
       <p className="mt-3 max-w-3xl leading-7 text-gray-700">
         {challenge.shortDescription}
       </p>
-      <MissionBrief challenge={challenge} />
       {challenge.runner === "discount-calculation-v1" ? (
-        <ChallengeWorkspace />
+        <ChallengeWorkspace>
+          <MissionBrief challenge={challenge} />
+        </ChallengeWorkspace>
       ) : (
-        <p className="mt-8 rounded-lg border border-amber-300 bg-amber-50 p-4 text-amber-950">
-          This challenge is not available to run yet.
-        </p>
+        <>
+          <MissionBrief challenge={challenge} />
+          <p className="mt-8 rounded-lg border border-amber-300 bg-amber-50 p-4 text-amber-950">
+            This challenge is not available to run yet.
+          </p>
+        </>
       )}
     </main>
   );

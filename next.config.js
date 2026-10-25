@@ -6,6 +6,7 @@ const nextConfig = {
   // Experimental CSS optimization to reduce render-blocking by inlining/optimizing critical CSS
   experimental: {
     optimizeCss: true,
+    webpackBuildWorker: true,
   },
 
   // Prefer modern image formats where available
