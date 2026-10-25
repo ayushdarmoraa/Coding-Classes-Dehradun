@@ -43,6 +43,9 @@ function loadTypeScript(relativePath) {
     if (specifier === "@/lib/lab/challenges") {
       return loadTypeScript("src/lib/lab/challenges.ts");
     }
+    if (specifier === "@/lib/lab/challenge-utils") {
+      return loadTypeScript("src/lib/lab/challenge-utils.ts");
+    }
     return nativeRequire(specifier);
   };
 

@@ -3,9 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ChallengeWorkspace from "@/components/lab/ChallengeWorkspace";
 import MissionBrief from "@/components/lab/MissionBrief";
+import { getChallengePath } from "@/lib/lab/challenge-utils";
 import {
   getChallenge,
-  getChallengePath,
   getChallengeStatus,
   getPublishedChallenges,
 } from "@/lib/lab/challenges";

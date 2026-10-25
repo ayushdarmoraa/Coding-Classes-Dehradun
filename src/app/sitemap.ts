@@ -1,7 +1,8 @@
 import type { MetadataRoute } from 'next'
 import { getCourses, isCourseModeAvailable } from '@/lib/courses'
 import { getAllBlogPosts, getPostLastModified } from '@/lib/blog'
-import { getPublishedChallenges, getChallengePath } from '@/lib/lab/challenges'
+import { getPublishedChallenges } from '@/lib/lab/challenges'
+import { getChallengePath } from '@/lib/lab/challenge-utils'
 import { SITE } from '@/lib/site-config'
 
 const BASE_URL = SITE.url

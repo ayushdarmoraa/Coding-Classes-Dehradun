@@ -24,6 +24,7 @@ const mission = loadTypeScript("src/lib/lab/mission.ts");
 const challengeRegistry = loadTypeScript("src/lib/lab/challenges.ts", {
   "./mission": mission,
   "./types": loadTypeScript("src/lib/lab/types.ts"),
+  "./challenge-utils": loadTypeScript("src/lib/lab/challenge-utils.ts"),
 });
 const { createSkillMap } = loadTypeScript("src/lib/lab/skill-map.ts", {
   "./mission": mission,

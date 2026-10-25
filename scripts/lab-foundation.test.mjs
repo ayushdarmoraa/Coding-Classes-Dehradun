@@ -20,12 +20,14 @@ const skillMapModule = loadTypeScript("src/lib/lab/skill-map.ts", {
 const {
   DEFAULT_CHALLENGE,
   getChallenge,
-  getChallengePath,
   getChallengeStatus,
   getChallengesByTrack,
   getPublishedChallenges,
   validateChallenges,
 } = registry;
+const { getChallengePath, isValidChallengeRouteSegment } = loadTypeScript(
+  "src/lib/lab/challenge-utils.ts",
+);
 
 function loadTypeScript(relativePath, localModules = {}) {
   const source = readFileSync(path.resolve(repositoryRoot, relativePath), "utf8");
@@ -93,6 +95,14 @@ test("draft and unknown missions are excluded from public lookup safely", () => 
   const validatedDraft = validateChallenges([draft]);
 
   assert.equal(getPublishedChallenges(validatedDraft).length, 0);
+  assert.equal(
+    getChallengeStatus("javascript", "future-draft", validatedDraft),
+    "draft",
+  );
+  assert.equal(
+    getChallenge("javascript", "future-draft", validatedDraft),
+    undefined,
+  );
   assert.equal(getChallengeStatus("javascript", "discount-calculation-bug"), "published");
   assert.equal(getChallenge("javascript", "future-draft"), undefined);
   assert.equal(getChallengeStatus("javascript", "future-draft"), "not-found");
@@ -100,7 +110,19 @@ test("draft and unknown missions are excluded from public lookup safely", () => 
   assert.deepEqual(getChallengesByTrack("../javascript"), []);
 });
 
+test("route utilities validate segments and build safe canonical challenge paths", () => {
+  assert.equal(isValidChallengeRouteSegment("javascript"), true);
+  assert.equal(isValidChallengeRouteSegment("../javascript"), false);
+  assert.equal(isValidChallengeRouteSegment(""), false);
+  assert.throws(() =>
+    getChallengePath({ track: "../javascript", slug: "discount-calculation-bug" }),
+  );
+});
+
 test("registry rejects malformed content, unsupported runners and invalid estimates", () => {
+  assert.throws(() => getPublishedChallenges([{}]));
+  assert.throws(() => getChallengeStatus("javascript", "broken", [{}]));
+
   const missingObjective = cloneChallenge(DEFAULT_CHALLENGE);
   missingObjective.mission.objective = "";
   assert.throws(() => validateChallenges([missingObjective]));

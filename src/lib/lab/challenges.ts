@@ -11,12 +11,9 @@ import {
   CHALLENGE_STATUSES,
   type LabChallenge,
 } from "./types";
+import { isValidChallengeRouteSegment } from "./challenge-utils";
 
-const routeSegmentSchema = z
-  .string()
-  .min(1)
-  .max(64)
-  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+const routeSegmentSchema = z.string().refine(isValidChallengeRouteSegment);
 const functionNameSchema = z.string().regex(/^[A-Za-z_$][A-Za-z0-9_$]{0,63}$/);
 
 const missionTestSchema = z.object({
@@ -242,43 +239,53 @@ export const DEFAULT_CHALLENGE = challenges.find(
 
 export type ChallengeLookupStatus = "published" | "draft" | "not-found";
 
+function getValidatedRegistry(records: unknown): LabChallenge[] {
+  return records === challenges ? challenges : validateChallenges(records);
+}
+
+function findChallenge(
+  track: string,
+  slug: string,
+  registry: readonly LabChallenge[],
+): LabChallenge | undefined {
+  if (!routeSegmentSchema.safeParse(track).success) return undefined;
+  if (!routeSegmentSchema.safeParse(slug).success) return undefined;
+  return registry.find((item) => item.track === track && item.slug === slug);
+}
+
 export function getChallengeStatus(
   track: string,
   slug: string,
+  records: unknown = challenges,
 ): ChallengeLookupStatus {
-  if (!routeSegmentSchema.safeParse(track).success) return "not-found";
-  if (!routeSegmentSchema.safeParse(slug).success) return "not-found";
-
-  const challenge = challenges.find(
-    (item) => item.track === track && item.slug === slug,
-  );
+  const challenge = findChallenge(track, slug, getValidatedRegistry(records));
   if (!challenge) return "not-found";
   return challenge.status;
 }
 
 export function getPublishedChallenges(
-  registry: readonly LabChallenge[] = challenges,
+  records: unknown = challenges,
 ): LabChallenge[] {
-  return registry.filter(({ status }) => status === "published");
+  return getValidatedRegistry(records).filter(
+    ({ status }) => status === "published",
+  );
 }
 
 export function getChallenge(
   track: string,
   slug: string,
+  records: unknown = challenges,
 ): LabChallenge | undefined {
-  if (getChallengeStatus(track, slug) !== "published") return undefined;
-  return challenges.find(
-    (item) => item.track === track && item.slug === slug,
-  );
+  const challenge = findChallenge(track, slug, getValidatedRegistry(records));
+  return challenge?.status === "published" ? challenge : undefined;
 }
 
-export function getChallengesByTrack(track: string): LabChallenge[] {
+export function getChallengesByTrack(
+  track: string,
+  records: unknown = challenges,
+): LabChallenge[] {
   if (!routeSegmentSchema.safeParse(track).success) return [];
-  return getPublishedChallenges().filter(
+  return getPublishedChallenges(records).filter(
     (challenge) => challenge.track === track,
   );
-}
-
-export function getChallengePath(challenge: Pick<LabChallenge, "track" | "slug">): string {
-  return `/lab/${challenge.track}/${challenge.slug}`;
 }

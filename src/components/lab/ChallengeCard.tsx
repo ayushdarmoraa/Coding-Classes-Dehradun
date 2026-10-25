@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { LabChallenge } from "@/lib/lab/types";
-import { getChallengePath } from "@/lib/lab/challenges";
+import { getChallengePath } from "@/lib/lab/challenge-utils";
 
 export default function ChallengeCard({
   challenge,
