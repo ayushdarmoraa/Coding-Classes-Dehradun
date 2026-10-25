@@ -7,16 +7,12 @@ export default function MissionBrief({
 }: {
   challenge: LabChallenge;
 }) {
-  const example = challenge.mission.example;
-  const exampleTest = example
-    ? challenge.tests.find(({ id }) => id === example.testId)
-    : undefined;
   const relatedCourse = challenge.relatedCourseSlug
     ? getCourseBySlug(challenge.relatedCourseSlug)
     : undefined;
 
   return (
-    <article className="mt-8 rounded-xl border border-gray-200 bg-white p-5 sm:p-7">
+    <article className="h-full rounded-xl border border-gray-200 bg-white p-5 sm:p-7">
       <div className="flex flex-wrap gap-2 text-sm text-gray-700">
         <span className="rounded-full bg-gray-100 px-3 py-1">
           {challenge.difficulty}
@@ -64,22 +60,6 @@ export default function MissionBrief({
             <li key={behavior}>{behavior}</li>
           ))}
         </ul>
-        {example && exampleTest && (
-          <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 rounded-lg bg-slate-50 p-4">
-            <dt className="text-gray-700">Example input</dt>
-            <dd className="text-right text-gray-900">
-              ₹{exampleTest.price}, {exampleTest.discountPercent}% off
-            </dd>
-            <dt className="text-gray-700">Current output</dt>
-            <dd className="text-right font-semibold text-gray-900">
-              ₹{example.starterOutput}
-            </dd>
-            <dt className="text-gray-700">Expected total</dt>
-            <dd className="text-right font-semibold text-gray-900">
-              ₹{exampleTest.expected}
-            </dd>
-          </dl>
-        )}
       </section>
 
       <p className="mt-6 border-t border-gray-200 pt-5 text-sm leading-6 text-gray-600">

@@ -38,6 +38,7 @@ const skillMapComponent = readFileSync(path.resolve(root, "src/components/lab/Sk
 const completionPanel = readFileSync(path.resolve(root, "src/components/lab/CompletionPanel.tsx"), "utf8");
 const editor = readFileSync(path.resolve(root, "src/components/lab/CodeEditor.tsx"), "utf8");
 const worker = readFileSync(path.resolve(root, "src/lib/lab/discount-calculation.worker.ts"), "utf8");
+const runController = readFileSync(path.resolve(root, "src/lib/lab/mission-run-controller.ts"), "utf8");
 const { compileMission, MissionSyntaxError } = loadTypeScript(
   "src/lib/lab/runner.ts",
   { "./mission": mission },
@@ -190,14 +191,15 @@ test("worker runs the restricted mission interpreter and never evaluates source 
   assert.doesNotMatch(worker, /new Function|eval\(/);
   assert.doesNotMatch(worker, /fetch\(|importScripts|import\(/);
   assert.match(workspace, /RUN_TIMEOUT_MS = 1500/);
-  assert.match(workspace, /terminate\(\)/);
-  assert.match(workspace, /worker\.postMessage\(\{ code \}\)/);
+  assert.match(runController, /worker\.terminate\(\)/);
+  assert.match(runController, /worker\.postMessage\(\{ code \}\)/);
+  assert.match(runController, /timeoutMs/);
   assert.doesNotMatch(workspace, /fetch\(|\/api\//);
   assert.doesNotMatch(worker, /stack|process\.env|SMTP|contact/i);
   assert.match(workspacePanels, /Execution timed out/);
   assert.match(workspacePanels, /Show hint \{index \+ 1\}/);
   assert.match(completionPanel, /Mission Complete/);
-  assert.match(workspacePanels, /aria-labelledby="results-heading" aria-live="polite"/);
+  assert.match(workspacePanels, /role="status" aria-live="polite"/);
   assert.match(workspacePanels, /min-h-11/);
 });
 
@@ -234,8 +236,9 @@ test("challenge workspace follows the required mobile content order", () => {
     "<MissionHints",
     "<CompletionPanel",
   ];
-  const workspaceOffset = route.indexOf("<ChallengeWorkspace");
-  assert.ok(route.indexOf("<MissionBrief") < workspaceOffset, "Mission brief must precede the workspace");
+  const workspaceOffset = route.indexOf("<ChallengeWorkspace>");
+  const briefOffset = route.indexOf("<MissionBrief");
+  assert.ok(briefOffset > workspaceOffset, "The server-rendered brief must be passed into the workspace first");
   let previousIndex = -1;
   for (const section of sections.slice(1)) {
     const index = workspace.indexOf(section);

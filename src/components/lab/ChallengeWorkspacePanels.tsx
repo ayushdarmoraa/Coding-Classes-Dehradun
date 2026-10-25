@@ -1,4 +1,5 @@
 import {
+  canRevealMissionHint,
   MAX_MISSION_CODE_LENGTH,
   MISSION_HINTS,
   MISSION_TESTS,
@@ -73,13 +74,21 @@ type MissionResultsProps = {
 };
 
 export function MissionResults({ running, hasRun, results, runnerError }: MissionResultsProps) {
+  const passed = results?.filter((result) => result.status === "passed").length ?? 0;
   return (
-    <section aria-labelledby="results-heading" aria-live="polite" className="rounded-xl border border-gray-200 bg-white p-5">
+    <section aria-labelledby="results-heading" className="rounded-xl border border-gray-200 bg-white p-5">
       <h3 id="results-heading" className="text-lg font-semibold text-gray-900">Test results</h3>
       {!hasRun && <p className="mt-2 text-gray-600">Run the tests to check your function.</p>}
-      {running && <p className="mt-2 text-gray-700" role="status">Running mission tests…</p>}
+      {running && <p className="mt-2 text-gray-700" role="status" aria-live="polite">Running mission tests…</p>}
+      {!running && hasRun && !runnerError && results && (
+        <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {passed === results.length
+            ? `All ${results.length} mission tests passed.`
+            : `${passed} of ${results.length} mission tests passed.`}
+        </p>
+      )}
       {runnerError && (
-        <p className="mt-3 text-amber-900" role="alert">
+        <p className="mt-3 text-amber-900" role="alert" aria-live="assertive">
           {runnerError === "syntax" && "Syntax error: check the function declaration and try again."}
           {runnerError === "runtime" && "Runtime error: the function could not be evaluated."}
           {runnerError === "timeout" && "Execution timed out. The worker was stopped; revise the code and try again."}
@@ -114,6 +123,7 @@ export function MissionPreview({ previewResult }: { previewResult: number | null
   return (
     <section aria-labelledby="preview-heading" className="rounded-xl border border-blue-200 bg-blue-50 p-5">
       <h3 id="preview-heading" className="text-lg font-semibold text-gray-900">Trusted preview</h3>
+      <p className="mt-1 text-sm text-gray-700">A live reference for the first fixed mission case.</p>
       <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
         <dt className="text-gray-700">Product price</dt><dd className="font-medium">{formatRupees(firstCase.price)}</dd>
         <dt className="text-gray-700">Discount</dt><dd className="font-medium">{firstCase.discountPercent}%</dd>
@@ -144,7 +154,7 @@ export function MissionHints({ highestHintViewed, onShowHint }: MissionHintsProp
               <button
                 type="button"
                 onClick={() => onShowHint(index)}
-                disabled={index > highestHintViewed}
+                disabled={!canRevealMissionHint(index, highestHintViewed)}
                 className="min-h-11 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-800 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
               >
                 Show hint {index + 1}

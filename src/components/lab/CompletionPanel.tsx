@@ -16,7 +16,10 @@ export default function CompletionPanel({
   if (!completed) return null;
 
   return (
-    <section aria-labelledby="completion-heading" aria-live="polite" className="space-y-5 rounded-xl border border-green-300 bg-green-50 p-5">
+    <section aria-labelledby="completion-heading" className="space-y-5 rounded-xl border border-green-300 bg-green-50 p-5">
+      <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        Mission complete. All mission tests passed.
+      </p>
       <div>
         <h3 id="completion-heading" className="text-xl font-bold text-green-950">Mission Complete</h3>
         <p className="mt-1 font-medium text-green-900">Great job! You fixed the bug.</p>
