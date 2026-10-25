@@ -5,7 +5,6 @@ import type { Metadata } from "next";
 import { getCourses } from "@/lib/courses";
 import CourseCard from "@/components/features/CourseCard";
 import LearningProgressionNote from "@/components/features/LearningProgressionNote";
-import Script from "next/script";
 import Link from "next/link";
 import CourseSnapshotMobile from "@/components/features/CourseSnapshotMobile";
 import { formatCourseDuration, formatCourseModes, formatCoursePrice } from "@/lib/pricing";
@@ -60,14 +59,15 @@ export default function CoursesPage() {
   } as const;
 
   return (
-    <div className="min-h-screen bg-gray-50" id="top">
+    <main className="min-h-screen bg-gray-50" id="top">
       {/* Breadcrumb JSON-LD */}
-      <Script
+      <script
         id="courses-breadcrumb"
         type="application/ld+json"
-        strategy="afterInteractive"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
+      <h1 className="mt-8 text-3xl font-bold text-gray-900">Explore Coding Courses</h1>
       <p className="mt-2 max-w-2xl text-gray-700">
         Compare course options, curriculum, duration, and fees to find a program that fits your goals.
       </p>
@@ -272,6 +272,6 @@ export default function CoursesPage() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

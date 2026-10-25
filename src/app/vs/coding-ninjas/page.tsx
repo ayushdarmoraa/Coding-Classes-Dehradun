@@ -3,11 +3,9 @@ import Link from "next/link";
 import Button from "@/components/ui/Button";
 import { getCourseBySlug } from "@/lib/courses";
 import { formatCourseDuration, formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
 
-const RAW = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const HTTPS = RAW.replace(/^http:\/\//, "https://");
-const APEX = HTTPS.replace(/^https:\/\/www\./, "https://");
-const CANON = `${APEX}/vs/coding-ninjas`;
+const CANON = `${SITE.url}/vs/coding-ninjas`;
 
 export const metadata: Metadata = {
   title: "Doon Coding Academy vs Coding Ninjas (2025)",
@@ -223,7 +221,7 @@ export default function Page() {
                 "@type": "ListItem",
                 position: 1,
                 name: "Home",
-                item: APEX,
+                item: SITE.url,
               },
               {
                 "@type": "ListItem",

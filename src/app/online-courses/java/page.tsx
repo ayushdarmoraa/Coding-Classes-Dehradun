@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
 import Card from "@/components/ui/Card";
@@ -84,18 +83,18 @@ export default function JavaOnlinePage() {
       </section>
 
       {jsonLd && (
-        <Script
+        <script
           id="jsonld-course-java-online"
           type="application/ld+json"
-          strategy="afterInteractive"
+          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
 
-      <Script
+      <script
         id="breadcrumbs-online-courses-java"
         type="application/ld+json"
-        strategy="afterInteractive"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(
             breadcrumbLd([

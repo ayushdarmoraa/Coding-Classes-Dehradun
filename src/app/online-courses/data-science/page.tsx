@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import Button from "@/components/ui/Button";
 import LearningProgressionNote from "@/components/features/LearningProgressionNote";
 import Link from "next/link";
@@ -104,15 +103,18 @@ export default function OnlineDataSciencePage() {
 
       {/* JSON-LD */}
       {jsonLd && (
-        <Script id="course-jsonld-data-science" type="application/ld+json" strategy="afterInteractive">
-          {JSON.stringify(jsonLd)}
-        </Script>
+        <script
+          id="course-jsonld-data-science"
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       )}
 
-      <Script
+      <script
         id="breadcrumbs-online-courses-data-science"
         type="application/ld+json"
-        strategy="afterInteractive"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(
             breadcrumbLd([

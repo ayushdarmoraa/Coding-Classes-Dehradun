@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import Link from "next/link";
 import TrackedLink from "@/components/analytics/TrackedLink";
 import { notFound } from "next/navigation";
@@ -225,17 +224,19 @@ export default async function CoursePage({ params }: Props) {
       {uiBreadcrumbs}
 
       {/* JSON-LD (Breadcrumbs, Course, FAQ) */}
-      <Script id="course-breadcrumb" type="application/ld+json" strategy="afterInteractive"
+      <script id="course-breadcrumb" type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       {courseJsonLd && (
-        <Script
+        <script
           id="course-structured-data"
           type="application/ld+json"
-          strategy="afterInteractive"
+          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
         />
       )}
-      <Script id="course-faq-schema" type="application/ld+json" strategy="afterInteractive"
+      <script id="course-faq-schema" type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       {/* Hero */}

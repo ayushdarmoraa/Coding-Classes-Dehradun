@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import Button from "@/components/ui/Button";
 import LearningProgressionNote from "@/components/features/LearningProgressionNote";
 import Link from "next/link";
@@ -60,18 +59,18 @@ export default function OnlinePythonPage() {
       </div>
 
       {ld && (
-        <Script
+        <script
           id="ld-course-python"
           type="application/ld+json"
-          strategy="afterInteractive"
+          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
         />
       )}
 
-      <Script
+      <script
         id="breadcrumbs-online-courses-python"
         type="application/ld+json"
-        strategy="afterInteractive"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(
             breadcrumbLd([
