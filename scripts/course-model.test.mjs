@@ -330,12 +330,12 @@ test("sitemap includes each course route supported by the canonical modes", asyn
 
 test("course display consumers use structured canonical facts", async () => {
   const consumers = [
-    ["src/app/page.tsx", /formatCoursePrice\(course\.pricing\)/],
-    ["src/app/page.tsx", /level: course\.level/],
-    ["src/app/page.tsx", /<td className="px-4 py-3">\{course\.level\}<\/td>/],
+    ["src/app/page.tsx", /const courses = getCourses\(\)/],
+    ["src/app/page.tsx", /courses\.map\(\(course, index\)/],
+    ["src/app/page.tsx", /<CourseCard[\s\S]*?course=\{course\}/],
     ["src/app/page.tsx", /import \{ SITE \} from "@\/lib\/site-config"/],
-    ["src/app/page.tsx", /canonical: SITE\.url \+ "\/"/],
-    ["src/app/page.tsx", /SITE\.whatsappUrl/],
+    ["src/app/page.tsx", /canonical: `\$\{SITE\.url\}\/`/],
+    ["src/components/features/CourseCard.tsx", /SITE\.whatsappUrl/],
     ["src/app/courses/page.tsx", /formatCourseDuration\(course\.duration\)/],
     ["src/app/courses/page.tsx", /level: c\.level/],
     ["src/app/courses/page.tsx", /<td className="px-6 py-4 text-center">\{course\.level\}<\/td>/],
