@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/layout/Header";
+import HeaderClient from "@/components/layout/HeaderClient";
 import Footer from "@/components/layout/Footer";
 import Script from "next/script";
 import { getCourses } from "@/lib/courses";
@@ -50,7 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Using system fonts - no external font preconnects needed */}
       </head>
       <body>
-        <Header />
+        <HeaderClient />
         {children}
         <Footer />
 
