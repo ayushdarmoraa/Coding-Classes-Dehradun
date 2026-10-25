@@ -212,6 +212,8 @@ test("public Lab routes are server-rendered, canonical, and exclude unpublished 
   assert.match(indexPage, /canonical: `\$\{SITE\.url\}\/lab`/);
   assert.match(challengePage, /generateStaticParams/);
   assert.match(challengePage, /notFound\(\)/);
+  assert.match(challengePage, /aria-label="Breadcrumb"/);
+  assert.match(challengePage, /aria-current="page"/);
   assert.match(challengePage, /challenge\.seo\.title/);
   assert.match(challengePage, /robots: \{ index: false, follow: false \}/);
   assert.match(sitemap, /getPublishedChallenges\(\)/);

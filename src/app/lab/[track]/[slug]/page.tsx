@@ -59,15 +59,35 @@ export default function ChallengePage({ params }: ChallengePageProps) {
 
   return (
     <main className="container mx-auto max-w-4xl px-4 py-12 sm:py-16">
-      <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-blue-700">
-        <Link
-          href="/lab"
-          className="rounded-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
-        >
-          DCA Lab
-        </Link>{" "}
-        · {challenge.tags[0]}
-      </p>
+      <nav aria-label="Breadcrumb" className="mb-3">
+        <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-700">
+          <li>
+            <Link
+              href="/"
+              className="rounded-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+            >
+              Home
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <Link
+              href="/lab"
+              className="rounded-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+            >
+              DCA Lab
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>{challenge.language === "javascript" ? "JavaScript" : challenge.track}</li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <span aria-current="page" className="font-semibold text-gray-950">
+              {challenge.title}
+            </span>
+          </li>
+        </ol>
+      </nav>
       <h1 className="text-3xl font-bold text-gray-950 sm:text-4xl">
         {challenge.title}
       </h1>
