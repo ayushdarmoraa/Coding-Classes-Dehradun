@@ -5,5 +5,5 @@ import Header from "./Header";
 
 export default function HeaderClient() {
   const pathname = usePathname() || "/";
-  return <Header currentPath={pathname} />;
+  return <Header key={pathname} currentPath={pathname} />;
 }
