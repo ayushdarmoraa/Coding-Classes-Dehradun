@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
 import {
   isSavedMissionProgress,
+  MAX_MISSION_CODE_LENGTH,
   MISSION_ID,
   MISSION_STARTER_CODE,
   MISSION_STORAGE_KEY,
@@ -39,6 +40,7 @@ export default function ChallengeWorkspace() {
   const [running, setRunning] = useState(false);
   const [hasRun, setHasRun] = useState(false);
   const [storageMessage, setStorageMessage] = useState("");
+  const [codeLimitMessage, setCodeLimitMessage] = useState("");
   const [progressReady, setProgressReady] = useState(false);
   const workerRef = useRef<Worker | null>(null);
   const timeoutRef = useRef<number | null>(null);
@@ -135,6 +137,20 @@ export default function ChallengeWorkspace() {
     track("dca_lab_hint_view", { challenge_id: MISSION_ID, hint_level: index + 1 });
   };
 
+  const handleCodeChange = (nextCode: string) => {
+    if (nextCode.length > MAX_MISSION_CODE_LENGTH) {
+      setCode(nextCode.slice(0, MAX_MISSION_CODE_LENGTH));
+      setCodeLimitMessage(
+        `The editor limit is ${MAX_MISSION_CODE_LENGTH.toLocaleString()} characters. Extra pasted characters were not kept.`,
+      );
+      setResults(null);
+      setHasRun(false);
+      return;
+    }
+    setCode(nextCode);
+    setCodeLimitMessage("");
+  };
+
   const resetMission = () => {
     workerRef.current?.terminate();
     workerRef.current = null;
@@ -148,6 +164,7 @@ export default function ChallengeWorkspace() {
     setCompleted(false);
     setResults(null);
     setRunnerError(null);
+    setCodeLimitMessage("");
     setRunning(false);
     setHasRun(false);
     try {
@@ -172,8 +189,13 @@ export default function ChallengeWorkspace() {
 
       <MissionPreview previewResult={previewResult} />
       <div className="overflow-hidden rounded-xl border border-gray-300">
-        <CodeEditor value={code} onChange={setCode} />
+        <CodeEditor value={code} onChange={handleCodeChange} />
       </div>
+      {codeLimitMessage && (
+        <p role="alert" className="text-sm text-amber-900">
+          {codeLimitMessage}
+        </p>
+      )}
       <WorkspaceControls
         running={running}
         progressReady={progressReady}

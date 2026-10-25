@@ -1,4 +1,5 @@
 import {
+  MAX_MISSION_CODE_LENGTH,
   MISSION_HINTS,
   MISSION_TESTS,
   type MissionRunnerError,
@@ -82,6 +83,7 @@ export function MissionResults({ running, hasRun, results, runnerError }: Missio
           {runnerError === "syntax" && "Syntax error: check the function declaration and try again."}
           {runnerError === "runtime" && "Runtime error: the function could not be evaluated."}
           {runnerError === "timeout" && "Execution timed out. The worker was stopped; revise the code and try again."}
+          {runnerError === "input-too-long" && `The submitted code exceeds the ${MAX_MISSION_CODE_LENGTH.toLocaleString()}-character limit.`}
           {runnerError === "internal" && "The challenge runner could not start safely. Please try again later."}
         </p>
       )}

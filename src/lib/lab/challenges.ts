@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   MISSION_HINTS,
   MISSION_ID,
+  MAX_MISSION_CODE_LENGTH,
   MISSION_STARTER_CODE,
   MISSION_TESTS,
 } from "./mission";
@@ -60,7 +61,7 @@ export const labChallengeSchema = z.object({
       })
       .optional(),
   }),
-  starterCode: z.string().min(1).max(5000),
+  starterCode: z.string().min(1).max(MAX_MISSION_CODE_LENGTH),
   entryFunction: functionNameSchema,
   tests: z.array(missionTestSchema).min(1),
   hints: z.array(z.string().trim().min(1).max(500)).max(5),

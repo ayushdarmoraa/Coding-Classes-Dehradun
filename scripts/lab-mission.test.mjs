@@ -38,7 +38,10 @@ const skillMapComponent = readFileSync(path.resolve(root, "src/components/lab/Sk
 const completionPanel = readFileSync(path.resolve(root, "src/components/lab/CompletionPanel.tsx"), "utf8");
 const editor = readFileSync(path.resolve(root, "src/components/lab/CodeEditor.tsx"), "utf8");
 const worker = readFileSync(path.resolve(root, "src/lib/lab/discount-calculation.worker.ts"), "utf8");
-const { compileMission, MissionSyntaxError } = loadTypeScript("src/lib/lab/runner.ts");
+const { compileMission, MissionSyntaxError } = loadTypeScript(
+  "src/lib/lab/runner.ts",
+  { "./mission": mission },
+);
 const header = readFileSync(path.resolve(root, "src/components/layout/Header.tsx"), "utf8");
 const labPage = readFileSync(path.resolve(root, "src/app/lab/page.tsx"), "utf8");
 
@@ -85,6 +88,13 @@ test("saved mission progress rejects malformed values", () => {
     updatedAt: "2026-10-25T00:00:00.000Z",
   };
   assert.equal(mission.isSavedMissionProgress(valid), true);
+  assert.equal(
+    mission.isSavedMissionProgress({
+      ...valid,
+      code: "x".repeat(mission.MAX_MISSION_CODE_LENGTH + 1),
+    }),
+    false,
+  );
   assert.equal(mission.isSavedMissionProgress({ ...valid, attempts: -1 }), false);
   assert.equal(mission.isSavedMissionProgress({ ...valid, highestHintViewed: 4 }), false);
   assert.equal(mission.isSavedMissionProgress(null), false);
@@ -152,6 +162,10 @@ test("mission runner evaluates the supported arithmetic expression and rejects e
     () => compileMission("function calculateTotal(price, discountPercent) { while (true) {} }"),
     MissionSyntaxError,
   );
+  assert.throws(
+    () => compileMission("x".repeat(mission.MAX_MISSION_CODE_LENGTH + 1)),
+    MissionSyntaxError,
+  );
 });
 
 test("editor is CodeMirror 6 and is loaded only inside the client workspace", () => {
@@ -170,6 +184,9 @@ test("editor is CodeMirror 6 and is loaded only inside the client workspace", ()
 
 test("worker runs the restricted mission interpreter and never evaluates source or leaks stacks", () => {
   assert.match(worker, /compileMission\(event\.data\.code\)/);
+  assert.match(worker, /event\.data\.code\.length > MAX_MISSION_CODE_LENGTH/);
+  assert.match(workspace, /MAX_MISSION_CODE_LENGTH/);
+  assert.match(workspace, /Extra pasted characters were not kept/);
   assert.doesNotMatch(worker, /new Function|eval\(/);
   assert.doesNotMatch(worker, /fetch\(|importScripts|import\(/);
   assert.match(workspace, /RUN_TIMEOUT_MS = 1500/);

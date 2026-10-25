@@ -1,4 +1,5 @@
 import { parser } from "@lezer/javascript";
+import { MAX_MISSION_CODE_LENGTH } from "./mission";
 
 type SyntaxNode = ReturnType<typeof parser.parse>["topNode"];
 type Variable = "price" | "discountPercent";
@@ -87,6 +88,7 @@ function evaluate(expression: Expression, price: number, discountPercent: number
 }
 
 export function compileMission(source: string): (price: number, discountPercent: number) => number {
+  if (source.length > MAX_MISSION_CODE_LENGTH) throw new MissionSyntaxError();
   const tree = parser.parse(source);
   const root = children(tree.topNode);
   if (root[root.length - 1]?.name === ";") root.pop();
