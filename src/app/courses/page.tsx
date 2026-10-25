@@ -2,27 +2,25 @@
 // src/app/courses/page.tsx
 
 import type { Metadata } from "next";
-import { getCourses, getCourseBySlug } from "@/lib/courses";
+import { getCourses } from "@/lib/courses";
 import CourseCard from "@/components/features/CourseCard";
-import Badge from "@/components/ui/Badge";
+import LearningProgressionNote from "@/components/features/LearningProgressionNote";
 import Script from "next/script";
 import Link from "next/link";
 import CourseSnapshotMobile from "@/components/features/CourseSnapshotMobile";
-
-// ⬇️ TOP-LEVEL (outside any function)
-const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
+import { formatCourseDuration, formatCourseModes, formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Courses | Doon Coding Academy",
   description:
     "Explore coding, data science, Python, and Java courses at Doon Coding Academy in Dehradun. Compare curriculum, duration, and fees.",
-  alternates: { canonical: BASE + "/courses" },
+  alternates: { canonical: `${SITE.url}/courses` },
   openGraph: {
     title: "Courses | Doon Coding Academy",
     description:
       "Browse Full-Stack, Data Science, Python, and Java courses in Dehradun. See curriculum, duration, and fees.",
-    url: BASE + "/courses",
+    url: `${SITE.url}/courses`,
     type: "website",
     siteName: "Doon Coding Academy",
   },
@@ -38,37 +36,25 @@ export const metadata: Metadata = {
 
 export default function CoursesPage() {
   const courses = getCourses();
-  const python = getCourseBySlug("python");
-  const java = getCourseBySlug("java");
-
 
   // Feature a couple up top
   const featuredSlugs = new Set(["full-stack", "data-science"]);
   const featured = courses.filter((c) => featuredSlugs.has(c.slug));
 
-  // Beginner, Intermediate, Advanced slug sets
-  const beginnerSlugs = new Set(["python", "java"]);
-  const intermediateSlugs = new Set(["data-science"]);
-  const advancedSlugs = new Set(["full-stack"]);
-
-  const beginner = courses.filter((c) => beginnerSlugs.has(c.slug));
-  const intermediate = courses.filter((c) => intermediateSlugs.has(c.slug));
-  const advanced = courses.filter((c) => advancedSlugs.has(c.slug));
-
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "@id": `${BASE}/courses#breadcrumb`,
+    "@id": `${SITE.url}/courses#breadcrumb`,
     itemListElement: [
       {
         "@type": "ListItem",
         position: 1,
-        item: { "@type": "WebPage", "@id": `${BASE}/`, name: "Home" },
+        item: { "@type": "WebPage", "@id": `${SITE.url}/`, name: "Home" },
       },
       {
         "@type": "ListItem",
         position: 2,
-        item: { "@type": "WebPage", "@id": `${BASE}/courses`, name: "Courses" },
+        item: { "@type": "WebPage", "@id": `${SITE.url}/courses`, name: "Courses" },
       },
     ],
   } as const;
@@ -89,18 +75,12 @@ export default function CoursesPage() {
         Need city / online context? Visit our{' '}
         <Link href="/locations" className="text-blue-700 hover:underline">Locations</Link> page.
       </p>
+      <LearningProgressionNote className="mt-3 max-w-3xl text-gray-600" />
 
           {/* Filters / Sort (anchor-only) */}
           <div className="mt-6">
             <div className="rounded-2xl bg-gray-50 ring-1 ring-gray-200 p-3 md:p-4">
               <div className="flex flex-wrap items-center gap-2 md:gap-3">
-                <span className="text-sm font-semibold text-gray-700">Quick filters:</span>
-                <a href="#beginner" className="inline-flex items-center rounded-xl border border-blue-700/30 bg-white px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-700/5">Beginner</a>
-                <a href="#intermediate" className="inline-flex items-center rounded-xl border border-blue-700/30 bg-white px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-700/5">Intermediate</a>
-                <a href="#advanced" className="inline-flex items-center rounded-xl border border-blue-700/30 bg-white px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-700/5">Advanced</a>
-
-                <span className="mx-2 h-5 w-px bg-gray-300" aria-hidden="true" />
-
                 <span className="text-sm font-semibold text-gray-700">Sort by (scan table):</span>
                 <a href="#comparison" className="inline-flex items-center rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100">Shortest duration</a>
                 <a href="#comparison" className="inline-flex items-center rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100">Lowest fees</a>
@@ -127,18 +107,11 @@ export default function CoursesPage() {
           </div>
         </section>
       )}
-{/* Removed unreachable/orphaned JSX tags and comments left outside the main return block */}
-
-      {!!beginner.length && (
-        <section className="py-6" id="beginner" aria-label="Beginner courses">
+      <section className="py-6" id="all-courses" aria-label="All courses">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="flex items-center gap-2">
-              <h3 className="text-xl md:text-2xl font-bold">Beginner</h3>
-              <Badge variant="primary">No experience needed</Badge>
-            </div>
-            <p className="mt-1 text-gray-600">Start from scratch and build strong fundamentals.</p>
+            <h3 className="text-xl md:text-2xl font-bold">All Courses</h3>
             <div className="mt-5 grid md:grid-cols-2 gap-8">
-              {beginner.map((course) => (
+              {courses.map((course) => (
                 <CourseCard key={course.id} course={course} />
               ))}
             </div>
@@ -146,54 +119,13 @@ export default function CoursesPage() {
               <a href="#top" className="text-sm text-blue-700 hover:underline">Back to top</a>
             </div>
           </div>
-        </section>
-      )}
-
-      {!!intermediate.length && (
-        <section className="py-6" id="intermediate" aria-label="Intermediate courses">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex items-center gap-2">
-              <h3 className="text-xl md:text-2xl font-bold">Intermediate</h3>
-              <Badge variant="info">Some fundamentals helpful</Badge>
-            </div>
-            <p className="mt-1 text-gray-600">Ideal if you’re comfortable with basics and want to specialize.</p>
-            <div className="mt-5 grid md:grid-cols-2 gap-8">
-              {intermediate.map((course) => (
-                <CourseCard key={course.id} course={course} />
-              ))}
-            </div>
-            <div className="mt-4">
-              <a href="#top" className="text-sm text-blue-700 hover:underline">Back to top</a>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {!!advanced.length && (
-        <section className="py-6" id="advanced" aria-label="Advanced courses">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex items-center gap-2">
-              <h3 className="text-xl md:text-2xl font-bold">Advanced</h3>
-              <Badge variant="success">Career track</Badge>
-            </div>
-            <p className="mt-1 text-gray-600">Go end-to-end on modern stacks and ship real projects.</p>
-            <div className="mt-5 grid md:grid-cols-2 gap-8">
-              {advanced.map((course) => (
-                <CourseCard key={course.id} course={course} />
-              ))}
-            </div>
-            <div className="mt-4">
-              <a href="#top" className="text-sm text-blue-700 hover:underline">Back to top</a>
-            </div>
-          </div>
-        </section>
-      )}
+      </section>
 
       {/* Benefits grid */}
       <section className="py-12 bg-white border-t" id="benefits">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold">Why Learn with Doon Coding Academy?</h2>
-          <p className="mt-1 text-gray-600">Designed for Dehradun learners—beginner-friendly, outcomes-first.</p>
+          <p className="mt-1 text-gray-600">Designed for Dehradun learners at different starting points.</p>
 
           <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -217,10 +149,11 @@ export default function CoursesPage() {
         <div className="max-w-6xl mx-auto px-4">
           <CourseSnapshotMobile
             rows={courses.map((c) => ({
-              name: c.title,
-              mode: "On-Campus / Online",
-              duration: c.duration,
-              fees: c.price,
+              name: c.shortTitle,
+              level: c.level,
+              mode: formatCourseModes(c),
+              duration: formatCourseDuration(c.duration),
+              fees: formatCoursePrice(c.pricing),
               outcome: c.outcomes?.[0],
               ctaHref: `/courses/${c.slug}`,
             }))}
@@ -239,63 +172,33 @@ export default function CoursesPage() {
               <thead className="bg-blue-600 text-white">
                 <tr>
                   <th className="px-6 py-4 text-left">Course</th>
+                  <th className="px-6 py-4 text-center">Level</th>
                   <th className="px-6 py-4 text-center">Duration</th>
                   <th className="px-6 py-4 text-center">Price</th>
-                  <th className="px-6 py-4 text-center">Level</th>
-                  <th className="px-6 py-4 text-center">Typical Roles</th>
+                  <th className="px-6 py-4 text-center">Mode</th>
+                  <th className="px-6 py-4 text-center">Course Focus</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                <tr className="hover:bg-gray-50" id="advanced-row">
-                  <td className="px-6 py-4">
-                    <div className="font-semibold text-gray-900">Full-Stack Development (MERN + Gen AI)</div>
-                    <div className="text-sm text-gray-600">Complete web development with AI integration</div>
-                  </td>
-                  <td className="px-6 py-4 text-center">6 months</td>
-                  <td className="px-6 py-4 text-center">₹25,000</td>
-                  <td className="px-6 py-4 text-center"><Badge variant="success">Beginner→Advanced</Badge></td>
-                  <td className="px-6 py-4 text-center text-sm">Full-Stack / Frontend / Backend Developer</td>
-                </tr>
-                <tr className="hover:bg-gray-50" id="intermediate-row">
-                  <td className="px-6 py-4">
-                    <div className="font-semibold text-gray-900">Data Science & AI</div>
-                    <div className="text-sm text-gray-600">Python, ML, statistics, visualization</div>
-                  </td>
-                  <td className="px-6 py-4 text-center">6 months</td>
-                  <td className="px-6 py-4 text-center">₹30,000</td>
-                  <td className="px-6 py-4 text-center"><Badge variant="info">Intermediate</Badge></td>
-                  <td className="px-6 py-4 text-center text-sm">Data Scientist / Analyst / ML Engineer</td>
-                </tr>
-                <tr className="hover:bg-gray-50" id="beginner-row-1">
-                  <td className="px-6 py-4">
-                    <div className="font-semibold text-gray-900">Python Programming</div>
-                    <div className="text-sm text-gray-600">Foundation programming with Python</div>
-                  </td>
-                  <td className="px-6 py-4 text-center">{python?.duration}</td>
-                  <td className="px-6 py-4 text-center">{python?.price}</td>
-                  <td className="px-6 py-4 text-center">
-                    <Badge variant="primary">{python?.level ?? "Intermediate"}</Badge>
-                  </td>
-                  <td className="px-6 py-4 text-center text-sm">Python Developer / Automation</td>
-                </tr>
-                <tr className="hover:bg-gray-50" id="beginner-row-2">
-                  <td className="px-6 py-4">
-                    <div className="font-semibold text-gray-900">Java Programming</div>
-                    <div className="text-sm text-gray-600">OOP, collections, basic backend</div>
-                  </td>
-                  <td className="px-6 py-4 text-center">{java?.duration}</td>
-                  <td className="px-6 py-4 text-center">{java?.price}</td>
-                  <td className="px-6 py-4 text-center">
-                    <Badge variant="primary">{java?.level ?? "Intermediate"}</Badge>
-                  </td>
-                  <td className="px-6 py-4 text-center text-sm">Java Developer / QA Automation</td>
-                </tr>
+                {courses.map((course) => (
+                  <tr className="hover:bg-gray-50" id={`${course.slug}-row`} key={course.id}>
+                    <td className="px-6 py-4">
+                      <div className="font-semibold text-gray-900">{course.title}</div>
+                      <div className="text-sm text-gray-600">{course.description}</div>
+                    </td>
+                    <td className="px-6 py-4 text-center">{course.level}</td>
+                    <td className="px-6 py-4 text-center">{formatCourseDuration(course.duration)}</td>
+                    <td className="px-6 py-4 text-center">{formatCoursePrice(course.pricing)}</td>
+                    <td className="px-6 py-4 text-center">{formatCourseModes(course)}</td>
+                    <td className="px-6 py-4 text-center text-sm">{course.outcomes[0]}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
 
           <p className="mt-3 text-sm text-gray-600">
-            Tip: For shortest duration, check the 2–3 month tracks. For lowest fees, compare prices across rows.
+            Compare listed durations and fees to find a course that fits your plans.
           </p>
         </div>
       </section>
@@ -305,10 +208,12 @@ export default function CoursesPage() {
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-xl md:text-2xl font-bold">What you’ll walk away with</h2>
           <ul className="mt-3 grid md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm text-gray-800">
-            <li className="rounded-xl bg-white p-3 ring-1 ring-gray-200">Portfolio projects on GitHub</li>
-            <li className="rounded-xl bg-white p-3 ring-1 ring-gray-200">Solid fundamentals + modern stack</li>
-            <li className="rounded-xl bg-white p-3 ring-1 ring-gray-200">Interview prep & guidance</li>
-            <li className="rounded-xl bg-white p-3 ring-1 ring-gray-200">Local mentor support in Dehradun</li>
+            {courses.map((course) => (
+              <li key={course.id} className="rounded-xl bg-white p-3 ring-1 ring-gray-200">
+                <span className="block font-semibold">{course.shortTitle}</span>
+                {course.outcomes[0]}
+              </li>
+            ))}
           </ul>
         </div>
       </section>
@@ -323,19 +228,19 @@ export default function CoursesPage() {
             {[
               {
                 q: "Do I need prior coding experience?",
-                a: "No—beginner-friendly options are available. If you have experience, we help you pace faster.",
+                a: "Your starting learning stage depends on your current skills and goals, and progression can follow your pace.",
               },
               {
                 q: "Are payment plans available?",
-                a: "Yes, both monthly and one-time plans are available.",
+                a: "Course pricing includes monthly rates and package rates. See each course page for its current pricing.",
               },
               {
                 q: "Will I build real projects?",
-                a: "Yes. Our approach is project-first; every course includes portfolio-ready work.",
+                a: "Review each course curriculum and outcomes for its listed project work.",
               },
               {
                 q: "How do I decide which course is right for me?",
-                a: "Message us on WhatsApp or request a free consultation and we’ll guide you.",
+                a: "Compare the course curriculum, duration, and fees, or contact us with questions.",
               },
             ].map((item) => (
               <details key={item.q} className="group rounded-2xl bg-gray-50 ring-1 ring-gray-200 open:ring-blue-700/30">
@@ -355,7 +260,7 @@ export default function CoursesPage() {
                 href="/contact"
                 className="inline-flex items-center rounded-xl bg-blue-700 px-4 py-2 text-white text-sm font-semibold shadow-sm hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-blue-700/30"
               >
-                Get a free consultation
+                Contact us about choosing a course
               </a>
               <a
                 href="https://wa.me/917037905464?text=Hi%2C%20I%20need%20help%20choosing%20a%20course"

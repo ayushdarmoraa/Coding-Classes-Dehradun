@@ -1,28 +1,26 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Button from "@/components/ui/Button";
+import LearningProgressionNote from "@/components/features/LearningProgressionNote";
 import Link from "next/link";
 import { getCourseBySlug } from "@/lib/courses";
 import { getCourseJsonLd } from "@/lib/schema";
 import { breadcrumbLd } from "@/lib/seo";
+import { formatCourseDuration, formatCourseModes, formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
 
-// Build apex base URL (https, no trailing slash, no www)
-const RAW = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const SITE = RAW.replace(/^http:\/\//, "https://");
-const APEX = SITE.replace(/^https:\/\/www\./, "https://");
-
-const TITLE = "Online Data Science Course in India (Live + Projects)";
+const TITLE = "Data Science & AI Course Details | Doon Coding Academy";
 const DESC =
-  "Explore the live online Data Science & AI curriculum, duration, and program details.";
+  "Explore the Data Science & AI curriculum, duration, fees, and confirmed delivery modes.";
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESC,
-  alternates: { canonical: `${APEX}/online-courses/data-science` },
+  alternates: { canonical: `${SITE.url}/online-courses/data-science` },
   openGraph: {
     title: TITLE,
     description: DESC,
-    url: `${APEX}/online-courses/data-science`,
+    url: `${SITE.url}/online-courses/data-science`,
     type: "website",
     siteName: "Doon Coding Academy",
   },
@@ -45,15 +43,15 @@ export default function OnlineDataSciencePage() {
       <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white pt-10 pb-16">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-5 leading-tight">
-            Online Data Science &amp; AI
+            Data Science &amp; AI Course Details
             <br />
-            <span className="text-blue-200">Live + Projects</span>
+            <span className="text-blue-200">Curriculum, duration, and fees</span>
           </h1>
           <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto">
-            Learn Python, data wrangling, visualization, ML fundamentals, and project workflows.
-            Includes live classes, recordings, mentor hours, and structured career support. {" "}
-            <Link href="/courses/data-science" className="underline text-yellow-200 hover:text-white">Prefer on-campus? See Dehradun Data Science</Link>
+            Review the Data Science &amp; AI curriculum and course details. {" "}
+            <Link href="/courses/data-science" className="underline text-yellow-200 hover:text-white">View the course page</Link>
           </p>
+          <LearningProgressionNote className="mt-3 text-blue-100" />
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
             <Button href="/contact" size="lg" className="bg-yellow-400 text-blue-900 font-semibold hover:bg-yellow-500">
               Talk to a Mentor
@@ -63,7 +61,7 @@ export default function OnlineDataSciencePage() {
               size="lg"
               className="!bg-transparent border-2 border-white text-white font-semibold hover:bg-white hover:text-blue-600 transition"
             >
-              View On-Campus Course
+              View Course Details
             </Button>
           </div>
         </div>
@@ -75,20 +73,23 @@ export default function OnlineDataSciencePage() {
           <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
             <h2 className="text-xl font-semibold mb-2">Who it’s for</h2>
             <p className="text-gray-700">
-              Beginners or upskillers aiming for analyst/ML roles who prefer structured, live cohorts with feedback.
+              Learners interested in data analysis, statistics, machine learning, and structured project work.
             </p>
           </div>
           <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
             <h2 className="text-xl font-semibold mb-2">What you’ll learn</h2>
-            <p className="text-gray-700">
-              Python, NumPy, Pandas, cleaning, Viz, basic stats, simple ML, and a capstone portfolio project.
-            </p>
+            <ul className="text-gray-700 space-y-1">
+              {course?.curriculum.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
           </div>
           <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
-            <h2 className="text-xl font-semibold mb-2">Cohort format</h2>
+            <h2 className="text-xl font-semibold mb-2">Course details</h2>
             <p className="text-gray-700">
-              6 months · live classes · recordings · weekly mentor hours · project reviews · placement help.
+              {course && `Level: ${course.level} · ${formatCourseDuration(course.duration)} · ${formatCourseModes(course)}`}
             </p>
+            {course && <p className="mt-2 text-sm text-gray-600">Fees: {formatCoursePrice(course.pricing)}</p>}
           </div>
         </div>
       </section>
@@ -96,7 +97,7 @@ export default function OnlineDataSciencePage() {
       {/* Bottom CTA */}
       <section className="pb-12 -mt-4">
         <div className="max-w-5xl mx-auto px-4 text-center">
-          <p className="text-sm text-blue-600 mb-3">Explore offline + other cities</p>
+          <p className="text-sm text-blue-600 mb-3">Explore locations and current course availability</p>
           <Link href="/locations" className="inline-block underline text-blue-700">See campus & cities</Link>
         </div>
       </section>
@@ -115,9 +116,9 @@ export default function OnlineDataSciencePage() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(
             breadcrumbLd([
-              { name: "Home", url: APEX },
-              { name: "Online Courses", url: `${APEX}/online-courses` },
-              { name: "Online Data Science & AI Live + Projects", url: `${APEX}/online-courses/data-science` },
+              { name: "Home", url: SITE.url },
+              { name: "Online Courses", url: `${SITE.url}/online-courses` },
+              { name: "Data Science & AI Course Details", url: `${SITE.url}/online-courses/data-science` },
             ])
           ),
         }}

@@ -227,7 +227,7 @@ export default function Page() {
             </li>
             <li>
               <Link href="/courses/python" className="text-blue-700 hover:underline">
-                Python Course (beginner-friendly)
+                Python Course
               </Link>
             </li>
             <li>

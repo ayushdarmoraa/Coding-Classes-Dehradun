@@ -1,5 +1,6 @@
-import { Course } from "./courses";
-import { parsePricing } from "./pricing";
+import { isCourseModeAvailable, type Course } from "./courses";
+import { courseDurationToIso, formatCourseDuration } from "./pricing";
+import { SITE } from "./site-config";
 import { Testimonial } from "./testimonials"; // Import Testimonial interface
 
 export function generateOrganizationSchema(siteUrl: string, businessName: string) {
@@ -48,20 +49,28 @@ export function generateCourseSchema(course: Course) {
     "@type": "Course",
     "name": course.title,
     "description": course.description,
+    ...(course.level ? { educationalLevel: course.level } : {}),
     "provider": {
       "@type": "EducationalOrganization",
       "name": "Doon Coding Academy"
     },
-    "courseMode": "Blended",
-    "location": {
-      "@type": "Place",
-      "address": "Herbertpur (Dehradun district), Uttarakhand"
-    },
-    "duration": course.duration,
+    ...(course.modeStatus === "confirmed" ? { courseMode: course.modes } : {}),
+    duration: formatCourseDuration(course.duration),
     "offers": {
       "@type": "Offer",
-      "price": course.price,
-      "priceCurrency": "INR"
+      price: course.pricing.packageRate,
+      priceCurrency: course.pricing.currency,
+      description: `${formatCourseDuration(course.duration)} package rate`,
+      ...(course.pricing.monthlyRate === undefined
+        ? {}
+        : {
+            priceSpecification: {
+              "@type": "UnitPriceSpecification",
+              price: course.pricing.monthlyRate,
+              priceCurrency: course.pricing.currency,
+              unitText: "month",
+            },
+          }),
     }
   }
 }
@@ -79,39 +88,18 @@ export function getCourseJsonLd(
     brandLogoUrl?: string;
     pathPrefix?: string; // default: "courses" (override for online pages)
   }
-) {
+): Record<string, unknown> | null {
   const variant = opts?.variant ?? "offline";
+  const requiredMode = variant === "online" ? "Online" : "On-Campus";
+  if (!isCourseModeAvailable(course, requiredMode)) return null;
+
   const city = opts?.city ?? "Dehradun";
-  const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-  const base = rawBase.replace(/^http:\/\//, "https://");
+  const base = SITE.url;
   const pathPrefix = (opts?.pathPrefix || "courses").replace(/^\/+|\/+$/g, "");
   const url = `${base}/${pathPrefix}/${course.slug}`;
 
   const image = opts?.imageUrl || `${base}/og-image.png`;
   const brandLogo = opts?.brandLogoUrl || `${base}/images/doon-coding-academy-logo.webp`;
-
-  // Parse one-time price from canonical pricing string
-  let price: number | undefined = undefined;
-  try {
-    const info = parsePricing(String(course.price || ""), String(course.duration || ""));
-    price = info.oneTime > 0 ? info.oneTime : undefined;
-  } catch {
-    const m = String(course.price || "").match(/₹?\s*([\d,]+)/);
-    price = m ? Number(m[1].replace(/,/g, "")) : undefined;
-  }
-
-  // Optional ISO 8601 duration, e.g., "6 months" => "P6M"
-  const timeRequired = (() => {
-    if (!course.duration) return undefined;
-    const txt = String(course.duration).toLowerCase();
-    const range = txt.match(/(\d+)\s*[–-]\s*(\d+)\s*month/);
-    if (range) return `P${parseInt(range[2], 10) || 1}M`;
-    const single = txt.match(/(\d+)\s*month/);
-    if (single) return `P${parseInt(single[1], 10) || 1}M`;
-    const weeks = txt.match(/(\d+)\s*week/);
-    if (weeks) return `P${(parseInt(weeks[1], 10) || 1) * 7}D`;
-    return undefined;
-  })();
 
   const areaServed =
     variant === "online"
@@ -124,11 +112,11 @@ export function getCourseJsonLd(
     "@id": `${url}#course`,
     name: course.title,
     description: course.description,
+    ...(course.level ? { educationalLevel: course.level } : {}),
     url,
     courseCode: course.slug,
     inLanguage: "en",
     educationalCredentialAwarded: "Certificate of Completion",
-    audience: { "@type": "Audience", audienceType: "Beginners and Intermediates" },
     areaServed,
     image,
     brand: { "@type": "Brand", name: "Doon Coding Academy", logo: brandLogo },
@@ -137,17 +125,28 @@ export function getCourseJsonLd(
       "https://facebook.com/dooncodingacademy",
       "https://linkedin.com/company/dooncodingacademy",
     ],
-    ...(timeRequired ? { timeRequired } : {}),
+    timeRequired: courseDurationToIso(course.duration),
     provider: {
       "@type": "EducationalOrganization",
-      name: "Doon Coding Academy",
+      name: SITE.name,
       url: base,
     },
     offers: {
       "@type": "Offer",
       url,
-      priceCurrency: "INR",
-      ...(typeof price === "number" ? { price } : {}),
+      priceCurrency: course.pricing.currency,
+      price: course.pricing.packageRate,
+      description: `${formatCourseDuration(course.duration)} package rate`,
+      ...(course.pricing.monthlyRate === undefined
+        ? {}
+        : {
+            priceSpecification: {
+              "@type": "UnitPriceSpecification",
+              price: course.pricing.monthlyRate,
+              priceCurrency: course.pricing.currency,
+              unitText: "month",
+            },
+          }),
       availability: "https://schema.org/InStock",
       category: "Paid",
       eligibleRegion: { "@type": "Country", name: "India" },
@@ -220,7 +219,7 @@ export function generateTestimonialSchema(testimonials: Testimonial[]) {
         itemReviewed: {
           "@type": "LocalBusiness",
           // Derive stable @id from env, normalized to https and without trailing slash
-          "@id": `${(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "").replace(/^http:\/\//, "https://")}/#localbusiness`
+          "@id": `${SITE.url}/#localbusiness`
         },
       },
     })),

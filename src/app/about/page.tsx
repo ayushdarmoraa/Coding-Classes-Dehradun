@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import InstructorsGrid from "@/components/features/InstructorsGrid";
 import { INSTRUCTORS } from "@/lib/instructors";
+import { getCourses } from "@/lib/courses";
+import { formatCourseDuration, formatCoursePrice } from "@/lib/pricing";
 
 const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
@@ -21,6 +23,8 @@ export const metadata: Metadata = {
 };
 
 export default function AboutPage() {
+  const courses = getCourses();
+
   return (
     <main className="pt-8">
       {/* Hero */}
@@ -161,7 +165,7 @@ export default function AboutPage() {
           <CourseCard
             title="Python"
             href="/courses/python"
-            points={["Beginner-friendly", "Problem-solving focus", "Automation & scripts"]}
+            points={["Flexible learning stages", "Problem-solving focus", "Automation & scripts"]}
           />
           <CourseCard
             title="Java"
@@ -188,7 +192,7 @@ export default function AboutPage() {
             <Stat label="Hands-on Projects" value="10+" />
             <Stat label="Curriculum Hours" value="100–150" />
             <Stat label="Doubt-Clear Sessions" value="Weekly" />
-            <Stat label="Flexible Plans" value="Monthly/One-time" />
+            <Stat label="Flexible Plans" value="Monthly/Package" />
           </div>
           <p className="mt-6 text-gray-700">
             You’ll finish with <span className="font-semibold">portfolio-ready work</span>, clarity
@@ -247,10 +251,11 @@ export default function AboutPage() {
                 Pricing & Duration (quick glance)
               </summary>
               <div className="mt-3 text-sm text-gray-700">
-                <p>Full-Stack with Gen AI: 6 months · ₹25,000 (or ₹5,000/month)</p>
-                <p>Data Science: 6 months · ₹30,000 (or ₹6,000/month)</p>
-                <p>Python: 4 months · ₹12,000 (or ₹4,000/month)</p>
-                <p>Java: 4 months · ₹12,000 (or ₹4,000/month)</p>
+                {courses.map((course) => (
+                  <p key={course.id}>
+                    {course.shortTitle}: {formatCourseDuration(course.duration)} · {formatCoursePrice(course.pricing)}
+                  </p>
+                ))}
               </div>
             </details>
           </div>

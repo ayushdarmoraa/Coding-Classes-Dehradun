@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
 import Script from "next/script";
+import { getCourses } from "@/lib/courses";
+import { formatCourseDuration, formatCoursePrice } from "@/lib/pricing";
   // ...existing code...
   // Place after <header>, before first <section>
   {/* FAQPage JSON-LD */}
@@ -38,12 +40,12 @@ import Script from "next/script";
           {
             "@type": "Question",
             "name": "Are payment plans available?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Yes, monthly and one-time options are available." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Course pricing includes monthly rates and package rates. See each course page for its current pricing." }
           },
           {
             "@type": "Question",
             "name": "Do I need prior coding experience?",
-            "acceptedAnswer": { "@type": "Answer", "text": "No, beginner tracks start from fundamentals." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Your starting learning stage depends on your current skills and goals, and progression can follow your pace." }
           },
           {
             "@type": "Question",
@@ -84,6 +86,13 @@ export const metadata: Metadata = {
 };
 
 export default function FAQPage() {
+  const courses = getCourses();
+  const coursePricingSummary = courses
+    .map(
+      (course) =>
+        `${course.shortTitle}: ${formatCourseDuration(course.duration)} · ${formatCoursePrice(course.pricing)}`
+    )
+    .join(". ");
   const faqLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -111,8 +120,7 @@ export default function FAQPage() {
         name: "What are the fees and payment options?",
         acceptedAnswer: {
           "@type": "Answer",
-          text:
-            "Affordable with monthly and one-time plans. Full-Stack with Gen AI: 6 months · ₹25,000 (₹5,000/month). Data Science: 6 months · ₹30,000 (₹6,000/month). Python: 4 months · ₹12,000 (₹4,000/month). Java: 4 months · ₹12,000 (₹4,000/month).",
+          text: coursePricingSummary,
         },
       },
       {
@@ -121,7 +129,7 @@ export default function FAQPage() {
         acceptedAnswer: {
           "@type": "Answer",
           text:
-            "No. Beginner-friendly tracks start with fundamentals and build up to projects. Experienced learners can pace faster.",
+            "Your starting learning stage depends on your current skills and goals, and progression can follow your pace.",
         },
       },
       {
@@ -230,12 +238,13 @@ export default function FAQPage() {
               What are the fees and payment options?
             </summary>
             <div className="px-5 pb-5 pt-0 text-gray-700">
-              We keep pricing <span className="font-semibold">affordable with monthly and one-time payment plans</span>.
+              Course pricing includes monthly rates and package rates.
               <ul className="mt-2 list-disc pl-5 space-y-1">
-                <li>Full-Stack with Gen AI: 6 months · ₹25,000 (or ₹5,000/month)</li>
-                <li>Data Science: 6 months · ₹30,000 (or ₹6,000/month)</li>
-                <li>Python: 4 months · ₹12,000 (or ₹4,000/month)</li>
-                <li>Java: 4 months · ₹12,000 (or ₹4,000/month)</li>
+                {courses.map((course) => (
+                  <li key={course.id}>
+                    {course.shortTitle}: {formatCourseDuration(course.duration)} · {formatCoursePrice(course.pricing)}
+                  </li>
+                ))}
               </ul>
               For current offers, please{" "}
               <a href="/contact" className="text-blue-700 font-semibold hover:underline">
@@ -251,7 +260,7 @@ export default function FAQPage() {
               Do I need prior coding experience?
             </summary>
             <div className="px-5 pb-5 pt-0 text-gray-700">
-              No. Our beginner-friendly tracks start with fundamentals and gradually build up to projects.
+              Your starting learning stage depends on your current skills and goals, and progression can follow your pace.
               If you already have experience, we’ll help you pace faster.
             </div>
           </details>

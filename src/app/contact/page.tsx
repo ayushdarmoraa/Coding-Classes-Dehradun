@@ -200,7 +200,7 @@ export default function ContactPage() {
                   Can I pay in installments?
                 </h3>
                 <p className="text-gray-600 text-sm mb-4">
-                  Yes, we offer flexible payment options including monthly installments for all our courses.
+                  Course pricing includes monthly rates and package rates. Please refer to each course page for its current pricing.
                 </p>
                 
                 <h3 className="font-semibold text-gray-900 mb-2">
