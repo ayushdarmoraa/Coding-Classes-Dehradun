@@ -54,14 +54,7 @@ jobs:
             http://localhost:3000/online-courses/full-stack
             http://localhost:3000/locations/dehradun
           configPath: .lighthouserc.json
-          output: html
           uploadArtifacts: true
+          artifactName: lighthouse-results
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Save LHCI logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: lhci-logs
-          path: ./lighthouseci_reports || ./lhci-report || ./lhci

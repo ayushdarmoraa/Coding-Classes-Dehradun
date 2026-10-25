@@ -10,7 +10,14 @@
       ],
       "settings": {
         "chromeFlags": "--no-sandbox",
-        "emulatedFormFactor": "mobile",
+        "formFactor": "mobile",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 375,
+          "height": 812,
+          "deviceScaleRatio": 2,
+          "disabled": false
+        },
         "throttlingMethod": "simulate",
         "throttling": {
           "rttMs": 150,
