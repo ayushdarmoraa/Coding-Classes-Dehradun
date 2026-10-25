@@ -1,162 +1,296 @@
-// scripts/seo-qa-check.js
-// ESM script to run simple SEO QA checks over src/app/**/page.tsx
-// Rules implemented:
-//  - Exactly one <h1> in the body/main area
-//  - Presence of a canonical (heuristic): <link rel="canonical"...> OR metadataBase OR 'canonical' in exported metadata
-//  - Presence of JSON-LD script for Course / FAQPage / BreadcrumbList when applicable (heuristic detection)
-// Usage: node scripts/seo-qa-check.js
-import fs from "fs";
-import path from "path";
+import { spawn } from "node:child_process";
+import { createServer } from "node:net";
+import { once } from "node:events";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { glob } from "glob";
 
 const ROOT = path.join(process.cwd(), "src", "app");
 const GLOB_PATTERNS = [
-  "courses/**/page.tsx",
-  "online-courses/**/page.tsx",
-  "vs/**/page.tsx",
-  "locations/**/page.tsx",
-  "locations/page.tsx",
+  "src/app/courses/**/page.tsx",
+  "src/app/online-courses/**/page.tsx",
+  "src/app/vs/**/page.tsx",
+  "src/app/locations/**/page.tsx",
+  "src/app/locations/page.tsx",
 ];
+export const PRODUCTION_ORIGIN = "https://dooncodingacademy.in";
 
-function warn(msg) {
-  console.log("\x1b[33m%s\x1b[0m", `WARN: ${msg}`);
-}
-function ok(msg) {
-  console.log("\x1b[32m%s\x1b[0m", `OK: ${msg}`);
-}
-function error(msg) {
-  console.log("\x1b[31m%s\x1b[0m", `ERR: ${msg}`);
-}
+function getAttributes(tag) {
+  const attributes = new Map();
+  const attributePattern = /([^\s=/>]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/g;
+  let match;
 
-function countH1sInMain(content) {
-  const mainMatch = content.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
-  const mainContent = mainMatch ? mainMatch[1] : content;
-  const matches = mainContent.match(/<h1\b[^>]*>/gi) || [];
-  return matches.length;
-}
-
-function hasCanonicalHeuristic(content) {
-  // look for <link rel="canonical"...> or metadataBase or export const metadata = { canonical...
-  if (/<link[^>]+rel=(?:'|")canonical(?:'|")/i.test(content)) return true;
-  if (/metadataBase\s*[:=]/i.test(content)) return true;
-  if (/['"`]canonical['"`]\s*[:=]/i.test(content)) return true;
-  if (/export\s+const\s+metadata\s*=/i.test(content) && /canonical/i.test(content)) return true;
-  return false;
-}
-
-function detectJsonLdTypes(content) {
-  // find <script type="application/ld+json"> blocks and search for @type values
-  const types = new Set();
-  const regex = /<script[^>]*type=(?:'|")application\/ld\+json(?:'|")[^>]*>([\s\S]*?)<\/script>/gi;
-  let m;
-  while ((m = regex.exec(content)) !== null) {
-    const jsonText = m[1];
-    if (!jsonText) continue;
-    if (/"@type"\s*:\s*"(Course)"/i.test(jsonText) || /"@type"\s*:\s*Course\b/i.test(jsonText)) types.add("Course");
-    if (/"@type"\s*:\s*"(FAQPage)"/i.test(jsonText) || /"@type"\s*:\s*FAQPage\b/i.test(jsonText)) types.add("FAQPage");
-    if (/"@type"\s*:\s*"(BreadcrumbList)"/i.test(jsonText) || /"@type"\s*:\s*BreadcrumbList\b/i.test(jsonText)) types.add("BreadcrumbList");
-    if (/"@type"\s*:\s*"(EducationalOrganization)"/i.test(jsonText) || /"@type"\s*:\s*EducationalOrganization\b/i.test(jsonText)) types.add("EducationalOrganization");
+  while ((match = attributePattern.exec(tag)) !== null) {
+    attributes.set(match[1].toLowerCase(), match[2] ?? match[3] ?? match[4] ?? "");
   }
-  return Array.from(types);
+
+  return attributes;
 }
 
-function isCoursePage(filepath, content) {
-  // heuristic: path includes /courses/ or /online-courses/
-  if (filepath.includes("/courses/") || filepath.includes("/online-courses/")) return true;
-  // also check explicit Course JSON-LD
-  if (/"@type"\s*:\s*["']Course["']/.test(content)) return true;
+function getCanonicalLinks(html) {
+  const links = [];
+  for (const match of html.matchAll(/<link\b[^>]*>/gi)) {
+    const attributes = getAttributes(match[0]);
+    if ((attributes.get("rel") ?? "").toLowerCase().split(/\s+/).includes("canonical")) {
+      links.push(attributes.get("href") ?? "");
+    }
+  }
+  return links;
+}
+
+function countH1s(html) {
+  const mainMatches = Array.from(html.matchAll(/<main\b[^>]*>([\s\S]*?)<\/main>/gi));
+  const mainContent = mainMatches
+    .map((match) => match[1])
+    .join("");
+  const content = mainMatches.length ? mainContent : html;
+  return Array.from(content.matchAll(/<h1\b[^>]*>/gi)).length;
+}
+
+function getJsonLd(html, issues) {
+  const schemas = [];
+  for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+    const attributes = getAttributes(match[1]);
+    if ((attributes.get("type") ?? "").toLowerCase() !== "application/ld+json") continue;
+
+    try {
+      schemas.push(JSON.parse(match[2]));
+    } catch (error) {
+      issues.push(`invalid JSON-LD script: ${String(error)}`);
+    }
+  }
+  return schemas;
+}
+
+function collectTypes(value, types = new Set()) {
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectTypes(item, types));
+  } else if (value && typeof value === "object") {
+    const type = value["@type"];
+    if (typeof type === "string") types.add(type);
+    if (Array.isArray(type)) type.forEach((item) => types.add(item));
+    Object.values(value).forEach((item) => collectTypes(item, types));
+  }
+  return types;
+}
+
+function hasFaqHeading(html) {
+  for (const match of html.matchAll(/<h[2-6]\b[^>]*>([\s\S]*?)<\/h[2-6]>/gi)) {
+    const text = match[1].replace(/<[^>]*>/g, " ").replace(/<!--.*?-->/g, " ");
+    if (/\bFAQs?\b|frequently asked questions/i.test(text)) return true;
+  }
   return false;
 }
 
-function isLocationPage(filepath) {
-  return filepath.includes("/locations/");
-}
+export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_ORIGIN) {
+  const issues = [];
+  const canonicalLinks = getCanonicalLinks(html);
 
-function isFaqExpected(filepath) {
-  // We expect FAQ JSON-LD on the location pages and maybe explicit /faq route; heuristic:
-  return isLocationPage(filepath) || /\/faq\b/.test(filepath);
-}
-
-async function run() {
-  console.log("Running SEO QA checks...");
-  const results = [];
-  let exitCode = 0;
-
-  for (const pattern of GLOB_PATTERNS) {
-    const files = await glob(path.join(ROOT, pattern), { nodir: true });
-    for (const file of files) {
-      try {
-        const raw = fs.readFileSync(file, "utf8");
-        const rel = path.relative(process.cwd(), file);
-        const h1Count = countH1sInMain(raw);
-        const hasCanonical = hasCanonicalHeuristic(raw);
-        const jsonLdTypes = detectJsonLdTypes(raw);
-
-        const issues = [];
-
-        if (h1Count === 0) {
-          issues.push("missing <h1> in <main>");
-        } else if (h1Count > 1) {
-          issues.push(`multiple <h1> tags in <main> (${h1Count})`);
-        }
-
-        // canonical heuristic: for pages we expect canonical, warn if not found
-        if (!hasCanonical) {
-          issues.push("no canonical detected by heuristic (look for <link rel=\"canonical\"> or metadataBase/export metadata)");
-        }
-
-        // JSON-LD checks: for Course pages, expect Course or EducationalOrganization or BreadcrumbList
-        if (isCoursePage(file, raw)) {
-          if (!jsonLdTypes.includes("Course")) {
-            issues.push("Course page missing Course JSON-LD (heuristic)");
-          }
-        }
-
-        if (isFaqExpected(file)) {
-          // for location pages, expect BreadcrumbList and FAQPage optionally
-            if (!jsonLdTypes.includes("BreadcrumbList")) {
-            issues.push("Missing BreadcrumbList JSON-LD (recommended for location pages)");
-          }
-          // FAQPage is optional, but warn if absent on location pages that explicitly have FAQ markup
-          // We'll only warn if there's an actual 'FAQ' heading in the main content
-          const mainMatch = raw.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
-          const mainText = mainMatch ? mainMatch[1] : raw;
-          if (/faq|frequently asked questions/i.test(mainText) && !jsonLdTypes.includes("FAQPage")) {
-            issues.push("Page contains FAQ section but no FAQPage JSON-LD detected");
-          }
-        }
-
-        if (issues.length) {
-          exitCode = 2;
-          error(`${rel} — ${issues.length} issue(s):`);
-          issues.forEach((it) => console.log(`  - ${it}`));
-          console.log(""); // blank line
-        } else {
-          ok(`${rel} — all checks passed`);
-        }
-
-        results.push({ file: rel, issues });
-      } catch (e) {
-        exitCode = 3;
-        error(`Failed to read/parse ${file}: ${String(e)}`);
+  if (canonicalLinks.length !== 1) {
+    issues.push(`expected exactly one canonical link, found ${canonicalLinks.length}`);
+  } else {
+    try {
+      const canonical = new URL(canonicalLinks[0]);
+      const expected = new URL(route, productionOrigin);
+      if (canonical.origin !== productionOrigin || canonical.href !== expected.href) {
+        issues.push(`canonical must be ${expected.href}, found ${canonical.href}`);
       }
+    } catch {
+      issues.push(`invalid canonical URL: ${canonicalLinks[0]}`);
     }
   }
 
-  // summary
-  const failed = results.filter((r) => r.issues.length);
-  console.log("\nSummary:");
-  if (failed.length) {
-    error(`${failed.length} file(s) failed SEO QA checks.`);
-    failed.forEach(f => console.log(` - ${f.file}: ${f.issues.length} issue(s)`));
-  } else {
-    ok("All scanned files passed SEO QA checks.");
+  const h1Count = countH1s(html);
+  if (h1Count !== 1) issues.push(`expected exactly one <h1> in <main> (or document body), found ${h1Count}`);
+
+  const schemas = getJsonLd(html, issues);
+  const types = collectTypes(schemas);
+  const isCourseDetail =
+    (route.startsWith("/courses/") && route !== "/courses/") ||
+    (route.startsWith("/online-courses/") && route !== "/online-courses/");
+  if (isCourseDetail && !types.has("Course")) {
+    issues.push("course detail is missing Course JSON-LD");
   }
 
-  process.exit(exitCode);
+  const isLocation = route === "/locations" || route.startsWith("/locations/");
+  if (isLocation && !types.has("BreadcrumbList")) {
+    issues.push("location page is missing BreadcrumbList JSON-LD");
+  }
+  if (route.startsWith("/locations/") && hasFaqHeading(html) && !types.has("FAQPage")) {
+    issues.push("visible location FAQ section is missing FAQPage JSON-LD");
+  }
+
+  return issues;
 }
 
-run().catch((e) => {
-  console.error(e);
-  process.exit(10);
-});
+function routeFromPageFile(file) {
+  const relativePath = path.relative(ROOT, file).split(path.sep).join("/");
+  if (!relativePath.endsWith("/page.tsx")) return undefined;
+
+  const segments = relativePath.slice(0, -"/page.tsx".length).split("/");
+  if (segments.some((segment) => segment.startsWith("[") && segment.endsWith("]"))) {
+    return undefined;
+  }
+  return `/${segments.join("/")}`;
+}
+
+export async function getPageRoutes() {
+  const files = new Set();
+  for (const pattern of GLOB_PATTERNS) {
+    (await glob(pattern, { cwd: process.cwd(), nodir: true })).forEach((file) =>
+      files.add(path.resolve(process.cwd(), file))
+    );
+  }
+  const routes = Array.from(files, routeFromPageFile)
+    .filter(Boolean)
+    .sort((left, right) => left.localeCompare(right));
+  if (!routes.includes("/courses") || !routes.includes("/locations")) {
+    throw new Error(`SEO QA route discovery was incomplete: ${routes.join(", ")}`);
+  }
+  return routes;
+}
+
+function extractLinkedRoutes(html, prefix) {
+  const routes = new Set();
+  for (const match of html.matchAll(/\bhref=(["'])(\/[^"']+)\1/gi)) {
+    const pathname = new URL(match[2], PRODUCTION_ORIGIN).pathname;
+    const remainder = pathname.slice(prefix.length + 1);
+    if (pathname.startsWith(`${prefix}/`) && remainder && !remainder.includes("/")) {
+      routes.add(pathname);
+    }
+  }
+  return Array.from(routes).sort();
+}
+
+async function getAvailablePort() {
+  const server = createServer();
+  await new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", resolve);
+  });
+  const address = server.address();
+  if (!address || typeof address === "string") {
+    throw new Error("Could not determine an available port for the production server.");
+  }
+  await new Promise((resolve, reject) => {
+    server.close((error) => (error ? reject(error) : resolve()));
+  });
+  return address.port;
+}
+
+function startProductionServer(port) {
+  const nextCli = path.join(process.cwd(), "node_modules", "next", "dist", "bin", "next");
+  const child = spawn(
+    process.execPath,
+    [nextCli, "start", "--hostname", "127.0.0.1", "--port", String(port)],
+    { cwd: process.cwd(), stdio: ["ignore", "pipe", "pipe"] }
+  );
+  let output = "";
+  child.stdout.on("data", (chunk) => {
+    output = `${output}${chunk}`.slice(-5000);
+  });
+  child.stderr.on("data", (chunk) => {
+    output = `${output}${chunk}`.slice(-5000);
+  });
+  return { child, getOutput: () => output };
+}
+
+async function waitForProductionServer(baseUrl, child, getOutput) {
+  let lastError;
+  for (let attempt = 0; attempt < 60; attempt += 1) {
+    if (child.exitCode !== null || child.signalCode !== null) {
+      throw new Error(`Production server exited before becoming ready.\n${getOutput()}`);
+    }
+    try {
+      const response = await fetch(baseUrl, { signal: AbortSignal.timeout(2000) });
+      if (response.ok) return;
+      lastError = new Error(`Readiness request returned HTTP ${response.status}.`);
+    } catch (error) {
+      lastError = error;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  throw new Error(`Production server did not become ready: ${String(lastError)}\n${getOutput()}`);
+}
+
+async function stopProductionServer(child) {
+  if (child.exitCode !== null || child.signalCode !== null) return;
+  child.kill();
+  await Promise.race([
+    once(child, "exit"),
+    new Promise((resolve) => setTimeout(resolve, 2000)),
+  ]);
+  if (child.exitCode === null && child.signalCode === null) child.kill("SIGKILL");
+}
+
+async function run() {
+  console.log("Running SEO QA against the production build...");
+  const routes = await getPageRoutes();
+  const port = await getAvailablePort();
+  const baseUrl = `http://127.0.0.1:${port}`;
+  const { child, getOutput } = startProductionServer(port);
+  const pageCache = new Map();
+  const failed = [];
+
+  try {
+    await waitForProductionServer(baseUrl, child, getOutput);
+
+    const fetchPage = async (route) => {
+      if (pageCache.has(route)) return pageCache.get(route);
+      const response = await fetch(new URL(route, baseUrl), {
+        signal: AbortSignal.timeout(10000),
+      });
+      if (!response.ok) {
+        const result = { issues: [`route returned HTTP ${response.status}`], html: "" };
+        pageCache.set(route, result);
+        return result;
+      }
+      const result = { issues: [], html: await response.text() };
+      pageCache.set(route, result);
+      return result;
+    };
+
+    const listingRoutes = ["/courses", "/online-courses"];
+    for (const listingRoute of listingRoutes) {
+      if (!routes.includes(listingRoute)) continue;
+      const { html, issues } = await fetchPage(listingRoute);
+      if (issues.length) continue;
+      const prefix = listingRoute;
+      const linkedRoutes = extractLinkedRoutes(html, prefix);
+      if (!linkedRoutes.length) {
+        failed.push({ route: listingRoute, issues: [`no detail links found under ${prefix}/`] });
+      } else {
+        linkedRoutes.forEach((route) => routes.push(route));
+      }
+    }
+
+    for (const route of Array.from(new Set(routes)).sort()) {
+      const { html, issues: responseIssues } = await fetchPage(route);
+      const issues = [...responseIssues, ...analyzeRenderedPage(html, route)];
+      if (issues.length) {
+        failed.push({ route, issues });
+        console.error(`ERR: ${route}`);
+        issues.forEach((issue) => console.error(`  - ${issue}`));
+      } else {
+        console.log(`OK: ${route} — rendered SEO checks passed`);
+      }
+    }
+  } finally {
+    await stopProductionServer(child);
+  }
+
+  console.log("\nSummary:");
+  if (failed.length) {
+    console.error(`ERR: ${failed.length} route(s) failed SEO QA checks.`);
+    process.exitCode = 2;
+    return;
+  }
+  console.log(`OK: All ${new Set(routes).size} scanned route(s) passed SEO QA checks.`);
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  run().catch((error) => {
+    console.error(error);
+    process.exitCode = 10;
+  });
+}

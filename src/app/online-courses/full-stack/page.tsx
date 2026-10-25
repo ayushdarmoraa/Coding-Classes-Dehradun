@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Script from "next/script";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import LearningProgressionNote from "@/components/features/LearningProgressionNote";
@@ -165,18 +164,18 @@ export default function OnlineFullStackPage() {
 
       {/* JSON-LD (Course) */}
       {courseJsonLd && (
-        <Script
+        <script
           id="jsonld-course-online-fullstack"
           type="application/ld+json"
-          strategy="afterInteractive"
+          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
         />
       )}
 
-      <Script
+      <script
         id="breadcrumbs-online-courses-full-stack"
         type="application/ld+json"
-        strategy="afterInteractive"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(
             breadcrumbLd([
