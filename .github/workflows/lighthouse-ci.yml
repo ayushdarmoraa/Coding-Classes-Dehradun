@@ -46,6 +46,7 @@ jobs:
           exit 1
 
       - name: Run Lighthouse checks (treosh/lighthouse-ci-action)
+        id: lighthouse
         uses: treosh/lighthouse-ci-action@v9
         with:
           urls: |
@@ -54,7 +55,13 @@ jobs:
             http://localhost:3000/online-courses/full-stack
             http://localhost:3000/locations/dehradun
           configPath: .lighthouserc.json
-          uploadArtifacts: true
-          artifactName: lighthouse-results
+          uploadArtifacts: false
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Lighthouse reports
+        if: always() && steps.lighthouse.outputs.resultsPath != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results
+          path: ${{ steps.lighthouse.outputs.resultsPath }}
