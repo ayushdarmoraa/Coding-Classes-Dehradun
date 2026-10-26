@@ -223,3 +223,45 @@ test("public Lab routes are server-rendered, canonical, and exclude unpublished 
     false,
   );
 });
+
+test("sitemap includes Lab index and published missions but excludes drafts", async () => {
+  const draft = cloneChallenge(DEFAULT_CHALLENGE);
+  draft.id = "future-draft";
+  draft.slug = "future-draft";
+  draft.status = "draft";
+  const registryWithDraft = validateChallenges([
+    cloneChallenge(DEFAULT_CHALLENGE),
+    draft,
+  ]);
+  const sitemapModule = loadTypeScript("src/app/sitemap.ts", {
+    "@/lib/courses": {
+      getCourses: async () => [],
+      isCourseModeAvailable: () => false,
+    },
+    "@/lib/blog": {
+      getAllBlogPosts: async () => [],
+      getPostLastModified: async () => undefined,
+    },
+    "@/lib/lab/challenges": {
+      getPublishedChallenges: () => getPublishedChallenges(registryWithDraft),
+    },
+    "@/lib/lab/challenge-utils": { getChallengePath },
+    "@/lib/site-config": { SITE: { url: "https://dooncodingacademy.in" } },
+  });
+
+  const entries = await sitemapModule.default();
+  const urls = entries.map(({ url }) => url);
+
+  assert.ok(urls.includes("https://dooncodingacademy.in/lab"));
+  assert.ok(
+    urls.includes(
+      "https://dooncodingacademy.in/lab/javascript/discount-calculation-bug",
+    ),
+  );
+  assert.equal(
+    urls.includes("https://dooncodingacademy.in/lab/javascript/future-draft"),
+    false,
+  );
+  assert.ok(urls.includes("https://dooncodingacademy.in/courses"));
+  assert.ok(urls.includes("https://dooncodingacademy.in/blog"));
+});

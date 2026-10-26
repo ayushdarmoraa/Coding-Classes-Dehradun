@@ -13,6 +13,7 @@ import {
   type LabChallenge,
 } from "./types";
 import { isValidChallengeRouteSegment } from "./challenge-utils";
+import { LAB_ANALYTICS_METADATA } from "./analytics-metadata";
 
 const routeSegmentSchema = z.string().refine(isValidChallengeRouteSegment);
 const functionNameSchema = z.string().regex(/^[A-Za-z_$][A-Za-z0-9_$]{0,63}$/);
@@ -158,13 +159,10 @@ const challengeRegistrySchema = z
 
 const challengeRecords: unknown[] = [
   {
-    id: MISSION_ID,
-    track: "javascript",
-    slug: MISSION_ID,
+    ...LAB_ANALYTICS_METADATA[0],
     title: "Fix the Discount Calculation Bug",
     shortDescription:
       "Repair a JavaScript function so it returns the correct discounted product price.",
-    difficulty: "Beginner",
     estimatedMinutes: { minimum: 5, maximum: 10 },
     language: "javascript",
     tags: ["JavaScript", "Debugging"],
@@ -219,13 +217,11 @@ const challengeRecords: unknown[] = [
       },
     ],
     runner: "discount-calculation-v1",
-    relatedCourseSlug: "full-stack",
     seo: {
       title: "Fix the Discount Calculation Bug | DCA Lab",
       description:
         "A beginner JavaScript debugging challenge: repair a discount calculation and check your solution against objective tests.",
     },
-    status: "published",
   },
 ];
 

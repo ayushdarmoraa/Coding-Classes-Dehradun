@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   trackLabAttempt,
-  trackLabCompletion,
   trackLabHintView,
+  type LabChallengeContext,
 } from "@/lib/analytics";
 import {
   canRevealMissionHint,
@@ -21,6 +21,7 @@ import {
 } from "@/lib/lab/mission";
 import { createDiscountCalculationWorker } from "@/lib/lab/discount-calculation.worker";
 import { createMissionRunController } from "@/lib/lab/mission-run-controller";
+import { LabAnalyticsSession } from "@/lib/lab/analytics-session";
 import {
   clearMissionProgress,
   loadMissionProgress,
@@ -46,8 +47,10 @@ type MissionRunController = ReturnType<typeof createMissionRunController>;
 
 export default function ChallengeWorkspace({
   children,
+  analyticsContext,
 }: {
   children: ReactNode;
+  analyticsContext: LabChallengeContext;
 }) {
   const [code, setCode] = useState(MISSION_STARTER_CODE);
   const [attempts, setAttempts] = useState(0);
@@ -62,6 +65,17 @@ export default function ChallengeWorkspace({
   const [progressReady, setProgressReady] = useState(false);
   const runControllerRef = useRef<MissionRunController | null>(null);
   const clearedProgressSnapshotRef = useRef<string | null>(null);
+  const activeRunTokenRef = useRef<number | null>(null);
+  const activeAttemptNumberRef = useRef(0);
+  const { challengeSlug, track, difficulty } = analyticsContext;
+  const analyticsSession = useMemo(
+    () => new LabAnalyticsSession({ challengeSlug, track, difficulty }),
+    [challengeSlug, track, difficulty],
+  );
+  const handleSkillMapViewed = useCallback(
+    () => analyticsSession.skillMapViewed(),
+    [analyticsSession],
+  );
 
   useEffect(() => {
     const saved = loadMissionProgress();
@@ -116,34 +130,52 @@ export default function ChallengeWorkspace({
       setRunnerError(error);
       setResults(response?.type === "results" ? response.results : null);
 
+      const runToken = activeRunTokenRef.current;
+      activeRunTokenRef.current = null;
+      if (runToken !== null) {
+        const runCompleted =
+          response?.type === "results" &&
+          response.results.length > 0 &&
+          response.results.every((result) => result.status === "passed");
+        analyticsSession.testResult(runToken, runCompleted);
+      }
+
       if (
         response?.type === "results" &&
         response.results.length > 0 &&
         response.results.every((result) => result.status === "passed")
       ) {
-        if (!completed) trackLabCompletion(MISSION_ID);
+        if (!completed) analyticsSession.complete(activeAttemptNumberRef.current);
         setCompleted(true);
       }
     },
-    [completed],
+    [analyticsSession, completed],
   );
   const finishRunRef = useRef(finishRun);
   finishRunRef.current = finishRun;
 
   useEffect(
     () => () => {
+      const runToken = activeRunTokenRef.current;
+      if (runToken !== null) {
+        analyticsSession.cancelRun(runToken);
+        activeRunTokenRef.current = null;
+      }
       runControllerRef.current?.cancel();
     },
-    [],
+    [analyticsSession],
   );
 
   const runTests = useCallback(() => {
     if (!progressReady || runControllerRef.current?.isRunning()) return;
-    setAttempts((count) => count + 1);
+    const attemptNumber = attempts + 1;
+    setAttempts(attemptNumber);
     setRunning(true);
     setRunnerError(null);
     setResults(null);
     trackLabAttempt(MISSION_ID);
+    activeAttemptNumberRef.current = attemptNumber;
+    activeRunTokenRef.current = analyticsSession.run(attemptNumber);
 
     if (!runControllerRef.current) {
       runControllerRef.current = createMissionRunController({
@@ -153,17 +185,20 @@ export default function ChallengeWorkspace({
       });
     }
     runControllerRef.current.start(code);
-  }, [code, progressReady]);
+  }, [analyticsSession, attempts, code, progressReady]);
 
   const showHint = (index: number) => {
     if (!canRevealMissionHint(index, highestHintViewed)) return;
     setHighestHintViewed((level) => getHighestMissionHintViewed(level, index));
     trackLabHintView(MISSION_ID, index + 1);
+    analyticsSession.hintOpen(index + 1);
   };
 
   const handleCodeChange = (nextCode: string) => {
     if (nextCode.length > MAX_MISSION_CODE_LENGTH) {
-      setCode(nextCode.slice(0, MAX_MISSION_CODE_LENGTH));
+      const acceptedCode = nextCode.slice(0, MAX_MISSION_CODE_LENGTH);
+      if (acceptedCode !== code) analyticsSession.firstEdit();
+      setCode(acceptedCode);
       setCodeLimitMessage(
         `The editor limit is ${MAX_MISSION_CODE_LENGTH.toLocaleString()} characters. Extra pasted characters were not kept.`,
       );
@@ -171,12 +206,17 @@ export default function ChallengeWorkspace({
       setHasRun(false);
       return;
     }
+    if (nextCode !== code) analyticsSession.firstEdit();
     setCode(nextCode);
     setCodeLimitMessage("");
   };
 
   const resetMission = () => {
+    const runToken = activeRunTokenRef.current;
+    if (runToken !== null) analyticsSession.cancelRun(runToken);
+    activeRunTokenRef.current = null;
     runControllerRef.current?.cancel();
+    analyticsSession.reset();
     setCode(MISSION_STARTER_CODE);
     setAttempts(0);
     setHighestHintViewed(0);
@@ -271,6 +311,8 @@ export default function ChallengeWorkspace({
           results={results}
           highestHintViewed={highestHintViewed}
           completed={completed}
+          analyticsContext={analyticsContext}
+          onSkillMapViewed={handleSkillMapViewed}
         />
       </div>
     </section>

@@ -1,11 +1,14 @@
-import Link from "next/link";
 import { getCourseBySlug } from "@/lib/courses";
 import type { LabChallenge } from "@/lib/lab/types";
+import type { LabChallengeContext } from "@/lib/analytics";
+import { LabTrackedLink } from "./LabTrackedLink";
 
 export default function MissionBrief({
   challenge,
+  analyticsContext,
 }: {
   challenge: LabChallenge;
+  analyticsContext: LabChallengeContext;
 }) {
   const relatedCourse = challenge.relatedCourseSlug
     ? getCourseBySlug(challenge.relatedCourseSlug)
@@ -71,12 +74,15 @@ export default function MissionBrief({
       {relatedCourse && (
         <p className="mt-4 text-sm text-gray-700">
           Want to explore the related course?{" "}
-          <Link
+          <LabTrackedLink
+            event="course"
+            context={analyticsContext}
+            relatedCourseSlug={relatedCourse.slug}
             href={`/courses/${relatedCourse.slug}`}
             className="font-semibold text-blue-800 underline underline-offset-2 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
           >
             {relatedCourse.shortTitle}
-          </Link>
+          </LabTrackedLink>
         </p>
       )}
     </article>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ChallengeCard from "@/components/lab/ChallengeCard";
+import { LabPageImpression, LabTrackedLink } from "@/components/lab/LabTrackedLink";
 import { getPublishedChallenges } from "@/lib/lab/challenges";
 import { SITE } from "@/lib/site-config";
 
@@ -46,9 +47,19 @@ export default function LabPage() {
     new Set(challenges.flatMap(({ tags }) => tags)),
   );
   const featuredChallenge = challenges[0];
+  const featuredAnalyticsContext = featuredChallenge
+    ? {
+        challengeSlug: featuredChallenge.slug,
+        track: featuredChallenge.track,
+        difficulty: featuredChallenge.difficulty,
+      }
+    : undefined;
 
   return (
     <main className="container mx-auto max-w-6xl px-4 py-14 sm:py-20">
+      {featuredAnalyticsContext && (
+        <LabPageImpression context={featuredAnalyticsContext} />
+      )}
       <header className="max-w-3xl">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
           Doon Coding Academy
@@ -64,13 +75,15 @@ export default function LabPage() {
           Start without signing up: choose a published mission and work through
           its scenario, code and checks.
         </p>
-        {featuredChallenge && (
-          <Link
+        {featuredChallenge && featuredAnalyticsContext && (
+          <LabTrackedLink
+            event="start"
+            context={featuredAnalyticsContext}
             href={`/lab/${featuredChallenge.track}/${featuredChallenge.slug}`}
             className="mt-7 inline-flex min-h-12 items-center justify-center rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
           >
             Start First Challenge
-          </Link>
+          </LabTrackedLink>
         )}
       </header>
 
