@@ -56,6 +56,9 @@ export default function OnlineFullStackPage() {
               Prefer on-campus? See Dehradun Full-Stack
             </Link>
           </p>
+          <p className="mt-3 text-sm text-blue-100">
+            Contact DCA to confirm current online delivery details.
+          </p>
           <LearningProgressionNote className="mt-3 text-blue-100" />
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <Button
@@ -90,24 +93,6 @@ export default function OnlineFullStackPage() {
               </span>
             </div>
           )}
-        </div>
-      </section>
-
-      {/* Key Outcomes / What you learn */}
-      <section className="py-12">
-        <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-6">
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">Course curriculum</h2>
-            <ul className="list-disc ml-5 text-gray-700 space-y-1">
-              {course?.curriculum.map((item) => <li key={item}>{item}</li>)}
-            </ul>
-          </Card>
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">Course outcomes</h2>
-            <ul className="list-disc ml-5 text-gray-700 space-y-1">
-              {course?.outcomes.map((item) => <li key={item}>{item}</li>)}
-            </ul>
-          </Card>
         </div>
       </section>
 

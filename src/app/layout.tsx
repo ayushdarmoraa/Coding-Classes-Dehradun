@@ -177,6 +177,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       // Find closest anchor
                       var a = el && (el.closest ? el.closest('a') : null);
                       if (!a) return;
+                      if (a.getAttribute('data-event')) return;
 
                       var href = a.getAttribute('href') || '';
 

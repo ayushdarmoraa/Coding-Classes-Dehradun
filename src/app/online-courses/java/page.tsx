@@ -49,9 +49,12 @@ export default function JavaOnlinePage() {
             Review the canonical Java course curriculum and details for the confirmed online offering.{" "}
             <Link href="/courses/java" className="underline text-blue-700">Prefer on-campus? See Java in Dehradun</Link>
           </p>
+          <p className="mt-2 text-sm text-gray-600">
+            Contact DCA to confirm current online delivery details.
+          </p>
           <LearningProgressionNote className="mt-3 text-gray-600" />
 
-          <div className="mt-8 grid md:grid-cols-2 gap-6">
+          <div className="mt-8 grid gap-6 md:grid-cols-2">
             <Card className="p-6">
               <h2 className="text-xl font-semibold text-gray-900">At a glance</h2>
               <ul className="mt-3 space-y-2 text-gray-700 text-sm">
@@ -67,6 +70,12 @@ export default function JavaOnlinePage() {
               <h2 className="text-xl font-semibold text-gray-900">What you’ll learn</h2>
               <ul className="mt-3 space-y-2 text-gray-700 text-sm">
                 {course?.outcomes.map((item) => <li key={item}>• {item}</li>)}
+              </ul>
+            </Card>
+            <Card className="p-6">
+              <h2 className="text-xl font-semibold text-gray-900">Prerequisites</h2>
+              <ul className="mt-3 space-y-2 text-gray-700 text-sm">
+                {course?.prerequisites.map((item) => <li key={item}>• {item}</li>)}
               </ul>
             </Card>
           </div>
