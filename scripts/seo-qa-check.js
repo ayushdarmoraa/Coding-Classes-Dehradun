@@ -1,20 +1,40 @@
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import { once } from "node:events";
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { glob } from "glob";
+import matter from "gray-matter";
 
 const ROOT = path.join(process.cwd(), "src", "app");
 const GLOB_PATTERNS = [
   "src/app/courses/**/page.tsx",
   "src/app/online-courses/**/page.tsx",
+  "src/app/blog/page.tsx",
   "src/app/vs/**/page.tsx",
   "src/app/locations/**/page.tsx",
   "src/app/locations/page.tsx",
   "src/app/lab/page.tsx",
 ];
 export const PRODUCTION_ORIGIN = "https://dooncodingacademy.in";
+const BLOG_CONTENT_DIRECTORY = path.join(process.cwd(), "src", "content", "blog");
+const EXCLUDED_BLOG_SLUGS = new Set(["sample-1", "sample-2"]);
+
+export function getPublishedGuideRoutes() {
+  if (!fs.existsSync(BLOG_CONTENT_DIRECTORY)) return [];
+  return fs
+    .readdirSync(BLOG_CONTENT_DIRECTORY)
+    .filter((filename) => /\.(?:md|mdx)$/.test(filename))
+    .filter((filename) => {
+      const slug = filename.replace(/\.mdx?$/, "");
+      if (EXCLUDED_BLOG_SLUGS.has(slug)) return false;
+      const source = fs.readFileSync(path.join(BLOG_CONTENT_DIRECTORY, filename), "utf8");
+      return matter(source).data.draft !== true;
+    })
+    .map((filename) => `/blog/${filename.replace(/\.mdx?$/, "")}`)
+    .sort((left, right) => left.localeCompare(right));
+}
 
 function getAttributes(tag) {
   const attributes = new Map();
@@ -122,16 +142,40 @@ function hasFaqHeading(html) {
   return false;
 }
 
+function hasAccessibleSearchInput(html) {
+  for (const match of html.matchAll(/<input\b[^>]*>/gi)) {
+    const attributes = getAttributes(match[0]);
+    if (attributes.get("name") !== "q") continue;
+    if ((attributes.get("aria-label") ?? "").trim()) return true;
+    const id = attributes.get("id");
+    if (!id) continue;
+    for (const label of html.matchAll(/<label\b([^>]*)>([\s\S]*?)<\/label>/gi)) {
+      if (
+        getAttributes(label[1]).get("for") === id &&
+        label[2].replace(/<[^>]*>/g, " ").trim()
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_ORIGIN) {
   const issues = [];
   const canonicalLinks = getCanonicalLinks(html);
   const isLabIndex = route === "/lab";
   const isLabChallenge = /^\/lab\/[^/]+\/[^/]+$/.test(route);
-  if (isLabIndex || isLabChallenge) {
+  const isBlogIndex = route === "/blog";
+  const isBlogPost = /^\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(route);
+  if (isLabIndex || isLabChallenge || isBlogIndex || isBlogPost) {
     if (!getPageTitle(html)) issues.push("page is missing a non-empty <title>");
     if (!getMetaDescription(html)) {
       issues.push("page is missing a non-empty meta description");
     }
+  }
+  if (isBlogIndex && !hasAccessibleSearchInput(html)) {
+    issues.push("Guides search input must have an accessible label");
   }
 
   if (canonicalLinks.length !== 1) {
@@ -158,6 +202,15 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
     (route.startsWith("/online-courses/") && route !== "/online-courses/");
   if (isCourseDetail && !types.has("Course")) {
     issues.push("course detail is missing Course JSON-LD");
+  }
+  if (isBlogPost && !types.has("BlogPosting")) {
+    issues.push("guide detail is missing BlogPosting JSON-LD");
+  }
+  if (isBlogPost && !types.has("BreadcrumbList")) {
+    issues.push("guide detail is missing BreadcrumbList JSON-LD");
+  }
+  if (isBlogPost && hasFaqHeading(html) && !types.has("FAQPage")) {
+    issues.push("visible guide FAQ section is missing FAQPage JSON-LD");
   }
 
   const isLocation = route === "/locations" || route.startsWith("/locations/");
@@ -201,7 +254,13 @@ export async function getPageRoutes() {
   const routes = Array.from(files, routeFromPageFile)
     .filter(Boolean)
     .sort((left, right) => left.localeCompare(right));
-  if (!routes.includes("/courses") || !routes.includes("/locations") || !routes.includes("/lab")) {
+  routes.push(...getPublishedGuideRoutes());
+  if (
+    !routes.includes("/blog") ||
+    !routes.includes("/courses") ||
+    !routes.includes("/locations") ||
+    !routes.includes("/lab")
+  ) {
     throw new Error(`SEO QA route discovery was incomplete: ${routes.join(", ")}`);
   }
   return routes;
@@ -321,12 +380,11 @@ async function run() {
       if (!routes.includes(listingRoute)) continue;
       const { html, issues } = await fetchPage(listingRoute);
       if (issues.length) continue;
-      const prefix = listingRoute;
-      const linkedRoutes = extractLinkedRoutes(html, prefix, segmentCount);
+      const linkedRoutes = extractLinkedRoutes(html, listingRoute, segmentCount);
       if (!linkedRoutes.length) {
         failed.push({
           route: listingRoute,
-          issues: [`no ${segmentCount}-segment detail links found under ${prefix}/`],
+          issues: [`no ${segmentCount}-segment detail links found under ${listingRoute}/`],
         });
       } else {
         linkedRoutes.forEach((route) => routes.push(route));

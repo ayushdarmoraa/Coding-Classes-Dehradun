@@ -19,11 +19,11 @@ export async function generateMetadata({
   const self = page > 1 ? `${base}/blog/how-to?page=${page}` : `${base}/blog/how-to`;
   const robots = q ? { index: false, follow: true } : undefined;
   return {
-    title: "How-To Tutorials | Doon Coding Academy",
-    description: "Step-by-step tutorials on Full-Stack, Data Science, Python, and Java.",
+    title: "Step-by-Step Guides | Doon Coding Academy",
+    description: "Browse coding Guides that include documented, step-by-step instructions.",
     robots,
     alternates: { canonical: self },
-    openGraph: { title: "How-To Tutorials | Doon Coding Academy", description: "Hands-on guides.", url: self, type: "website" },
+    openGraph: { title: "Step-by-Step Guides | Doon Coding Academy", description: "Browse coding Guides that include documented, step-by-step instructions.", url: self, type: "website" },
   };
 }
 
@@ -72,14 +72,14 @@ export default function HowToIndex({
       <FeedLinks />
       <PrevNextLinks prev={prevUrl} next={nextUrl} />
       <nav className="mb-3 text-sm">
-        <Link href="/blog" className="text-blue-700 hover:underline">Blog</Link>
+        <Link href="/blog" className="text-blue-700 hover:underline">Guides</Link>
         <span> / </span>
         <span className="text-gray-700 font-semibold">How-To</span>
       </nav>
 
-      <h1 className="text-3xl font-bold mb-2">How-To Tutorials</h1>
+      <h1 className="text-3xl font-bold mb-2">Step-by-Step Guides</h1>
       <p className="text-gray-700 mb-6">
-        Step-by-step guides with tools, supplies, time and cost—perfect for beginners and practitioners.
+        Guides with documented steps for following a practical coding process.
       </p>
 
       <form className="mb-6 flex gap-2">
@@ -108,9 +108,10 @@ export default function HowToIndex({
 
       {items.length === 0 ? (
         <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-900">
-          No How-To posts found{q ? " for that search." : "."} Add
-          <code className="mx-1 rounded bg-gray-100 px-1.5 py-0.5">howtoSteps</code>
-          (2+ steps) in frontmatter to include a post here.
+          No step-by-step Guides are available yet{q ? " for that search." : "."}{" "}
+          <Link href="/blog" className="font-semibold underline">
+            Browse all Guides
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -179,7 +180,7 @@ export default function HowToIndex({
                   href={`/blog/${p.slug}`}
                   className="text-blue-700 hover:underline mt-4 inline-block"
                 >
-                  Read Tutorial
+                  Read Guide
                 </Link>
               </article>
             );
