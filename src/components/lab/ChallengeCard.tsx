@@ -1,6 +1,6 @@
-import Link from "next/link";
 import type { LabChallenge } from "@/lib/lab/types";
 import { getChallengePath } from "@/lib/lab/challenge-utils";
+import { LabTrackedLink } from "./LabTrackedLink";
 
 export default function ChallengeCard({
   challenge,
@@ -37,12 +37,18 @@ export default function ChallengeCard({
           </li>
         ))}
       </ul>
-      <Link
+      <LabTrackedLink
+        event="start"
+        context={{
+          challengeSlug: challenge.slug,
+          track: challenge.track,
+          difficulty: challenge.difficulty,
+        }}
         href={getChallengePath(challenge)}
         className="mt-6 inline-flex min-h-11 items-center justify-center rounded-lg bg-blue-700 px-4 py-3 font-semibold text-white hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
       >
         Start challenge
-      </Link>
+      </LabTrackedLink>
     </article>
   );
 }

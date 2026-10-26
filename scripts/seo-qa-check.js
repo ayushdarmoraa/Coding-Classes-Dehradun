@@ -12,6 +12,7 @@ const GLOB_PATTERNS = [
   "src/app/vs/**/page.tsx",
   "src/app/locations/**/page.tsx",
   "src/app/locations/page.tsx",
+  "src/app/lab/page.tsx",
 ];
 export const PRODUCTION_ORIGIN = "https://dooncodingacademy.in";
 
@@ -38,6 +39,21 @@ function getCanonicalLinks(html) {
   return links;
 }
 
+function getPageTitle(html) {
+  const match = html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i);
+  return match?.[1].replace(/<[^>]*>/g, "").trim() ?? "";
+}
+
+function getMetaDescription(html) {
+  for (const match of html.matchAll(/<meta\b[^>]*>/gi)) {
+    const attributes = getAttributes(match[0]);
+    if ((attributes.get("name") ?? "").toLowerCase() === "description") {
+      return attributes.get("content")?.trim() ?? "";
+    }
+  }
+  return "";
+}
+
 function countH1s(html) {
   const mainMatches = Array.from(html.matchAll(/<main\b[^>]*>([\s\S]*?)<\/main>/gi));
   const mainContent = mainMatches
@@ -45,6 +61,30 @@ function countH1s(html) {
     .join("");
   const content = mainMatches.length ? mainContent : html;
   return Array.from(content.matchAll(/<h1\b[^>]*>/gi)).length;
+}
+
+function hasNonEmptyMissionSection(html, heading) {
+  const mainMatches = Array.from(html.matchAll(/<main\b[^>]*>([\s\S]*?)<\/main>/gi));
+  const mainContent = mainMatches.map((match) => match[1]).join("");
+  const sectionPattern = /<section\b[^>]*>([\s\S]*?)<\/section>/gi;
+
+  for (const match of mainContent.matchAll(sectionPattern)) {
+    const headingMatch = Array.from(
+      match[1].matchAll(/<h[2-6]\b[^>]*>([\s\S]*?)<\/h[2-6]>/gi),
+    ).find(
+      (candidate) =>
+        candidate[1].replace(/<[^>]*>/g, " ").trim().toLowerCase() ===
+        heading.toLowerCase(),
+    );
+    if (!headingMatch) continue;
+    const content = match[1]
+      .slice(headingMatch.index + headingMatch[0].length)
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;|&#160;/gi, " ")
+      .trim();
+    if (content) return true;
+  }
+  return false;
 }
 
 function getJsonLd(html, issues) {
@@ -85,6 +125,14 @@ function hasFaqHeading(html) {
 export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_ORIGIN) {
   const issues = [];
   const canonicalLinks = getCanonicalLinks(html);
+  const isLabIndex = route === "/lab";
+  const isLabChallenge = /^\/lab\/[^/]+\/[^/]+$/.test(route);
+  if (isLabIndex || isLabChallenge) {
+    if (!getPageTitle(html)) issues.push("page is missing a non-empty <title>");
+    if (!getMetaDescription(html)) {
+      issues.push("page is missing a non-empty meta description");
+    }
+  }
 
   if (canonicalLinks.length !== 1) {
     issues.push(`expected exactly one canonical link, found ${canonicalLinks.length}`);
@@ -120,6 +168,15 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
     issues.push("visible location FAQ section is missing FAQPage JSON-LD");
   }
 
+  if (isLabChallenge) {
+    if (!hasNonEmptyMissionSection(html, "Mission scenario")) {
+      issues.push("Lab challenge is missing server-rendered mission scenario content");
+    }
+    if (!hasNonEmptyMissionSection(html, "Your objective")) {
+      issues.push("Lab challenge is missing server-rendered mission objective content");
+    }
+  }
+
   return issues;
 }
 
@@ -144,18 +201,23 @@ export async function getPageRoutes() {
   const routes = Array.from(files, routeFromPageFile)
     .filter(Boolean)
     .sort((left, right) => left.localeCompare(right));
-  if (!routes.includes("/courses") || !routes.includes("/locations")) {
+  if (!routes.includes("/courses") || !routes.includes("/locations") || !routes.includes("/lab")) {
     throw new Error(`SEO QA route discovery was incomplete: ${routes.join(", ")}`);
   }
   return routes;
 }
 
-function extractLinkedRoutes(html, prefix) {
+export function extractLinkedRoutes(html, prefix, segmentCount = 1) {
   const routes = new Set();
   for (const match of html.matchAll(/\bhref=(["'])(\/[^"']+)\1/gi)) {
     const pathname = new URL(match[2], PRODUCTION_ORIGIN).pathname;
     const remainder = pathname.slice(prefix.length + 1);
-    if (pathname.startsWith(`${prefix}/`) && remainder && !remainder.includes("/")) {
+    const segments = remainder.split("/");
+    if (
+      pathname.startsWith(`${prefix}/`) &&
+      segments.length === segmentCount &&
+      segments.every((segment) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(segment))
+    ) {
       routes.add(pathname);
     }
   }
@@ -250,15 +312,22 @@ async function run() {
       return result;
     };
 
-    const listingRoutes = ["/courses", "/online-courses"];
-    for (const listingRoute of listingRoutes) {
+    const listingRoutes = [
+      { route: "/courses", segmentCount: 1 },
+      { route: "/online-courses", segmentCount: 1 },
+      { route: "/lab", segmentCount: 2 },
+    ];
+    for (const { route: listingRoute, segmentCount } of listingRoutes) {
       if (!routes.includes(listingRoute)) continue;
       const { html, issues } = await fetchPage(listingRoute);
       if (issues.length) continue;
       const prefix = listingRoute;
-      const linkedRoutes = extractLinkedRoutes(html, prefix);
+      const linkedRoutes = extractLinkedRoutes(html, prefix, segmentCount);
       if (!linkedRoutes.length) {
-        failed.push({ route: listingRoute, issues: [`no detail links found under ${prefix}/`] });
+        failed.push({
+          route: listingRoute,
+          issues: [`no ${segmentCount}-segment detail links found under ${prefix}/`],
+        });
       } else {
         linkedRoutes.forEach((route) => routes.push(route));
       }

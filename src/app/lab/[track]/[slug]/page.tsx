@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ChallengeWorkspace from "@/components/lab/ChallengeWorkspace";
+import { LabChallengeImpression } from "@/components/lab/LabTrackedLink";
 import MissionBrief from "@/components/lab/MissionBrief";
 import { getChallengePath } from "@/lib/lab/challenge-utils";
 import {
@@ -56,9 +57,15 @@ export async function generateMetadata({
 export default function ChallengePage({ params }: ChallengePageProps) {
   const challenge = getChallenge(params.track, params.slug);
   if (!challenge) notFound();
+  const analyticsContext = {
+    challengeSlug: challenge.slug,
+    track: challenge.track,
+    difficulty: challenge.difficulty,
+  };
 
   return (
     <main className="container mx-auto max-w-7xl px-4 py-12 sm:py-16">
+      <LabChallengeImpression context={analyticsContext} />
       <nav aria-label="Breadcrumb" className="mb-3">
         <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-700">
           <li>
@@ -95,12 +102,20 @@ export default function ChallengePage({ params }: ChallengePageProps) {
         {challenge.shortDescription}
       </p>
       {challenge.runner === "discount-calculation-v1" ? (
-        <ChallengeWorkspace>
-          <MissionBrief challenge={challenge} />
+        <ChallengeWorkspace
+          analyticsContext={analyticsContext}
+        >
+          <MissionBrief
+            challenge={challenge}
+            analyticsContext={analyticsContext}
+          />
         </ChallengeWorkspace>
       ) : (
         <>
-          <MissionBrief challenge={challenge} />
+          <MissionBrief
+            challenge={challenge}
+            analyticsContext={analyticsContext}
+          />
           <p className="mt-8 rounded-lg border border-amber-300 bg-amber-50 p-4 text-amber-950">
             This challenge is not available to run yet.
           </p>

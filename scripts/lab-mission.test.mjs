@@ -25,6 +25,9 @@ const challengeRegistry = loadTypeScript("src/lib/lab/challenges.ts", {
   "./mission": mission,
   "./types": loadTypeScript("src/lib/lab/types.ts"),
   "./challenge-utils": loadTypeScript("src/lib/lab/challenge-utils.ts"),
+  "./analytics-metadata": loadTypeScript(
+    "src/lib/lab/analytics-metadata.ts",
+  ),
 });
 const { createSkillMap } = loadTypeScript("src/lib/lab/skill-map.ts", {
   "./mission": mission,
@@ -61,7 +64,7 @@ test("mission route presents the approved scenario, metadata, and learning objec
     [[800, 10, 720], [1000, 20, 800], [500, 0, 500], [200, 100, 0]],
   );
   assert.match(route, /getChallenge\(params\.track, params\.slug\)/);
-  assert.match(route, /MissionBrief challenge=\{challenge\}/);
+  assert.match(route, /<MissionBrief\s+challenge=\{challenge\}/);
   assert.match(route, /notFound\(\)/);
   assert.match(route, /alternates: \{ canonical \}/);
   assert.deepEqual(route.includes("ChallengeWorkspace"), true);

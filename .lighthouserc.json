@@ -6,7 +6,9 @@
         "http://localhost:3000/",
         "http://localhost:3000/courses/full-stack",
         "http://localhost:3000/online-courses/full-stack",
-        "http://localhost:3000/locations/dehradun"
+        "http://localhost:3000/locations/dehradun",
+        "http://localhost:3000/lab",
+        "http://localhost:3000/lab/javascript/discount-calculation-bug"
       ],
       "settings": {
         "chromeFlags": "--no-sandbox",
