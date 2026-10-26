@@ -42,6 +42,9 @@ export default function OnlineCoursesPage() {
             Explore courses with confirmed online delivery. Review each course page for curriculum,
             duration, and package or monthly pricing.
           </p>
+          <p className="mt-3 text-sm text-blue-100">
+            Contact DCA to confirm current online delivery details.
+          </p>
         </div>
   </section>
 

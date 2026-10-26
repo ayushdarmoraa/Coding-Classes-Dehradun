@@ -55,6 +55,12 @@ const Button: React.FC<ButtonProps> = ({
         className={classes}
         target={target}
         rel={rel}
+        {...(event
+          ? {
+              "data-event": event,
+              "data-event-params": JSON.stringify(eventParams || {}),
+            }
+          : {})}
         onClick={handleClick}
       >
         {children}
@@ -70,4 +76,3 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 export default Button;
-

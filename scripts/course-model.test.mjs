@@ -5,13 +5,15 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import ts from "typescript";
 
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const nativeRequire = createRequire(import.meta.url);
 const moduleCache = new Map();
 
-function loadTypeScript(relativePath) {
+function loadTypeScript(relativePath, overrides = {}) {
   const filename = path.resolve(repositoryRoot, relativePath);
   if (moduleCache.has(filename)) return moduleCache.get(filename).exports;
 
@@ -21,14 +23,18 @@ function loadTypeScript(relativePath) {
   const compiled = ts.transpileModule(source, {
     compilerOptions: {
       esModuleInterop: true,
+      jsx: ts.JsxEmit.ReactJSX,
       module: ts.ModuleKind.CommonJS,
       target: ts.ScriptTarget.ES2020,
     },
   }).outputText;
   const localRequire = (specifier) => {
+    if (Object.prototype.hasOwnProperty.call(overrides, specifier)) {
+      return overrides[specifier];
+    }
     if (specifier.startsWith(".")) {
       const dependencyPath = path.resolve(path.dirname(filename), `${specifier}.ts`);
-      return loadTypeScript(path.relative(repositoryRoot, dependencyPath));
+      return loadTypeScript(path.relative(repositoryRoot, dependencyPath), overrides);
     }
     if (specifier === "@/lib/courses") return coursesModule;
     if (specifier === "@/lib/site-config") {
@@ -77,6 +83,148 @@ const { generateCourseSchema, getCourseJsonLd } = schemaModule;
 function cloneCourse(course) {
   return structuredClone(course);
 }
+
+test("course hub groups the canonical courses and applies duration and fee sorting", () => {
+  const { filterAndSortCourses, getCourseLearningPath } = loadTypeScript(
+    "src/lib/course-catalog.ts",
+  );
+  const courses = getCourses();
+
+  assert.deepEqual(
+    courses.map((course) => [course.slug, getCourseLearningPath(course)]),
+    [
+      ["full-stack", "developer"],
+      ["data-science", "data-ai"],
+      ["python", "beginner"],
+      ["java", "beginner"],
+    ],
+  );
+  assert.deepEqual(
+    filterAndSortCourses(courses, "data-ai", "recommended").map(({ slug }) => slug),
+    ["data-science"],
+  );
+  assert.deepEqual(
+    filterAndSortCourses(courses, "all", "duration").map(({ slug }) => slug),
+    ["python", "java", "full-stack", "data-science"],
+  );
+  assert.deepEqual(
+    filterAndSortCourses(courses, "all", "fees").map(({ slug }) => slug),
+    ["python", "java", "full-stack", "data-science"],
+  );
+  assert.deepEqual(
+    filterAndSortCourses(courses, "beginner", "duration").map(({ slug }) => slug),
+    ["python", "java"],
+  );
+});
+
+test("course cards show canonical facts, course and contact links, and only supplied Lab links", () => {
+  const MockCard = ({ children, className }) =>
+    React.createElement("article", { className }, children);
+  const MockButton = ({ children, ...props }) =>
+    React.createElement("a", props, children);
+  const CourseCard = loadTypeScript("src/components/features/CourseCard.tsx", {
+    "@/components/ui/Card": MockCard,
+    "@/components/ui/Button": MockButton,
+    "@/lib/pricing": pricingModule,
+  }).default;
+  const fullStack = getCourseBySlug("full-stack");
+  const python = getCourseBySlug("python");
+  const relatedChallengeHref = "/lab/javascript/discount-calculation-bug";
+
+  const fullStackMarkup = renderToStaticMarkup(
+    React.createElement(CourseCard, { course: fullStack, relatedChallengeHref }),
+  );
+  assert.match(fullStackMarkup, new RegExp(fullStack.description));
+  assert.match(fullStackMarkup, /6 months/);
+  assert.match(fullStackMarkup, /Beginner to Intermediate/);
+  assert.match(fullStackMarkup, /₹25,000 package rate/);
+  assert.match(fullStackMarkup, /href="\/courses\/full-stack"/);
+  assert.match(fullStackMarkup, /View Course/);
+  assert.match(fullStackMarkup, /href="\/lab\/javascript\/discount-calculation-bug"/);
+  assert.match(fullStackMarkup, /Try Related Challenge/);
+  assert.match(fullStackMarkup, /wa\.me\/917037905464/);
+
+  const pythonMarkup = renderToStaticMarkup(
+    React.createElement(CourseCard, { course: python }),
+  );
+  assert.match(pythonMarkup, /href="\/courses\/python"/);
+  assert.doesNotMatch(pythonMarkup, /Try Related Challenge|href="\/lab\//);
+  assert.match(pythonMarkup, /href="https:\/\/wa\.me\/917037905464/);
+});
+
+test("course catalog renders each offering once and ties comparison to the same sorted list", () => {
+  const MockCourseCard = ({ course, relatedChallengeHref }) =>
+    React.createElement(
+      "article",
+      { "data-course": course.slug },
+      React.createElement("a", { href: `/courses/${course.slug}` }, "View Course"),
+      relatedChallengeHref &&
+        React.createElement(
+          "a",
+          { href: relatedChallengeHref },
+          "Try Related Challenge",
+        ),
+    );
+  const CourseCatalog = loadTypeScript(
+    "src/components/features/CourseCatalog.tsx",
+    {
+      "@/components/features/CourseCard": MockCourseCard,
+      "@/lib/course-catalog": loadTypeScript("src/lib/course-catalog.ts"),
+      "@/lib/pricing": pricingModule,
+    },
+  ).default;
+  const markup = renderToStaticMarkup(
+    React.createElement(CourseCatalog, {
+      courses: getCourses(),
+      relatedChallengeHrefs: {
+        "full-stack": "/lab/javascript/discount-calculation-bug",
+      },
+    }),
+  );
+
+  assert.equal((markup.match(/data-course=/g) ?? []).length, 4);
+  for (const course of getCourses()) {
+    assert.equal(
+      (markup.match(new RegExp(`href="/courses/${course.slug}"`, "g")) ?? [])
+        .length,
+      1,
+    );
+    assert.ok(markup.includes(course.outcomes[0].replaceAll("&", "&amp;")));
+  }
+  assert.equal(
+    (markup.match(/href="\/lab\/javascript\/discount-calculation-bug"/g) ?? [])
+      .length,
+    1,
+  );
+  assert.match(markup, /Shortest duration/);
+  assert.match(markup, /Lowest fees/);
+  assert.match(markup, /Data &amp; AI/);
+});
+
+test("course hub controls and server page preserve comparison, routes, FAQs, and contact paths", async () => {
+  const [catalog, page] = await Promise.all([
+    readFile(
+      path.resolve(repositoryRoot, "src/components/features/CourseCatalog.tsx"),
+      "utf8",
+    ),
+    readFile(path.resolve(repositoryRoot, "src/app/courses/page.tsx"), "utf8"),
+  ]);
+  assert.match(catalog, /onClick=\{\(\) => setSortOrder\("duration"\)\}/);
+  assert.match(catalog, /onClick=\{\(\) => setSortOrder\("fees"\)\}/);
+  assert.match(catalog, /onClick=\{\(\) => setPath\(coursePath\.id\)\}/);
+  assert.match(catalog, /filterAndSortCourses\(courses, path, sortOrder\)/);
+  assert.match(catalog, /visibleCourses\.map\(\(course\) =>/);
+  assert.match(catalog, /formatCourseDuration\(course\.duration\)/);
+  assert.match(catalog, /formatCoursePrice\(course\.pricing\)/);
+  assert.match(catalog, /formatCourseModes\(course\)/);
+  assert.match(page, /canonical: `\$\{SITE\.url\}\/courses`/);
+  assert.match(page, /getPublishedChallenges\(\)/);
+  assert.match(page, /getChallengePath\(challenge\)/);
+  assert.match(page, /href="\/lab"/);
+  assert.match(page, /id="faqs"/);
+  assert.match(page, /href="\/contact"/);
+  assert.match(page, /https:\/\/wa\.me\/917037905464/);
+});
 
 test("validates non-negative structured prices", () => {
   const course = cloneCourse(getCourseBySlug("python"));
@@ -357,9 +505,9 @@ test("course display consumers use structured canonical facts", async () => {
     ["src/app/page.tsx", /import \{ SITE \} from "@\/lib\/site-config"/],
     ["src/app/page.tsx", /canonical: `\$\{SITE\.url\}\/`/],
     ["src/components/features/CourseCard.tsx", /SITE\.whatsappUrl/],
-    ["src/app/courses/page.tsx", /formatCourseDuration\(course\.duration\)/],
-    ["src/app/courses/page.tsx", /level: c\.level/],
-    ["src/app/courses/page.tsx", /<td className="px-6 py-4 text-center">\{course\.level\}<\/td>/],
+    ["src/components/features/CourseCatalog.tsx", /formatCourseDuration\(course\.duration\)/],
+    ["src/components/features/CourseCatalog.tsx", /course\.level/],
+    ["src/components/features/CourseCatalog.tsx", /formatCoursePrice\(course\.pricing\)/],
     ["src/app/courses/page.tsx", /canonical: `\$\{SITE\.url\}\/courses`/],
     ["src/app/courses/[slug]/page.tsx", /const url = `\$\{SITE\.url\}\/courses\/\$\{course\.slug\}`/],
     ["src/app/courses/[slug]/page.tsx", /formatCoursePrice\(course\.pricing\)/],
@@ -370,7 +518,7 @@ test("course display consumers use structured canonical facts", async () => {
     ["src/app/online-courses/page.tsx", /href=\{`\/online-courses\/\$\{course\.slug\}`\}/],
     ["src/app/online-courses/page.tsx", /Online Coding Courses in India/],
     ["src/app/online-courses/page.tsx", /confirmed online delivery/],
-    ["src/app/online-courses/data-science/page.tsx", /Data Science &amp; AI Course Details/],
+    ["src/app/online-courses/data-science/page.tsx", /Online Data Science &amp; AI Course in India/],
     ["src/app/online-courses/data-science/page.tsx", /Level: \$\{course\.level\}/],
     ["src/app/online-courses/data-science/page.tsx", /canonical: `\$\{SITE\.url\}\/online-courses\/data-science`/],
     ["src/app/online-courses/data-science/page.tsx", /View Course Details/],
@@ -475,8 +623,11 @@ test("course display consumers use structured canonical facts", async () => {
     path.resolve(repositoryRoot, "src/app/courses/page.tsx"),
     "utf8",
   );
-  assert.match(coursesPage, /courses\.map\(\(course\) => \(/);
-  assert.match(coursesPage, /\{course\.outcomes\[0\]\}/);
+  assert.match(coursesPage, /<CourseCatalog/);
+  assert.match(coursesPage, /Course details and learning path/);
+  assert.match(coursesPage, /Details about class format, assignments, project/);
+  assert.match(coursesPage, /contact us to confirm current details/);
+  assert.match(coursesPage, /Try a coding challenge in DCA Lab/);
   assert.doesNotMatch(
     coursesPage,
     /Portfolio projects on GitHub|Interview prep & guidance|Local mentor support|free consultation|every course includes portfolio-ready work/i,

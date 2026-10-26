@@ -5,7 +5,11 @@ import Link from "next/link";
 import { getCourseBySlug } from "@/lib/courses";
 import { getCourseJsonLd } from "@/lib/schema";
 import { breadcrumbLd } from "@/lib/seo";
-import { formatCourseDuration, formatCoursePrice } from "@/lib/pricing";
+import {
+  formatCourseDuration,
+  formatCourseModes,
+  formatCoursePrice,
+} from "@/lib/pricing";
 import { SITE } from "@/lib/site-config";
 
 const CANONICAL = `${SITE.url}/online-courses/python`;
@@ -48,15 +52,41 @@ export default function OnlinePythonPage() {
       </p>
       <LearningProgressionNote className="mb-6" />
       {course && (
-        <p className="text-sm text-gray-600 mb-6">
-          Level: {course.level} · Duration: {formatCourseDuration(course.duration)} · Fees: {formatCoursePrice(course.pricing)}
-        </p>
+        <>
+          <p className="text-sm text-gray-600 mb-2">
+            Level: {course.level} · Duration: {formatCourseDuration(course.duration)} · Fees: {formatCoursePrice(course.pricing)}
+          </p>
+          <p className="text-sm text-gray-600 mb-6">
+            Confirmed delivery modes: {formatCourseModes(course)}. Contact DCA to confirm current online delivery details.
+          </p>
+        </>
       )}
 
-      <div className="flex gap-3 mb-10">
+      <div className="flex flex-wrap gap-3 mb-10">
         <Button href="/contact" size="lg" variant="primary">Talk to a Mentor</Button>
         <Button href="/courses/python" size="lg" variant="secondary">On-Campus (Dehradun)</Button>
       </div>
+
+      <section className="mb-8 grid gap-6 sm:grid-cols-2">
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Course curriculum</h2>
+          <ul className="list-disc ml-5 text-gray-700 space-y-1">
+            {course?.curriculum.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Prerequisites</h2>
+          <ul className="list-disc ml-5 text-gray-700 space-y-1">
+            {course?.prerequisites.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Course outcomes</h2>
+          <ul className="list-disc ml-5 text-gray-700 space-y-1">
+            {course?.outcomes.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+        </div>
+      </section>
 
       {ld && (
         <script

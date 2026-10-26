@@ -25,7 +25,15 @@ export const TrackedLink: React.FC<TrackedLinkProps> = ({
     try { track(event, eventParams || {}); } catch { /* swallow */ }
   };
   return (
-    <Link {...linkProps} className={className} onClick={handleClick} target={target} rel={rel}>
+    <Link
+      {...linkProps}
+      className={className}
+      data-event={event}
+      data-event-params={JSON.stringify(eventParams || {})}
+      onClick={handleClick}
+      target={target}
+      rel={rel}
+    >
       {children}
     </Link>
   );

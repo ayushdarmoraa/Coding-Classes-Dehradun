@@ -8,9 +8,9 @@ import { breadcrumbLd } from "@/lib/seo";
 import { formatCourseDuration, formatCourseModes, formatCoursePrice } from "@/lib/pricing";
 import { SITE } from "@/lib/site-config";
 
-const TITLE = "Data Science & AI Course Details | Doon Coding Academy";
+const TITLE = "Online Data Science & AI Course in India | Doon Coding Academy";
 const DESC =
-  "Explore the Data Science & AI curriculum, duration, fees, and confirmed delivery modes.";
+  "Explore the online Data Science & AI curriculum, duration, fees, and confirmed delivery.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -42,12 +42,12 @@ export default function OnlineDataSciencePage() {
       <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white pt-10 pb-16">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-5 leading-tight">
-            Data Science &amp; AI Course Details
+            Online Data Science &amp; AI Course in India
             <br />
             <span className="text-blue-200">Curriculum, duration, and fees</span>
           </h1>
           <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto">
-            Review the Data Science &amp; AI curriculum and course details. {" "}
+            Review the curriculum and canonical details for the confirmed online offering.{" "}
             <Link href="/courses/data-science" className="underline text-yellow-200 hover:text-white">View the course page</Link>
           </p>
           <LearningProgressionNote className="mt-3 text-blue-100" />
@@ -70,16 +70,10 @@ export default function OnlineDataSciencePage() {
       <section className="py-12">
         <div className="max-w-5xl mx-auto px-4 grid md:grid-cols-3 gap-6">
           <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
-            <h2 className="text-xl font-semibold mb-2">Who it’s for</h2>
-            <p className="text-gray-700">
-              Learners interested in data analysis, statistics, machine learning, and structured project work.
-            </p>
-          </div>
-          <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
             <h2 className="text-xl font-semibold mb-2">What you’ll learn</h2>
             <ul className="text-gray-700 space-y-1">
-              {course?.curriculum.map((item, index) => (
-                <li key={index}>{item}</li>
+              {course?.curriculum.map((item) => (
+                <li key={item}>{item}</li>
               ))}
             </ul>
           </div>
@@ -90,8 +84,19 @@ export default function OnlineDataSciencePage() {
             </p>
             {course && <p className="mt-2 text-sm text-gray-600">Fees: {formatCoursePrice(course.pricing)}</p>}
           </div>
+          <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+            <h2 className="text-xl font-semibold mb-2">Course outcomes</h2>
+            <ul className="text-gray-700 space-y-1">
+              {course?.outcomes.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
+      <p className="max-w-5xl mx-auto px-4 -mt-6 pb-8 text-sm text-gray-600">
+        Contact DCA to confirm current online delivery details.
+      </p>
 
       {/* Bottom CTA */}
       <section className="pb-12 -mt-4">

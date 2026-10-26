@@ -12,6 +12,8 @@ import LearningProgressionNote from "@/components/features/LearningProgressionNo
 import { getCourseJsonLd } from "@/lib/schema";
 import { formatCourseDuration, formatCourseModes, formatCoursePrice } from "@/lib/pricing";
 import { SITE } from "@/lib/site-config";
+import { getChallengePath } from "@/lib/lab/challenge-utils";
+import { getPublishedChallenges } from "@/lib/lab/challenges";
 
 type Props = { params: { slug: string } };
 
@@ -141,6 +143,9 @@ export default async function CoursePage({ params }: Props) {
   const onlineTarget = isCourseModeAvailable(course, "Online")
     ? ONLINE_TARGETS[slug]
     : undefined;
+  const relatedLabChallenges = getPublishedChallenges().filter(
+    (challenge) => challenge.relatedCourseSlug === course.slug,
+  );
 
   const priceText = formatCoursePrice(course.pricing);
   const durationText = formatCourseDuration(course.duration);
@@ -357,6 +362,34 @@ export default async function CoursePage({ params }: Props) {
           ))}
         </ul>
       </section>
+
+      {relatedLabChallenges.length > 0 && (
+        <section
+          id="related-lab"
+          className="mt-8"
+          aria-labelledby="related-lab-heading"
+        >
+          <h2 id="related-lab-heading" className="text-2xl font-semibold mb-2">
+            Related DCA Lab challenge
+          </h2>
+          <ul className="space-y-3">
+            {relatedLabChallenges.map((challenge) => (
+              <li key={challenge.id} className="rounded-xl border bg-white p-4">
+                <h3 className="font-semibold">{challenge.title}</h3>
+                <p className="mt-1 text-sm text-gray-700">
+                  {challenge.shortDescription}
+                </p>
+                <Link
+                  href={getChallengePath(challenge)}
+                  className="mt-3 inline-flex font-medium text-blue-700 hover:underline"
+                >
+                  Try this challenge
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {onlineTarget && (
         <div className="mt-6">
