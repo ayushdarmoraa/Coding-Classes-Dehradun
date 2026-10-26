@@ -5,6 +5,7 @@ import {
   analyzeRenderedPage,
   extractLinkedRoutes,
   getPageRoutes,
+  getPublishedGuideRoutes,
   PRODUCTION_ORIGIN,
 } from "./seo-qa-check.js";
 
@@ -112,6 +113,41 @@ test("does not require Course schema on the courses listing page", () => {
   assert.deepEqual(analyzeRenderedPage(html, "/courses"), []);
 });
 
+test("validates Guides index metadata, canonical, heading, and accessible search", () => {
+  const html = page(
+    "/blog",
+    [{ "@type": "BreadcrumbList", itemListElement: [] }],
+    `<main>
+      <h1>Guides for Coding Learners</h1>
+      <label for="guide-search">Search Guides</label>
+      <input id="guide-search" name="q">
+    </main>`,
+  );
+  assert.deepEqual(analyzeRenderedPage(html, "/blog"), []);
+});
+
+test("rejects an unlabeled Guides search input", () => {
+  const html = page(
+    "/blog",
+    [],
+    '<main><h1>Guides for Coding Learners</h1><input name="q"></main>',
+  );
+  assert.ok(analyzeRenderedPage(html, "/blog").includes(
+    "Guides search input must have an accessible label",
+  ));
+});
+
+test("requires BlogPosting and breadcrumb schemas on guide detail routes", () => {
+  const html = page("/blog/python-guide", [
+    { "@type": "BlogPosting", headline: "Python Guide" },
+    { "@type": "BreadcrumbList", itemListElement: [] },
+  ]);
+  assert.deepEqual(analyzeRenderedPage(html, "/blog/python-guide"), []);
+  assert.ok(analyzeRenderedPage(page("/blog/python-guide"), "/blog/python-guide").includes(
+    "guide detail is missing BlogPosting JSON-LD",
+  ));
+});
+
 test("requires a breadcrumb on the locations index but no irrelevant FAQ schema", () => {
   const html = page("/locations", [{ "@type": "BreadcrumbList", itemListElement: [] }]);
   assert.deepEqual(analyzeRenderedPage(html, "/locations"), []);
@@ -156,6 +192,7 @@ test("discovers and deduplicates all affected page routes", async () => {
 
   for (const route of [
     "/courses",
+    "/blog",
     "/online-courses",
     "/online-courses/full-stack",
     "/vs/coding-ninjas",
@@ -170,4 +207,21 @@ test("discovers and deduplicates all affected page routes", async () => {
     assert.ok(routes.includes(route), `expected route discovery to include ${route}`);
   }
   assert.equal(routes.filter((route) => route === "/locations").length, 1);
+  assert.deepEqual(
+    getPublishedGuideRoutes(),
+    [
+      "/blog/best-full-stack-course-dehradun-2025",
+      "/blog/best-online-data-science-courses-india",
+      "/blog/coding-classes-dehradun-complete-guide-2025",
+      "/blog/coding-jobs-in-dehradun-2025",
+      "/blog/data-science-course-dehradun-2025",
+      "/blog/java-course-dehradun-2025",
+      "/blog/learn-full-stack-online-roadmap-india-2025",
+      "/blog/live-vs-recorded-coding-classes-india",
+      "/blog/python-course-dehradun-fees-syllabus-jobs-2025",
+      "/blog/visit-dca-campus-dehradun-guide",
+    ],
+  );
+  assert.ok(!routes.includes("/blog/archive"));
+  assert.ok(!routes.includes("/blog/sample-1"));
 });

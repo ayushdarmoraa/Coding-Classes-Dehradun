@@ -13,7 +13,7 @@ Saved: 2025-09-08
 ## A. What carries over vs. what changes (quick reconciler)
 
 Keep:
-- Online-courses section, /vs comparisons, deeper course pages, FAQ expansion, success stories, content velocity (local + national)
+- Online-courses section, /vs comparisons, deeper course pages, FAQ expansion, and verified success evidence
 - Core Web Vitals (CWV) guardrails, redirects cleanup, OG/Twitter metadata, Course & FAQ schema
 
 Fix wording / precision:
@@ -23,7 +23,7 @@ Fix wording / precision:
 Add what was missing:
 - Concrete site architecture, internal link map, and sitemap contract
 - Reusable code patterns (metadata, schema, redirects) with acceptance tests
-- Content factory (templates, briefs, editorial calendar)
+- An editorial review process for accurate, useful Guides connected to relevant learning content
 - Measurement (event & goal map), rollout gates (QA checklists)
 
 ---
@@ -36,8 +36,8 @@ Add what was missing:
 - /online-courses (index) → /online-courses/[slug] (Online emphasis; India-wide)
   - Slugs v1: full-stack, data-science, python, java
 - /vs/[competitor] (comparison hub): v1: coding-ninjas, scaler (add pw-skills later if needed)
-- /locations/dehradun (keep) → later: /locations/[city] content-only “learn online from [City]” landers
-- /blog (+ categories/tags you already use)
+- /locations/dehradun (keep); consider another location page only when it has distinct, verified local information and a clear user need
+- /blog as the existing Guides hub (+ existing categories/tags)
 - /faq, /about, /contact, /testimonials (keep)
 
 2) Internal link map (minimum viable)
@@ -96,27 +96,20 @@ C6) Analytics & events
 
 ---
 
-## D. Content System (“factory”), not just a list
+## D. Useful, Evidence-Led Content
 
-D1) Page templates (copy blocks you can reuse)
-- Home: H1 with “Coding Courses in Dehradun & Online in India”. Why DCA (600–800 words) with bullets (small batches, GenAI in curriculum, projects, placement). Why Online with DCA (300–400 words): live + recording, mentor hours, peer community. Snapshot table (Mode / Duration / Price / Placement rate). 3–4 Success stories (name + role + company + CTC if allowed). FAQ (8–10) mixing local + online questions.
-- /courses/[slug] (offline): H1: “{Course} in Dehradun (On-Campus/Hybrid)” Outcome bullets, Prerequisites, Weekly/Module breakdown (150–200 words per module), What you’ll build (3–5 projects), Placement support, Campus info (map/city). CTA + link to online version.
-- /online-courses/[slug] (online): H1: “Online {Course} in India (Live + Projects)” Mirror offline page but emphasize delivery, schedule, tools, cohort flow, recordings, support, no physical location; link back to offline version.
-- /vs/[competitor]: H1: “Doon Coding Academy vs {Competitor} (2025)” Comparison table (curriculum span, price, format, batch size, placement help, mentor ratio). “Who should pick which?” + CTA to relevant online course.
-- /locations/dehradun: 600–1000 words about learning in Dehradun + transport + campus, plus “If you’re not local: join online cohorts”.
+Prioritize accurate, helpful content over publishing volume. The content system should connect:
 
-D2) Blog clusters (with search intent)
-- Local cluster (2/mo min): “Top Coding Jobs in Dehradun 2025”; “Cost of Learning Programming in Dehradun (Fees, Duration, ROI)”; “Colleges vs Bootcamps in Dehradun: Which suits you?”
-- Online/national cluster (4–6/mo): “Learn Full-Stack Online: Complete Roadmap (India)”; “Best Online Data Science Courses in India (Hands-on & Placement)”; “Live vs Recorded Coding Classes: Pros & Cons (For Indian learners)”; “How to Get Placed After an Online Bootcamp (Portfolio + Interviews)”; “DCA vs Coding Ninjas vs Scaler (2025 Comparison)”; “Top 10 Online Coding Classes in India (Fees, Duration, Outcomes)”
-- Templates: Every post ends with FAQ (3–5 Qs) + CTA to the most relevant online course
+```text
+Courses + Guides + DCA Lab + Projects + Outcomes
+```
 
-D3) Editorial calendar (first 8 weeks)
-- Week 1: Home Why DCA + Why Online; 2 posts (Roadmap FS Online, Dehradun Jobs 2025)
-- Week 2: Publish /online-courses/full-stack + /vs/coding-ninjas; 2 posts (Live vs Recorded, Visit Campus Guide)
-- Week 3: /online-courses/data-science; 2 posts (Best Online DS India, Placement after bootcamp)
-- Week 4: /online-courses/python; 2 posts (Top 10 Online Classes India, Dehradun Fees & ROI)
-- Week 5: /online-courses/java; /vs/scaler; 2 posts (Interview Prep for Bootcamp Grads, Portfolio Guide)
-- Week 6–8: 2–3 posts/week + enrich course pages (projects gallery, outcomes screenshots), begin backlink outreach
+- Keep existing useful Guide URLs and improve them when there is reliable source material or a clear learner problem to solve.
+- Make Guide pages answer the stated question first; course promotion and other calls to action remain secondary.
+- Link a Guide to a course or Lab challenge only when the relationship is verified and the destination is published.
+- Use canonical course records for course facts. Publish projects, testimonials, placement claims, and outcomes only with genuine evidence and required permissions.
+- Do not mass-generate similar articles or expand city pages by default. A new Guide or location page requires a distinct user need, reliable information, and a review for duplication and accuracy.
+- Review content when underlying facts change or an accuracy issue is found; do not impose weekly post quotas or manufacture update dates.
 
 ---
 
@@ -125,7 +118,7 @@ D3) Editorial calendar (first 8 weeks)
 - H1: one per page; contains primary keyword + qualifier (Dehradun/Online India)
 - Meta title: ≤ 60 chars; Meta desc: 140–160 chars with value prop + CTA
 - Alt text: descriptive, not stuffed (tech/tool names okay)
-- Internal links: 3–5 per page pointing to next step (FAQ, relevant course, contact)
+- Internal links: provide useful links to relevant published learning content; do not add unrelated links to meet a quota
 - Avoid duplication: Online page copy ≠ Offline copy (change framing, examples, FAQs)
 - Canonical: each page self-canonical; /online-* and /courses-* are distinct
 
@@ -141,7 +134,7 @@ D3) Editorial calendar (first 8 weeks)
 
 ## G. Off-Page & Authority
 
-- Stage 1 (Weeks 4–8): Education blogs, local news, regional tech communities; pitch “DCA launches national live online cohorts” + data-rich guides (Roadmap FS, DS listicle)
+- Earn relevant mentions by sharing useful, verifiable educational resources and approved product updates; avoid unsupported launch, cohort, or outcome claims.
 - Stage 2 (Months 2–3): “Top bootcamps in India” list inclusions; alumni stories on LinkedIn/Medium (with follow links to DCA)
 - Stage 3 (Month 4+): Partnerships (college clubs, hackathons), scholarship page (link magnet), webinars (embed replays; later YouTube channel)
 
@@ -178,9 +171,10 @@ Sprint 3 (Week 3–5) – Comparisons & Local
 - /vs/scaler (page + internal links)
 - Enrich /locations/dehradun (≥ 800 words; local transport/context; link to online)
 
-Content pipeline (parallel)
-- Week 1–4: 8 posts (list above)
-- Week 5–8: 6–8 posts (interview prep, portfolio, listicles, city-adjacent)
+Content review (ongoing)
+- Maintain and improve existing Guides using reliable sources and learner feedback.
+- Add a Guide only when it addresses a distinct, supported need and offers value beyond existing content.
+- Do not use publishing quotas or city-page expansion as default growth tactics.
 
 ---
 
@@ -262,11 +256,11 @@ Post-deploy
 - Fix redirects duplication → deploy
 - Home upgrades (Why DCA, Why Online, table, FAQ, stories)
 - /online-courses index + Full-Stack page (the biggest national search demand)
-- Two blog posts/week (one national, one local) — start with FS Roadmap + Dehradun Jobs
+- Improve a small number of useful, verified Guides and link them to relevant published courses or Lab challenges
 - /vs/coding-ninjas (captures comparison intent fast)
 - Data Science online page + “Best Online DS India” post
 - Remaining online slugs (Python, Java) + /vs/scaler
-- Outreach wave #1 (pitch roadmap + DS listicle) and keep publishing
+- Pursue relevant outreach around useful Guides and verified product information
 
 ---
 
