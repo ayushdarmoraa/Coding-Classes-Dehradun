@@ -103,8 +103,8 @@ blogModule = loadTypeScript("src/lib/blog.ts", {
       use() {
         return this;
       },
-      async process() {
-        return "<p>Rendered guide content.</p>";
+      async process(content) {
+        return `<p>${content}</p>`;
       },
     }),
   },
@@ -150,6 +150,20 @@ test("published guide listing keeps existing slugs and excludes sample posts", (
   assert.equal(slugs.includes("sample-1"), false);
   assert.equal(slugs.includes("sample-2"), false);
   assert.equal(render(React.createElement(blogPage.default)).includes('href="/blog/how-to"'), false);
+});
+
+test("rendered guide content does not expose raw YAML frontmatter", async () => {
+  const post = await blogModule.getPostHtmlBySlug(
+    "best-full-stack-course-dehradun-2025",
+  );
+
+  assert.ok(post);
+  assert.match(post.html, /Related links/);
+  assert.match(post.html, /^<p>\r?\n## Related links/);
+  assert.doesNotMatch(
+    post.html,
+    /title: "Best Full-Stack Course in Dehradun \(2025 Guide\)"|description: "Compare Full-Stack \(MERN \+ Generative AI\)|date: "2025-09-02"/,
+  );
 });
 
 test("course cross-links require an explicit existing guide link and a canonical course", () => {

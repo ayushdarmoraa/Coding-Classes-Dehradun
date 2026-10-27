@@ -49,8 +49,8 @@ import { formatCourseDuration, formatCoursePrice } from "@/lib/pricing";
           },
           {
             "@type": "Question",
-            "name": "Will I build real projects?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our approach is project-first for all courses." }
+            "name": "What practical work is included in a course?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Contact the academy to confirm the practical work currently included in your chosen course." }
           },
           {
             "@type": "Question",
@@ -134,11 +134,11 @@ export default function FAQPage() {
       },
       {
         "@type": "Question",
-        name: "Will I build real projects and a portfolio?",
+        name: "What practical work is included in a course?",
         acceptedAnswer: {
           "@type": "Answer",
           text:
-            "Yes. Our approach is project-first and you’ll build portfolio-ready work in every course.",
+            "Contact the academy to confirm the practical work currently included in your chosen course.",
         },
       },
       {
@@ -164,7 +164,7 @@ export default function FAQPage() {
         acceptedAnswer: {
           "@type": "Answer",
           text:
-            "We focus on skills and portfolio first, and share opportunities plus guidance on resumes, GitHub, and interviews.",
+            "Contact the academy for current information about internship or placement support.",
         },
       },
       {
@@ -268,11 +268,11 @@ export default function FAQPage() {
           {/* Projects */}
           <details className="group rounded-2xl bg-white ring-1 ring-gray-200 open:ring-blue-700/30 transition">
             <summary className="cursor-pointer list-none select-none p-5 font-semibold text-lg">
-              Will I build real projects and a portfolio?
+              What practical work is included in a course?
             </summary>
             <div className="px-5 pb-5 pt-0 text-gray-700">
-              Yes—our approach is <span className="font-semibold">project-first</span>. You’ll build{" "}
-              <span className="font-semibold">portfolio-ready work</span> in every course to showcase to colleges or employers.
+              Contact the academy to confirm the practical work currently included in your chosen
+              course.
             </div>
           </details>
 
@@ -302,7 +302,7 @@ export default function FAQPage() {
               Do you help with internships or placements?
             </summary>
             <div className="px-5 pb-5 pt-0 text-gray-700">
-              We focus on <span className="font-semibold">skills and portfolio</span> first. We share opportunities and guidance on resumes, GitHub, and interviews.
+              Contact the academy for current information about internship or placement support.
             </div>
           </details>
 

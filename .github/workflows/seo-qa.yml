@@ -26,6 +26,15 @@ jobs:
       - name: Install dev dependencies
         run: npm ci
 
+      - name: Validate blog content
+        run: npm run check:content
+
+      - name: Test blog content validation
+        run: npm run test:content
+
+      - name: Test Guides rendering
+        run: node --test scripts/guides.test.mjs
+
       - name: Test DCA Lab
         run: npm run test:lab
 
