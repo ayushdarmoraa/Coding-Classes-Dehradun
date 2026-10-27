@@ -69,17 +69,29 @@ export function MissionStatus({ storageMessage }: MissionStatusProps) {
 type MissionResultsProps = {
   running: boolean;
   hasRun: boolean;
+  runCancelled: boolean;
   results: MissionTestResult[] | null;
   runnerError: MissionRunnerError | null;
 };
 
-export function MissionResults({ running, hasRun, results, runnerError }: MissionResultsProps) {
+export function MissionResults({
+  running,
+  hasRun,
+  runCancelled,
+  results,
+  runnerError,
+}: MissionResultsProps) {
   const passed = results?.filter((result) => result.status === "passed").length ?? 0;
   return (
     <section aria-labelledby="results-heading" className="rounded-xl border border-gray-200 bg-white p-5">
       <h3 id="results-heading" className="text-lg font-semibold text-gray-900">Test results</h3>
       {!hasRun && <p className="mt-2 text-gray-600">Run the tests to check your function.</p>}
       {running && <p className="mt-2 text-gray-700" role="status" aria-live="polite">Running mission tests…</p>}
+      {runCancelled && (
+        <p className="mt-2 text-gray-700" role="status" aria-live="polite">
+          Execution was canceled because the code changed. Run Tests again to check the latest code.
+        </p>
+      )}
       {!running && hasRun && !runnerError && results && (
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {passed === results.length
