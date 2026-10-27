@@ -1,4 +1,4 @@
-import Link from "next/link";
+import TrackedLink from "@/components/analytics/TrackedLink";
 
 const intents = [
   {
@@ -56,8 +56,10 @@ export default function IntentCards() {
       <ul className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {intents.map((intent) => (
           <li key={intent.href}>
-            <Link
+            <TrackedLink
               href={intent.href}
+              event="cta_home_intent"
+              eventParams={{ intent: intent.number }}
               className="group flex h-full min-h-52 flex-col rounded-xl border border-gray-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-950/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
             >
               <span className="text-sm font-semibold text-blue-700">
@@ -75,7 +77,7 @@ export default function IntentCards() {
                   →
                 </span>
               </span>
-            </Link>
+            </TrackedLink>
           </li>
         ))}
       </ul>

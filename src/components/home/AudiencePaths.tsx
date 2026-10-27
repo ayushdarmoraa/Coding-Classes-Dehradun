@@ -1,4 +1,4 @@
-import Link from "next/link";
+import TrackedLink from "@/components/analytics/TrackedLink";
 
 const paths = [
   {
@@ -54,12 +54,14 @@ export default function AudiencePaths() {
                   {path.description}
                 </p>
               </div>
-              <Link
+              <TrackedLink
                 href={path.href}
+                event="cta_home_audience_path"
+                eventParams={{ path: path.title }}
                 className="mt-5 inline-flex min-h-11 shrink-0 items-center font-semibold text-blue-800 underline decoration-blue-300 underline-offset-4 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 sm:mt-0"
               >
                 {path.action}
-              </Link>
+              </TrackedLink>
             </article>
           </li>
         ))}

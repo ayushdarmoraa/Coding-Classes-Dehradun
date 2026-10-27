@@ -9,6 +9,7 @@ import matter from "gray-matter";
 
 const ROOT = path.join(process.cwd(), "src", "app");
 const GLOB_PATTERNS = [
+  "src/app/page.tsx",
   "src/app/courses/**/page.tsx",
   "src/app/online-courses/**/page.tsx",
   "src/app/blog/page.tsx",
@@ -167,11 +168,12 @@ function hasAccessibleSearchInput(html) {
 export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_ORIGIN) {
   const issues = [];
   const canonicalLinks = getCanonicalLinks(html);
+  const isHomePage = route === "/";
   const isLabIndex = route === "/lab";
   const isLabChallenge = /^\/lab\/[^/]+\/[^/]+$/.test(route);
   const isBlogIndex = route === "/blog";
   const isBlogPost = /^\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(route);
-  if (isLabIndex || isLabChallenge || isBlogIndex || isBlogPost) {
+  if (isHomePage || isLabIndex || isLabChallenge || isBlogIndex || isBlogPost) {
     if (!getPageTitle(html)) issues.push("page is missing a non-empty <title>");
     if (!getMetaDescription(html)) {
       issues.push("page is missing a non-empty meta description");
@@ -228,6 +230,9 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
   if (isBlogPost && hasFaqHeading(html) && !types.has("FAQPage")) {
     issues.push("visible guide FAQ section is missing FAQPage JSON-LD");
   }
+  if (isHomePage && hasFaqHeading(html) && !types.has("FAQPage")) {
+    issues.push("visible homepage FAQ section is missing FAQPage JSON-LD");
+  }
 
   const isLocation = route === "/locations" || route.startsWith("/locations/");
   if (isLocation && !types.has("BreadcrumbList")) {
@@ -251,6 +256,7 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
 
 function routeFromPageFile(file) {
   const relativePath = path.relative(ROOT, file).split(path.sep).join("/");
+  if (relativePath === "page.tsx") return "/";
   if (!relativePath.endsWith("/page.tsx")) return undefined;
 
   const segments = relativePath.slice(0, -"/page.tsx".length).split("/");
@@ -272,6 +278,7 @@ export async function getPageRoutes() {
     .sort((left, right) => left.localeCompare(right));
   routes.push(...getPublishedGuideRoutes());
   if (
+    !routes.includes("/") ||
     !routes.includes("/blog") ||
     !routes.includes("/courses") ||
     !routes.includes("/locations") ||

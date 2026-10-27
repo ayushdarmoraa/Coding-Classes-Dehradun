@@ -11,8 +11,25 @@ import ts from "typescript";
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const require = createRequire(path.join(repositoryRoot, "package.json"));
 const moduleCache = new Map();
+const trackedActions = [];
 const Link = ({ href, children, ...props }) =>
   React.createElement("a", { href, ...props }, children);
+const TrackedLink = ({ href, event, eventParams, children, ...props }) => {
+  trackedActions.push({ href, event, eventParams });
+  return React.createElement("a", { href, ...props }, children);
+};
+const Button = ({
+  href,
+  event,
+  eventParams,
+  children,
+  variant,
+  size,
+  ...props
+}) => {
+  if (event) trackedActions.push({ href, event, eventParams });
+  return React.createElement(href ? "a" : "button", { href, ...props }, children);
+};
 
 function resolveLocalModule(specifier, parentPath) {
   const basePath = specifier.startsWith("@/")
@@ -47,6 +64,12 @@ function loadLocalModule(modulePath) {
 
   const localRequire = (specifier) => {
     if (specifier === "next/link") return { __esModule: true, default: Link };
+    if (specifier === "@/components/analytics/TrackedLink") {
+      return { __esModule: true, default: TrackedLink };
+    }
+    if (specifier === "@/components/ui/Button") {
+      return { __esModule: true, default: Button };
+    }
     if (specifier === "remark") {
       return {
         remark: () => ({
@@ -135,6 +158,11 @@ test("homepage presents one clear value proposition and valid primary actions", 
 
 test("homepage course previews render every canonical course and route", () => {
   assert.equal(courses.length, 4);
+  assert.match(
+    markup,
+    /Advanced coverage is subject to curriculum and instructor validation/,
+  );
+  assert.match(markup, /Delivery availability not confirmed/);
   for (const course of courses) {
     assert.ok(
       markup.includes(escapeHtml(course.title)),
@@ -194,10 +222,68 @@ test("homepage internal destinations resolve and metadata retains canonical SEO"
   assert.equal((markup.match(/id="home-faq-heading"/g) ?? []).length, 1);
 });
 
+test("homepage FAQ structured data matches the visible questions and unconfirmed modes", () => {
+  const schemaMarkup = markup.match(
+    /<script id="home-faq-schema" type="application\/ld\+json">([\s\S]*?)<\/script>/,
+  );
+  assert.ok(schemaMarkup, "Missing server-rendered homepage FAQ JSON-LD");
+
+  const schema = JSON.parse(schemaMarkup[1]);
+  assert.equal(schema["@type"], "FAQPage");
+  assert.deepEqual(
+    schema.mainEntity.map((question) => question.name),
+    [
+      "What delivery options are available?",
+      "Are classes live or recorded?",
+      "Where is your Dehradun campus?",
+      "What are the fees for each course?",
+      "How long are the programs?",
+    ],
+  );
+  assert.match(
+    schema.mainEntity[0].acceptedAnswer.text,
+    /Data Science & AI: Delivery availability not confirmed/,
+  );
+});
+
 test("homepage avoids unsupported placement and fabricated testimonial claims", () => {
   assert.doesNotMatch(
     markup,
     /placement guarantee|guaranteed placement|students placed|salary guarantee|verified student testimonial/i,
   );
   assert.doesNotMatch(markup, /<h[1-6][^>]*>\s*Testimonials\s*<\/h[1-6]>/i);
+});
+
+test("homepage discovery and course actions include attributable analytics events", () => {
+  const events = new Set(trackedActions.map((action) => action.event));
+  for (const event of [
+    "cta_home_try_challenge",
+    "cta_home_explore_courses",
+    "cta_home_view_all_courses",
+    "cta_home_intent",
+    "cta_home_audience_path",
+    "cta_home_lab_start",
+    "cta_home_lab_explore",
+    "cta_home_view_guides",
+    "cta_home_read_guide",
+    "cta_home_course_details",
+  ]) {
+    assert.ok(events.has(event), `Missing homepage analytics event: ${event}`);
+  }
+
+  const courseDetails = trackedActions.filter(
+    (action) => action.event === "cta_home_course_details",
+  );
+  assert.equal(courseDetails.length, courses.length);
+  for (const course of courses) {
+    assert.ok(
+      courseDetails.some(
+        (action) =>
+          action.href === `/courses/${course.slug}` &&
+          action.eventParams.location === "home_course_preview" &&
+          action.eventParams.course_slug === course.slug,
+      ),
+      `Missing analytics context for course ${course.slug}`,
+    );
+  }
 });

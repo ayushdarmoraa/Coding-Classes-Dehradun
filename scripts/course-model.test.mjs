@@ -120,8 +120,20 @@ test("course hub groups the canonical courses and applies duration and fee sorti
 test("course cards show canonical facts, course and contact links, and only supplied Lab links", () => {
   const MockCard = ({ children, className }) =>
     React.createElement("article", { className }, children);
-  const MockButton = ({ children, ...props }) =>
-    React.createElement("a", props, children);
+  const MockButton = ({ children, event, eventParams, ...props }) =>
+    React.createElement(
+      "a",
+      {
+        ...props,
+        ...(event
+          ? {
+              "data-event": event,
+              "data-event-params": JSON.stringify(eventParams || {}),
+            }
+          : {}),
+      },
+      children,
+    );
   const CourseCard = loadTypeScript("src/components/features/CourseCard.tsx", {
     "@/components/ui/Card": MockCard,
     "@/components/ui/Button": MockButton,
@@ -669,7 +681,7 @@ test("course display consumers use structured canonical facts", async () => {
     path.resolve(repositoryRoot, "src/components/faq/HomeFAQ.tsx"),
     "utf8",
   );
-  assert.match(homeFaq, /courses\.map\(\(course, index\)/);
+  assert.match(homeFaq, /const deliveryOptions = courses\.map\(\(course\) =>/);
   assert.match(homeFaq, /formatCourseModes\(course\)/);
   assert.doesNotMatch(homeFaq, /All four courses are available On-Campus, Online, and Hybrid/);
   for (const course of getCourses()) {

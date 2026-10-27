@@ -1,4 +1,4 @@
-import Link from "next/link";
+import TrackedLink from "@/components/analytics/TrackedLink";
 
 export default function LabPreview() {
   return (
@@ -35,18 +35,22 @@ export default function LabPreview() {
           </div>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-          <Link
+          <TrackedLink
             href="/lab/javascript/discount-calculation-bug"
+            event="cta_home_lab_start"
+            eventParams={{ location: "home_lab_preview" }}
             className="inline-flex min-h-11 items-center justify-center rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white transition hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
           >
             Start the challenge
-          </Link>
-          <Link
+          </TrackedLink>
+          <TrackedLink
             href="/lab"
+            event="cta_home_lab_explore"
+            eventParams={{ location: "home_lab_preview" }}
             className="inline-flex min-h-11 items-center justify-center rounded-lg border border-blue-700 bg-white px-5 py-3 font-semibold text-blue-800 transition hover:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
           >
             Explore DCA Lab
-          </Link>
+          </TrackedLink>
         </div>
       </div>
     </section>

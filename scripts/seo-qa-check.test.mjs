@@ -39,6 +39,26 @@ test("validates Lab index metadata, canonical and unique H1 without Course schem
   assert.deepEqual(analyzeRenderedPage(html, "/lab"), []);
 });
 
+test("validates homepage metadata and requires schema for a visible FAQ section", () => {
+  const homepage = page(
+    "/",
+    [{ "@type": "FAQPage", mainEntity: [{ "@type": "Question", name: "Question" }] }],
+    "<main><h1>Homepage</h1><h2>Frequently Asked Questions</h2></main>",
+  );
+  assert.deepEqual(analyzeRenderedPage(homepage, "/"), []);
+
+  const missingFaqSchema = page(
+    "/",
+    [],
+    "<main><h1>Homepage</h1><h2>Frequently Asked Questions</h2></main>",
+  );
+  assert.ok(
+    analyzeRenderedPage(missingFaqSchema, "/").includes(
+      "visible homepage FAQ section is missing FAQPage JSON-LD",
+    ),
+  );
+});
+
 test("requires exactly one semantic main landmark with its page heading inside", () => {
   const missingMain = page("/courses", [], "<div><h1>Courses</h1></div>");
   const missingMainIssues = analyzeRenderedPage(missingMain, "/courses");
@@ -244,6 +264,7 @@ test("discovers and deduplicates all affected page routes", async () => {
   const routes = await getPageRoutes();
 
   for (const route of [
+    "/",
     "/courses",
     "/blog",
     "/online-courses",

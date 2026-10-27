@@ -9,12 +9,14 @@ interface CourseCardProps {
   course: Course;
   featured?: boolean;
   relatedChallengeHref?: string;
+  analyticsLocation?: string;
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({
   course,
   featured = false,
   relatedChallengeHref,
+  analyticsLocation,
 }) => {
   const cardClass = featured ? 'border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white' : '';
   
@@ -57,6 +59,12 @@ const CourseCard: React.FC<CourseCardProps> = ({
       <div className="mt-4 flex flex-wrap gap-2">
         <Button
           href={`/courses/${course.slug}`}
+          event={analyticsLocation ? "cta_home_course_details" : undefined}
+          eventParams={
+            analyticsLocation
+              ? { location: analyticsLocation, course_slug: course.slug }
+              : undefined
+          }
           className="bg-blue-600 text-white hover:bg-blue-700"
         >
           View Course
