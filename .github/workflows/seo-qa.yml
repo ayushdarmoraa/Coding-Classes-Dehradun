@@ -33,7 +33,7 @@ jobs:
         run: npm run test:content
 
       - name: Test Guides rendering
-        run: node --test scripts/guides.test.mjs
+        run: npm run test:guides
 
       - name: Test course source of truth
         run: npm run test:courses
