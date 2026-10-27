@@ -26,5 +26,8 @@ jobs:
       - name: Install dev dependencies
         run: npm ci
 
+      - name: Test DCA Lab and navigation
+        run: npm run test:pr3
+
       - name: Run SEO QA script
         run: node scripts/seo-qa-check.js
