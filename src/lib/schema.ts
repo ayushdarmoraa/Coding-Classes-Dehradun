@@ -49,7 +49,6 @@ export function generateCourseSchema(course: Course) {
     "@type": "Course",
     "name": course.title,
     "description": course.description,
-    ...(course.level ? { educationalLevel: course.level } : {}),
     "provider": {
       "@type": "EducationalOrganization",
       "name": "Doon Coding Academy"
@@ -112,7 +111,6 @@ export function getCourseJsonLd(
     "@id": `${url}#course`,
     name: course.title,
     description: course.description,
-    ...(course.level ? { educationalLevel: course.level } : {}),
     url,
     courseCode: course.slug,
     inLanguage: "en",

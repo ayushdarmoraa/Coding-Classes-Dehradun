@@ -51,7 +51,12 @@ function loadTypeScript(relativePath, overrides = {}) {
     if (specifier === "@/components/features/LearningProgressionNote") {
       return {
         __esModule: true,
-        default: () => React.createElement("p", null, "Learning progression"),
+        default: () =>
+          React.createElement(
+            "p",
+            null,
+            '"Beginner to Advanced" reflects requested wording; advanced coverage is subject to curriculum and instructor validation.',
+          ),
       };
     }
     if (specifier === "@/lib/courses") return coursesModule;
@@ -195,15 +200,23 @@ test("online course index lists the canonical courses and keeps its links", () =
   const page = loadTypeScript("src/app/online-courses/page.tsx");
   const markup = renderToStaticMarkup(page.default());
   const decoded = decodeHtml(markup);
-
+  assert.match(
+    decoded,
+    /advanced coverage is subject to curriculum and instructor validation/i,
+  );
   assert.equal(
     courses.length,
     4,
     "expected the canonical registry to contain four courses",
   );
   for (const course of courses) {
-    assert.ok(decoded.includes(course.title));
-    assert.ok(markup.includes(`href="/online-courses/${course.slug}"`));
+    if (course.modeStatus === "confirmed") {
+      assert.ok(decoded.includes(course.title));
+      assert.ok(markup.includes(`href="/online-courses/${course.slug}"`));
+    } else {
+      assert.equal(decoded.includes(course.title), false);
+      assert.equal(markup.includes(`href="/online-courses/${course.slug}"`), false);
+    }
   }
   assert.equal(
     page.metadata.alternates.canonical,
@@ -220,27 +233,43 @@ test("online detail routes render canonical facts, metadata, schema, and crossli
     const { module: page } = routeModules.get(slug);
     const markup = renderToStaticMarkup(page.default());
     const decoded = decodeHtml(markup);
-    const schema = parseJsonLd(markup, schemaId);
     const canonical = `${siteConfigModule.SITE.url}/online-courses/${slug}`;
+    const hasConfirmedOnlineMode = coursesModule.isCourseModeAvailable(
+      course,
+      "Online",
+    );
 
     const h1 = decoded.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
     assert.ok(h1, `${slug} should render a visible H1`);
-    assert.match(
-      h1[1].replace(/<[^>]+>/g, " "),
-      /online/i,
-      `${slug} should identify its online offering in the visible H1`,
-    );
+    if (hasConfirmedOnlineMode) {
+      assert.match(
+        h1[1].replace(/<[^>]+>/g, " "),
+        /online/i,
+        `${slug} should identify its online offering in the visible H1`,
+      );
+    } else {
+      assert.doesNotMatch(
+        h1[1].replace(/<[^>]+>/g, " "),
+        /online/i,
+        `${slug} should not advertise an unconfirmed online offering`,
+      );
+    }
     assert.ok(decoded.includes(course.level));
     assert.ok(decoded.includes(pricingModule.formatCourseDuration(course.duration)));
     assert.ok(decoded.includes(pricingModule.formatCoursePrice(course.pricing)));
     assert.equal(page.metadata.alternates.canonical, canonical);
-    assert.equal(schema["@type"], "Course");
-    assert.equal(schema.name, course.title);
-    assert.equal(schema.courseCode, course.slug);
-    assert.equal(schema.url, canonical);
-    assert.equal(schema.offers.price, course.pricing.packageRate);
-    assert.equal(schema.timeRequired, `P${course.duration.value}M`);
-    assert.equal(schema.hasCourseInstance[0].courseMode, "Online");
+    if (hasConfirmedOnlineMode) {
+      const schema = parseJsonLd(markup, schemaId);
+      assert.equal(schema["@type"], "Course");
+      assert.equal(schema.name, course.title);
+      assert.equal(schema.courseCode, course.slug);
+      assert.equal(schema.url, canonical);
+      assert.equal(schema.offers.price, course.pricing.packageRate);
+      assert.equal(schema.timeRequired, `P${course.duration.value}M`);
+      assert.equal(schema.hasCourseInstance[0].courseMode, "Online");
+    } else {
+      assert.equal(markup.includes(`id="${schemaId}"`), false);
+    }
     assert.equal(
       parseJsonLd(markup, `breadcrumbs-online-courses-${slug}`)["@type"],
       "BreadcrumbList",
@@ -293,8 +322,9 @@ test("online detail pages render registry-backed sections without repeated or un
       }
     }
     if (slug === "data-science") {
-      assert.match(page.metadata.title, /online/i);
-      assert.match(decoded, /<h1[^>]*>Online Data Science & AI Course in India<br\/>/);
+      assert.doesNotMatch(page.metadata.title, /online/i);
+      assert.match(decoded, /<h1[^>]*>Data Science & AI Course Details<br\/>/);
+      assert.match(decoded, /Delivery availability not confirmed/);
       assert.doesNotMatch(decoded, /Who it.s for|career switchers|structured project work/i);
       for (const fact of course.outcomes) {
         assert.equal(
@@ -303,7 +333,11 @@ test("online detail pages render registry-backed sections without repeated or un
         );
       }
     }
-    assert.ok(parseJsonLd(markup, schemaId));
+    if (coursesModule.isCourseModeAvailable(course, "Online")) {
+      assert.ok(parseJsonLd(markup, schemaId));
+    } else {
+      assert.equal(markup.includes(`id="${schemaId}"`), false);
+    }
     assert.doesNotMatch(
       visibleText,
       /live sessions?|recordings|remote mentorship|mentor support|online community|accountability|project reviews?|project feedback|cohort structure|placement support|employment guarantee|students placed|career switchers/i,

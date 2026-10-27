@@ -113,6 +113,41 @@ test("does not require Course schema on the courses listing page", () => {
   assert.deepEqual(analyzeRenderedPage(html, "/courses"), []);
 });
 
+test("does not require Course schema when delivery availability is unconfirmed", () => {
+  const html = page(
+    "/courses/data-science",
+    [],
+    "<main><h1>Data Science &amp; AI</h1><p>Delivery availability not confirmed</p></main>",
+  );
+  assert.deepEqual(analyzeRenderedPage(html, "/courses/data-science"), []);
+});
+
+test("still requires Course schema on unrelated routes with an availability notice", () => {
+  const html = page(
+    "/courses/python",
+    [],
+    "<main><h1>Python</h1><p>Delivery availability not confirmed</p></main>",
+  );
+  assert.ok(
+    analyzeRenderedPage(html, "/courses/python").includes(
+      "course detail is missing Course JSON-LD",
+    ),
+  );
+});
+
+test("requires Course schema when the availability notice is not visible", () => {
+  const html = page(
+    "/courses/data-science",
+    [],
+    '<main><h1>Data Science &amp; AI</h1><script>const notice = "Delivery availability not confirmed";</script></main>',
+  );
+  assert.ok(
+    analyzeRenderedPage(html, "/courses/data-science").includes(
+      "course detail is missing Course JSON-LD",
+    ),
+  );
+});
+
 test("validates Guides index metadata, canonical, heading, and accessible search", () => {
   const html = page(
     "/blog",

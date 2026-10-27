@@ -136,7 +136,11 @@ test("course cards show canonical facts, course and contact links, and only supp
   );
   assert.match(fullStackMarkup, new RegExp(fullStack.description));
   assert.match(fullStackMarkup, /6 months/);
-  assert.match(fullStackMarkup, /Beginner to Intermediate/);
+  assert.match(fullStackMarkup, /Beginner to Advanced/);
+  assert.match(
+    fullStackMarkup,
+    /Advanced coverage is subject to curriculum and instructor validation/,
+  );
   assert.match(fullStackMarkup, /₹25,000 package rate/);
   assert.match(fullStackMarkup, /href="\/courses\/full-stack"/);
   assert.match(fullStackMarkup, /View Course/);
@@ -259,10 +263,10 @@ test("validates canonical levels while keeping learner progression independent o
   assert.deepEqual(
     courses.map(({ slug, level }) => [slug, level]),
     [
-      ["full-stack", "Beginner to Intermediate"],
-      ["data-science", "Beginner to Intermediate"],
-      ["python", "Beginner to Intermediate"],
-      ["java", "Beginner to Intermediate"],
+      ["full-stack", "Beginner to Advanced"],
+      ["data-science", "Beginner to Advanced"],
+      ["python", "Beginner to Advanced"],
+      ["java", "Beginner to Advanced"],
     ],
   );
   for (const course of courses) {
@@ -330,7 +334,7 @@ test("rejects courses with an empty curriculum", () => {
   assert.throws(() => courseSchema.parse(course));
 });
 
-test("retains canonical course titles, package prices, durations, and confirmed modes", () => {
+test("retains canonical course titles, levels, pricing, durations, and mode status", () => {
   assert.deepEqual(
     getCourses().map(({ slug, title, level, pricing, duration, modes, modeStatus }) => ({
       slug,
@@ -343,10 +347,10 @@ test("retains canonical course titles, package prices, durations, and confirmed 
       modeStatus,
     })),
     [
-      { slug: "full-stack", title: "Full-Stack Development (MERN + Gen AI)", level: "Beginner to Intermediate", packageRate: 25000, monthlyRate: 5000, duration: 6, modes: ["On-Campus", "Online", "Hybrid"], modeStatus: "confirmed" },
-      { slug: "data-science", title: "Data Science & AI", level: "Beginner to Intermediate", packageRate: 30000, monthlyRate: 6000, duration: 6, modes: ["On-Campus", "Online", "Hybrid"], modeStatus: "confirmed" },
-      { slug: "python", title: "Python Programming", level: "Beginner to Intermediate", packageRate: 12000, monthlyRate: 4000, duration: 4, modes: ["On-Campus", "Online", "Hybrid"], modeStatus: "confirmed" },
-      { slug: "java", title: "Java Programming", level: "Beginner to Intermediate", packageRate: 12000, monthlyRate: 4000, duration: 4, modes: ["On-Campus", "Online", "Hybrid"], modeStatus: "confirmed" },
+      { slug: "full-stack", title: "Full-Stack Development (MERN + Gen AI)", level: "Beginner to Advanced", packageRate: 25000, monthlyRate: 5000, duration: 6, modes: ["On-Campus", "Online", "Hybrid"], modeStatus: "confirmed" },
+      { slug: "data-science", title: "Data Science & AI", level: "Beginner to Advanced", packageRate: 30000, monthlyRate: 6000, duration: 6, modes: ["On-Campus", "Online", "Hybrid"], modeStatus: "temporary" },
+      { slug: "python", title: "Python Programming", level: "Beginner to Advanced", packageRate: 12000, monthlyRate: 4000, duration: 4, modes: ["On-Campus", "Online", "Hybrid"], modeStatus: "confirmed" },
+      { slug: "java", title: "Java Programming", level: "Beginner to Advanced", packageRate: 12000, monthlyRate: 4000, duration: 4, modes: ["On-Campus", "Online", "Hybrid"], modeStatus: "confirmed" },
     ],
   );
 });
@@ -358,7 +362,12 @@ test("formats canonical pricing and duration at presentation boundaries", () => 
   assert.equal(formatCoursePrice(python.pricing), "₹12,000 package rate; ₹4,000/month option");
   assert.equal(formatCourseDuration(python.duration), "4 months");
   for (const course of getCourses()) {
-    assert.equal(formatCourseModes(course), "On-Campus / Online / Hybrid");
+    assert.equal(
+      formatCourseModes(course),
+      course.modeStatus === "confirmed"
+        ? "On-Campus / Online / Hybrid"
+        : "Delivery availability not confirmed",
+    );
   }
 });
 
@@ -395,24 +404,26 @@ test("published course guides align DCA pricing and duration with the canonical 
   assert.doesNotMatch(pythonGuide, /DCA.{0,80}(?:6 months|6 mo|₹30,000|₹6,000|₹6k)/i);
 });
 
-test("all four courses expose every confirmed delivery mode", () => {
+test("only owner-confirmed courses expose delivery modes", () => {
   const courses = getCourses();
   assert.equal(courses.length, 4);
-  for (const dataScience of courses) {
+  for (const course of courses.filter(({ slug }) => slug !== "data-science")) {
     for (const mode of ["On-Campus", "Online", "Hybrid"]) {
-      assert.equal(isCourseModeAvailable(dataScience, mode), true);
+      assert.equal(isCourseModeAvailable(course, mode), true);
     }
-    assert.equal(dataScience.modeStatus, "confirmed");
+    assert.equal(course.modeStatus, "confirmed");
   }
+  const dataScience = getCourseBySlug("data-science");
+  assert.equal(dataScience.modeStatus, "temporary");
   for (const mode of ["On-Campus", "Online", "Hybrid"]) {
-    assert.equal(isCourseModeAvailable(getCourseBySlug("data-science"), mode), true);
+    assert.equal(isCourseModeAvailable(dataScience, mode), false);
   }
   assert.equal(isCourseModeAvailable(getCourseBySlug("python"), "Online"), true);
   assert.deepEqual(
     getCourses()
       .filter((course) => isCourseModeAvailable(course, "Online"))
       .map((course) => course.slug),
-    ["full-stack", "data-science", "python", "java"],
+    ["full-stack", "python", "java"],
   );
 });
 
@@ -426,8 +437,12 @@ test("course schemas propagate canonical facts and preserve route variants", () 
       assert.equal(standardSchema.offers.price, course.pricing.packageRate);
       assert.equal(standardSchema.offers.priceCurrency, course.pricing.currency);
       assert.equal(standardSchema.duration, formatCourseDuration(course.duration));
-      assert.equal(standardSchema.educationalLevel, course.level ?? undefined);
-      assert.deepEqual(standardSchema.courseMode, course.modes);
+      assert.equal("educationalLevel" in standardSchema, false);
+      if (course.modeStatus === "confirmed") {
+        assert.deepEqual(standardSchema.courseMode, course.modes);
+      } else {
+        assert.equal("courseMode" in standardSchema, false);
+      }
       assert.equal(standardSchema.offers.description, `${formatCourseDuration(course.duration)} package rate`);
       assert.equal(standardSchema.offers.priceSpecification?.price, course.pricing.monthlyRate);
 
@@ -440,7 +455,7 @@ test("course schemas propagate canonical facts and preserve route variants", () 
       assert.equal(Boolean(onlineSchema), isCourseModeAvailable(course, "Online"));
       if (onCampusSchema) {
         assert.equal(onCampusSchema.name, course.title);
-        assert.equal(onCampusSchema.educationalLevel, course.level ?? undefined);
+        assert.equal("educationalLevel" in onCampusSchema, false);
         assert.equal(onCampusSchema.offers.price, course.pricing.packageRate);
         assert.equal(onCampusSchema.offers.priceSpecification?.price, course.pricing.monthlyRate);
         assert.equal(onCampusSchema.timeRequired, `P${course.duration.value}M`);
@@ -449,7 +464,7 @@ test("course schemas propagate canonical facts and preserve route variants", () 
         assert.equal(onCampusSchema.hasCourseInstance[0].courseMode, "Onsite");
       }
       if (onlineSchema) {
-        assert.equal(onlineSchema.educationalLevel, course.level ?? undefined);
+        assert.equal("educationalLevel" in onlineSchema, false);
         assert.equal(onlineSchema.url, `https://dooncodingacademy.in/online-courses/${course.slug}`);
         assert.equal(
           onlineSchema["@id"],
@@ -518,7 +533,7 @@ test("course display consumers use structured canonical facts", async () => {
     ["src/app/online-courses/page.tsx", /href=\{`\/online-courses\/\$\{course\.slug\}`\}/],
     ["src/app/online-courses/page.tsx", /Online Coding Courses in India/],
     ["src/app/online-courses/page.tsx", /confirmed online delivery/],
-    ["src/app/online-courses/data-science/page.tsx", /Online Data Science &amp; AI Course in India/],
+    ["src/app/online-courses/data-science/page.tsx", /Data Science &amp; AI Course Details/],
     ["src/app/online-courses/data-science/page.tsx", /Level: \$\{course\.level\}/],
     ["src/app/online-courses/data-science/page.tsx", /canonical: `\$\{SITE\.url\}\/online-courses\/data-science`/],
     ["src/app/online-courses/data-science/page.tsx", /View Course Details/],
@@ -632,16 +647,17 @@ test("course display consumers use structured canonical facts", async () => {
     coursesPage,
     /Portfolio projects on GitHub|Interview prep & guidance|Local mentor support|free consultation|every course includes portfolio-ready work/i,
   );
-  assert.doesNotMatch(dataScienceOnline, /Delivery availability has not been confirmed|contact us to confirm/i);
+  assert.match(dataScienceOnline, /Contact the academy to confirm delivery availability/);
   assert.match(dataScienceOnline, /formatCourseModes\(course\)/);
   assert.match(dataScienceOnline, /LearningProgressionNote/);
   assert.match(dataScienceOnline, /getCourseJsonLd\(course, \{ variant: "online"/);
   assert.match(dataScienceOnline, /\{jsonLd && \(/);
-  assert.ok(
+  assert.equal(
     getCourseJsonLd(getCourseBySlug("data-science"), {
       variant: "online",
       pathPrefix: "online-courses",
     }),
+    null,
   );
   const learningNote = await readFile(
     path.resolve(repositoryRoot, "src/components/features/LearningProgressionNote.tsx"),

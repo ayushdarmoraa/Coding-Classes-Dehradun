@@ -4,6 +4,7 @@ export const COURSE_LEVELS = [
   "Beginner",
   "Advanced Beginner",
   "Beginner to Intermediate",
+  "Beginner to Advanced",
   "Intermediate",
 ] as const;
 export const LEARNING_STAGES = [
@@ -60,7 +61,7 @@ const courseRecords: unknown[] = [
     shortTitle: "Full-Stack Development",
     description:
       "Modern full-stack program covering HTML/CSS/JS, React, Node.js, Express, MongoDB, Git/GitHub, deployments, and Gen AI integrations.",
-    level: "Beginner to Intermediate",
+    level: "Beginner to Advanced",
     duration: { value: 6, unit: "months" },
     pricing: { packageRate: 25000, monthlyRate: 5000, currency: "INR" },
     modes: ["On-Campus", "Online", "Hybrid"],
@@ -88,11 +89,11 @@ const courseRecords: unknown[] = [
     shortTitle: "Data Science & AI",
     description:
       "Python for data analysis, statistics, ML algorithms, model evaluation, and practical AI workflows.",
-    level: "Beginner to Intermediate",
+    level: "Beginner to Advanced",
     duration: { value: 6, unit: "months" },
     pricing: { packageRate: 30000, monthlyRate: 6000, currency: "INR" },
     modes: ["On-Campus", "Online", "Hybrid"],
-    modeStatus: "confirmed",
+    modeStatus: "temporary",
     curriculum: [
       "Python, NumPy, Pandas",
       "Data cleaning & visualization",
@@ -115,7 +116,7 @@ const courseRecords: unknown[] = [
     shortTitle: "Python",
     description:
       "Start-to-pro Python: syntax, data structures, OOP, file/JSON work, and small projects.",
-    level: "Beginner to Intermediate",
+    level: "Beginner to Advanced",
     duration: { value: 4, unit: "months" },
     pricing: { packageRate: 12000, monthlyRate: 4000, currency: "INR" },
     modes: ["On-Campus", "Online", "Hybrid"],
@@ -141,7 +142,7 @@ const courseRecords: unknown[] = [
     shortTitle: "Java",
     description:
       "Core Java foundations: syntax, OOP, collections, exceptions, and intro to Spring basics.",
-    level: "Beginner to Intermediate",
+    level: "Beginner to Advanced",
     duration: { value: 4, unit: "months" },
     pricing: { packageRate: 12000, monthlyRate: 4000, currency: "INR" },
     modes: ["On-Campus", "Online", "Hybrid"],

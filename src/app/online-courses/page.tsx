@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getCourses, isCourseModeAvailable } from "@/lib/courses";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import LearningProgressionNote from "@/components/features/LearningProgressionNote";
 import { formatCourseDuration, formatCourseModes, formatCoursePrice } from "@/lib/pricing";
 import { SITE } from "@/lib/site-config";
 
@@ -45,6 +46,7 @@ export default function OnlineCoursesPage() {
           <p className="mt-3 text-sm text-blue-100">
             Contact DCA to confirm current online delivery details.
           </p>
+          <LearningProgressionNote className="mt-3 text-blue-100" />
         </div>
   </section>
 

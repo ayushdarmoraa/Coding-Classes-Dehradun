@@ -8,9 +8,9 @@ import { breadcrumbLd } from "@/lib/seo";
 import { formatCourseDuration, formatCourseModes, formatCoursePrice } from "@/lib/pricing";
 import { SITE } from "@/lib/site-config";
 
-const TITLE = "Online Data Science & AI Course in India | Doon Coding Academy";
+const TITLE = "Data Science & AI Course Details | Doon Coding Academy";
 const DESC =
-  "Explore the online Data Science & AI curriculum, duration, fees, and confirmed delivery.";
+  "Explore the Data Science & AI curriculum, duration, and fees. Contact the academy to confirm delivery availability.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -42,12 +42,12 @@ export default function OnlineDataSciencePage() {
       <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white pt-10 pb-16">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-5 leading-tight">
-            Online Data Science &amp; AI Course in India
+            Data Science &amp; AI Course Details
             <br />
             <span className="text-blue-200">Curriculum, duration, and fees</span>
           </h1>
           <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto">
-            Review the curriculum and canonical details for the confirmed online offering.{" "}
+            Review the curriculum and canonical details. Contact the academy to confirm delivery availability.{" "}
             <Link href="/courses/data-science" className="underline text-yellow-200 hover:text-white">View the course page</Link>
           </p>
           <LearningProgressionNote className="mt-3 text-blue-100" />
@@ -95,7 +95,7 @@ export default function OnlineDataSciencePage() {
         </div>
       </section>
       <p className="max-w-5xl mx-auto px-4 -mt-6 pb-8 text-sm text-gray-600">
-        Contact DCA to confirm current online delivery details.
+        Contact DCA to confirm current delivery details.
       </p>
 
       {/* Bottom CTA */}

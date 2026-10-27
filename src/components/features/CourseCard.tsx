@@ -35,6 +35,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
             </span>
           )}
         </div>
+        <p className="mt-1 text-xs text-gray-600">
+          Advanced coverage is subject to curriculum and instructor validation.
+        </p>
         <p className="mt-3 text-sm font-semibold text-gray-800">
           Fees: {formatCoursePrice(course.pricing)}
         </p>
