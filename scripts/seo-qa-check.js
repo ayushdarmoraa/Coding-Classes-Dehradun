@@ -138,6 +138,94 @@ function collectTypes(value, types = new Set()) {
   return types;
 }
 
+function findSchemasByType(value, expectedType, schemas = []) {
+  if (Array.isArray(value)) {
+    value.forEach((item) => findSchemasByType(item, expectedType, schemas));
+  } else if (value && typeof value === "object") {
+    const type = value["@type"];
+    if (
+      type === expectedType ||
+      (Array.isArray(type) && type.includes(expectedType))
+    ) {
+      schemas.push(value);
+    }
+    Object.values(value).forEach((item) =>
+      findSchemasByType(item, expectedType, schemas),
+    );
+  }
+  return schemas;
+}
+
+function getVisibleLabBreadcrumb(html) {
+  const breadcrumbNavigations = Array.from(html.matchAll(/<nav\b([^>]*)>([\s\S]*?)<\/nav>/gi))
+    .filter((match) => getAttributes(match[1]).get("aria-label") === "Breadcrumb");
+  if (breadcrumbNavigations.length !== 1) return undefined;
+
+  const navigation = breadcrumbNavigations[0][2];
+  const links = Array.from(navigation.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi))
+    .map((match) => ({
+      href: getAttributes(match[1]).get("href"),
+      label: match[2].replace(/<[^>]*>/g, " ").trim(),
+    }));
+  const currentPage = Array.from(
+    navigation.matchAll(/<span\b([^>]*)>([\s\S]*?)<\/span>/gi),
+  ).find((match) => getAttributes(match[1]).get("aria-current") === "page");
+
+  return {
+    links,
+    currentLabel: currentPage?.[2].replace(/<[^>]*>/g, " ").trim(),
+  };
+}
+
+function hasMatchingLabBreadcrumb(html, route, canonical, schemas) {
+  const visible = getVisibleLabBreadcrumb(html);
+  if (
+    !visible ||
+    visible.links.length !== 2 ||
+    visible.links[0].href !== "/" ||
+    visible.links[0].label !== "Home" ||
+    visible.links[1].href !== "/lab" ||
+    visible.links[1].label !== "DCA Lab"
+  ) {
+    return false;
+  }
+
+  const heading = html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1]
+    ?.replace(/<[^>]*>/g, " ")
+    .trim();
+  if (!heading || visible.currentLabel !== heading) return false;
+
+  const breadcrumbs = findSchemasByType(schemas, "BreadcrumbList");
+  if (
+    breadcrumbs.length !== 1 ||
+    breadcrumbs[0]["@context"] !== "https://schema.org" ||
+    !Array.isArray(breadcrumbs[0].itemListElement)
+  ) {
+    return false;
+  }
+
+  const items = breadcrumbs[0].itemListElement;
+  const expected = [
+    { position: 1, name: "Home", url: new URL("/", PRODUCTION_ORIGIN).href },
+    { position: 2, name: "DCA Lab", url: new URL("/lab", PRODUCTION_ORIGIN).href },
+    { position: 3, name: heading, url: new URL(route, PRODUCTION_ORIGIN).href },
+  ];
+  return (
+    items.length === expected.length &&
+    items.every((item, index) => {
+      const itemUrl =
+        typeof item?.item === "string" ? item.item : item?.item?.["@id"];
+      return (
+        item?.["@type"] === "ListItem" &&
+        item.position === expected[index].position &&
+        item.name === expected[index].name &&
+        itemUrl === expected[index].url &&
+        (index !== expected.length - 1 || itemUrl === canonical)
+      );
+    })
+  );
+}
+
 function hasFaqHeading(html) {
   for (const match of html.matchAll(/<h[2-6]\b[^>]*>([\s\S]*?)<\/h[2-6]>/gi)) {
     const text = match[1].replace(/<[^>]*>/g, " ").replace(/<!--.*?-->/g, " ");
@@ -248,6 +336,19 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
     }
     if (!hasNonEmptyMissionSection(html, "Your objective")) {
       issues.push("Lab challenge is missing server-rendered mission objective content");
+    }
+    if (!getVisibleLabBreadcrumb(html)) {
+      issues.push("Lab challenge is missing its visible breadcrumb");
+    }
+    if (!types.has("BreadcrumbList")) {
+      issues.push("Lab challenge is missing BreadcrumbList JSON-LD");
+    } else if (
+      canonicalLinks.length === 1 &&
+      !hasMatchingLabBreadcrumb(html, route, canonicalLinks[0], schemas)
+    ) {
+      issues.push(
+        "Lab challenge BreadcrumbList does not match the visible breadcrumb and canonical route",
+      );
     }
   }
 

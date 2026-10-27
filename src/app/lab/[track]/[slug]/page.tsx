@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Fragment } from "react";
 import { notFound } from "next/navigation";
 import ChallengeWorkspace from "@/components/lab/ChallengeWorkspace";
 import { LabChallengeImpression } from "@/components/lab/LabTrackedLink";
 import MissionBrief from "@/components/lab/MissionBrief";
+import { breadcrumbLd } from "@/lib/seo";
 import { getChallengePath } from "@/lib/lab/challenge-utils";
 import {
   getChallenge,
@@ -57,42 +59,48 @@ export async function generateMetadata({
 export default function ChallengePage({ params }: ChallengePageProps) {
   const challenge = getChallenge(params.track, params.slug);
   if (!challenge) notFound();
+  const challengePath = getChallengePath(challenge);
   const analyticsContext = {
     challengeSlug: challenge.slug,
     track: challenge.track,
     difficulty: challenge.difficulty,
   };
+  const breadcrumbItems: Array<{ name: string; href: string; current?: boolean }> = [
+    { name: "Home", href: "/" },
+    { name: "DCA Lab", href: "/lab" },
+    { name: challenge.title, href: challengePath, current: true },
+  ];
+  const breadcrumbJsonLd = breadcrumbLd(
+    breadcrumbItems.map(({ name, href }) => ({
+      name,
+      url: `${SITE.url}${href}`,
+    })),
+  );
 
   return (
     <main className="container mx-auto max-w-7xl px-4 py-12 sm:py-16">
       <LabChallengeImpression context={analyticsContext} />
       <nav aria-label="Breadcrumb" className="mb-3">
         <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-700">
-          <li>
-            <Link
-              href="/"
-              className="rounded-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
-            >
-              Home
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <Link
-              href="/lab"
-              className="rounded-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
-            >
-              DCA Lab
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>{challenge.language === "javascript" ? "JavaScript" : challenge.track}</li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <span aria-current="page" className="font-semibold text-gray-950">
-              {challenge.title}
-            </span>
-          </li>
+          {breadcrumbItems.map(({ name, href, current }, index) => (
+            <Fragment key={name}>
+              {index > 0 && <li aria-hidden="true">/</li>}
+              <li>
+                {current ? (
+                  <span aria-current="page" className="font-semibold text-gray-950">
+                    {name}
+                  </span>
+                ) : (
+                  <Link
+                    href={href}
+                    className="rounded-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+                  >
+                    {name}
+                  </Link>
+                )}
+              </li>
+            </Fragment>
+          ))}
         </ol>
       </nav>
       <h1 className="text-3xl font-bold text-gray-950 sm:text-4xl">
@@ -121,6 +129,12 @@ export default function ChallengePage({ params }: ChallengePageProps) {
           </p>
         </>
       )}
+      <script
+        id="lab-challenge-breadcrumb-jsonld"
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
     </main>
   );
 }

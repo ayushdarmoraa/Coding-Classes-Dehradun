@@ -78,19 +78,106 @@ test("requires exactly one semantic main landmark with its page heading inside",
 });
 
 test("validates server-rendered mission scenario and objective without Course schema", () => {
+  const route = "/lab/javascript/discount-calculation-bug";
+  const title = "Fix the Discount Calculation Bug";
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${PRODUCTION_ORIGIN}/` },
+      { "@type": "ListItem", position: 2, name: "DCA Lab", item: `${PRODUCTION_ORIGIN}/lab` },
+      { "@type": "ListItem", position: 3, name: title, item: `${PRODUCTION_ORIGIN}${route}` },
+    ],
+  };
   const html = page(
-    "/lab/javascript/discount-calculation-bug",
-    [],
+    route,
+    [breadcrumb],
     `<main>
-      <h1>Fix the Discount Calculation Bug</h1>
+      <nav aria-label="Breadcrumb"><ol>
+        <li><a href="/">Home</a></li>
+        <li><a href="/lab">DCA Lab</a></li>
+        <li><span aria-current="page">${title}</span></li>
+      </ol></nav>
+      <h1>${title}</h1>
       <article>
         <section><h2>Mission scenario</h2><p>An online store has a discount calculator.</p></section>
         <section><h2>Your objective</h2><p>Fix calculateTotal to return the correct price.</p></section>
       </article>
     </main>`,
   );
+  assert.deepEqual(analyzeRenderedPage(html, route), []);
+});
+
+test("validates canonical and matching visible breadcrumb for registry-driven Lab routes", () => {
+  const route = "/lab/javascript/discount-calculation-bug";
+  const title = "Fix the Discount Calculation Bug";
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${PRODUCTION_ORIGIN}/` },
+      { "@type": "ListItem", position: 2, name: "DCA Lab", item: `${PRODUCTION_ORIGIN}/lab` },
+      { "@type": "ListItem", position: 3, name: title, item: `${PRODUCTION_ORIGIN}${route}` },
+    ],
+  };
+  const body = `<main>
+    <nav aria-label="Breadcrumb"><ol>
+      <li><a href="/">Home</a></li>
+      <li><a href="/lab">DCA Lab</a></li>
+      <li><span aria-current="page">${title}</span></li>
+    </ol></nav>
+    <h1>${title}</h1>
+    <section><h2>Mission scenario</h2><p>Scenario text.</p></section>
+    <section><h2>Your objective</h2><p>Objective text.</p></section>
+  </main>`;
+
+  assert.deepEqual(analyzeRenderedPage(page(route, [breadcrumb], body), route), []);
+
+  const missingBreadcrumb = analyzeRenderedPage(
+    page(route, [], body.replace(/<nav[\s\S]*?<\/nav>/, "")),
+    route,
+  );
+  assert.ok(missingBreadcrumb.includes("Lab challenge is missing its visible breadcrumb"));
+  assert.ok(missingBreadcrumb.includes("Lab challenge is missing BreadcrumbList JSON-LD"));
+
+  const mismatchedBreadcrumb = {
+    ...breadcrumb,
+    itemListElement: breadcrumb.itemListElement.map((item, index) =>
+      index === 2 ? { ...item, item: `${PRODUCTION_ORIGIN}/lab/another-mission` } : item,
+    ),
+  };
+  assert.ok(
+    analyzeRenderedPage(page(route, [mismatchedBreadcrumb], body), route).includes(
+      "Lab challenge BreadcrumbList does not match the visible breadcrumb and canonical route",
+    ),
+  );
+});
+
+test("validates BreadcrumbList data on another registry-driven Lab route shape", () => {
+  const route = "/lab/python/debug-loop-boundary";
+  const title = "Debug the Loop Boundary";
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${PRODUCTION_ORIGIN}/` },
+      { "@type": "ListItem", position: 2, name: "DCA Lab", item: `${PRODUCTION_ORIGIN}/lab` },
+      { "@type": "ListItem", position: 3, name: title, item: `${PRODUCTION_ORIGIN}${route}` },
+    ],
+  };
+  const body = `<main>
+    <nav aria-label="Breadcrumb"><ol>
+      <li><a href="/">Home</a></li>
+      <li><a href="/lab">DCA Lab</a></li>
+      <li><span aria-current="page">${title}</span></li>
+    </ol></nav>
+    <h1>${title}</h1>
+    <section><h2>Mission scenario</h2><p>Scenario text.</p></section>
+    <section><h2>Your objective</h2><p>Objective text.</p></section>
+  </main>`;
+
   assert.deepEqual(
-    analyzeRenderedPage(html, "/lab/javascript/discount-calculation-bug"),
+    analyzeRenderedPage(page(route, [breadcrumb], body), route),
     [],
   );
 });

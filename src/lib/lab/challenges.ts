@@ -220,7 +220,7 @@ const challengeRecords: unknown[] = [
     seo: {
       title: "Fix the Discount Calculation Bug | DCA Lab",
       description:
-        "A beginner JavaScript debugging challenge: repair a discount calculation and check your solution against objective tests.",
+        "A beginner JavaScript debugging mission about calculating a discounted product total.",
     },
   },
 ];
