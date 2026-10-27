@@ -59,6 +59,7 @@ export default function ChallengeWorkspace({
   const [results, setResults] = useState<MissionTestResult[] | null>(null);
   const [runnerError, setRunnerError] = useState<MissionRunnerError | null>(null);
   const [running, setRunning] = useState(false);
+  const [runCancelled, setRunCancelled] = useState(false);
   const [hasRun, setHasRun] = useState(false);
   const [storageMessage, setStorageMessage] = useState("");
   const [codeLimitMessage, setCodeLimitMessage] = useState("");
@@ -126,6 +127,7 @@ export default function ChallengeWorkspace({
   const finishRun = useCallback(
     (response: MissionWorkerResponse | null, error: MissionRunnerError | null) => {
       setRunning(false);
+      setRunCancelled(false);
       setHasRun(true);
       setRunnerError(error);
       setResults(response?.type === "results" ? response.results : null);
@@ -171,6 +173,7 @@ export default function ChallengeWorkspace({
     const attemptNumber = attempts + 1;
     setAttempts(attemptNumber);
     setRunning(true);
+    setRunCancelled(false);
     setRunnerError(null);
     setResults(null);
     trackLabAttempt(MISSION_ID);
@@ -195,20 +198,28 @@ export default function ChallengeWorkspace({
   };
 
   const handleCodeChange = (nextCode: string) => {
-    if (nextCode.length > MAX_MISSION_CODE_LENGTH) {
-      const acceptedCode = nextCode.slice(0, MAX_MISSION_CODE_LENGTH);
-      if (acceptedCode !== code) analyticsSession.firstEdit();
+    const acceptedCode = nextCode.slice(0, MAX_MISSION_CODE_LENGTH);
+    const wasTruncated = nextCode.length > MAX_MISSION_CODE_LENGTH;
+    if (acceptedCode !== code) {
+      if (runControllerRef.current?.isRunning()) {
+        const runToken = activeRunTokenRef.current;
+        if (runToken !== null) analyticsSession.cancelRun(runToken);
+        activeRunTokenRef.current = null;
+        runControllerRef.current.cancel();
+        setRunning(false);
+        setRunCancelled(true);
+      }
+      analyticsSession.firstEdit();
       setCode(acceptedCode);
-      setCodeLimitMessage(
-        `The editor limit is ${MAX_MISSION_CODE_LENGTH.toLocaleString()} characters. Extra pasted characters were not kept.`,
-      );
       setResults(null);
+      setRunnerError(null);
       setHasRun(false);
-      return;
     }
-    if (nextCode !== code) analyticsSession.firstEdit();
-    setCode(nextCode);
-    setCodeLimitMessage("");
+    setCodeLimitMessage(
+      wasTruncated
+        ? `The editor limit is ${MAX_MISSION_CODE_LENGTH.toLocaleString()} characters. Extra pasted characters were not kept.`
+        : "",
+    );
   };
 
   const resetMission = () => {
@@ -225,6 +236,7 @@ export default function ChallengeWorkspace({
     setRunnerError(null);
     setCodeLimitMessage("");
     setRunning(false);
+    setRunCancelled(false);
     setHasRun(false);
     clearedProgressSnapshotRef.current = JSON.stringify([
       MISSION_STARTER_CODE,
@@ -296,6 +308,7 @@ export default function ChallengeWorkspace({
         <MissionResults
           running={running}
           hasRun={hasRun}
+          runCancelled={runCancelled}
           results={results}
           runnerError={runnerError}
         />

@@ -1241,7 +1241,7 @@ test("workspace wires persistence, result announcements, and interruptible reset
   assert.match(workspace, /analyticsSession\.reset\(\)/);
   assert.equal(
     (workspace.match(/analyticsSession\.cancelRun\(runToken\)/g) ?? []).length,
-    2,
+    3,
   );
   assert.match(workspace, /analyticsSession\.complete\(activeAttemptNumberRef\.current\)/);
   assert.match(workspace, /analyticsSession\.skillMapViewed\(\)/);
@@ -1263,4 +1263,28 @@ test("workspace wires persistence, result announcements, and interruptible reset
   assert.match(panels, /role="alert"/);
   assert.match(completion, /role="status" aria-live="polite"/);
   assert.doesNotMatch(panels, /section aria-labelledby="results-heading" aria-live/);
+});
+
+test("editing code cancels active runs and clears feedback for the previous code", () => {
+  const workspace = readFileSync(
+    path.resolve(root, "src/components/lab/ChallengeWorkspace.tsx"),
+    "utf8",
+  );
+  const panels = readFileSync(
+    path.resolve(root, "src/components/lab/ChallengeWorkspacePanels.tsx"),
+    "utf8",
+  );
+  const handleCodeChange = workspace
+    .split("const handleCodeChange = ")[1]
+    ?.split("\n  const resetMission = ")[0];
+
+  assert.ok(handleCodeChange);
+  assert.match(handleCodeChange, /runControllerRef\.current\?\.isRunning\(\)/);
+  assert.match(handleCodeChange, /analyticsSession\.cancelRun\(runToken\)/);
+  assert.match(handleCodeChange, /runControllerRef\.current\.cancel\(\)/);
+  assert.match(handleCodeChange, /setResults\(null\)/);
+  assert.match(handleCodeChange, /setHasRun\(false\)/);
+  assert.match(handleCodeChange, /setRunCancelled\(true\)/);
+  assert.match(panels, /runCancelled/);
+  assert.match(panels, /changed[\s\S]*Run Tests[\s\S]*latest code/i);
 });
