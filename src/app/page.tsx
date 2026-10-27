@@ -84,6 +84,7 @@ export default function HomePage() {
               key={course.id}
               course={course}
               featured={index === 0}
+              analyticsLocation="home_course_preview"
             />
           ))}
         </div>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { Course } from "@/lib/courses";
 import { formatCourseDuration, formatCourseModes, formatCoursePrice } from "@/lib/pricing";
+import { generateFAQPageSchema } from "@/lib/schema";
 
 function Chevron({ open }: { open: boolean }) {
   return (
@@ -21,19 +22,32 @@ function Chevron({ open }: { open: boolean }) {
 }
 
 export default function HomeFAQ({ courses }: { courses: Course[] }) {
+  const deliveryOptions = courses.map((course) => ({
+    course,
+    text: `${course.shortTitle}: ${formatCourseModes(course)}`,
+  }));
+  const courseFees = courses.map((course) => ({
+    course,
+    text: `${course.shortTitle}: ${formatCoursePrice(course.pricing)}`,
+  }));
+  const courseDurations = courses.map((course) => ({
+    course,
+    text: `${course.shortTitle}: ${formatCourseDuration(course.duration)}`,
+  }));
   const faqs = [
     {
       q: "What delivery options are available?",
       a: (
         <>
-          {courses.map((course, index) => (
+          {deliveryOptions.map(({ course, text }, index) => (
             <span key={course.id}>
               {index > 0 ? "; " : ""}
-              {course.shortTitle}: {formatCourseModes(course)}
+              {text}
             </span>
           ))}
         </>
       ),
+      schemaAnswer: deliveryOptions.map(({ text }) => text).join("; "),
     },
     {
       q: "Are classes live or recorded?",
@@ -42,6 +56,7 @@ export default function HomeFAQ({ courses }: { courses: Course[] }) {
           Contact us to confirm the current class format for the course you are considering.
         </>
       ),
+      schemaAnswer: "Contact us to confirm the current class format for the course you are considering.",
     },
     {
       q: "Where is your Dehradun campus?",
@@ -54,12 +69,14 @@ export default function HomeFAQ({ courses }: { courses: Course[] }) {
           .
         </>
       ),
+      schemaAnswer:
+        "We’re in Herbertpur (Dehradun district) (near DR School). Explore on-campus courses or online course options. See directions & details.",
     },
     {
       q: "What are the fees for each course?",
       a: (
         <>
-          {courses.map((course, index) => (
+          {courseFees.map(({ course }, index) => (
             <span key={course.id}>
               {index > 0 ? "; " : ""}
               <Link className="text-blue-600 underline" href={`/courses/${course.slug}`}>
@@ -70,21 +87,26 @@ export default function HomeFAQ({ courses }: { courses: Course[] }) {
           ))}
         </>
       ),
+      schemaAnswer: courseFees.map(({ text }) => text).join("; "),
     },
     {
       q: "How long are the programs?",
       a: (
         <>
-          {courses.map((course, index) => (
+          {courseDurations.map(({ course, text }, index) => (
             <span key={course.id}>
               {index > 0 ? "; " : ""}
-              {course.shortTitle}: {formatCourseDuration(course.duration)}
+              {text}
             </span>
           ))}
         </>
       ),
+      schemaAnswer: courseDurations.map(({ text }) => text).join("; "),
     },
   ];
+  const faqSchema = generateFAQPageSchema(
+    faqs.map(({ q, schemaAnswer }) => ({ question: q, answer: schemaAnswer })),
+  );
 
   // one-open-at-a-time, first item open by default
   const [openIdx, setOpenIdx] = useState<number>(0);
@@ -162,6 +184,11 @@ export default function HomeFAQ({ courses }: { courses: Course[] }) {
           Explore on-campus courses
         </Link>
       </div>
+      <script
+        id="home-faq-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
     </section>
   );
 }

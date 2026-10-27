@@ -1,4 +1,4 @@
-import Link from "next/link";
+import TrackedLink from "@/components/analytics/TrackedLink";
 import type { BlogPost } from "@/lib/blog";
 
 type GuidePreview = Pick<
@@ -31,12 +31,14 @@ export default function HomeGuidePreview({
               Helpful guides for coding learners
             </h2>
           </div>
-          <Link
+          <TrackedLink
             href="/blog"
+            event="cta_home_view_guides"
+            eventParams={{ location: "home_guide_preview" }}
             className="inline-flex min-h-11 items-center font-semibold text-blue-800 underline decoration-blue-300 underline-offset-4 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
           >
             Browse all guides
-          </Link>
+          </TrackedLink>
         </div>
         <ul className="mt-8 grid gap-4 md:grid-cols-3">
           {guides.map((guide) => (
@@ -46,24 +48,28 @@ export default function HomeGuidePreview({
                   {guide.category} · {guide.readingTime} min read
                 </p>
                 <h3 className="mt-3 text-lg font-bold leading-6 text-gray-950">
-                  <Link
+                  <TrackedLink
                     href={`/blog/${guide.slug}`}
+                    event="cta_home_read_guide"
+                    eventParams={{ guide_slug: guide.slug }}
                     className="rounded-sm hover:text-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
                   >
                     {guide.title}
-                  </Link>
+                  </TrackedLink>
                 </h3>
                 <p className="mt-3 flex-1 leading-6 text-gray-600">
                   {guide.description}
                 </p>
-                <Link
+                <TrackedLink
                   href={`/blog/${guide.slug}`}
+                  event="cta_home_read_guide"
+                  eventParams={{ guide_slug: guide.slug }}
                   className="mt-5 inline-flex min-h-11 items-center font-semibold text-blue-800 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
                 >
                   Read guide
                   <span className="sr-only">: {guide.title}</span>
                   <span aria-hidden="true" className="ml-2">→</span>
-                </Link>
+                </TrackedLink>
               </article>
             </li>
           ))}
