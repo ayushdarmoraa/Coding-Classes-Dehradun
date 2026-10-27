@@ -4,6 +4,7 @@ import TrackedLink from "@/components/analytics/TrackedLink";
 import { notFound } from "next/navigation";
 
 import { getCourseBySlug, isCourseModeAvailable } from "@/lib/courses";
+import { getCourseExperienceContent } from "@/lib/course-experience-content";
 import { getAllBlogPosts } from "@/lib/blog";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Badge from "@/components/ui/Badge";
@@ -146,66 +147,16 @@ export default async function CoursePage({ params }: Props) {
   const relatedLabChallenges = getPublishedChallenges().filter(
     (challenge) => challenge.relatedCourseSlug === course.slug,
   );
+  const courseContent = getCourseExperienceContent(course);
+  const projectDetails = courseContent.projectDetails;
 
   const priceText = formatCoursePrice(course.pricing);
   const durationText = formatCourseDuration(course.duration);
 
-  // FAQs (immutable)
-  const baseFaqs: Array<{ q: string; a: string }> = [
-    {
-      q: `What is the duration of the ${course.title}?`,
-      a: durationText
-        ? `The typical duration is ${durationText}.`
-        : `The course duration varies by batch schedule. Contact us for the current plan.`,
-    },
-    {
-      q: `What are the fees for the ${course.title}?`,
-      a: priceText
-        ? `The fee is ${priceText}. Flexible monthly options are available.`
-        : `Fees depend on the current batch and offers. Please contact us for the latest fee structure.`,
-    },
-    {
-      q: "How can I confirm current learner support?",
-      a: "Contact the academy directly for details about currently available support.",
-    },
-    {
-      q: "Is prior programming experience required?",
-      a: "Your starting learning stage depends on your current skills and goals, and you can progress at your own pace.",
-    },
-  ];
-
-  const extraFaqs: Array<{ q: string; a: string }> =
-    course.slug === "full-stack"
-      ? [
-          {
-            q: "Which stack is covered?",
-            a: "MERN (MongoDB, Express, React, Node.js) with Generative AI integrations and deployment basics.",
-          },
-        ]
-      : course.slug === "data-science"
-      ? [
-          {
-            q: "Which tools/libraries are covered?",
-            a: "Python, NumPy, Pandas, Matplotlib, scikit-learn, and intro to AI/ML workflows with real datasets.",
-          },
-        ]
-      : course.slug === "python"
-      ? [
-          {
-            q: "What will I be able to build?",
-            a: "CLI utilities, data processing scripts, and small apps using files/JSON and OOP concepts.",
-          },
-        ]
-      : course.slug === "java"
-      ? [
-          {
-            q: "Does it include Spring Boot?",
-            a: "Yes. We cover Core Java foundations and an introduction to Spring Boot with real-world practices.",
-          },
-        ]
-      : [];
-
-  const faqs = [...baseFaqs, ...extraFaqs];
+  const faqs = courseContent.faqs.map(({ question, answer }) => ({
+    q: question,
+    a: answer,
+  }));
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -313,9 +264,15 @@ export default async function CoursePage({ params }: Props) {
             <div className="flex flex-wrap gap-2">
               <a href="#overview" className="text-sm font-medium text-blue-700 hover:underline">Overview</a>
               <span aria-hidden="true" className="text-gray-300">•</span>
+              <a href="#who-for" className="text-sm font-medium text-blue-700 hover:underline">Who this is for</a>
+              <span aria-hidden="true" className="text-gray-300">•</span>
               <a href="#curriculum" className="text-sm font-medium text-blue-700 hover:underline">Curriculum</a>
               <span aria-hidden="true" className="text-gray-300">•</span>
               <a href="#prereq" className="text-sm font-medium text-blue-700 hover:underline">Prerequisites</a>
+              <span aria-hidden="true" className="text-gray-300">•</span>
+              <a href="#projects" className="text-sm font-medium text-blue-700 hover:underline">Projects</a>
+              <span aria-hidden="true" className="text-gray-300">•</span>
+              <a href="#learning-works" className="text-sm font-medium text-blue-700 hover:underline">How learning works</a>
               <span aria-hidden="true" className="text-gray-300">•</span>
               <a href="#outcomes" className="text-sm font-medium text-blue-700 hover:underline">Outcomes</a>
               <span aria-hidden="true" className="text-gray-300">•</span>
@@ -331,6 +288,19 @@ export default async function CoursePage({ params }: Props) {
         <p className="text-gray-700">
           {course.description}
         </p>
+      </section>
+
+      <section id="who-for" className="mb-8" aria-labelledby="who-for-heading">
+        <h2 id="who-for-heading" className="text-2xl font-semibold mb-2">
+          Who this course is for
+        </h2>
+        <p className="text-gray-700">
+          {courseContent.learnerFit} Compare the prerequisites with your current
+          experience, then discuss your goals with the team if you are unsure.
+        </p>
+        <Link href="/contact" className="mt-3 inline-flex font-medium text-blue-700 hover:underline">
+          Ask whether this course is a fit
+        </Link>
       </section>
 
       {/* Local SEO: areas served */}
@@ -355,7 +325,7 @@ export default async function CoursePage({ params }: Props) {
       </section>}
 
       <section id="curriculum" className="mt-8">
-        <h2 className="text-2xl font-semibold mb-2">Course curriculum</h2>
+        <h2 className="text-2xl font-semibold mb-2">What you&apos;ll learn</h2>
         <ul className="list-disc ml-6 text-gray-700 space-y-1">
           {course.curriculum.map((item, index) => (
             <li key={`${course.id}-curriculum-${index}`}>{item}</li>
@@ -363,15 +333,31 @@ export default async function CoursePage({ params }: Props) {
         </ul>
       </section>
 
-      {relatedLabChallenges.length > 0 && (
-        <section
-          id="related-lab"
-          className="mt-8"
-          aria-labelledby="related-lab-heading"
-        >
-          <h2 id="related-lab-heading" className="text-2xl font-semibold mb-2">
-            Related DCA Lab challenge
-          </h2>
+      <section id="projects" className="mt-8" aria-labelledby="projects-heading">
+        <h2 id="projects-heading" className="text-2xl font-semibold mb-2">
+          Projects and practical work
+        </h2>
+        {projectDetails.length > 0 ? (
+          <>
+            <p className="text-gray-700">
+              {courseContent.projectSummary}
+            </p>
+            <p className="mt-2 text-gray-700">
+              {courseContent.practicalPractice}
+            </p>
+          </>
+        ) : (
+          <p className="text-gray-700">
+            {courseContent.practicalPractice}
+          </p>
+        )}
+      </section>
+
+      <section id="related-lab" className="mt-8" aria-labelledby="related-lab-heading">
+        <h2 id="related-lab-heading" className="text-2xl font-semibold mb-2">
+          Related DCA Lab challenge
+        </h2>
+        {relatedLabChallenges.length > 0 ? (
           <ul className="space-y-3">
             {relatedLabChallenges.map((challenge) => (
               <li key={challenge.id} className="rounded-xl border bg-white p-4">
@@ -388,8 +374,15 @@ export default async function CoursePage({ params }: Props) {
               </li>
             ))}
           </ul>
-        </section>
-      )}
+        ) : (
+          <p className="text-gray-700">
+            Keep building practical skills with a challenge from DCA Lab.{" "}
+            <Link href="/lab" className="font-medium text-blue-700 hover:underline">
+              Explore all DCA Lab challenges
+            </Link>
+          </p>
+        )}
+      </section>
 
       {onlineTarget && (
         <div className="mt-6">
@@ -421,6 +414,17 @@ export default async function CoursePage({ params }: Props) {
         </ul>
       </section>
 
+      <section id="learning-works" className="mt-8" aria-labelledby="learning-works-heading">
+        <h2 id="learning-works-heading" className="text-2xl font-semibold mb-2">
+          How learning works
+        </h2>
+        <p className="text-gray-700">
+          {courseContent.learningApproach[0]} {courseContent.learningApproach[1]}{" "}
+          {courseContent.learningApproach[2]} Discuss your goals with the team to ask
+          about the current class format and support.
+        </p>
+      </section>
+
       {/* Outcomes */}
       <section id="outcomes" className="mt-8">
         <h2 className="text-2xl font-semibold mb-2">Outcomes</h2>
@@ -447,6 +451,35 @@ export default async function CoursePage({ params }: Props) {
             </div>
           ))}
         </dl>
+      </section>
+
+      <section
+        id="course-final-cta"
+        className="mt-10 rounded-2xl bg-blue-50 p-6"
+        aria-labelledby="course-final-cta-heading"
+      >
+        <h2 id="course-final-cta-heading" className="text-2xl font-semibold">
+          Ready to explore your next step?
+        </h2>
+        <p className="mt-2 text-gray-700">
+          Discuss your learning goals, ask about upcoming batches, or explore a practical
+          coding challenge in DCA Lab.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Button
+            href="/contact"
+            event="cta_enroll_click"
+            eventParams={{ page_type: 'offline_course', course_slug: course.slug, city: 'dehradun', variant: 'final_course_consultation' }}
+          >
+            Discuss your learning goals
+          </Button>
+          <Link
+            href="/lab"
+            className="inline-flex items-center rounded-lg border border-blue-700 px-6 py-3 font-medium text-blue-700 hover:bg-blue-700/5 focus:outline-none focus:ring-2 focus:ring-blue-700"
+          >
+            Explore DCA Lab
+          </Link>
+        </div>
       </section>
 
       {/* Further reading */}
@@ -507,7 +540,19 @@ export default async function CoursePage({ params }: Props) {
               ))}
             </ul>
           </section>
-        ) : null;
+        ) : (
+          <section className="mt-12 border-t pt-8" aria-labelledby="course-guides-heading">
+            <h2 id="course-guides-heading" className="text-2xl font-semibold">
+              Keep exploring
+            </h2>
+            <p className="mt-2 text-gray-700">
+              Browse coding guides for more learning ideas and course context.
+            </p>
+            <Link href="/blog" className="mt-3 inline-flex font-medium text-blue-700 hover:underline">
+              Browse coding guides
+            </Link>
+          </section>
+        );
       })()}
 
     </main>

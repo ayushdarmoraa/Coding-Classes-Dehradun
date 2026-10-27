@@ -57,13 +57,14 @@ export default function OnlinePythonPage() {
             Level: {course.level} · Duration: {formatCourseDuration(course.duration)} · Fees: {formatCoursePrice(course.pricing)}
           </p>
           <p className="text-sm text-gray-600 mb-6">
-            Confirmed delivery modes: {formatCourseModes(course)}. Contact DCA to confirm current online delivery details.
+            Confirmed delivery modes: {formatCourseModes(course)}. Ask the team about
+            upcoming batches, class timings, learning support, and other current online arrangements.
           </p>
         </>
       )}
 
       <div className="flex flex-wrap gap-3 mb-10">
-        <Button href="/contact" size="lg" variant="primary">Talk to a Mentor</Button>
+        <Button href="/contact" size="lg" variant="primary">Ask about this course</Button>
         <Button href="/courses/python" size="lg" variant="secondary">On-Campus (Dehradun)</Button>
       </div>
 

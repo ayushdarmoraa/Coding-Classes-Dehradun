@@ -37,6 +37,12 @@ function loadTypeScript(relativePath, overrides = {}) {
       return loadTypeScript(path.relative(repositoryRoot, dependencyPath), overrides);
     }
     if (specifier === "@/lib/courses") return coursesModule;
+    if (specifier === "@/lib/course-catalog") {
+      return loadTypeScript("src/lib/course-catalog.ts");
+    }
+    if (specifier === "@/lib/course-experience-content") {
+      return loadTypeScript("src/lib/course-experience-content.ts");
+    }
     if (specifier === "@/lib/site-config") {
       return loadTypeScript("src/lib/site-config.ts");
     }
@@ -79,13 +85,18 @@ const {
 } = coursesModule;
 const { formatCourseDuration, formatCoursePrice, formatCourseModes } = pricingModule;
 const { generateCourseSchema, getCourseJsonLd } = schemaModule;
+const { filterAndSortCourses } = loadTypeScript("src/lib/course-catalog.ts");
 
 function cloneCourse(course) {
   return structuredClone(course);
 }
 
 test("course hub groups the canonical courses and applies duration and fee sorting", () => {
-  const { filterAndSortCourses, getCourseLearningPath } = loadTypeScript(
+  const {
+    filterAndSortCourses,
+    getCourseLearningPath,
+    getCourseProjectDetails,
+  } = loadTypeScript(
     "src/lib/course-catalog.ts",
   );
   const courses = getCourses();
@@ -114,6 +125,15 @@ test("course hub groups the canonical courses and applies duration and fee sorti
   assert.deepEqual(
     filterAndSortCourses(courses, "beginner", "duration").map(({ slug }) => slug),
     ["python", "java"],
+  );
+  assert.deepEqual(
+    courses.map(({ slug, ...course }) => [slug, getCourseProjectDetails(course)]),
+    [
+      ["full-stack", ["Project, Git/GitHub, deployment (Vercel)", "Deploy production projects", "Portfolio with 2–3 projects"]],
+      ["data-science", ["Mini capstone project"]],
+      ["python", ["Files, JSON, simple CLI projects", "Build small utilities"]],
+      ["java", []],
+    ],
   );
 });
 
@@ -144,20 +164,23 @@ test("course cards show canonical facts, course and contact links, and only supp
   const relatedChallengeHref = "/lab/javascript/discount-calculation-bug";
 
   const fullStackMarkup = renderToStaticMarkup(
-    React.createElement(CourseCard, { course: fullStack, relatedChallengeHref }),
+    React.createElement(CourseCard, {
+      course: fullStack,
+      relatedChallengeHref,
+      showProjectSummary: true,
+    }),
   );
   assert.match(fullStackMarkup, new RegExp(fullStack.description));
   assert.match(fullStackMarkup, /6 months/);
   assert.match(fullStackMarkup, /Beginner to Advanced/);
-  assert.match(
-    fullStackMarkup,
-    /Advanced coverage is subject to curriculum and instructor validation/,
-  );
+  assert.match(fullStackMarkup, /Explore the listed curriculum to see what the course covers/);
   assert.match(fullStackMarkup, /₹25,000 package rate/);
   assert.match(fullStackMarkup, /href="\/courses\/full-stack"/);
   assert.match(fullStackMarkup, /View Course/);
   assert.match(fullStackMarkup, /href="\/lab\/javascript\/discount-calculation-bug"/);
   assert.match(fullStackMarkup, /Try Related Challenge/);
+  assert.match(fullStackMarkup, /Practical work/);
+  assert.match(fullStackMarkup, /Portfolio with 2–3 projects/);
   assert.match(fullStackMarkup, /wa\.me\/917037905464/);
 
   const pythonMarkup = renderToStaticMarkup(
@@ -166,6 +189,7 @@ test("course cards show canonical facts, course and contact links, and only supp
   assert.match(pythonMarkup, /href="\/courses\/python"/);
   assert.doesNotMatch(pythonMarkup, /Try Related Challenge|href="\/lab\//);
   assert.match(pythonMarkup, /href="https:\/\/wa\.me\/917037905464/);
+  assert.doesNotMatch(pythonMarkup, /Practical work/);
 });
 
 test("course catalog renders each offering once and ties comparison to the same sorted list", () => {
@@ -364,6 +388,14 @@ test("retains canonical course titles, levels, pricing, durations, and mode stat
       { slug: "python", title: "Python Programming", level: "Beginner to Advanced", packageRate: 12000, monthlyRate: 4000, duration: 4, modes: ["On-Campus", "Online", "Hybrid"], modeStatus: "confirmed" },
       { slug: "java", title: "Java Programming", level: "Beginner to Advanced", packageRate: 12000, monthlyRate: 4000, duration: 4, modes: ["On-Campus", "Online", "Hybrid"], modeStatus: "confirmed" },
     ],
+  );
+});
+
+test("course path filtering returns no results for empty collections and unknown runtime values", () => {
+  assert.deepEqual(filterAndSortCourses([], "all", "recommended"), []);
+  assert.deepEqual(
+    filterAndSortCourses(getCourses(), "invalid", "recommended"),
+    [],
   );
 });
 
@@ -604,7 +636,7 @@ test("course display consumers use structured canonical facts", async () => {
     );
     assert.doesNotMatch(
       source,
-      /live sessions|recordings|mentor hours|project reviews|placement support|mock interviews|referrals|Zoom\/Meet|cohort space/i,
+      /weekly live sessions|recordings are included|mentor hours are provided|project reviews are included|placement support|mock interviews|referrals|Zoom\/Meet|cohort space/i,
       `${route} online page should not make unsupported service claims`,
     );
   }
@@ -637,7 +669,7 @@ test("course display consumers use structured canonical facts", async () => {
   );
   assert.doesNotMatch(
     courseDetail,
-    /placement support|placement assistance|interview prep|resume reviews|referrals|mentor feedback|career guidance|job-ready|portfolio-ready|live cohort|live \+ projects|free consultation|trial session/i,
+    /placement support|placement assistance|interview prep|resume reviews|referrals|mentor|career guidance|job-ready|portfolio-ready|live cohort|live \+ projects|free consultation|trial session/i,
   );
   assert.match(courseDetail, /\{course\.description\}/);
   assert.match(courseDetail, /Python Course in Dehradun \| Doon Coding Academy/);
@@ -652,8 +684,8 @@ test("course display consumers use structured canonical facts", async () => {
   );
   assert.match(coursesPage, /<CourseCatalog/);
   assert.match(coursesPage, /Course details and learning path/);
-  assert.match(coursesPage, /Details about class format, assignments, project/);
-  assert.match(coursesPage, /contact us to confirm current details/);
+  assert.match(coursesPage, /Have questions about fit, upcoming batches, or learning formats/);
+  assert.match(coursesPage, /Discuss your\s+goals with the DCA team/);
   assert.match(coursesPage, /Try a coding challenge in DCA Lab/);
   assert.doesNotMatch(
     coursesPage,
@@ -675,8 +707,8 @@ test("course display consumers use structured canonical facts", async () => {
     path.resolve(repositoryRoot, "src/components/features/LearningProgressionNote.tsx"),
     "utf8",
   );
-  assert.match(learningNote, /LEARNING_STAGES\.join/);
-  assert.match(learningNote, /current skills, goals,[\s\S]*pace—not course duration/);
+  assert.match(learningNote, /Course levels are a broad guide/);
+  assert.match(learningNote, /starting[\s\S]*point depends on your skills and goals, not course duration/);
   const homeFaq = await readFile(
     path.resolve(repositoryRoot, "src/components/faq/HomeFAQ.tsx"),
     "utf8",

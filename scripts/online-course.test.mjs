@@ -338,9 +338,19 @@ test("online detail pages render registry-backed sections without repeated or un
     } else {
       assert.equal(markup.includes(`id="${schemaId}"`), false);
     }
+    if (slug !== "data-science") {
+      assert.match(
+        decoded,
+        /This course is listed for online delivery|Confirmed delivery modes:|upcoming batches, class timings, learning support/,
+      );
+    }
     assert.doesNotMatch(
       visibleText,
-      /live sessions?|recordings|remote mentorship|mentor support|online community|accountability|project reviews?|project feedback|cohort structure|placement support|employment guarantee|students placed|career switchers/i,
+      /weekly live sessions|recordings are included|remote mentor support is included|project feedback is provided|cohort meetings are scheduled|placement support|employment guarantee|students placed|career switchers/i,
+    );
+    assert.match(
+      visibleText,
+      /Ask the team about upcoming batches, class timings, learning support|Ask the team whether online delivery is currently available/i,
     );
   }
 });

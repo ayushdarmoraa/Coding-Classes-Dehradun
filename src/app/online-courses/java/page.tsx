@@ -50,7 +50,8 @@ export default function JavaOnlinePage() {
             <Link href="/courses/java" className="underline text-blue-700">Prefer on-campus? See Java in Dehradun</Link>
           </p>
           <p className="mt-2 text-sm text-gray-600">
-            Contact DCA to confirm current online delivery details.
+            Ask the team about upcoming batches, class timings, learning support, and
+            other current online arrangements.
           </p>
           <LearningProgressionNote className="mt-3 text-gray-600" />
 
@@ -82,7 +83,7 @@ export default function JavaOnlinePage() {
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
             <Button href="/contact" size="lg" className="bg-blue-600 text-white hover:bg-blue-700">
-              Talk to a Mentor
+              Ask about this course
             </Button>
             <Button href="/courses/java" size="lg" variant="secondary">
               See On-Campus Java (Dehradun)

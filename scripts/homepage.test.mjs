@@ -158,10 +158,7 @@ test("homepage presents one clear value proposition and valid primary actions", 
 
 test("homepage course previews render every canonical course and route", () => {
   assert.equal(courses.length, 4);
-  assert.match(
-    markup,
-    /Advanced coverage is subject to curriculum and instructor validation/,
-  );
+  assert.match(markup, /Explore the listed curriculum to see what the course covers/);
   assert.match(markup, /Delivery availability not confirmed/);
   for (const course of courses) {
     assert.ok(

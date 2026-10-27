@@ -78,7 +78,7 @@ export default function OnlineCoursesPage() {
 
           <div className="text-center mt-10">
             <Button href="/faq" variant="secondary" className="mr-3">See FAQs</Button>
-            <Button href="/contact" variant="ghost">Talk to a Mentor</Button>
+            <Button href="/contact" variant="ghost">Ask about a course</Button>
           </div>
         </div>
       </section>

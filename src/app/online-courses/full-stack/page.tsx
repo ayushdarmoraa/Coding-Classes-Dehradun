@@ -57,7 +57,8 @@ export default function OnlineFullStackPage() {
             </Link>
           </p>
           <p className="mt-3 text-sm text-blue-100">
-            Contact DCA to confirm current online delivery details.
+            Ask the team about upcoming batches, class timings, learning support, and
+            other current online arrangements.
           </p>
           <LearningProgressionNote className="mt-3 text-blue-100" />
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
@@ -68,7 +69,7 @@ export default function OnlineFullStackPage() {
               event="cta_enroll_click"
               eventParams={{ page_type: 'online_course', course_slug: 'full-stack', city: 'india', variant: 'hero_primary' }}
             >
-              Talk to a Mentor
+              Ask about this course
             </Button>
             <Button
               href="/courses/full-stack"

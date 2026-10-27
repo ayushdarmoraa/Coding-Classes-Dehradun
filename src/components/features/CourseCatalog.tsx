@@ -73,7 +73,7 @@ export default function CourseCatalog({
             type="button"
             onClick={() => setSortOrder("recommended")}
             aria-pressed={sortOrder === "recommended"}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
           >
             Recommended order
           </button>
@@ -81,7 +81,7 @@ export default function CourseCatalog({
             type="button"
             onClick={() => setSortOrder("duration")}
             aria-pressed={sortOrder === "duration"}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
           >
             Shortest duration
           </button>
@@ -89,7 +89,7 @@ export default function CourseCatalog({
             type="button"
             onClick={() => setSortOrder("fees")}
             aria-pressed={sortOrder === "fees"}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
           >
             Lowest fees
           </button>
@@ -110,6 +110,7 @@ export default function CourseCatalog({
               key={course.id}
               course={course}
               relatedChallengeHref={relatedChallengeHrefs[course.slug]}
+              showProjectSummary
             />
           ))}
         </div>
@@ -133,7 +134,12 @@ export default function CourseCatalog({
             Course details below follow the same selection and order as the
             course cards.
           </p>
-          <div className="mt-5 overflow-x-auto">
+          <div
+            className="mt-5 overflow-x-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+            role="region"
+            aria-label="Scrollable course comparison"
+            tabIndex={0}
+          >
             <table className="w-full min-w-[42rem] bg-white text-left text-sm">
               <caption className="sr-only">Course comparison</caption>
               <thead className="bg-blue-700 text-white">

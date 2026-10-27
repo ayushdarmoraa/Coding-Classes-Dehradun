@@ -43,6 +43,9 @@ const EnquiryForm: React.FC = () => {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [submitMessage, setSubmitMessage] = useState('');
   const statusRef = useRef<HTMLDivElement | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const focusFirstErrorRef = useRef(false);
+  const submissionInFlightRef = useRef(false);
 
   // --- Analytics context ---
   const startedRef = useRef(false);
@@ -71,7 +74,7 @@ const EnquiryForm: React.FC = () => {
     }
   };
 
-  const validateForm = (): boolean => {
+  const validateForm = (): FormErrors => {
     const newErrors: FormErrors = {};
     
     if (!formData.name.trim()) {
@@ -96,26 +99,31 @@ const EnquiryForm: React.FC = () => {
     }
     
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return newErrors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
+    if (submissionInFlightRef.current) return;
+
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      focusFirstErrorRef.current = true;
       // Validation error event
-  trackForm('error', {
+      trackForm('error', {
         page_type: ctx.page_type,
         course_slug: ctx.course_slug || '(none)',
         city: ctx.city,
         page_path: pathname,
         error_origin: 'validation',
-        field_errors: Object.keys(errors).length ? Object.keys(errors) : undefined,
+        field_errors: Object.keys(validationErrors),
         has_message: Boolean(formData.message.trim()),
       });
       return;
     }
     
+    submissionInFlightRef.current = true;
     setIsSubmitting(true);
     setSubmitStatus('idle');
     
@@ -130,7 +138,7 @@ const EnquiryForm: React.FC = () => {
       
       const result = await response.json();
       
-      if (result.success) {
+      if (response.ok && result.success) {
         setSubmitStatus('success');
         setSubmitMessage(result.message || 'Thank you! We’ve received your enquiry and will get back shortly.');
   trackForm('submit', {
@@ -184,6 +192,7 @@ const EnquiryForm: React.FC = () => {
         has_message: Boolean(formData.message.trim()),
       });
     } finally {
+      submissionInFlightRef.current = false;
       setIsSubmitting(false);
     }
   };
@@ -197,6 +206,12 @@ const EnquiryForm: React.FC = () => {
       } catch {}
     }
   }, [submitStatus]);
+
+  useEffect(() => {
+    if (!focusFirstErrorRef.current) return;
+    focusFirstErrorRef.current = false;
+    formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+  }, [errors]);
 
   return (
     <Card className="p-8">
@@ -241,6 +256,9 @@ const EnquiryForm: React.FC = () => {
       )}
 
       <form
+        ref={formRef}
+        aria-busy={isSubmitting}
+        noValidate
         onSubmit={(e) => {
           emitStartOnce();
           handleSubmit(e);
@@ -356,4 +374,3 @@ const EnquiryForm: React.FC = () => {
 };
 
 export default EnquiryForm;
-
