@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import Link from "next/link";
 import TrackedLink from "@/components/analytics/TrackedLink";
 import { notFound } from "next/navigation";
 
-import { getCourseBySlug } from "@/lib/courses";
+import { getCourseBySlug, isCourseModeAvailable } from "@/lib/courses";
 import { getAllBlogPosts } from "@/lib/blog";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+import LearningProgressionNote from "@/components/features/LearningProgressionNote";
 import { getCourseJsonLd } from "@/lib/schema";
+import { formatCourseDuration, formatCourseModes, formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
+import { getChallengePath } from "@/lib/lab/challenge-utils";
+import { getPublishedChallenges } from "@/lib/lab/challenges";
 
 type Props = { params: { slug: string } };
 
@@ -26,20 +30,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const course = getCourseBySlug(params.slug);
   if (!course) return { title: "Course Not Found | Doon Coding Academy" };
 
-  const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-  const base = rawBase.replace(/^http:\/\//, "https://");
-  const url = `${base}/courses/${course.slug}`;
+  const url = `${SITE.url}/courses/${course.slug}`;
 
   if (course.slug === "full-stack") {
     return {
-      title: "Best Full Stack Development Course in Dehradun (2025) | Doon Coding Academy",
+      title: "Full-Stack Development Course | Doon Coding Academy",
       description:
-        "Join Dehradun’s top Full Stack (MERN + Gen AI) course. Affordable fees, 6-month duration, job-ready projects, career guidance & placement support.",
+        "Explore the Full-Stack Development curriculum, duration, fees, and course details at Doon Coding Academy.",
       alternates: { canonical: url },
       openGraph: {
         title: "Full Stack Development Course in Dehradun (2025)",
         description:
-          "Hands-on MERN + Gen AI training: MongoDB, Express, React, Node.js, AI tools, real projects, interview prep.",
+          "Review the MERN, React, Node.js, and Gen AI topics in the Full-Stack Development curriculum.",
         url,
         type: "article",
         siteName: "Doon Coding Academy",
@@ -48,51 +50,51 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         card: "summary",
         title: "Full Stack Course in Dehradun (MERN + Gen AI)",
         description:
-          "Project-first MERN + Gen AI course with affordable fees & placement support.",
+          "Explore the Full-Stack Development curriculum and course details.",
       },
     };
   }
 
   if (course.slug === "data-science") {
     return {
-      title: "Data Science Course in Dehradun (2025) | Python, ML, AI | Doon Coding Academy",
+      title: "Data Science & AI Course Details | Doon Coding Academy",
       description:
-        "Practical Data Science course in Dehradun: Python, Pandas, ML, SQL, Visualization & Gen AI. Real datasets, capstone projects, placement support.",
+        "Review the Data Science & AI curriculum and course details at Doon Coding Academy.",
       alternates: { canonical: url },
       openGraph: {
-        title: "Data Science Training in Dehradun (Python • ML • AI)",
+        title: "Data Science & AI Course Details",
         description:
-          "Learn Python, Pandas, Scikit-learn, SQL, dashboards & Gen AI. Work on real datasets and career-oriented projects.",
+          "Review the Data Science & AI curriculum and course details.",
         url,
         type: "article",
         siteName: "Doon Coding Academy",
       },
       twitter: {
         card: "summary",
-        title: "Data Science Course in Dehradun (Python • ML • AI)",
+        title: "Data Science & AI Course Details",
         description:
-          "Hands-on projects, affordable fees & placement support.",
+          "Review the Data Science & AI curriculum and course details.",
       },
     };
   }
 
   if (course.slug === "python") {
     return {
-      title: "Python Course in Dehradun (2025) | Beginner to Advanced | Doon Coding Academy",
+      title: "Python Course in Dehradun | Doon Coding Academy",
       description:
-        "Python course in Dehradun covering fundamentals, OOP, libraries, mini-projects, and career guidance.",
+        "Explore the Python Programming curriculum, duration, fees, and course details at Doon Coding Academy.",
       alternates: { canonical: url },
       openGraph: {
         title: "Python Programming Classes in Dehradun",
         description:
-          "Learn Python step-by-step with projects and course guidance.",
+          "Review the Python Programming curriculum and course details.",
         url,
         type: "article",
         siteName: "Doon Coding Academy",
       },
       twitter: {
         card: "summary",
-        title: "Python Course in Dehradun (Beginner → Advanced)",
+        title: "Python Course in Dehradun",
         description:
           "Explore the Python course curriculum and program details.",
       },
@@ -111,8 +113,7 @@ export default async function CoursePage({ params }: Props) {
   const course = getCourseBySlug(params.slug);
   if (!course) notFound();
 
-  const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-  const base = rawBase.replace(/^http:\/\//, "https://");
+  const base = SITE.url;
   const pageUrl = `${base}/courses/${course.slug}`;
 
   const breadcrumbJsonLd = {
@@ -139,14 +140,15 @@ export default async function CoursePage({ params }: Props) {
     python: "/online-courses/python",
     java: "/online-courses/java",
   };
+  const onlineTarget = isCourseModeAvailable(course, "Online")
+    ? ONLINE_TARGETS[slug]
+    : undefined;
+  const relatedLabChallenges = getPublishedChallenges().filter(
+    (challenge) => challenge.relatedCourseSlug === course.slug,
+  );
 
-
-
-
-  // Helpers used in JSON-LD & FAQs
-  const normalize = (v?: string | number) => (v == null ? "" : String(v));
-  const priceText = normalize(course.price);
-  const durationText = normalize(course.duration);
+  const priceText = formatCoursePrice(course.pricing);
+  const durationText = formatCourseDuration(course.duration);
 
   // FAQs (immutable)
   const baseFaqs: Array<{ q: string; a: string }> = [
@@ -163,12 +165,12 @@ export default async function CoursePage({ params }: Props) {
         : `Fees depend on the current batch and offers. Please contact us for the latest fee structure.`,
     },
     {
-      q: "Do you provide placement assistance?",
-      a: "Yes. We offer interview prep, resume reviews, and referrals/assistance through our local network.",
+      q: "How can I confirm current learner support?",
+      a: "Contact the academy directly for details about currently available support.",
     },
     {
       q: "Is prior programming experience required?",
-      a: "No prior experience is required for beginner tracks. We start from fundamentals and progress to projects.",
+      a: "Your starting learning stage depends on your current skills and goals, and you can progress at your own pace.",
     },
   ];
 
@@ -204,14 +206,6 @@ export default async function CoursePage({ params }: Props) {
       : [];
 
   const faqs = [...baseFaqs, ...extraFaqs];
-
-
-  // --- Course JSON-LD (GSC-compliant, single block, no Schedule, correct enums) ---
-  // Parse price like "₹25,000"
-
-
-
-
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -224,50 +218,60 @@ export default async function CoursePage({ params }: Props) {
   };
 
   const uiBreadcrumbs = <Breadcrumbs items={breadcrumbs} />;
+  const courseJsonLd = getCourseJsonLd(course, {
+    variant: "offline",
+    city: "Dehradun",
+    pathPrefix: "courses",
+  });
 
   return (
     <main className="container mx-auto py-8">
       {uiBreadcrumbs}
 
       {/* JSON-LD (Breadcrumbs, Course, FAQ) */}
-      <Script id="course-breadcrumb" type="application/ld+json" strategy="afterInteractive"
+      <script id="course-breadcrumb" type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <Script
-        id="course-structured-data"
-        type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(
-            getCourseJsonLd(course, {
-              variant: "offline",
-              city: "Dehradun",
-              pathPrefix: "courses",
-            })
-          ),
-        }}
-      />
-      <Script id="course-faq-schema" type="application/ld+json" strategy="afterInteractive"
+      {courseJsonLd && (
+        <script
+          id="course-structured-data"
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
+        />
+      )}
+      <script id="course-faq-schema" type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       {/* Hero */}
       <header className="mb-6">
         <h1 className="text-3xl md:text-4xl font-extrabold mb-3">{course.title}</h1>
+        {course.level && (
+          <p className="mb-3 text-sm font-medium text-gray-700">
+            Learning stage: {course.level}
+          </p>
+        )}
         <p className="text-gray-700 max-w-3xl">
           {course.description}{" "}
-          <TrackedLink
-            href={(ONLINE_TARGETS[slug] ?? "/online-courses/full-stack")}
-            event="cta_enroll_click"
-            eventParams={{ page_type: 'offline_course', course_slug: course.slug, city: 'dehradun', variant: 'inline_online_crosslink' }}
-            className="underline text-blue-700 hover:text-blue-800"
-          >
-            Learn this track online (live cohort)
-          </TrackedLink>
+          {onlineTarget && (
+            <TrackedLink
+              href={onlineTarget}
+              event="cta_enroll_click"
+              eventParams={{ page_type: 'offline_course', course_slug: course.slug, city: 'dehradun', variant: 'inline_online_crosslink' }}
+              className="underline text-blue-700 hover:text-blue-800"
+            >
+              View online course details
+            </TrackedLink>
+          )}
         </p>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <Badge variant="success" className="bg-green-500 text-white">Duration: {course.duration}</Badge>
-          <Badge variant="primary">Fees: {course.price}</Badge>
+          <Badge variant="success" className="bg-green-500 text-white">Duration: {durationText}</Badge>
+          <Badge variant="primary">Fees: {priceText}</Badge>
+          <Badge variant="info">Delivery: {formatCourseModes(course)}</Badge>
         </div>
+        <LearningProgressionNote className="mt-3 text-gray-600" />
 
         <div className="mt-4 flex flex-wrap gap-3">
           <Button
@@ -276,7 +280,7 @@ export default async function CoursePage({ params }: Props) {
             eventParams={{ page_type: 'offline_course', course_slug: course.slug, city: 'dehradun', variant: 'hero_consultation' }}
             className="inline-flex items-center rounded-xl bg-blue-700 px-4 py-2 text-white text-sm font-semibold shadow-sm hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-blue-700/30"
           >
-            Get a free consultation
+            Contact us about this course
           </Button>
           <Button
             href="https://wa.me/917037905464?text=Hi%2C%20I%27m%20interested%20in%20the%20${course.slug}%20course"
@@ -289,16 +293,16 @@ export default async function CoursePage({ params }: Props) {
         </div>
 
         {/* Offline → Online cross-link (per SEO plan) */}
-        {ONLINE_TARGETS[slug] ? (
+        {onlineTarget ? (
           <div className="mt-3">
             <Button
-              href={ONLINE_TARGETS[slug]}
+              href={onlineTarget}
               variant="secondary"
               size="lg"
               event="cta_enroll_click"
               eventParams={{ page_type: 'offline_course', course_slug: course.slug, city: 'dehradun', variant: 'hero_online_crosslink_button' }}
             >
-              Not in Dehradun? Learn Online (Live + Projects)
+              Not in Dehradun? View online course details
             </Button>
           </div>
         ) : null}
@@ -325,13 +329,12 @@ export default async function CoursePage({ params }: Props) {
       <section id="overview" className="mb-8">
         <h2 className="text-2xl font-semibold mb-2">Overview</h2>
         <p className="text-gray-700">
-          This program is designed to be hands-on and outcome-focused. You’ll build portfolio-ready work,
-          get mentor feedback, and prepare for real roles.
+          {course.description}
         </p>
       </section>
 
       {/* Local SEO: areas served */}
-      <section id="service-areas" className="mt-12 border-t pt-8">
+      {isCourseModeAvailable(course, "On-Campus") && <section id="service-areas" className="mt-12 border-t pt-8">
         <h2 className="text-2xl font-semibold mb-2">Serving Dehradun & Nearby</h2>
         <p className="text-gray-700 mb-3">
           Our Herbertpur campus serves students across Dehradun and nearby areas. See{" "}
@@ -349,288 +352,67 @@ export default async function CoursePage({ params }: Props) {
         <div className="mt-4">
           <a href="tel:+917037905464" className="text-blue-700 hover:underline">Call +91 7037905464</a>
         </div>
+      </section>}
+
+      <section id="curriculum" className="mt-8">
+        <h2 className="text-2xl font-semibold mb-2">Course curriculum</h2>
+        <ul className="list-disc ml-6 text-gray-700 space-y-1">
+          {course.curriculum.map((item, index) => (
+            <li key={`${course.id}-curriculum-${index}`}>{item}</li>
+          ))}
+        </ul>
       </section>
 
-      {/* Course-specific syllabus blocks */}
+      {relatedLabChallenges.length > 0 && (
+        <section
+          id="related-lab"
+          className="mt-8"
+          aria-labelledby="related-lab-heading"
+        >
+          <h2 id="related-lab-heading" className="text-2xl font-semibold mb-2">
+            Related DCA Lab challenge
+          </h2>
+          <ul className="space-y-3">
+            {relatedLabChallenges.map((challenge) => (
+              <li key={challenge.id} className="rounded-xl border bg-white p-4">
+                <h3 className="font-semibold">{challenge.title}</h3>
+                <p className="mt-1 text-sm text-gray-700">
+                  {challenge.shortDescription}
+                </p>
+                <Link
+                  href={getChallengePath(challenge)}
+                  className="mt-3 inline-flex font-medium text-blue-700 hover:underline"
+                >
+                  Try this challenge
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {onlineTarget && (
+        <div className="mt-6">
+          <TrackedLink
+            href={onlineTarget}
+            className="text-blue-700 hover:underline font-medium"
+            event="cta_enroll_click"
+            eventParams={{ location: "course_detail", course_slug: course.slug, variant: "online_course_details" }}
+          >
+            View online course details →
+          </TrackedLink>
+        </div>
+      )}
+
       {course.slug === "full-stack" && (
-        <section id="curriculum" className="mt-8">
-          <h2 className="text-2xl font-semibold mb-2">Detailed Syllabus (MERN + Gen&nbsp;AI)</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 1 — Web Foundations</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>HTML5, CSS3, responsive layouts</li>
-                <li>Tailwind CSS essentials & utility-first patterns</li>
-                <li>Git & GitHub workflow (branches, PRs, releases)</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 2 — JavaScript & TS</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Modern JS (ES6+), async patterns, fetch</li>
-                <li>TypeScript basics for safer React/Node</li>
-                <li>Testing fundamentals (unit & integration)</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 3 — React & Next.js</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>React hooks, context, forms, routing</li>
-                <li>Next.js App Router, data fetching, metadata</li>
-                <li>State management patterns & performance</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 4 — Backend (Node.js & Express)</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>REST APIs, auth (JWT), validation</li>
-                <li>MongoDB & Mongoose (schemas, indexes)</li>
-                <li>File uploads, email/notifications</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 5 — Gen&nbsp;AI Integration</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Prompt design & API usage</li>
-                <li>Simple RAG patterns (vector search basics)</li>
-                <li>Adding AI features into MERN apps</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 6 — Deploy & DevOps</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Vercel & Node deployments, env management</li>
-                <li>CI basics, monitoring & logging</li>
-                <li>Performance, SEO & accessibility checks</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-8">
-            <h3 className="text-xl font-semibold mb-2">Projects you’ll build</h3>
-            <ul className="list-disc ml-6 text-gray-700 space-y-1">
-              <li><span className="font-medium">Auth-ready MERN Starter</span> — protected routes, forms, API layer</li>
-              <li><span className="font-medium">E-commerce Mini</span> — product CRUD, cart, checkout flow</li>
-              <li><span className="font-medium">AI Notes / Q&A</span> — ingest notes, ask questions via Gen&nbsp;AI (simple RAG)</li>
-              <li><span className="font-medium">Portfolio App</span> — deploy & optimize for lighthouse/SEO</li>
-            </ul>
-          </div>
-
-          <div className="mt-6 rounded-xl bg-blue-50 border border-blue-100 p-4">
-            <p className="text-sm text-blue-900">
-              <span className="font-semibold">Outcome:</span> Ship 3–4 portfolio projects, understand MERN + Gen&nbsp;AI integration,
-              and practice interview-focused problem-solving with code reviews.
-            </p>
-          </div>
-
-          {/* Compare with online block */}
-          <div className="mt-6">
-            <TrackedLink
-              href="/online-courses/full-stack"
-              className="text-blue-700 hover:underline font-medium"
-              event="cta_fullstack_prefer_online"
-              eventParams={{ location: 'course_detail', course_slug: course.slug }}
-            >
-              Prefer online? See the Live Full-Stack cohort →
-            </TrackedLink>
-          </div>
-
-          {course.slug === "full-stack" && (
-            <div className="mt-8 space-y-2 text-sm">
-              <p className="font-semibold">Compare with other institutes:</p>
-              <ul className="list-disc list-inside">
-                <li><Link href="/vs/coding-ninjas" className="text-blue-700 hover:underline">DCA vs Coding Ninjas</Link></li>
-                <li><Link href="/vs/scaler" className="text-blue-700 hover:underline">DCA vs Scaler</Link></li>
-              </ul>
-            </div>
-          )}
-        </section>
+        <div className="mt-8 space-y-2 text-sm">
+          <p className="font-semibold">Compare with other institutes:</p>
+          <ul className="list-disc list-inside">
+            <li><Link href="/vs/coding-ninjas" className="text-blue-700 hover:underline">DCA vs Coding Ninjas</Link></li>
+            <li><Link href="/vs/scaler" className="text-blue-700 hover:underline">DCA vs Scaler</Link></li>
+          </ul>
+        </div>
       )}
-
-      {course.slug === "data-science" && (
-        <section id="curriculum" className="mt-8">
-          <h2 className="text-2xl font-semibold mb-2">Detailed Syllabus (Python • ML • AI)</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 1 — Python Foundations</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Python syntax, IDEs, virtual envs</li>
-                <li>Data types, control flow, functions</li>
-                <li>Files, JSON, modules & packaging</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 2 — Data Analysis</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>NumPy arrays & vectorization</li>
-                <li>Pandas: series, dataframes, joins, groupby</li>
-                <li>Cleaning, EDA, feature engineering</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 3 — Visualization</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Matplotlib & Plotly basics</li>
-                <li>Dashboards & storytelling</li>
-                <li>Exporting charts for the web</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 4 — Machine Learning</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>ML workflow, train/val/test splits</li>
-                <li>scikit-learn: regression, classification, metrics</li>
-                <li>Model tuning & cross-validation</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 5 — SQL & Data Ops</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>SQL querying & joins</li>
-                <li>Connecting Python ↔ DB</li>
-                <li>Basics of pipelines & scheduling</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 6 — Gen&nbsp;AI Intro</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Prompting & API usage</li>
-                <li>Lightweight embeddings & retrieval</li>
-                <li>Using AI to augment analysis</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-8">
-            <h3 className="text-xl font-semibold mb-2">Projects you’ll build</h3>
-            <ul className="list-disc ml-6 text-gray-700 space-y-1">
-              <li><span className="font-medium">Exploratory Data Analysis</span> — real dataset cleaning & insights report</li>
-              <li><span className="font-medium">Predictive Model</span> — scikit-learn pipeline with evaluation</li>
-              <li><span className="font-medium">Analytics Dashboard</span> — interactive charts for stakeholders</li>
-              <li><span className="font-medium">AI-Aided Notebook</span> — prompt-assisted feature ideas & summaries</li>
-            </ul>
-          </div>
-
-          <div className="mt-6 rounded-xl bg-blue-50 border border-blue-100 p-4">
-            <p className="text-sm text-blue-900">
-              <span className="font-semibold">Outcome:</span> Build solid Python + ML foundations, ship 3 portfolio artifacts
-              (EDA, model, dashboard), and learn to use Gen&nbsp;AI to accelerate analysis.
-            </p>
-          </div>
-
-          <div className="mt-6">
-            <TrackedLink
-              href="/online-courses/data-science"
-              className="text-blue-700 hover:underline font-medium"
-              event="cta_enroll_click"
-              eventParams={{ page_type: 'offline_course', course_slug: 'data-science', city: 'dehradun', variant: 'curriculum_online_compare' }}
-            >
-              Compare with the Online Data Science cohort →
-            </TrackedLink>
-          </div>
-        </section>
-      )}
-
-      {course.slug === "java" && (
-        <section id="curriculum" className="mt-8">
-          <h2 className="text-2xl font-semibold mb-2">Detailed Syllabus (Core Java + Spring Boot)</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 1 — Core Java Foundations</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>JDK/JRE, IDE setup (IntelliJ/Eclipse)</li>
-                <li>Syntax, data types, control flow</li>
-                <li>Methods, packages, access modifiers</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 2 — OOP Essentials</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Classes, objects, inheritance, polymorphism</li>
-                <li>Interfaces, abstract classes</li>
-                <li>Encapsulation & immutability</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 3 — Collections & Generics</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>List, Set, Map, Queue</li>
-                <li>Iterators, streams (intro)</li>
-                <li>Generics & common patterns</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 4 — Exceptions & I/O</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Checked vs unchecked exceptions</li>
-                <li>Try-with-resources</li>
-                <li>File I/O, serialization basics</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 5 — JDBC & SQL</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>JDBC drivers & connections</li>
-                <li>CRUD with PreparedStatement</li>
-                <li>Basic schema design & indexing</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 6 — Spring Boot (Intro)</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Boot project structure & starters</li>
-                <li>REST controllers, DTOs, validation</li>
-                <li>Data JPA with MySQL/Postgres</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 7 — Build & Testing</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Maven/Gradle basics</li>
-                <li>JUnit & Mockito (unit tests)</li>
-                <li>Configuration & profiles</li>
-              </ul>
-            </div>
-            <div className="rounded-2xl border p-4">
-              <h3 className="font-semibold mb-1">Module 8 — Deploy & Ops</h3>
-              <ul className="list-disc ml-5 text-gray-700 space-y-1">
-                <li>Packaging JARs, env variables</li>
-                <li>Deploying a Boot app</li>
-                <li>Logging & simple monitoring</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-8">
-            <h3 className="text-xl font-semibold mb-2">Projects you’ll build</h3>
-            <ul className="list-disc ml-6 text-gray-700 space-y-1">
-              <li><span className="font-medium">Console Banking App</span> — OOP, exceptions, file I/O</li>
-              <li><span className="font-medium">Library Manager (JDBC)</span> — CRUD, queries, pagination</li>
-              <li><span className="font-medium">Spring Boot REST API</span> — validation, JPA, Postman tests</li>
-              <li><span className="font-medium">Mini MVC Web</span> — simple UI consuming the Boot API</li>
-            </ul>
-          </div>
-
-          <div className="mt-6 rounded-xl bg-blue-50 border border-blue-100 p-4">
-            <p className="text-sm text-blue-900">
-              <span className="font-semibold">Outcome:</span> Strong Core Java skills, a working REST API with Spring Boot,
-              and 3–4 portfolio projects to showcase.
-            </p>
-          </div>
-
-          <div className="mt-6">
-            <TrackedLink
-              href="/online-courses/java"
-              className="text-blue-700 hover:underline font-medium"
-              event="cta_enroll_click"
-              eventParams={{ page_type: 'offline_course', course_slug: 'java', city: 'dehradun', variant: 'curriculum_online_compare' }}
-            >
-              Compare with the Online Java cohort →
-            </TrackedLink>
-          </div>
-        </section>
-      )}
-
       {/* Prerequisites */}
       <section id="prereq" className="mt-8">
         <h2 className="text-2xl font-semibold mb-2">Prerequisites</h2>
@@ -648,11 +430,11 @@ export default async function CoursePage({ params }: Props) {
       </section>
 
       {/* Outcomes CTA augmentation */}
-      <section className="mt-6">
+      {isCourseModeAvailable(course, "On-Campus") && <section className="mt-6">
         <p className="text-sm text-gray-600">
-          Want to sit in first? <Link href="/locations/dehradun" className="underline text-blue-700">Visit the Dehradun campus</Link> for a trial session.
+          Find directions on the <Link href="/locations/dehradun" className="underline text-blue-700">Dehradun location page</Link>.
         </p>
-      </section>
+      </section>}
 
       {/* FAQs (UI mirrors JSON-LD) */}
       <section id="faqs" className="mt-10">

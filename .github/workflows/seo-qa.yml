@@ -26,8 +26,26 @@ jobs:
       - name: Install dev dependencies
         run: npm ci
 
-      - name: Test DCA Lab and navigation
+      - name: Validate blog content
+        run: npm run check:content
+
+      - name: Test blog content validation
+        run: npm run test:content
+
+      - name: Test Guides rendering
+        run: node --test scripts/guides.test.mjs
+
+      - name: Test course source of truth
+        run: npm run test:courses
+
+      - name: Test DCA Lab
         run: npm run test:pr3
+
+      - name: Build production app
+        run: npm run build
+
+      - name: Test SEO QA analysis
+        run: node --test scripts/seo-qa-check.test.mjs
 
       - name: Run SEO QA script
         run: node scripts/seo-qa-check.js

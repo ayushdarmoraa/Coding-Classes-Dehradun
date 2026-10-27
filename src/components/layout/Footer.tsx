@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { SITE } from "@/lib/site-config";
 
 export default function Footer() {
-  const phone = process.env.NEXT_PUBLIC_PHONE || "+91 7037905464";
-  const email = process.env.CONTACT_EMAIL || "dooncodingacademy@gmail.com";
+  const phone = SITE.phone;
+  const email = SITE.email;
   const telHref = `tel:${phone.replace(/\s+/g, "")}`;
   const street = process.env.NEXT_PUBLIC_ADDRESS_STREET || "Ambala - Dehradun Rd, near D.R School, Herbertpur";
   const locality = process.env.NEXT_PUBLIC_ADDRESS_LOCALITY || "Dehradun";
@@ -53,7 +54,7 @@ export default function Footer() {
           <section aria-labelledby="footer-connect">
             <h2 id="footer-connect" className="text-sm font-semibold uppercase tracking-wide text-white">Connect</h2>
             <ul className="mt-4 space-y-3 text-sm">
-              <li><a href="https://wa.me/917037905464" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp (opens in a new tab)" className="hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">WhatsApp</a></li>
+              <li><a href={SITE.whatsappUrl} target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp (opens in a new tab)" className="hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">WhatsApp</a></li>
               <li><a href={telHref} aria-label={`Call us at ${phone}`} className="hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">{phone}</a></li>
               <li><a href={`mailto:${email}`} aria-label={`Email ${email}`} className="hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">{email}</a></li>
             </ul>

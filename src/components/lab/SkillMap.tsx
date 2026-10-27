@@ -1,5 +1,7 @@
 import { createSkillMap } from "@/lib/lab/skill-map";
 import type { MissionTestResult } from "@/lib/lab/mission";
+import { observeLabSkillMap } from "@/lib/lab/analytics-session";
+import { useEffect, useRef } from "react";
 
 const STATUS_STYLES = {
   Demonstrated: "bg-green-100 text-green-900",
@@ -11,13 +13,25 @@ type SkillMapProps = {
   results: MissionTestResult[] | null;
   highestHintViewed: number;
   completed: boolean;
+  onViewed: () => void;
 };
 
-export default function SkillMap({ results, highestHintViewed, completed }: SkillMapProps) {
+export default function SkillMap({
+  results,
+  highestHintViewed,
+  completed,
+  onViewed,
+}: SkillMapProps) {
   const skills = createSkillMap(results, highestHintViewed, completed);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    return section ? observeLabSkillMap(section, onViewed) : undefined;
+  }, [onViewed]);
 
   return (
-    <section aria-labelledby="skill-map-heading" className="rounded-xl border border-gray-200 bg-white p-5">
+    <section ref={sectionRef} aria-labelledby="skill-map-heading" className="rounded-xl border border-gray-200 bg-white p-5">
       <h3 id="skill-map-heading" className="text-lg font-semibold text-gray-900">Skill Map</h3>
       <ul className="mt-4 space-y-3">
         {skills.map(({ id, label, status }) => (

@@ -1,7 +1,17 @@
+import { getCourses } from "./courses";
+import { formatCourseDuration, formatCoursePrice } from "./pricing";
+
 export interface FAQItem {
   question: string;
   answer: string;
 }
+
+const coursePricingAnswer = getCourses()
+  .map(
+    (course) =>
+      `• ${course.shortTitle}: ${formatCourseDuration(course.duration)} · ${formatCoursePrice(course.pricing)} — <a href="/courses/${course.slug}">see curriculum & outcomes</a>.`
+  )
+  .join("\n");
 
 export const faqs: FAQItem[] = [
   {
@@ -18,20 +28,15 @@ export const faqs: FAQItem[] = [
   },
   {
     question: "What are the fees for the courses?",
-    answer: `We keep pricing affordable with monthly and one-time plans.
-• Full-Stack with Gen AI: 6 months · ₹25,000 (or ₹5,000/month) — <a href="/courses/full-stack">see curriculum & outcomes</a>.
-• Data Science: 6 months · ₹30,000 (or ₹6,000/month) — <a href="/courses/data-science">see curriculum & outcomes</a>.
-• Python: 4 months · ₹12,000 (or ₹4,000/month) — <a href="/courses/python">see curriculum & outcomes</a>.
-• Java: 4 months · ₹12,000 (or ₹4,000/month) — <a href="/courses/java">see curriculum & outcomes</a>.`,
+    answer: `Current course pricing and duration:
+${coursePricingAnswer}`,
   },
   {
     question: "Do you offer flexible payment plans?",
-    answer: `Yes — both monthly and one-time options are available. Details are listed on each course page under Fees. <a href="/courses">Browse courses</a> or <a href="/contact">talk to a mentor</a>.`,
+    answer: `Course pricing includes monthly rates and package rates. Details are listed on each course page under Fees. <a href="/courses">Browse courses</a> or <a href="/contact">talk to a mentor</a>.`,
   },
   {
     question: "Who is the target audience for your courses?",
     answer: `College/school students in Dehradun and working professionals seeking upskilling. If you’re unsure which track fits best, <a href="/courses">browse the courses</a> or <a href="/contact">request a quick counselling call</a>.`,
   },
 ];
-
-

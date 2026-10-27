@@ -1,19 +1,20 @@
 /* eslint-disable @next/next/no-img-element */
 import type { Metadata } from "next";
-import Script from "next/script";
 import Link from "next/link";
 import Image from "next/image";
 
-const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
 import {
   filterPosts,
   listCategories,
   paginate,
   getAllBlogPosts,
+  listHowToPosts,
 } from "@/lib/blog";
 import PrevNextLinks from "@/components/seo/PrevNextLinks";
 import FeedLinks from "@/components/seo/FeedLinks";
+import { SITE } from "@/lib/site-config";
+
+const BASE = SITE.url;
 
 export async function generateMetadata({
   searchParams,
@@ -33,27 +34,24 @@ export async function generateMetadata({
   return {
     // Title will get " | Doon Coding Academy" appended by layout.tsx template
     title: page > 1
-      ? `Coding & Career Guides (Page ${page}) – Dehradun 2025`
-      : "Coding & Career Guides – Dehradun 2025",
-    description:
-      "In-depth guides for Dehradun students: Full-Stack (Gen AI), Data Science, Python & Java—fees, syllabus, placements, roadmaps, and tutorials.",
+      ? `Coding Guides & Learning Resources (Page ${page})`
+      : "Coding Guides & Learning Resources",
+    description: "Beginner-friendly, practical, and useful resources to help you learn clearly.",
     robots,
   // Canonical: /blog (search) OR /blog?page=n (pagination) OR /blog (page 1)
   // Per repo guardrails, prefer relative canonical hints; metadataBase in layout handles host
   alternates: { canonical: "/blog" },
     openGraph: {
-      title: "Blog – Coding & Career Guides (Dehradun)",
-      description:
-        "Guides on Full-Stack (Gen AI), Data Science, Python & Java: fees, syllabus, placements, roadmaps, tutorials.",
+      title: "Coding Guides & Learning Resources",
+      description: "Beginner-friendly, practical, and useful resources to help you learn clearly.",
       url: BASE + "/blog",
       type: "website",
       siteName: "Doon Coding Academy"
     },
     twitter: {
       card: "summary",
-      title: "Blog – Coding & Career Guides (Dehradun)",
-      description:
-        "Full-Stack (Gen AI), Data Science, Python & Java guides: fees, syllabus, placements, roadmaps, tutorials."
+      title: "Coding Guides & Learning Resources",
+      description: "Beginner-friendly, practical, and useful resources to help you learn clearly."
     }
   }
   }
@@ -64,7 +62,8 @@ export async function generateMetadata({
   const page = Number(searchParams?.page || "1");
 
   const categories = listCategories();
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const hasHowToGuides = listHowToPosts().length > 0;
+  const base = SITE.url;
 
   // Featured posts from frontmatter
   const all = getAllBlogPosts();
@@ -88,8 +87,7 @@ export async function generateMetadata({
     const t = (title || "").trim();
     if (!t) return undefined;
     const base = `${t} — insights from Doon Coding Academy (Dehradun).`;
-    const extra = " Compare options, syllabus, fees, and outcomes. Updated 2025.";
-    const v = base + extra;
+    const v = base;
     return v.length > 160 ? v.slice(0, 157) + "…" : v;
   };
 
@@ -130,31 +128,36 @@ export async function generateMetadata({
       {
         "@type": "ListItem",
         position: 2,
-        item: { "@type": "WebPage", "@id": `${base}/blog`, name: "Blog" },
+        item: { "@type": "WebPage", "@id": `${base}/blog`, name: "Guides" },
       },
     ],
   } as const;
 
   return (
-    <div className="container mx-auto p-4">
+    <main className="container mx-auto p-4">
       <FeedLinks />
       <PrevNextLinks prev={prevUrl} next={nextUrl} />
-      <h1 className="text-3xl font-bold mb-2">Our Blog</h1>
+      <h1 className="text-3xl font-bold mb-2">Guides for Coding Learners</h1>
+      <p className="mb-6 max-w-3xl text-gray-700">
+        Beginner-friendly, practical, and useful resources to help you learn clearly.
+      </p>
       <div className="mb-4 flex gap-4">
         <Link href="/blog/archive" className="text-blue-700 hover:underline text-sm">
-          Browse the archive →
+          Browse by date →
         </Link>
         <Link href="/blog/pinned" className="text-blue-700 hover:underline text-sm">
-          Featured posts →
+          Featured guides →
         </Link>
-        <Link href="/blog/how-to" className="text-blue-700 hover:underline text-sm">
-          How-To tutorials →
-        </Link>
+        {hasHowToGuides ? (
+          <Link href="/blog/how-to" className="text-blue-700 hover:underline text-sm">
+            Step-by-step guides →
+          </Link>
+        ) : null}
         <Link href="/blog/series" className="text-blue-700 hover:underline text-sm">
-          Series →
+          Guide series →
         </Link>
         <Link href="/blog/author" className="text-blue-700 hover:underline text-sm">
-          Authors →
+          Guide authors →
         </Link>
       </div>
 
@@ -162,15 +165,8 @@ export async function generateMetadata({
       {isDefaultView && featured.length > 0 && (
         <section aria-label="Featured posts" className="mb-8 defer-visibility">
           <div className="mb-2 flex items-center gap-2">
-            <h2 className="text-xl font-semibold">Featured</h2>
+            <h2 className="text-xl font-semibold">Featured guides</h2>
             <span className="text-xs text-gray-500">Editor’s picks</span>
-            {/* eslint-disable-next-line react/no-danger */}
-            <Script
-              id="blog-breadcrumb"
-              type="application/ld+json"
-              strategy="afterInteractive"
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-            />
           </div>
           <div className="-mx-4 px-4 overflow-x-auto">
             <ul className="flex gap-4 min-w-full snap-x">
@@ -287,8 +283,9 @@ export async function generateMetadata({
           <input
             name="q"
             defaultValue={q}
-            placeholder="Search posts…"
+            placeholder="Search Guides…"
             className="rounded-lg border px-3 py-1.5 text-sm"
+            aria-label="Search Guides"
           />
           <button
             type="submit"
@@ -369,7 +366,7 @@ export async function generateMetadata({
                 href={`/blog/${post.slug}`}
                 className="text-blue-700 hover:underline mt-4 inline-block"
               >
-                Read More
+                Read guide
               </Link>
             </article>
           ))}
@@ -399,14 +396,16 @@ export async function generateMetadata({
         </div>
       )}
       {/* ItemList schema for this page */}
-      <Script
+      <script
+        id="blog-breadcrumb"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
         id="blog-itemlist"
         type="application/ld+json"
-        strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
-    </div>
+    </main>
   );
 }
-
-

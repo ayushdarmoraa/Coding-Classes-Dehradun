@@ -9,6 +9,7 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
   const isActive = (href: string) =>
     href === "/" ? currentPath === "/" : currentPath.startsWith(href);
   const isCurrent = (href: string) => currentPath === href;
+  const isCourseSectionActive = isActive("/courses") || isActive("/online-courses");
 
   const courseLinks = (
     <>
@@ -76,7 +77,7 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
                       <summary
                         aria-controls="desktop-course-menu"
                         className={`cursor-pointer list-none rounded-md px-2 py-2 transition-colors hover:text-yellow-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 [&::-webkit-details-marker]:hidden ${
-                          isActive(item.href) ? "font-semibold underline underline-offset-4" : ""
+                          isCourseSectionActive ? "font-semibold underline underline-offset-4" : ""
                         }`}
                       >
                         {item.label}
@@ -153,7 +154,9 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
                       <details>
                         <summary
                           aria-controls="mobile-course-menu"
-                          className="cursor-pointer list-none rounded-xl px-4 py-3 transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 [&::-webkit-details-marker]:hidden"
+                          className={`cursor-pointer list-none rounded-xl px-4 py-3 transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 [&::-webkit-details-marker]:hidden ${
+                            isCourseSectionActive ? "font-semibold underline underline-offset-4" : ""
+                          }`}
                         >
                           Courses
                         </summary>

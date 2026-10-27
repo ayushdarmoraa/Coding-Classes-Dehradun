@@ -1,5 +1,7 @@
 // Generic GA parameter map (avoid 'any')
 // Using unknown allows safe passing through to gtag / dataLayer without typing noise.
+import { PUBLISHED_LAB_ANALYTICS_METADATA } from "./lab/analytics-metadata";
+
 export type GAParams = Record<string, unknown>;
 
 export function track(event: string, params: GAParams = {}): void {
@@ -16,12 +18,18 @@ export function track(event: string, params: GAParams = {}): void {
   (w.dataLayer as unknown[]).push({ event, ...params });
 }
 
+/** Accepts only a pathname; query strings and fragments are rejected. */
 export function derivePageContext(pathname: string): {
   page_type: string;
   course_slug: string;
   city: "dehradun" | "india" | "(unknown)";
 } {
-  const path = pathname.replace(/\/+/g, "/").replace(/\/$/, "");
+  if (typeof pathname !== "string" || /[?#]/.test(pathname)) {
+    return { page_type: "generic", course_slug: "", city: "(unknown)" };
+  }
+
+  const path = pathname.replace(/\/+/g, "/").replace(/\/$/, "") || "/";
+  const labPath = pathname.replace(/\/+$/, "") || "/";
   const segs = path.split("/").filter(Boolean);
 
   let page_type = "generic";
@@ -42,6 +50,13 @@ export function derivePageContext(pathname: string): {
     page_type = "blog_post";
   } else if (segs[0] === "contact") {
     page_type = "contact";
+  } else if (labPath === "/lab") {
+    page_type = "lab_index";
+  } else if (PUBLISHED_LAB_ANALYTICS_METADATA.some(
+    ({ track, slug, status }) =>
+      status === "published" && labPath === `/lab/${track}/${slug}`,
+  )) {
+    page_type = "lab_challenge";
   }
 
   return { page_type, course_slug, city };
@@ -59,4 +74,211 @@ export function trackEnrollClick(params: { page_type: string; course_slug?: stri
 
 export function trackForm(step: 'start' | 'submit' | 'error', extra: GAParams = {}) {
   track(`lead_form_${step}`, extra);
+}
+
+export function trackLabAttempt(challengeId: string): void {
+  track("dca_lab_attempt", { challenge_id: challengeId });
+}
+
+export function trackLabHintView(challengeId: string, hintLevel: number): void {
+  track("dca_lab_hint_view", {
+    challenge_id: challengeId,
+    hint_level: hintLevel,
+  });
+}
+
+export function trackLabCompletion(challengeId: string): void {
+  track("dca_lab_completed", { challenge_id: challengeId });
+}
+
+export type LabDifficulty = "Beginner" | "Intermediate" | "Advanced";
+
+export type LabChallengeContext = Readonly<{
+  challengeSlug: string;
+  track: string;
+  difficulty: LabDifficulty;
+}>;
+
+const SAFE_ROUTE_SEGMENT = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const MAX_ATTEMPT_NUMBER = 10000;
+const MAX_HINT_LEVEL = 5;
+
+function isPublishedLabContext(
+  context: LabChallengeContext,
+): boolean {
+  if (!context || typeof context !== "object") return false;
+  return PUBLISHED_LAB_ANALYTICS_METADATA.some(
+    (metadata) =>
+      metadata.status === "published" &&
+      context.challengeSlug === metadata.slug &&
+      context.track === metadata.track &&
+      context.difficulty === metadata.difficulty &&
+      SAFE_ROUTE_SEGMENT.test(context.challengeSlug) &&
+      SAFE_ROUTE_SEGMENT.test(context.track),
+  );
+}
+
+function isValidPositiveInteger(value: number, maximum: number): boolean {
+  return Number.isSafeInteger(value) && value >= 1 && value <= maximum;
+}
+
+function getSafeLabPagePath(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  const pathname = window.location.pathname;
+  if (typeof pathname !== "string" || /[?#]/.test(pathname)) return undefined;
+
+  const normalized = pathname.replace(/\/+$/, "") || "/";
+  if (normalized === "/lab") return normalized;
+  return PUBLISHED_LAB_ANALYTICS_METADATA.some(
+    ({ track, slug, status }) =>
+      status === "published" &&
+      normalized === `/lab/${track}/${slug}`,
+  )
+    ? normalized
+    : undefined;
+}
+
+function labEventParams(
+  context: LabChallengeContext,
+  additional?: Readonly<{
+    attempt_number?: number;
+    hint_level?: number;
+    completed?: boolean;
+    related_course_slug?: string;
+  }>,
+): GAParams | undefined {
+  if (!isPublishedLabContext(context)) return undefined;
+  if (
+    additional?.attempt_number !== undefined &&
+    !isValidPositiveInteger(additional.attempt_number, MAX_ATTEMPT_NUMBER)
+  ) {
+    return undefined;
+  }
+  if (
+    additional?.hint_level !== undefined &&
+    !isValidPositiveInteger(additional.hint_level, MAX_HINT_LEVEL)
+  ) {
+    return undefined;
+  }
+  if (
+    additional?.completed !== undefined &&
+    typeof additional.completed !== "boolean"
+  ) {
+    return undefined;
+  }
+  if (
+    additional?.related_course_slug !== undefined &&
+    (additional.related_course_slug !==
+      PUBLISHED_LAB_ANALYTICS_METADATA.find(
+        ({ slug }) => slug === context.challengeSlug,
+      )?.relatedCourseSlug ||
+      !SAFE_ROUTE_SEGMENT.test(additional.related_course_slug))
+  ) {
+    return undefined;
+  }
+
+  const pagePath = getSafeLabPagePath();
+  return {
+    challenge_slug: context.challengeSlug,
+    track: context.track,
+    difficulty: context.difficulty,
+    ...(pagePath ? { page_path: pagePath } : {}),
+    ...(additional?.attempt_number === undefined
+      ? {}
+      : { attempt_number: additional.attempt_number }),
+    ...(additional?.hint_level === undefined
+      ? {}
+      : { hint_level: additional.hint_level }),
+    ...(additional?.completed === undefined
+      ? {}
+      : { completed: additional.completed }),
+    ...(additional?.related_course_slug === undefined
+      ? {}
+      : { related_course_slug: additional.related_course_slug }),
+  };
+}
+
+function trackLabEvent(event: string, params: GAParams | undefined): void {
+  if (params) track(event, params);
+}
+
+export function trackLabImpression(context: LabChallengeContext): void {
+  trackLabEvent("lab_impression", labEventParams(context));
+}
+
+export function trackLabStart(context: LabChallengeContext): void {
+  trackLabEvent("lab_start", labEventParams(context));
+}
+
+export function trackLabFirstEdit(context: LabChallengeContext): void {
+  trackLabEvent("lab_first_edit", labEventParams(context));
+}
+
+export function trackLabRun(
+  context: LabChallengeContext,
+  attemptNumber: number,
+): void {
+  trackLabEvent(
+    "lab_run",
+    labEventParams(context, { attempt_number: attemptNumber }),
+  );
+}
+
+export function trackLabTestResult(
+  context: LabChallengeContext,
+  attemptNumber: number,
+  completed: boolean,
+): void {
+  trackLabEvent(
+    "lab_test_result",
+    labEventParams(context, {
+      attempt_number: attemptNumber,
+      completed,
+    }),
+  );
+}
+
+export function trackLabHintOpen(
+  context: LabChallengeContext,
+  hintLevel: number,
+): void {
+  trackLabEvent(
+    "lab_hint_open",
+    labEventParams(context, { hint_level: hintLevel }),
+  );
+}
+
+export function trackLabReset(context: LabChallengeContext): void {
+  trackLabEvent("lab_reset", labEventParams(context));
+}
+
+export function trackLabComplete(
+  context: LabChallengeContext,
+  attemptNumber: number,
+): void {
+  trackLabEvent(
+    "lab_complete",
+    labEventParams(context, {
+      attempt_number: attemptNumber,
+      completed: true,
+    }),
+  );
+}
+
+export function trackLabSkillMapView(context: LabChallengeContext): void {
+  trackLabEvent("lab_skill_map_view", labEventParams(context));
+}
+
+export function trackLabCourseClick(
+  context: LabChallengeContext,
+  relatedCourseSlug: string,
+): void {
+  trackLabEvent(
+    "lab_course_click",
+    labEventParams(context, { related_course_slug: relatedCourseSlug }),
+  );
+}
+
+export function trackLabContactClick(context: LabChallengeContext): void {
+  trackLabEvent("lab_contact_click", labEventParams(context));
 }

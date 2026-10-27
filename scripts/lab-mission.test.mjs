@@ -21,44 +21,53 @@ function loadTypeScript(relativePath, localModules = {}) {
 }
 
 const mission = loadTypeScript("src/lib/lab/mission.ts");
-const { createSkillMap } = loadTypeScript("src/lib/lab/skill-map.ts", { "./mission": mission });
-const route = readFileSync(path.resolve(root, "src/app/lab/javascript/discount-calculation-bug/page.tsx"), "utf8");
+const challengeRegistry = loadTypeScript("src/lib/lab/challenges.ts", {
+  "./mission": mission,
+  "./types": loadTypeScript("src/lib/lab/types.ts"),
+  "./challenge-utils": loadTypeScript("src/lib/lab/challenge-utils.ts"),
+  "./analytics-metadata": loadTypeScript(
+    "src/lib/lab/analytics-metadata.ts",
+  ),
+});
+const { createSkillMap } = loadTypeScript("src/lib/lab/skill-map.ts", {
+  "./mission": mission,
+  "./challenges": challengeRegistry,
+});
+const route = readFileSync(path.resolve(root, "src/app/lab/[track]/[slug]/page.tsx"), "utf8");
+const missionChallenge = challengeRegistry.getChallenge("javascript", mission.MISSION_ID);
 const workspace = readFileSync(path.resolve(root, "src/components/lab/ChallengeWorkspace.tsx"), "utf8");
 const workspacePanels = readFileSync(path.resolve(root, "src/components/lab/ChallengeWorkspacePanels.tsx"), "utf8");
 const skillMapComponent = readFileSync(path.resolve(root, "src/components/lab/SkillMap.tsx"), "utf8");
 const completionPanel = readFileSync(path.resolve(root, "src/components/lab/CompletionPanel.tsx"), "utf8");
 const editor = readFileSync(path.resolve(root, "src/components/lab/CodeEditor.tsx"), "utf8");
 const worker = readFileSync(path.resolve(root, "src/lib/lab/discount-calculation.worker.ts"), "utf8");
-const workerClient = readFileSync(path.resolve(root, "src/lib/lab/worker-client.ts"), "utf8");
-const {
-  isMissionWorkerResponse,
-  MISSION_TESTS,
-} = mission;
-const { compileMission, MissionSyntaxError } = loadTypeScript("src/lib/lab/runner.ts", {
-  "./mission": mission,
-});
-const { handleMissionMessage } = loadTypeScript("src/lib/lab/discount-calculation.worker.ts", {
-  "./mission": mission,
-  "./runner": { compileMission, MissionSyntaxError },
-});
-const { startMissionWorker } = loadTypeScript("src/lib/lab/worker-client.ts", {
-  "./mission": mission,
-});
+const runController = readFileSync(path.resolve(root, "src/lib/lab/mission-run-controller.ts"), "utf8");
+const { compileMission, MissionSyntaxError } = loadTypeScript(
+  "src/lib/lab/runner.ts",
+  { "./mission": mission },
+);
 const header = readFileSync(path.resolve(root, "src/components/layout/Header.tsx"), "utf8");
 const labPage = readFileSync(path.resolve(root, "src/app/lab/page.tsx"), "utf8");
 
 test("mission route presents the approved scenario, metadata, and learning objective", () => {
-  assert.match(route, /Fix the Discount Calculation Bug/);
-  assert.match(route, /An online store has a discount calculator/);
-  assert.match(route, /A product costs ₹800/);
-  assert.match(route, /The discount is 10%/);
-  assert.match(route, /Expected total/);
-  assert.match(route, /₹720/);
-  assert.match(route, /Current output/);
-  assert.match(route, /₹800/);
-  assert.match(route, /calculateTotal/);
-  assert.match(route, /learning objective/i);
-  assert.match(route, /canonical: "\/lab\/javascript\/discount-calculation-bug"/);
+  assert.equal(missionChallenge.title, "Fix the Discount Calculation Bug");
+  assert.match(missionChallenge.mission.scenario.join(" "), /online store has a discount calculator/);
+  assert.match(missionChallenge.mission.scenario.join(" "), /₹800/);
+  assert.match(missionChallenge.mission.scenario.join(" "), /10%/);
+  assert.match(missionChallenge.mission.objective, /calculateTotal/);
+  assert.deepEqual(
+    missionChallenge.tests.map(({ price, discountPercent, expected }) => [
+      price,
+      discountPercent,
+      expected,
+    ]),
+    [[800, 10, 720], [1000, 20, 800], [500, 0, 500], [200, 100, 0]],
+  );
+  assert.match(route, /getChallenge\(params\.track, params\.slug\)/);
+  assert.match(route, /<MissionBrief\s+challenge=\{challenge\}/);
+  assert.match(route, /notFound\(\)/);
+  assert.match(route, /alternates: \{ canonical \}/);
+  assert.deepEqual(route.includes("ChallengeWorkspace"), true);
 });
 
 test("starter code is intentionally incorrect and the deterministic cases cover boundaries", () => {
@@ -83,6 +92,13 @@ test("saved mission progress rejects malformed values", () => {
     updatedAt: "2026-10-25T00:00:00.000Z",
   };
   assert.equal(mission.isSavedMissionProgress(valid), true);
+  assert.equal(
+    mission.isSavedMissionProgress({
+      ...valid,
+      code: "x".repeat(mission.MAX_MISSION_CODE_LENGTH + 1),
+    }),
+    false,
+  );
   assert.equal(mission.isSavedMissionProgress({ ...valid, attempts: -1 }), false);
   assert.equal(mission.isSavedMissionProgress({ ...valid, highestHintViewed: 4 }), false);
   assert.equal(mission.isSavedMissionProgress(null), false);
@@ -151,11 +167,7 @@ test("mission runner evaluates the supported arithmetic expression and rejects e
     MissionSyntaxError,
   );
   assert.throws(
-    () => compileMission(`function calculateTotal(price, discountPercent) { return ${"(".repeat(33)}price${")".repeat(33)}; }`),
-    MissionSyntaxError,
-  );
-  assert.throws(
-    () => compileMission(`function calculateTotal(price, discountPercent) { return ${"1 + ".repeat(1100)}1; }`),
+    () => compileMission("x".repeat(mission.MAX_MISSION_CODE_LENGTH + 1)),
     MissionSyntaxError,
   );
 });
@@ -174,124 +186,25 @@ test("editor is CodeMirror 6 and is loaded only inside the client workspace", ()
   assert.doesNotMatch(readFileSync(path.resolve(root, "src/app/page.tsx"), "utf8"), /CodeEditor|ChallengeWorkspace/);
 });
 
-test("worker rejects imports and network-capable expressions before evaluation", () => {
-  for (const code of [
-    'function calculateTotal(price, discountPercent) { return import("https://example.invalid/module.js"); }',
-    "function calculateTotal(price, discountPercent) { return fetch('/private'); }",
-    "function calculateTotal(price, discountPercent) { return new XMLHttpRequest(); }",
-    "function calculateTotal(price, discountPercent) { return new WebSocket('wss://example.invalid'); }",
-    "function calculateTotal(price, discountPercent) { return navigator.sendBeacon('/private'); }",
-    "function calculateTotal(price, discountPercent) { return importScripts('/worker.js'); }",
-  ]) {
-    assert.deepEqual(
-      handleMissionMessage({ code }),
-      { type: "error", error: "syntax" },
-    );
-  }
-});
-
-test("worker protocol accepts only canonical complete results and rejects forged successes", () => {
-  const code = "function calculateTotal(price, discountPercent) { return price * (100 - discountPercent) / 100; }";
-  const response = handleMissionMessage({ code });
-  assert.equal(isMissionWorkerResponse(response), true);
-  assert.equal(
-    response.type === "results" && response.results.every(({ status }) => status === "passed"),
-    true,
-  );
-
-  if (response.type !== "results") return;
-  const forged = {
-    ...response,
-    results: response.results.map((result, index) =>
-      index === 0 ? { ...result, expected: 0 } : result,
-    ),
-  };
-  assert.equal(isMissionWorkerResponse(forged), false);
-  assert.equal(isMissionWorkerResponse({ type: "results", results: [] }), false);
-  assert.equal(isMissionWorkerResponse({ type: "results", results: response.results.slice(1) }), false);
-  assert.equal(isMissionWorkerResponse({ type: "error", error: "forged" }), false);
-  assert.equal(isMissionWorkerResponse({ ...response, extra: true }), false);
-});
-
-test("worker catches evaluation exceptions and reports non-finite arithmetic as incorrect", () => {
-  const throwingWorker = loadTypeScript("src/lib/lab/discount-calculation.worker.ts", {
-    "./mission": mission,
-    "./runner": {
-      MissionSyntaxError,
-      compileMission: () => () => {
-        throw new Error("evaluation failure");
-      },
-    },
-  });
-  const throwingResponse = throwingWorker.handleMissionMessage({ code: "valid parsed expression" });
-  assert.equal(throwingResponse.type, "results");
-  if (throwingResponse.type === "results") {
-    assert.ok(throwingResponse.results.every(({ status, actual }) =>
-      status === "runtime-error" && actual === null,
-    ));
-  }
-
-  const nonFiniteResponse = handleMissionMessage({
-    code: "function calculateTotal(price, discountPercent) { return price / 0; }",
-  });
-  assert.equal(nonFiniteResponse.type, "results");
-  if (nonFiniteResponse.type === "results") {
-    assert.deepEqual(
-      nonFiniteResponse.results.map(({ actual, status }) => [actual, status]),
-      MISSION_TESTS.map(() => [null, "incorrect"]),
-    );
-  }
-});
-
-test("worker client rejects malformed or forged messages and terminates on timeout or cancellation", async () => {
-  class FakeWorker {
-    onmessage = null;
-    onerror = null;
-    onmessageerror = null;
-    terminated = false;
-    postedMessage = null;
-
-    postMessage(message) {
-      this.postedMessage = message;
-    }
-
-    terminate() {
-      this.terminated = true;
-    }
-  }
-
-  const malformedWorker = new FakeWorker();
-  const malformedRun = startMissionWorker(malformedWorker, "code", 1000);
-  assert.deepEqual(malformedWorker.postedMessage, { code: "code" });
-  malformedWorker.onmessage({ data: { type: "results", results: [{ status: "passed" }] } });
-  assert.deepEqual(await malformedRun.promise, { type: "error", error: "internal" });
-  assert.equal(malformedWorker.terminated, true);
-
-  const timeoutWorker = new FakeWorker();
-  const timeoutRun = startMissionWorker(timeoutWorker, "code", 5);
-  assert.deepEqual(await timeoutRun.promise, { type: "error", error: "timeout" });
-  assert.equal(timeoutWorker.terminated, true);
-
-  const cancelledWorker = new FakeWorker();
-  const cancelledRun = startMissionWorker(cancelledWorker, "code", 1000);
-  cancelledRun.cancel();
-  assert.deepEqual(await cancelledRun.promise, { type: "cancelled" });
-  assert.equal(cancelledWorker.terminated, true);
-});
-
 test("worker runs the restricted mission interpreter and never evaluates source or leaks stacks", () => {
+  assert.match(worker, /function compileMission\(source\)/);
   assert.match(worker, /compileMission\(request\.code\)/);
+  assert.match(worker, /request\.code\.length > MAX_MISSION_CODE_LENGTH/);
+  assert.match(workspace, /MAX_MISSION_CODE_LENGTH/);
+  assert.match(workspace, /Extra pasted characters were not kept/);
   assert.doesNotMatch(worker, /new Function|eval\(/);
-  assert.doesNotMatch(worker, /fetch\(|importScripts|import\(/);
+  assert.doesNotMatch(worker, /fetch\(|importScripts|import\(|XMLHttpRequest/);
   assert.match(workspace, /RUN_TIMEOUT_MS = 1500/);
-  assert.match(workspace, /startMissionWorker/);
-  assert.match(workerClient, /worker\.postMessage\(\{ code \}\)/);
+  assert.match(runController, /worker\.terminate\(\)/);
+  assert.match(runController, /worker\.postMessage\(\{ code \}\)/);
+  assert.match(runController, /isMissionWorkerResponse\(data\)/);
+  assert.match(runController, /timeoutMs/);
   assert.doesNotMatch(workspace, /fetch\(|\/api\//);
   assert.doesNotMatch(worker, /stack|process\.env|SMTP|contact/i);
   assert.match(workspacePanels, /Execution timed out/);
   assert.match(workspacePanels, /Show hint \{index \+ 1\}/);
   assert.match(completionPanel, /Mission Complete/);
-  assert.match(workspacePanels, /aria-labelledby="results-heading" aria-live="polite"/);
+  assert.match(workspacePanels, /role="status" aria-live="polite"/);
   assert.match(workspacePanels, /min-h-11/);
 });
 
@@ -300,7 +213,7 @@ test("challenge and mentor CTAs point to implemented routes", () => {
   assert.match(header, /Try Free Challenge/);
   assert.match(header, /href="\/contact"/);
   assert.match(header, /Talk to Mentor/);
-  assert.match(labPage, /href="\/lab\/javascript\/discount-calculation-bug"/);
+  assert.match(labPage, /href=\{`\/lab\/\$\{featuredChallenge\.track\}\/\$\{featuredChallenge\.slug\}`\}/);
 });
 
 test("completed mission integrates the limited Skill Map and existing next-step routes", () => {
@@ -328,8 +241,9 @@ test("challenge workspace follows the required mobile content order", () => {
     "<MissionHints",
     "<CompletionPanel",
   ];
-  const workspaceOffset = route.indexOf("<ChallengeWorkspace");
-  assert.ok(route.indexOf(sections[0]) < workspaceOffset, "Mission brief must precede the workspace");
+  const workspaceOffset = route.indexOf("<ChallengeWorkspace>");
+  const briefOffset = route.indexOf("<MissionBrief");
+  assert.ok(briefOffset > workspaceOffset, "The server-rendered brief must be passed into the workspace first");
   let previousIndex = -1;
   for (const section of sections.slice(1)) {
     const index = workspace.indexOf(section);

@@ -3,6 +3,7 @@ import path from "path";
 import matter from "gray-matter";
 import { remark } from "remark";
 import html from "remark-html";
+import { getCourseBySlug } from "@/lib/courses";
 
 // Optional HowTo types (for HowTo schema support)
 export interface HowToStep {
@@ -50,7 +51,7 @@ export interface BlogPost {
 const postsDirectory = path.join(process.cwd(), "src/content/blog");
 
 // --- Taxonomy Normalizers (minimal, centralized) -----------------------------
-const CATEGORY_MAP: Record<string, "Full-Stack" | "Data Science" | "Python" | "Java"> = {
+const CATEGORY_MAP: Record<string, "Full-Stack" | "Data Science" | "Python" | "Java" | "How-To"> = {
   "full-stack": "Full-Stack",
   "full stack": "Full-Stack",
   "fullstack": "Full-Stack",
@@ -59,12 +60,60 @@ const CATEGORY_MAP: Record<string, "Full-Stack" | "Data Science" | "Python" | "J
   "datascience": "Data Science",
   "python": "Python",
   "java": "Java",
+  "how-to": "How-To",
 };
 
-function normalizeCategory(input?: string | null): "Full-Stack" | "Data Science" | "Python" | "Java" | undefined {
+function normalizeCategory(input?: string | null): "Full-Stack" | "Data Science" | "Python" | "Java" | "How-To" | undefined {
   if (!input) return undefined;
   const key = String(input).trim().toLowerCase();
   return CATEGORY_MAP[key as keyof typeof CATEGORY_MAP];
+}
+
+export function parseEditorialDate(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const date = value.trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return undefined;
+  const parsed = new Date(`${date}T00:00:00.000Z`);
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date
+    ? date
+    : undefined;
+}
+
+export function extractMarkdownFaqs(content: string): { q: string; a: string }[] {
+  const section = content
+    .match(/^##\s+(?:FAQs?|Frequently asked questions)\b[^\r\n]*\r?\n([\s\S]*)/im)?.[1]
+    ?.split(/^##?\s/m, 1)[0];
+  if (!section) return [];
+
+  const questions = Array.from(
+    section.matchAll(/^\s*\*\*((?:Q\.\s*)?[^*\r\n]*\?)\*\*\s*$/gm),
+  );
+  const cleanText = (value: string) =>
+    value
+      .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+      .replace(/<[^>]*>/g, "")
+      .replace(/[`*_~]/g, "")
+      .replace(/^\s*[-*+]\s+/gm, "")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#(?:39|x27);/gi, "'")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  return questions.flatMap((question, index) => {
+    const answerStart = question.index + question[0].length;
+    const nextQuestion = questions[index + 1];
+    const rawAnswer = section.slice(
+      answerStart,
+      nextQuestion?.index ?? section.length,
+    ).split(/\r?\n\s*---\s*\r?\n/)[0];
+    const q = cleanText(question[1].replace(/^Q\.\s*/i, ""));
+    const a = cleanText(rawAnswer);
+    return q && a ? [{ q, a }] : [];
+  });
 }
 
 // We won't change how tags/keywords are displayed across the site;
@@ -106,17 +155,7 @@ function readOne(name: string): BlogPost {
     throw new Error(`Missing or invalid publication date in ${name}`);
   }
 
-  // lastModified: use fm.lastModified or fallback to file mtime (ISO)
-  let lastModified: string | undefined = (fm.lastModified || "").toString().trim() || undefined;
-  if (!lastModified) {
-    try {
-      const fsPath = fs.existsSync(path.join(process.cwd(), "src/content/blog", `${slug}.mdx`))
-        ? path.join(process.cwd(), "src/content/blog", `${slug}.mdx`)
-        : path.join(process.cwd(), "src/content/blog", `${slug}.md`);
-      const stat = fs.statSync(fsPath);
-      lastModified = new Date(stat.mtime).toISOString();
-    } catch {}
-  }
+  const lastModified = parseEditorialDate(fm.lastModified);
 
   // Image: treat empty strings as undefined; accept coverImage alias
   const imageRaw = (fm.image ?? fm.coverImage ?? "").toString().trim();
@@ -227,7 +266,7 @@ export async function getPostHtmlBySlug(
   const rendered = await remark().use(html).process(post.content);
   let htmlStr = String(rendered);
 
-  // Add ids to <h2> and <h3>, build TOC (simple, dependency-free)
+  // Demote article-level H1s so the page title remains the route's only H1.
   const toc: { id: string; text: string; level: 2 | 3 }[] = [];
   const mkId = (s: string) =>
     s
@@ -238,6 +277,11 @@ export async function getPostHtmlBySlug(
       .slice(0, 64);
 
   htmlStr = htmlStr
+    .replace(/<h1>([^<]+)<\/h1>/g, (_m, text) => {
+      const id = mkId(text);
+      toc.push({ id, text, level: 2 });
+      return `<h2 id="${id}">${text}</h2>`;
+    })
     .replace(/<h2>([^<]+)<\/h2>/g, (_m, text) => {
       const id = mkId(text);
       toc.push({ id, text, level: 2 });
@@ -249,8 +293,8 @@ export async function getPostHtmlBySlug(
       return `<h3 id="${id}">${text}</h3>`;
     });
 
-  // Optional: file mtime as lastModified (best-effort)
-  const lastModified = getPostLastModified(slug);
+  // Only explicit editorial update dates are eligible for display or schema.
+  const lastModified = post.lastModified;
 
   return { ...post, html: htmlStr, toc, lastModified };
 }
@@ -296,30 +340,55 @@ export function paginate<T>(items: T[], page = 1, perPage = 6) {
   };
 }
 
+export function selectRelatedPosts(
+  post: Pick<BlogPost, "slug" | "related">,
+  posts: BlogPost[],
+  limit = 3,
+): BlogPost[] {
+  if (!post.related?.length || limit <= 0) return [];
+  const related: BlogPost[] = [];
+  for (const slug of post.related) {
+    const candidate = posts.find(
+      (entry) => entry.slug === slug && entry.slug !== post.slug && !entry.draft,
+    );
+    if (candidate && !related.some((entry) => entry.slug === candidate.slug)) {
+      related.push(candidate);
+    }
+    if (related.length === limit) break;
+  }
+  return related;
+}
+
 export function relatedPosts(slug: string, limit = 3): BlogPost[] {
   const all = getAllBlogPosts();
-  const me = all.find((p) => p.slug === slug);
-  if (!me) return all.slice(0, limit);
+  const post = all.find((entry) => entry.slug === slug);
+  return post ? selectRelatedPosts(post, all, limit) : [];
+}
 
-  // 1) If frontmatter provides explicit related slugs, respect them first
-  if (me.related?.length) {
-    const explicit = me.related
-      .map((r) => all.find((p) => p.slug === r))
-      .filter(Boolean) as BlogPost[];
-    if (explicit.length >= limit) return explicit.slice(0, limit);
+export type RelatedCourseLink = {
+  slug: string;
+  title: string;
+  href: string;
+  mode: "Online" | "On-Campus";
+};
 
-    // top up with category-based suggestions
-    const pool = all.filter((p) => p.slug !== slug && !explicit.some((e) => e.slug === p.slug));
-    const sameCat = pool.filter((p) => normalizeCategory(p.category) === normalizeCategory(me.category));
-    const rest = pool.filter((p) => normalizeCategory(p.category) !== normalizeCategory(me.category));
-    return [...explicit, ...sameCat, ...rest].slice(0, limit);
+export function getRelatedCourseLinks(
+  post: Pick<BlogPost, "content">,
+): RelatedCourseLink[] {
+  const links = new Map<string, RelatedCourseLink>();
+  const pattern = /\]\((\/(online-)?courses\/([a-z0-9]+(?:-[a-z0-9]+)*)(?:[?#][^)]*)?)\)/gi;
+  for (const match of post.content.matchAll(pattern)) {
+    const [, href, online, slug] = match;
+    const course = getCourseBySlug(slug);
+    if (!course || links.has(href)) continue;
+    links.set(href, {
+      slug,
+      title: course.title,
+      href,
+      mode: online ? "Online" : "On-Campus",
+    });
   }
-
-  // 2) Otherwise, fall back to category proximity
-  const pool = all.filter((p) => p.slug !== slug);
-  const sameCat = pool.filter((p) => normalizeCategory(p.category) === normalizeCategory(me.category));
-  const rest = pool.filter((p) => normalizeCategory(p.category) !== normalizeCategory(me.category));
-  return [...sameCat, ...rest].slice(0, limit);
+  return Array.from(links.values());
 }
 
 // Unique list of tags (keywords)
@@ -403,21 +472,9 @@ export function postsIn(year?: number, month?: number) {
   });
 }
 
-// Get file last-modified timestamp for a post (mdx or md)
+// Return only an explicitly supplied editorial update date.
 export function getPostLastModified(slug: string): string | undefined {
-  try {
-    const fsPathMdx = path.join(process.cwd(), "src/content/blog", `${slug}.mdx`);
-    const stat = fs.statSync(fsPathMdx);
-    return new Date(stat.mtime).toISOString();
-  } catch {
-    try {
-      const fsPathMd = path.join(process.cwd(), "src/content/blog", `${slug}.md`);
-      const stat = fs.statSync(fsPathMd);
-      return new Date(stat.mtime).toISOString();
-    } catch {
-      return undefined;
-    }
-  }
+  return getPostBySlug(slug)?.lastModified;
 }
 
 // --- HowTo helpers ---
@@ -463,4 +520,3 @@ export function nextPrevInSeries(
     nextInSeries: idx >= 0 && idx < seq.length - 1 ? seq[idx + 1] : undefined,
   };
 }
-

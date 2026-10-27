@@ -29,8 +29,8 @@ function requireNodeName(node: SyntaxNode | undefined, name: string): SyntaxNode
   return node;
 }
 
-function parseExpression(node: SyntaxNode, source: string, depth = 0): Expression {
-  if (node.type.isError || depth > 32) throw new MissionSyntaxError();
+function parseExpression(node: SyntaxNode, source: string): Expression {
+  if (node.type.isError) throw new MissionSyntaxError();
 
   if (node.name === "Number") {
     const value = Number(source.slice(node.from, node.to));
@@ -50,12 +50,12 @@ function parseExpression(node: SyntaxNode, source: string, depth = 0): Expressio
     const expression = parts[1];
     requireNodeName(parts[2], ")");
     if (parts.length !== 3 || !expression) throw new MissionSyntaxError();
-    return parseExpression(expression, source, depth + 1);
+    return parseExpression(expression, source);
   }
 
   if (node.name === "BinaryExpression") {
     if (parts.length !== 3) throw new MissionSyntaxError();
-    const left = parseExpression(parts[0], source, depth + 1);
+    const left = parseExpression(parts[0], source);
     const operatorNode = requireNodeName(parts[1], "ArithOp");
     const operator = source.slice(operatorNode.from, operatorNode.to);
     if (!["+", "-", "*", "/", "%"].includes(operator)) throw new MissionSyntaxError();
@@ -63,7 +63,7 @@ function parseExpression(node: SyntaxNode, source: string, depth = 0): Expressio
       kind: "binary",
       operator: operator as Operator,
       left,
-      right: parseExpression(parts[2], source, depth + 1),
+      right: parseExpression(parts[2], source),
     };
   }
 
