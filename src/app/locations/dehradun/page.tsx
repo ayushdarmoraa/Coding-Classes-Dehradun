@@ -90,7 +90,7 @@ export default function DehradunLocationPage() {
   const courses = getCourses();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white py-16">
         <div className="max-w-6xl mx-auto px-4">
@@ -541,6 +541,6 @@ export default function DehradunLocationPage() {
           }),
         }}
       />
-    </div>
+    </main>
   );
 }

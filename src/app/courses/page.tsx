@@ -74,7 +74,7 @@ export default function CoursesPage() {
   } as const;
 
   return (
-    <div className="min-h-screen bg-gray-50" id="top">
+    <main className="min-h-screen bg-gray-50" id="top">
       {/* Breadcrumb JSON-LD */}
       <Script
         id="courses-breadcrumb"
@@ -82,6 +82,9 @@ export default function CoursesPage() {
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
+      <h1 className="mx-auto mt-8 max-w-6xl px-4 text-3xl font-bold text-gray-900 md:text-4xl">
+        Explore Courses
+      </h1>
       <p className="mt-2 max-w-2xl text-gray-700">
         Compare course options, curriculum, duration, and fees to find a program that fits your goals.
       </p>
@@ -367,6 +370,6 @@ export default function CoursesPage() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

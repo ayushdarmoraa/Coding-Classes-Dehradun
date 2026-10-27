@@ -38,7 +38,7 @@ export default function OnlinePythonPage() {
     : undefined;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
+    <main className="max-w-4xl mx-auto px-4 py-12">
       <h1 className="text-3xl md:text-4xl font-bold mb-4">
         Online Python Course in India (Live + Projects)
       </h1>
@@ -78,6 +78,6 @@ export default function OnlinePythonPage() {
       <div className="mt-10 text-center">
         <Link href="/locations" className="underline text-blue-700 text-sm">See campus & cities</Link>
       </div>
-    </div>
+    </main>
   );
 }

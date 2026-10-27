@@ -34,7 +34,7 @@ export default function OnlineCoursesPage() {
   const onlineCourses = courses.filter(c => onlineSlugs.has(c.slug));
 
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen">
       {/* Hero */}
       <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white pt-10 pb-16">
         <div className="max-w-6xl mx-auto px-4 text-center">
@@ -103,6 +103,6 @@ export default function OnlineCoursesPage() {
           })
         }}
       />
-    </div>
+    </main>
   );
 }
