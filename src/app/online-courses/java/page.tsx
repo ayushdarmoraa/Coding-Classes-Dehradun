@@ -39,7 +39,7 @@ export default function JavaOnlinePage() {
     : undefined;
 
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen">
       <section className="py-12 md:py-16 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
@@ -117,6 +117,6 @@ export default function JavaOnlinePage() {
       <div className="mt-8 text-center pb-12">
         <Link href="/locations" className="underline text-blue-700 text-sm">See campus & cities</Link>
       </div>
-    </div>
+    </main>
   );
 }

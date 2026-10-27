@@ -39,7 +39,7 @@ jobs:
         run: npm run test:courses
 
       - name: Test DCA Lab
-        run: npm run test:lab
+        run: npm run test:pr3
 
       - name: Build production app
         run: npm run build

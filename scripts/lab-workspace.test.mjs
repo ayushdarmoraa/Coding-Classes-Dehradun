@@ -303,6 +303,78 @@ test("generated worker parses the supported formula and rejects executable learn
   assert.equal(messages.pop().error, "syntax");
 });
 
+test("worker rejects imports, network access, malformed requests, and forged results", () => {
+  let onMessage;
+  const messages = [];
+  const workerSelf = {
+    addEventListener(type, listener) {
+      assert.equal(type, "message");
+      onMessage = listener;
+    },
+    postMessage(message) {
+      messages.push(message);
+    },
+  };
+  runInNewContext(workerSource.buildDiscountCalculationWorkerScript(), {
+    self: workerSelf,
+  });
+
+  for (const expression of [
+    'import("https://example.invalid/module.js")',
+    "fetch('/private')",
+    "new XMLHttpRequest()",
+  ]) {
+    onMessage({
+      data: {
+        code: `function calculateTotal(price, discountPercent) { return ${expression}; }`,
+      },
+    });
+    assert.equal(messages.pop().error, "syntax", expression);
+  }
+
+  onMessage({
+    data: {
+      code: "function calculateTotal(price, discountPercent) { return price; }",
+      forged: true,
+    },
+  });
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(messages.pop())),
+    { type: "error", error: "internal" },
+  );
+
+  onMessage({
+    data: {
+      code: "x".repeat(mission.MAX_MISSION_CODE_LENGTH + 1),
+    },
+  });
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(messages.pop())),
+    { type: "error", error: "input-too-long" },
+  );
+
+  const valid = successfulResponse();
+  assert.equal(mission.isMissionWorkerResponse(valid), true);
+  assert.equal(
+    mission.isMissionWorkerResponse({ ...valid, success: true }),
+    false,
+  );
+  assert.equal(
+    mission.isMissionWorkerResponse({
+      ...valid,
+      results: [{ ...valid.results[0], status: "passed", actual: -1 }, ...valid.results.slice(1)],
+    }),
+    false,
+  );
+  assert.equal(
+    mission.isMissionWorkerResponse({
+      ...valid,
+      results: [{ ...valid.results[0], stack: "forged" }, ...valid.results.slice(1)],
+    }),
+    false,
+  );
+});
+
 test("mission execution prevents overlapping runs and returns objective results", () => {
   const timers = makeTimerHarness();
   const worker = makeWorker();

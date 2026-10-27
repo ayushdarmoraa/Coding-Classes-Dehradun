@@ -161,18 +161,26 @@ export function buildDiscountCalculationWorkerScript(): string {
     }
 
     self.addEventListener("message", (event) => {
-      if (typeof event.data?.code !== "string") {
+      const request = event.data;
+      if (
+        typeof request !== "object" ||
+        request === null ||
+        Array.isArray(request) ||
+        Object.keys(request).length !== 1 ||
+        !Object.prototype.hasOwnProperty.call(request, "code") ||
+        typeof request.code !== "string"
+      ) {
         self.postMessage({ type: "error", error: "internal" });
         return;
       }
-      if (event.data.code.length > MAX_MISSION_CODE_LENGTH) {
+      if (request.code.length > MAX_MISSION_CODE_LENGTH) {
         self.postMessage({ type: "error", error: "input-too-long" });
         return;
       }
 
       let calculateTotal;
       try {
-        calculateTotal = compileMission(event.data.code);
+        calculateTotal = compileMission(request.code);
       } catch (error) {
         const category = error instanceof MissionSyntaxError ? "syntax" : "internal";
         self.postMessage({ type: "error", error: category });

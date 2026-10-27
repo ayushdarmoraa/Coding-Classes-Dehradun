@@ -187,15 +187,17 @@ test("editor is CodeMirror 6 and is loaded only inside the client workspace", ()
 });
 
 test("worker runs the restricted mission interpreter and never evaluates source or leaks stacks", () => {
-  assert.match(worker, /compileMission\(event\.data\.code\)/);
-  assert.match(worker, /event\.data\.code\.length > MAX_MISSION_CODE_LENGTH/);
+  assert.match(worker, /function compileMission\(source\)/);
+  assert.match(worker, /compileMission\(request\.code\)/);
+  assert.match(worker, /request\.code\.length > MAX_MISSION_CODE_LENGTH/);
   assert.match(workspace, /MAX_MISSION_CODE_LENGTH/);
   assert.match(workspace, /Extra pasted characters were not kept/);
   assert.doesNotMatch(worker, /new Function|eval\(/);
-  assert.doesNotMatch(worker, /fetch\(|importScripts|import\(/);
+  assert.doesNotMatch(worker, /fetch\(|importScripts|import\(|XMLHttpRequest/);
   assert.match(workspace, /RUN_TIMEOUT_MS = 1500/);
   assert.match(runController, /worker\.terminate\(\)/);
   assert.match(runController, /worker\.postMessage\(\{ code \}\)/);
+  assert.match(runController, /isMissionWorkerResponse\(data\)/);
   assert.match(runController, /timeoutMs/);
   assert.doesNotMatch(workspace, /fetch\(|\/api\//);
   assert.doesNotMatch(worker, /stack|process\.env|SMTP|contact/i);

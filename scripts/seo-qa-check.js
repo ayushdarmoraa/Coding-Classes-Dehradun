@@ -79,8 +79,11 @@ function countH1s(html) {
   const mainContent = mainMatches
     .map((match) => match[1])
     .join("");
-  const content = mainMatches.length ? mainContent : html;
-  return Array.from(content.matchAll(/<h1\b[^>]*>/gi)).length;
+  return Array.from(mainContent.matchAll(/<h1\b[^>]*>/gi)).length;
+}
+
+function countMainLandmarks(html) {
+  return Array.from(html.matchAll(/<main\b[^>]*>/gi)).length;
 }
 
 function hasNonEmptyMissionSection(html, heading) {
@@ -192,8 +195,12 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
     }
   }
 
+  const mainCount = countMainLandmarks(html);
+  if (mainCount !== 1) {
+    issues.push(`expected exactly one <main> landmark, found ${mainCount}`);
+  }
   const h1Count = countH1s(html);
-  if (h1Count !== 1) issues.push(`expected exactly one <h1> in <main> (or document body), found ${h1Count}`);
+  if (h1Count !== 1) issues.push(`expected exactly one <h1> in <main>, found ${h1Count}`);
 
   const schemas = getJsonLd(html, issues);
   const types = collectTypes(schemas);

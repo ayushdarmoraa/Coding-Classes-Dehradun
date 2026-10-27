@@ -47,6 +47,27 @@ export type MissionRunnerError =
 
 export type MissionWorkerRequest = { code: string };
 
+function hasExactKeys(value: Record<string, unknown>, expectedKeys: readonly string[]) {
+  const keys = Object.keys(value).sort();
+  const sortedExpectedKeys = [...expectedKeys].sort();
+  return (
+    keys.length === sortedExpectedKeys.length &&
+    keys.every((key, index) => key === sortedExpectedKeys[index])
+  );
+}
+
+export function isMissionWorkerRequest(value: unknown): value is MissionWorkerRequest {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return false;
+  }
+  const request = value as Record<string, unknown>;
+  return (
+    hasExactKeys(request, ["code"]) &&
+    typeof request.code === "string" &&
+    request.code.length <= MAX_MISSION_CODE_LENGTH
+  );
+}
+
 export type SavedMissionProgress = {
   code: string;
   attempts: number;
@@ -98,30 +119,49 @@ export function getHighestMissionHintViewed(
 export function isMissionWorkerResponse(
   value: unknown,
 ): value is MissionWorkerResponse {
-  if (typeof value !== "object" || value === null) return false;
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return false;
+  }
 
   const response = value as Record<string, unknown>;
   if (response.type === "error") {
-    return [
-      "syntax",
-      "runtime",
-      "internal",
-      "input-too-long",
-    ].includes(String(response.error));
+    return (
+      hasExactKeys(response, ["type", "error"]) &&
+      ["syntax", "runtime", "internal", "input-too-long"].includes(
+        String(response.error),
+      )
+    );
   }
-  if (response.type !== "results" || !Array.isArray(response.results)) {
+  if (
+    response.type !== "results" ||
+    !hasExactKeys(response, ["type", "results"]) ||
+    !Array.isArray(response.results)
+  ) {
     return false;
   }
   if (response.results.length !== MISSION_TESTS.length) return false;
 
   return response.results.every((result: unknown, index: number) => {
-    if (typeof result !== "object" || result === null) return false;
+    if (typeof result !== "object" || result === null || Array.isArray(result)) {
+      return false;
+    }
     const item = result as Record<string, unknown>;
+    if (
+      !hasExactKeys(item, [
+        "id",
+        "price",
+        "discountPercent",
+        "expected",
+        "actual",
+        "status",
+      ])
+    ) {
+      return false;
+    }
     const expectedCase = MISSION_TESTS[index];
     const validStatus =
       (item.status === "passed" && item.actual === expectedCase.expected) ||
       (item.status === "incorrect" &&
-        item.actual !== null &&
         item.actual !== expectedCase.expected) ||
       (item.status === "runtime-error" && item.actual === null);
     return (

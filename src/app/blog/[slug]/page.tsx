@@ -182,7 +182,7 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
     : null;
 
   return (
-    <div className="container mx-auto p-4">
+    <main className="container mx-auto p-4">
       <Breadcrumbs items={crumbs} />
       {post.draft ? (
         <p className="mb-3 text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-md px-2 py-1 inline-block">
@@ -455,6 +455,6 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
         />
       ) : null}
-    </div>
+    </main>
   );
 }

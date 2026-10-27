@@ -39,6 +39,24 @@ test("validates Lab index metadata, canonical and unique H1 without Course schem
   assert.deepEqual(analyzeRenderedPage(html, "/lab"), []);
 });
 
+test("requires exactly one semantic main landmark with its page heading inside", () => {
+  const missingMain = page("/courses", [], "<div><h1>Courses</h1></div>");
+  const missingMainIssues = analyzeRenderedPage(missingMain, "/courses");
+  assert.ok(missingMainIssues.includes("expected exactly one <main> landmark, found 0"));
+  assert.ok(missingMainIssues.includes("expected exactly one <h1> in <main>, found 0"));
+
+  const duplicateMain = page(
+    "/courses",
+    [],
+    "<main><h1>Courses</h1></main><main><h2>Other content</h2></main>",
+  );
+  assert.ok(
+    analyzeRenderedPage(duplicateMain, "/courses").includes(
+      "expected exactly one <main> landmark, found 2",
+    ),
+  );
+});
+
 test("validates server-rendered mission scenario and objective without Course schema", () => {
   const html = page(
     "/lab/javascript/discount-calculation-bug",
@@ -69,7 +87,7 @@ test("reports missing Lab metadata and server-rendered mission content", () => {
   assert.ok(indexIssues.includes("page is missing a non-empty <title>"));
   assert.ok(indexIssues.includes("page is missing a non-empty meta description"));
   assert.ok(indexIssues.includes(
-    "expected exactly one <h1> in <main> (or document body), found 2",
+    "expected exactly one <h1> in <main>, found 2",
   ));
 
   const missingMissionContent = page(

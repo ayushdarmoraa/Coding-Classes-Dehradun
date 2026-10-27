@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 export default function Page() {
   const fullStack = getCourseBySlug("full-stack");
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
+    <main className="max-w-5xl mx-auto px-4 py-10">
       <header className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold">
           Doon Coding Academy vs Coding Ninjas (2025)
@@ -233,6 +233,6 @@ export default function Page() {
           }),
         }}
       />
-    </div>
+    </main>
   );
 }

@@ -134,7 +134,7 @@ export async function generateMetadata({
   } as const;
 
   return (
-    <div className="container mx-auto p-4">
+    <main className="container mx-auto p-4">
       <FeedLinks />
       <PrevNextLinks prev={prevUrl} next={nextUrl} />
       <h1 className="text-3xl font-bold mb-2">Guides for Coding Learners</h1>
@@ -406,6 +406,6 @@ export async function generateMetadata({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
-    </div>
+    </main>
   );
 }
