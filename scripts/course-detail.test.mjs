@@ -215,7 +215,13 @@ test("all canonical course detail routes render their registry facts and metadat
     const metadata = await routeModule.generateMetadata({
       params: { slug: course.slug },
     });
-    const courseJsonLd = readJsonLd(markup, "course-structured-data");
+    const hasConfirmedCampusMode = coursesModule.isCourseModeAvailable(
+      course,
+      "On-Campus",
+    );
+    const courseJsonLd = hasConfirmedCampusMode
+      ? readJsonLd(markup, "course-structured-data")
+      : undefined;
 
     const decodedMarkup = decodeHtml(markup);
     assert.ok(decodedMarkup.includes(`<h1 class="text-3xl md:text-4xl font-extrabold mb-3">${course.title}</h1>`));
@@ -227,11 +233,15 @@ test("all canonical course detail routes render their registry facts and metadat
       metadata.alternates.canonical,
       `${siteConfigModule.SITE.url}/courses/${course.slug}`,
     );
-    assert.equal(courseJsonLd["@type"], "Course");
-    assert.equal(courseJsonLd.name, course.title);
-    assert.equal(courseJsonLd.courseCode, course.slug);
-    assert.equal(courseJsonLd.offers.price, course.pricing.packageRate);
-    assert.equal(courseJsonLd.timeRequired, `P${course.duration.value}M`);
+    if (courseJsonLd) {
+      assert.equal(courseJsonLd["@type"], "Course");
+      assert.equal(courseJsonLd.name, course.title);
+      assert.equal(courseJsonLd.courseCode, course.slug);
+      assert.equal(courseJsonLd.offers.price, course.pricing.packageRate);
+      assert.equal(courseJsonLd.timeRequired, `P${course.duration.value}M`);
+    } else {
+      assert.equal(markup.includes('id="course-structured-data"'), false);
+    }
   }
 });
 
@@ -314,11 +324,12 @@ test("course links, further reading, and existing CTA analytics remain intact", 
     });
     assert.match(markup, /href="https:\/\/wa\.me\/917037905464/);
     assert.match(markup, /data-event="lead_contact_click"/);
-    assert.match(
-      markup,
-      new RegExp(`href="/online-courses/${slug}"`),
-    );
-    assert.match(markup, /inline_online_crosslink/);
+    if (coursesModule.isCourseModeAvailable(course, "Online")) {
+      assert.match(markup, new RegExp(`href="/online-courses/${slug}"`));
+      assert.match(markup, /inline_online_crosslink/);
+    } else {
+      assert.doesNotMatch(markup, new RegExp(`href="/online-courses/${slug}"`));
+    }
     assert.equal(course.slug, slug);
   }
 });

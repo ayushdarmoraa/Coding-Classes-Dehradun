@@ -35,6 +35,9 @@ jobs:
       - name: Test Guides rendering
         run: node --test scripts/guides.test.mjs
 
+      - name: Test course source of truth
+        run: npm run test:courses
+
       - name: Test DCA Lab
         run: npm run test:lab
 

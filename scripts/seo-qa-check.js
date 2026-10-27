@@ -200,7 +200,16 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
   const isCourseDetail =
     (route.startsWith("/courses/") && route !== "/courses/") ||
     (route.startsWith("/online-courses/") && route !== "/online-courses/");
-  if (isCourseDetail && !types.has("Course")) {
+  const visibleText = html
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;|&#160;/gi, " ");
+  const courseAvailabilityUnconfirmed =
+    (route === "/courses/data-science" ||
+      route === "/online-courses/data-science") &&
+    /delivery availability not confirmed/i.test(visibleText);
+  if (isCourseDetail && !types.has("Course") && !courseAvailabilityUnconfirmed) {
     issues.push("course detail is missing Course JSON-LD");
   }
   if (isBlogPost && !types.has("BlogPosting")) {
