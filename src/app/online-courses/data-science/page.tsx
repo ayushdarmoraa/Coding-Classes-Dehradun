@@ -53,7 +53,7 @@ export default function OnlineDataSciencePage() {
           <LearningProgressionNote className="mt-3 text-blue-100" />
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
             <Button href="/contact" size="lg" className="bg-yellow-400 text-blue-900 font-semibold hover:bg-yellow-500">
-              Talk to a Mentor
+              Ask about this course
             </Button>
             <Button
               href="/courses/data-science"
@@ -95,7 +95,8 @@ export default function OnlineDataSciencePage() {
         </div>
       </section>
       <p className="max-w-5xl mx-auto px-4 -mt-6 pb-8 text-sm text-gray-600">
-        Contact DCA to confirm current delivery details.
+        Ask the team whether online delivery is currently available and, if so, about
+        upcoming batches, class timings, and learning support.
       </p>
 
       {/* Bottom CTA */}

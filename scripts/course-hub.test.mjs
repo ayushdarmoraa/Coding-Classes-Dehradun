@@ -39,6 +39,12 @@ function loadTypeScript(relativePath) {
         default: () => React.createElement("div", null, "Course catalog"),
       };
     }
+    if (specifier === "@/components/features/CourseCard") {
+      return {
+        __esModule: true,
+        default: ({ course }) => React.createElement("article", null, course.title),
+      };
+    }
     if (specifier === "@/components/features/LearningProgressionNote") {
       return {
         __esModule: true,
@@ -47,6 +53,12 @@ function loadTypeScript(relativePath) {
     }
     if (specifier === "@/lib/lab/challenges") {
       return { getPublishedChallenges: () => [] };
+    }
+    if (specifier === "@/lib/course-catalog") {
+      return loadTypeScript("src/lib/course-catalog.ts");
+    }
+    if (specifier === "@/lib/pricing") {
+      return loadTypeScript("src/lib/pricing.ts");
     }
     if (specifier.startsWith("@/")) {
       return loadTypeScript(
@@ -132,7 +144,20 @@ test("Courses FAQ does not imply that every course includes project work", () =>
 
   assert.deepEqual(projectFaq, [
     "Does every course include project work?",
-    "Project details are not listed for every course. Contact DCA to confirm whether a specific course includes project work.",
+    "Practical work varies by course. Review the published outcomes on each course page, or ask us what practice is included in a specific track.",
   ]);
   assert.doesNotMatch(projectFaq[1], /every course includes|each course includes|all courses include/i);
+});
+
+test("course comparison table is keyboard reachable and sorting controls expose focus styling", async () => {
+  const catalogModule = loadTypeScript("src/components/features/CourseCatalog.tsx");
+  const catalogMarkup = renderToStaticMarkup(
+    React.createElement(catalogModule.default, {
+      courses: [],
+      relatedChallengeHrefs: {},
+    }),
+  );
+  assert.match(catalogMarkup, /role="region" aria-label="Scrollable course comparison" tabindex="0"/);
+  assert.match(catalogMarkup, /focus-visible:ring-2/);
+  assert.match(catalogMarkup, /aria-live="polite"/);
 });

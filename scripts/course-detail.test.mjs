@@ -12,6 +12,8 @@ const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const nativeRequire = createRequire(import.meta.url);
 const moduleCache = new Map();
 const coursesModule = loadTypeScript("src/lib/courses.ts");
+const courseCatalogModule = loadTypeScript("src/lib/course-catalog.ts");
+const courseExperienceModule = loadTypeScript("src/lib/course-experience-content.ts");
 const pricingModule = loadTypeScript("src/lib/pricing.ts");
 const schemaModule = loadTypeScript("src/lib/schema.ts");
 const challengesModule = loadTypeScript("src/lib/lab/challenges.ts");
@@ -138,6 +140,8 @@ function loadTypeScript(relativePath) {
       };
     }
     if (specifier === "@/lib/courses") return coursesModule;
+    if (specifier === "@/lib/course-catalog") return courseCatalogModule;
+    if (specifier === "@/lib/course-experience-content") return courseExperienceModule;
     if (specifier === "@/lib/blog") {
       return { getAllBlogPosts: () => blogPosts };
     }
@@ -299,6 +303,63 @@ test("course breadcrumb and visible FAQs match their structured data", async () 
   }
 });
 
+test("course FAQs do not extend Data Science or Java facts beyond the canonical curriculum", async () => {
+  const dataScienceMarkup = await renderCourse("data-science");
+  const dataScienceFaq = readVisibleFaqs(dataScienceMarkup).find(
+    ([question]) => question === "Which tools and topics are covered?",
+  );
+  assert.deepEqual(dataScienceFaq, [
+    "Which tools and topics are covered?",
+    `The listed curriculum covers ${courses.find(({ slug }) => slug === "data-science").curriculum.join("; ")}.`,
+  ]);
+  assert.doesNotMatch(dataScienceFaq[1], /Matplotlib|scikit-learn|real datasets/i);
+
+  const javaMarkup = await renderCourse("java");
+  const javaFaq = readVisibleFaqs(javaMarkup).find(
+    ([question]) => question === "Does the curriculum include Spring Boot?",
+  );
+  assert.deepEqual(javaFaq, [
+    "Does the curriculum include Spring Boot?",
+    `The published curriculum lists ${courses.find(({ slug }) => slug === "java").curriculum.find((item) => /spring/i.test(item))}. Spring Boot is not specifically listed.`,
+  ]);
+
+  const fullStackContent = courseExperienceModule.getCourseExperienceContent(
+    courses.find(({ slug }) => slug === "full-stack"),
+  );
+  assert.equal(
+    fullStackContent.faqs[2].answer,
+    `The listed curriculum covers ${courses.find(({ slug }) => slug === "full-stack").curriculum.join("; ")}.`,
+  );
+
+  const pythonContent = courseExperienceModule.getCourseExperienceContent(
+    courses.find(({ slug }) => slug === "python"),
+  );
+  const python = courses.find(({ slug }) => slug === "python");
+  assert.equal(
+    pythonContent.faqs[2].answer,
+    `The published prerequisite is ${python.prerequisites.join("; ")}. The curriculum starts with ${python.curriculum[0]} and continues through ${python.curriculum.slice(1).join("; ")}.`,
+  );
+});
+
+test("course experience copy is tailored to published prerequisites and curriculum", () => {
+  for (const course of courses) {
+    const content = courseExperienceModule.getCourseExperienceContent(course);
+    assert.ok(content.learnerFit.length > 50);
+    assert.ok(content.practicalPractice.length > 50);
+    assert.equal(content.learningApproach.length, 3);
+    assert.equal(content.faqs.length, 4);
+    assert.match(content.faqs[0].answer, /months/);
+    assert.match(content.faqs[1].answer, /₹/);
+    assert.match(content.faqs[3].answer, /upcoming batches, class arrangements, and available support/);
+  }
+
+  const javaContent = courseExperienceModule.getCourseExperienceContent(
+    courses.find(({ slug }) => slug === "java"),
+  );
+  assert.match(javaContent.practicalPractice, /based on the published curriculum/);
+  assert.doesNotMatch(javaContent.practicalPractice, /Spring Boot|specific project names/i);
+});
+
 test("course links, further reading, and existing CTA analytics remain intact", async () => {
   const featuredPosts = {
     "full-stack": "best-full-stack-course-dehradun-2025",
@@ -334,13 +395,26 @@ test("course links, further reading, and existing CTA analytics remain intact", 
   }
 });
 
-test("unapproved audiences, projects, learning practices, and employment claims are not added", async () => {
+test("course detail sections expose verified fit, project, delivery, Lab, and CTA information", async () => {
   for (const course of courses) {
     const markup = await renderCourse(course.slug);
+    const decoded = decodeHtml(markup);
+    assert.match(decoded, /id="who-for"[\s\S]*Who this course is for/);
+    assert.match(decoded, /id="projects"[\s\S]*Projects and practical work/);
+    assert.match(decoded, /id="learning-works"[\s\S]*How learning works/);
+    assert.match(decoded, /id="related-lab"/);
+    assert.match(decoded, /id="course-final-cta"/);
+    assert.match(decoded, /href="\/contact"/);
+    assert.match(decoded, /href="\/lab"/);
+    if (course.slug !== "java") {
+      assert.match(decoded, /Published course outcomes include:/);
+    }
     assert.doesNotMatch(
-      markup,
-      /Who this course is for|How learning works|Projects you(?:'|’)ll build|placement guarantee|guaranteed employment|students placed|mentor-led sessions|weekly mentor hours|project reviews|recordings available/i,
+      decoded,
+      /placement guarantee|guaranteed employment|students placed|mentor-led sessions|weekly mentor hours|project reviews, learner support, and recordings are not specified/i,
     );
-    assert.doesNotMatch(markup, /id="projects"/);
+    if (course.slug === "java") {
+      assert.match(decoded, /Practise Java syntax, object-oriented concepts, collections, exceptions, and input\/output/);
+    }
   }
 });

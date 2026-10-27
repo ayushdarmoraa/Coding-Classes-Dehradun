@@ -33,12 +33,21 @@ const Select: React.FC<SelectProps> = ({
   return (
     <div className="space-y-2">
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label htmlFor={props.id} className="block text-sm font-medium text-gray-700">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
-      <select className={selectClasses} {...props}>
+      <select
+        className={selectClasses}
+        {...props}
+        aria-invalid={error ? true : props["aria-invalid"]}
+        aria-describedby={
+          [props["aria-describedby"], error && props.id ? `${props.id}-error` : undefined]
+            .filter(Boolean)
+            .join(" ") || undefined
+        }
+      >
         <option value="">{placeholder}</option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -47,7 +56,7 @@ const Select: React.FC<SelectProps> = ({
         ))}
       </select>
       {error && (
-        <p className="text-sm text-red-600 flex items-center">
+        <p id={props.id ? `${props.id}-error` : undefined} className="text-sm text-red-600 flex items-center">
           <span className="mr-1">⚠</span>
           {error}
         </p>
@@ -57,4 +66,3 @@ const Select: React.FC<SelectProps> = ({
 };
 
 export default Select;
-

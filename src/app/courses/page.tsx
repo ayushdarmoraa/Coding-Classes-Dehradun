@@ -18,7 +18,7 @@ const courseHubFaqs = [
   },
   {
     q: "Does every course include project work?",
-    a: "Project details are not listed for every course. Contact DCA to confirm whether a specific course includes project work.",
+    a: "Practical work varies by course. Review the published outcomes on each course page, or ask us what practice is included in a specific track.",
   },
   {
     q: "How do I decide which course is right for me?",
@@ -137,11 +137,10 @@ export default function CoursesPage() {
             Course details and learning path
           </h2>
           <p className="mt-3 max-w-3xl text-gray-700">
-            Compare each course&apos;s listed prerequisites, curriculum, level,
-            duration, and fees, then review its curriculum and outcomes on the
-            course page. Details about class format, assignments, project
-            reviews, and learner support are not listed in this catalog;
-            contact us to confirm current details before choosing a course.
+            Compare the listed prerequisites, curriculum, level, duration, and fees,
+            then explore each course page for its learning focus and published outcomes.
+            Have questions about fit, upcoming batches, or learning formats? Discuss your
+            goals with the DCA team.
           </p>
         </div>
       </section>

@@ -3,6 +3,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import type { Course } from '@/lib/courses';
 import { formatCourseDuration, formatCourseModes, formatCoursePrice } from '@/lib/pricing';
+import { getCourseExperienceContent } from '@/lib/course-experience-content';
 import { SITE } from '@/lib/site-config';
 
 interface CourseCardProps {
@@ -10,6 +11,7 @@ interface CourseCardProps {
   featured?: boolean;
   relatedChallengeHref?: string;
   analyticsLocation?: string;
+  showProjectSummary?: boolean;
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({
@@ -17,8 +19,10 @@ const CourseCard: React.FC<CourseCardProps> = ({
   featured = false,
   relatedChallengeHref,
   analyticsLocation,
+  showProjectSummary = false,
 }) => {
   const cardClass = featured ? 'border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white' : '';
+  const courseContent = getCourseExperienceContent(course);
   
   return (
     <Card className={`p-6 flex flex-col justify-between ${cardClass}`} hover>
@@ -38,7 +42,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
           )}
         </div>
         <p className="mt-1 text-xs text-gray-600">
-          Advanced coverage is subject to curriculum and instructor validation.
+          Explore the listed curriculum to see what the course covers.
         </p>
         <p className="mt-3 text-sm font-semibold text-gray-800">
           Fees: {formatCoursePrice(course.pricing)}
@@ -55,6 +59,14 @@ const CourseCard: React.FC<CourseCardProps> = ({
             </li>
           ))}
         </ul>
+        {showProjectSummary && (
+          <>
+            <p className="mt-3 text-sm font-semibold text-gray-800">Practical work</p>
+            <p className="mt-1 text-sm text-gray-600">
+              {courseContent.projectSummary}
+            </p>
+          </>
+        )}
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
         <Button

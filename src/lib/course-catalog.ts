@@ -11,6 +11,16 @@ export type CoursePathId = (typeof COURSE_PATHS)[number]["id"];
 export type CourseSortOrder = "recommended" | "duration" | "fees";
 export type CourseLearningPath = Exclude<CoursePathId, "all">;
 
+export function getCourseProjectDetails(course: Course): string[] {
+  return [
+    ...new Set([
+      ...(course.projects ?? []),
+      ...course.curriculum.filter((item) => /\bproject/i.test(item)),
+      ...course.outcomes.filter((item) => /\bproject|portfolio|utilit/i.test(item)),
+    ]),
+  ];
+}
+
 export function getCourseLearningPath(course: Course): CourseLearningPath {
   const curriculum = course.curriculum.join(" ").toLowerCase();
   if (/data science|machine learning|pandas|statistics/.test(curriculum)) {

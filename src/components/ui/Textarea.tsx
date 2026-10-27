@@ -24,14 +24,23 @@ const Textarea: React.FC<TextareaProps> = ({
   return (
     <div className="space-y-2">
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label htmlFor={props.id} className="block text-sm font-medium text-gray-700">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
-      <textarea className={textareaClasses} {...props} />
+      <textarea
+        className={textareaClasses}
+        {...props}
+        aria-invalid={error ? true : props["aria-invalid"]}
+        aria-describedby={
+          [props["aria-describedby"], error && props.id ? `${props.id}-error` : undefined]
+            .filter(Boolean)
+            .join(" ") || undefined
+        }
+      />
       {error && (
-        <p className="text-sm text-red-600 flex items-center">
+        <p id={props.id ? `${props.id}-error` : undefined} className="text-sm text-red-600 flex items-center">
           <span className="mr-1">⚠</span>
           {error}
         </p>
@@ -41,4 +50,3 @@ const Textarea: React.FC<TextareaProps> = ({
 };
 
 export default Textarea;
-
