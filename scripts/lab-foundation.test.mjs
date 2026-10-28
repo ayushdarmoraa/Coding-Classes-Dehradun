@@ -246,6 +246,10 @@ test("sitemap includes Lab index and published missions but excludes drafts", as
       getPublishedChallenges: () => getPublishedChallenges(registryWithDraft),
     },
     "@/lib/lab/challenge-utils": { getChallengePath },
+    "@/lib/projects": {
+      getPublishedProjects: () => [],
+      getProjectPath: ({ slug }) => `/projects/${slug}`,
+    },
     "@/lib/site-config": { SITE: { url: "https://dooncodingacademy.in" } },
   });
 
@@ -262,6 +266,7 @@ test("sitemap includes Lab index and published missions but excludes drafts", as
     urls.includes("https://dooncodingacademy.in/lab/javascript/future-draft"),
     false,
   );
+  assert.equal(urls.includes("https://dooncodingacademy.in/projects"), false);
   assert.ok(urls.includes("https://dooncodingacademy.in/courses"));
   assert.ok(urls.includes("https://dooncodingacademy.in/blog"));
 });
