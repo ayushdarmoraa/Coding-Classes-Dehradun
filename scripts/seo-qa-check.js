@@ -2,10 +2,12 @@ import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import { once } from "node:events";
 import fs from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { glob } from "glob";
 import matter from "gray-matter";
+import ts from "typescript";
 
 const ROOT = path.join(process.cwd(), "src", "app");
 const GLOB_PATTERNS = [
@@ -21,6 +23,7 @@ const GLOB_PATTERNS = [
 export const PRODUCTION_ORIGIN = "https://dooncodingacademy.in";
 const BLOG_CONTENT_DIRECTORY = path.join(process.cwd(), "src", "content", "blog");
 const EXCLUDED_BLOG_SLUGS = new Set(["sample-1", "sample-2"]);
+const require = createRequire(path.join(process.cwd(), "package.json"));
 
 export function getPublishedGuideRoutes() {
   if (!fs.existsSync(BLOG_CONTENT_DIRECTORY)) return [];
@@ -35,6 +38,29 @@ export function getPublishedGuideRoutes() {
     })
     .map((filename) => `/blog/${filename.replace(/\.mdx?$/, "")}`)
     .sort((left, right) => left.localeCompare(right));
+}
+
+function getPublishedProjectRoutes() {
+  const relativePath = "src/lib/projects.ts";
+  const source = fs.readFileSync(path.resolve(process.cwd(), relativePath), "utf8");
+  const compiled = ts.transpileModule(source, {
+    compilerOptions: {
+      esModuleInterop: true,
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2020,
+    },
+  }).outputText;
+  const projectModule = { exports: {} };
+  new Function("require", "module", "exports", compiled)(
+    require,
+    projectModule,
+    projectModule.exports,
+  );
+  const { getProjectPath, getPublishedProjects } = projectModule.exports;
+  const projects = getPublishedProjects();
+  return projects.length
+    ? ["/projects", ...projects.map((project) => getProjectPath(project))]
+    : [];
 }
 
 function getAttributes(tag) {
@@ -261,10 +287,28 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
   const isLabChallenge = /^\/lab\/[^/]+\/[^/]+$/.test(route);
   const isBlogIndex = route === "/blog";
   const isBlogPost = /^\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(route);
-  if (isHomePage || isLabIndex || isLabChallenge || isBlogIndex || isBlogPost) {
+  const isProjectsIndex = route === "/projects";
+  if (
+    isHomePage ||
+    isLabIndex ||
+    isLabChallenge ||
+    isBlogIndex ||
+    isBlogPost ||
+    isProjectsIndex
+  ) {
     if (!getPageTitle(html)) issues.push("page is missing a non-empty <title>");
-    if (!getMetaDescription(html)) {
+    const description = getMetaDescription(html);
+    if (!description) {
       issues.push("page is missing a non-empty meta description");
+    }
+    if (
+      isProjectsIndex &&
+      description.length > 0 &&
+      (description.length < 140 || description.length > 160)
+    ) {
+      issues.push(
+        `Projects index meta description must be 140-160 characters, found ${description.length}`,
+      );
     }
   }
   if (isBlogIndex && !hasAccessibleSearchInput(html)) {
@@ -378,6 +422,7 @@ export async function getPageRoutes() {
     .filter(Boolean)
     .sort((left, right) => left.localeCompare(right));
   routes.push(...getPublishedGuideRoutes());
+  routes.push(...getPublishedProjectRoutes());
   if (
     !routes.includes("/") ||
     !routes.includes("/blog") ||

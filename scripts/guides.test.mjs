@@ -52,6 +52,12 @@ function loadTypeScript(relativePath, overrides = {}) {
     if (specifier === "@/lib/lab/challenge-utils") {
       return loadTypeScript("src/lib/lab/challenge-utils.ts");
     }
+    if (specifier === "@/lib/projects") {
+      return {
+        getPublishedProjects: () => [],
+        getProjectPath: ({ slug }) => `/projects/${slug}`,
+      };
+    }
     if (specifier === "next/link") {
       return function Link({ children, ...props }) {
         return React.createElement("a", props, children);
@@ -323,4 +329,5 @@ test("sitemap retains every published guide URL", async () => {
     assert.ok(urls.has(`/blog/${slug}`), `sitemap should include /blog/${slug}`);
   }
   assert.ok(urls.has("/blog"));
+  assert.equal(urls.has("/projects"), false);
 });

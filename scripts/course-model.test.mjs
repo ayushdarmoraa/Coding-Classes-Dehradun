@@ -58,6 +58,12 @@ function loadTypeScript(relativePath, overrides = {}) {
     if (specifier === "@/lib/lab/challenge-utils") {
       return loadTypeScript("src/lib/lab/challenge-utils.ts");
     }
+    if (specifier === "@/lib/projects") {
+      return {
+        getPublishedProjects: () => [],
+        getProjectPath: ({ slug }) => `/projects/${slug}`,
+      };
+    }
     return nativeRequire(specifier);
   };
 

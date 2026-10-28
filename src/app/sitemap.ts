@@ -3,6 +3,7 @@ import { getCourses, isCourseModeAvailable } from '@/lib/courses'
 import { getAllBlogPosts, getPostLastModified } from '@/lib/blog'
 import { getPublishedChallenges } from '@/lib/lab/challenges'
 import { getChallengePath } from '@/lib/lab/challenge-utils'
+import { getPublishedProjects, getProjectPath } from '@/lib/projects'
 import { SITE } from '@/lib/site-config'
 
 const BASE_URL = SITE.url
@@ -36,6 +37,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         : path.startsWith('/locations') ? 0.8
         : 0.7,
       // Optional: omit lastModified for static pages or use a build-time value if you have one
+    })
+  }
+
+  const projects = getPublishedProjects()
+  if (projects.length > 0) {
+    entries.push({
+      url: `${BASE_URL}/projects`,
+      changeFrequency: 'monthly',
+      priority: 0.7,
     })
   }
 
@@ -94,6 +104,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const challenge of getPublishedChallenges()) {
     entries.push({
       url: `${BASE_URL}${getChallengePath(challenge)}`,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    })
+  }
+
+  for (const project of projects) {
+    entries.push({
+      url: `${BASE_URL}${getProjectPath(project)}`,
       changeFrequency: 'monthly',
       priority: 0.7,
     })
