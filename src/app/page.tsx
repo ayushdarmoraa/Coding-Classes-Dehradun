@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import HomeFAQ from "@/components/faq/HomeFAQ";
 import CourseCard from "@/components/features/CourseCard";
+import ProjectCard from "@/components/projects/ProjectCard";
 import AudiencePaths from "@/components/home/AudiencePaths";
 import HomeGuidePreview from "@/components/home/HomeGuidePreview";
 import HomeHero from "@/components/home/HomeHero";
@@ -11,7 +12,9 @@ import LearningLoop from "@/components/home/LearningLoop";
 import TrackedLink from "@/components/analytics/TrackedLink";
 import { getAllBlogPosts } from "@/lib/blog";
 import { getCourses } from "@/lib/courses";
+import { getPublishedProjects } from "@/lib/projects";
 import { SITE } from "@/lib/site-config";
+import { testimonials } from "@/lib/testimonials";
 
 export const metadata: Metadata = {
   title: "Coding Courses in Dehradun & Online in India",
@@ -52,6 +55,7 @@ const evidencePoints = [
 export default function HomePage() {
   const courses = getCourses();
   const guides = getAllBlogPosts().slice(0, 3);
+  const projects = getPublishedProjects().slice(0, 3);
 
   return (
     <main>
@@ -71,7 +75,7 @@ export default function HomePage() {
             id="learning-paths-heading"
             className="mt-3 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl"
           >
-            Choose your learning path
+            Choose Your Learning Path
           </h2>
           <p className="mt-4 text-lg leading-7 text-gray-600">
             Compare the course focus, level, duration, fees and available modes
@@ -101,6 +105,42 @@ export default function HomePage() {
       </section>
 
       <LabPreview />
+
+      {projects.length > 0 && (
+        <section
+          aria-labelledby="home-projects-heading"
+          className="bg-slate-50 py-16 sm:py-20"
+        >
+          <div className="container">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="max-w-2xl">
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
+                  Verified project work
+                </p>
+                <h2
+                  id="home-projects-heading"
+                  className="mt-3 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl"
+                >
+                  See What Practical Learning Looks Like
+                </h2>
+              </div>
+              <Link
+                href="/projects"
+                className="inline-flex min-h-11 items-center font-semibold text-blue-800 underline decoration-blue-300 underline-offset-4 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+              >
+                View all projects
+              </Link>
+            </div>
+            <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {projects.map((project) => (
+                <li key={project.slug}>
+                  <ProjectCard project={project} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       <section
         aria-labelledby="practical-learning-heading"
@@ -145,6 +185,48 @@ export default function HomePage() {
 
       <AudiencePaths />
       <HomeGuidePreview guides={guides} />
+
+      {testimonials.length > 0 && (
+        <section
+          aria-labelledby="home-testimonials-heading"
+          className="container py-16 sm:py-20"
+        >
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
+                Verified learner stories
+              </p>
+              <h2
+                id="home-testimonials-heading"
+                className="mt-3 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl"
+              >
+                Verified Testimonials
+              </h2>
+            </div>
+            <Link
+              href="/testimonials"
+              className="inline-flex min-h-11 items-center font-semibold text-blue-800 underline decoration-blue-300 underline-offset-4 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+            >
+              Read all testimonials
+            </Link>
+          </div>
+          <ul className="mt-8 grid gap-5 md:grid-cols-3">
+            {testimonials.slice(0, 3).map((testimonial, index) => (
+              <li
+                key={`${testimonial.author}-${index}`}
+                className="flex h-full flex-col rounded-xl border border-gray-200 bg-white p-6"
+              >
+                <blockquote className="flex-1 text-gray-700">
+                  <p>{testimonial.text}</p>
+                </blockquote>
+                <cite className="mt-5 font-semibold not-italic text-gray-950">
+                  {testimonial.author}
+                </cite>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <HomeFAQ courses={courses} />
 

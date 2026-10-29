@@ -400,7 +400,8 @@ test("project pages use publication gating and stay out of public navigation and
   assert.match(sitemap, /getPublishedProjects\(\)/);
   assert.match(seoQa, /getPublishedProjectRoutes/);
   assert.doesNotMatch(navigation, /\/projects/);
-  assert.doesNotMatch(homepage, /\/projects/);
+  assert.match(homepage, /getPublishedProjects\(\)/);
+  assert.match(homepage, /projects\.length > 0/);
 });
 
 test("screenshot location documents the approved local asset convention", () => {

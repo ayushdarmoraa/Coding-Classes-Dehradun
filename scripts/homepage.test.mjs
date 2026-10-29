@@ -106,8 +106,15 @@ const { getCourses } = loadLocalModule(
 const { getAllBlogPosts } = loadLocalModule(
   path.join(repositoryRoot, "src/lib/blog.ts"),
 );
+const { getPublishedProjects } = loadLocalModule(
+  path.join(repositoryRoot, "src/lib/projects.ts"),
+);
+const { testimonials } = loadLocalModule(
+  path.join(repositoryRoot, "src/lib/testimonials.ts"),
+);
 const courses = getCourses();
 const guides = getAllBlogPosts().slice(0, 3);
+const projects = getPublishedProjects();
 const markup = renderToStaticMarkup(React.createElement(HomePage));
 const internalHrefs = [
   ...markup.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g),
@@ -153,7 +160,42 @@ test("homepage presents one clear value proposition and valid primary actions", 
   assert.match(markup, />Learn\. Debug\. Build\. Prove\.</);
   assert.match(markup, /href="\/lab\/javascript\/discount-calculation-bug"[^>]*>Try a Free Coding Challenge/);
   assert.match(markup, /href="\/courses"[^>]*>Explore Courses/);
-  assert.match(markup, /href="\/contact"[^>]*>Contact the Academy/);
+  assert.match(markup, /href="\/contact"[^>]*>Talk to a Mentor/);
+});
+
+test("homepage follows the approved section order without appended legacy content", () => {
+  const sectionOrder = [
+    "home-hero-heading",
+    "intent-heading",
+    "learning-loop-heading",
+    "learning-paths-heading",
+    "lab-preview-heading",
+    ...(projects.length > 0 ? ["home-projects-heading"] : []),
+    "practical-learning-heading",
+    "audience-paths-heading",
+    "home-guides-heading",
+    ...(testimonials.length > 0 ? ["home-testimonials-heading"] : []),
+    "home-faq-heading",
+    "home-final-cta-heading",
+  ];
+  const sectionPositions = sectionOrder.map((id) => markup.indexOf(`id="${id}"`));
+
+  assert.ok(sectionPositions.every((position) => position >= 0));
+  assert.deepEqual(sectionPositions, [...sectionPositions].sort((a, b) => a - b));
+  assert.equal((markup.match(/<main\b/g) ?? []).length, 1);
+  assert.equal((markup.match(/id="home-final-cta-heading"/g) ?? []).length, 1);
+  assert.doesNotMatch(
+    markup,
+    /Now with Gen AI Integration|500\+\s*Students Trained|85%\s*Placement Rate|15\s*Max Batch Size|6\+\s*Years Experience/i,
+  );
+  assert.equal(
+    markup.includes('id="home-projects-heading"'),
+    projects.length > 0,
+  );
+  assert.equal(
+    markup.includes('id="home-testimonials-heading"'),
+    testimonials.length > 0,
+  );
 });
 
 test("homepage course previews render every canonical course and route", () => {
