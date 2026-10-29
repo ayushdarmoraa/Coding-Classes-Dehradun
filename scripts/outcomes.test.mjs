@@ -1,0 +1,414 @@
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import test from "node:test";
+import { fileURLToPath } from "node:url";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import ts from "typescript";
+import {
+  analyzeRenderedPage,
+  getPublishedOutcomeRoutes,
+} from "./seo-qa-check.js";
+
+const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
+const nativeRequire = createRequire(import.meta.url);
+const moduleCache = new Map();
+
+function loadTypeScript(relativePath, mocks = {}) {
+  const filename = path.resolve(repositoryRoot, relativePath);
+  if (moduleCache.has(filename)) return moduleCache.get(filename).exports;
+
+  const loadedModule = { exports: {} };
+  moduleCache.set(filename, loadedModule);
+  const source = readFileSync(filename, "utf8");
+  const compiled = ts.transpileModule(source, {
+    compilerOptions: {
+      esModuleInterop: true,
+      jsx: ts.JsxEmit.ReactJSX,
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2020,
+    },
+  }).outputText;
+  const localRequire = (specifier) =>
+    Object.hasOwn(mocks, specifier) ? mocks[specifier] : nativeRequire(specifier);
+
+  new Function("require", "module", "exports", compiled)(
+    localRequire,
+    loadedModule,
+    loadedModule.exports,
+  );
+  return loadedModule.exports;
+}
+
+const outcomes = loadTypeScript("src/lib/outcomes.ts");
+
+function metric(overrides = {}) {
+  return {
+    kind: "completion",
+    slug: "test-completion",
+    title: "Test-only completion metric",
+    publicStatement: "Test-only statement, not a real learner outcome.",
+    sourceLabel: "Test-only source label",
+    definition: "Test-only definition for validating the metric contract.",
+    numerator: 2,
+    denominator: 4,
+    eligibleCohort: "Test-only cohort",
+    periodStart: "2025-01-01",
+    periodEnd: "2025-03-31",
+    sampleSize: 4,
+    exclusions: ["Test-only exclusion"],
+    limitations: "Test-only limitation.",
+    sourceEvidenceReference: "test-source-ref",
+    sourceVerified: true,
+    claimVerified: true,
+    verificationOwner: "Test verifier",
+    verifiedAt: "2025-04-01",
+    businessApprovalReference: "test-approval-ref",
+    businessApproved: true,
+    published: true,
+    ...overrides,
+  };
+}
+
+function story(overrides = {}) {
+  return {
+    slug: "test-story",
+    attribution: "Test-only learner",
+    quote: "Test-only quote; not a real testimonial.",
+    sourceLabel: "Test-only testimonial source",
+    sourceEvidenceReference: "test-story-source-ref",
+    sourceVerified: true,
+    claimVerified: true,
+    verificationOwner: "Test verifier",
+    verifiedAt: "2025-04-01",
+    consentEvidenceReference: "test-consent-ref",
+    consentVerified: true,
+    consentScope: ["quote", "attribution"],
+    businessApprovalReference: "test-story-approval-ref",
+    businessApproved: true,
+    published: true,
+    ...overrides,
+  };
+}
+
+test("production outcomes registry contains no demo or development-only records", () => {
+  assert.deepEqual(outcomes.getPublishedOutcomeContent(), { metrics: [], stories: [] });
+  assert.equal(outcomes.hasPublishedOutcomeContent(), false);
+  assert.deepEqual(getPublishedOutcomeRoutes(), []);
+});
+
+test("metric validation requires coherent counts and a valid measurement period", () => {
+  assert.doesNotThrow(() => outcomes.validateOutcomeEvidence([metric()], []));
+  assert.throws(
+    () => outcomes.validateOutcomeEvidence([metric({ numerator: 5 })], []),
+    /numerator/i,
+  );
+  assert.throws(
+    () =>
+      outcomes.validateOutcomeEvidence(
+        [metric({ periodStart: "2025-04-01", periodEnd: "2025-03-31" })],
+        [],
+      ),
+    /period/i,
+  );
+  assert.throws(
+    () =>
+      outcomes.validateOutcomeEvidence(
+        [metric({ periodStart: "2025-02-31" })],
+        [],
+      ),
+    /calendar date/i,
+  );
+  assert.throws(
+    () => outcomes.validateOutcomeEvidence([metric({ kind: "placement" })], []),
+    /what counts as placed/i,
+  );
+  assert.doesNotThrow(() =>
+    outcomes.validateOutcomeEvidence(
+      [metric({ kind: "placement", published: false })],
+      [],
+    ),
+  );
+  assert.doesNotThrow(() =>
+    outcomes.validateOutcomeEvidence(
+      [metric({ kind: "placement", placementDefinition: "Test-only placement definition." })],
+      [],
+    ),
+  );
+  assert.throws(
+    () =>
+      outcomes.validateOutcomeEvidence(
+        [metric({ kind: "project-completion" })],
+        [],
+      ),
+    /publication permission/i,
+  );
+  assert.doesNotThrow(() =>
+    outcomes.validateOutcomeEvidence(
+      [metric({ kind: "project-completion", published: false })],
+      [],
+    ),
+  );
+});
+
+test("publication requires verified sources, claim checks, business approval, and consent", () => {
+  const content = outcomes.getPublishedOutcomeContent(
+    [
+      metric(),
+      metric({ slug: "unverified-source", sourceVerified: false }),
+      metric({ slug: "unverified-claim", claimVerified: false }),
+      metric({ slug: "unapproved", businessApproved: false }),
+      metric({ slug: "draft", published: false }),
+      metric({
+        slug: "project-no-permission",
+        kind: "project-completion",
+        published: false,
+      }),
+      metric({
+        slug: "approved-project",
+        kind: "project-completion",
+        consentEvidenceReference: "test-project-consent-ref",
+        consentVerified: true,
+        consentScope: ["aggregate"],
+      }),
+    ],
+    [
+      story(),
+      story({ slug: "no-consent", consentVerified: false }),
+      story({ slug: "no-quote-permission", consentScope: ["attribution"] }),
+      story({ slug: "no-attribution-permission", consentScope: ["quote"] }),
+      story({ slug: "unapproved-story", businessApproved: false }),
+    ],
+  );
+
+  assert.deepEqual(
+    content.metrics.map(({ slug }) => slug),
+    ["test-completion", "approved-project"],
+  );
+  assert.deepEqual(content.stories.map(({ slug }) => slug), ["test-story"]);
+});
+
+test("duplicate evidence slugs are rejected across metrics and stories", () => {
+  assert.throws(
+    () => outcomes.validateOutcomeEvidence([metric()], [story({ slug: "test-completion" })]),
+    /unique|duplicate/i,
+  );
+});
+
+test("outcomes UI is accessible and JSON-LD contains exactly its visible approved evidence", () => {
+  const content = outcomes.getPublishedOutcomeContent([metric()], [story()]);
+  const OutcomesContent = loadTypeScript("src/components/outcomes/OutcomesContent.tsx", {
+    "@/lib/outcomes": outcomes,
+  }).default;
+  const markup = renderToStaticMarkup(
+    React.createElement(OutcomesContent, content),
+  );
+  const jsonLdMatch = markup.match(
+    /<script type="application\/ld\+json">([\s\S]*?)<\/script>/,
+  );
+
+  assert.match(markup, /<main\b/);
+  assert.match(markup, /<h1\b/);
+  assert.match(markup, /Test-only completion metric/);
+  assert.match(markup, /Test-only learner/);
+  assert.match(markup, /2 \/ 4/);
+  assert.match(markup, /Test-only cohort/);
+  assert.match(markup, /Test-only limitation\./);
+  assert.match(markup, /Test-only source label/);
+  assert.match(markup, /Test-only testimonial source/);
+  assert.match(markup, /Course completion/);
+  assert.match(markup, /Verified learner stories/);
+  assert.match(markup, /grid-cols-1 gap-5 md:grid-cols-2/);
+  assert.match(markup, /aria-labelledby="outcomes-title"/);
+  assert.ok(jsonLdMatch, "approved visible evidence should have matching JSON-LD");
+  const schema = JSON.parse(jsonLdMatch[1]);
+  assert.deepEqual(
+    schema.itemListElement.map(({ item }) => [item.name, item.description]),
+    [
+      ["Test-only completion metric", "Test-only statement, not a real learner outcome."],
+      ["Test-only learner", "Test-only quote; not a real testimonial."],
+    ],
+  );
+});
+
+test("empty outcomes remain absent from indexable routes and public discovery", async () => {
+  const page = loadTypeScript("src/app/outcomes/page.tsx", {
+    "@/components/outcomes/OutcomesContent": { __esModule: true, default: () => null },
+    "@/lib/outcomes": outcomes,
+    "@/lib/site-config": { SITE: { url: "https://dooncodingacademy.in" } },
+    "next/navigation": {
+      notFound() {
+        throw new Error("NEXT_NOT_FOUND");
+      },
+    },
+  });
+  const metadata = page.generateMetadata();
+  const navPath = path.resolve(repositoryRoot, "src/lib/nav.ts");
+  const nav = loadTypeScript("src/lib/nav.ts", {
+    "@/lib/outcomes": { hasPublishedOutcomeContent: () => false },
+  }).NAV_LINKS;
+
+  assert.equal(metadata.robots.index, false);
+  assert.equal(metadata.robots.follow, false);
+  assert.throws(() => page.default(), /NEXT_NOT_FOUND/);
+  assert.equal(nav.some(({ href }) => href === "/outcomes"), false);
+  assert.deepEqual(await getPublishedOutcomeRoutes(), []);
+
+  const sitemapPath = path.resolve(repositoryRoot, "src/app/sitemap.ts");
+  const sitemap = loadTypeScript("src/app/sitemap.ts", {
+    "@/lib/courses": { getCourses: async () => [], isCourseModeAvailable: () => false },
+    "@/lib/blog": { getAllBlogPosts: async () => [], getPostLastModified: async () => undefined },
+    "@/lib/lab/challenges": { getPublishedChallenges: () => [] },
+    "@/lib/lab/challenge-utils": { getChallengePath: () => "" },
+    "@/lib/projects": { getPublishedProjects: () => [], getProjectPath: () => "" },
+    "@/lib/outcomes": { hasPublishedOutcomeContent: () => false },
+    "@/lib/site-config": { SITE: { url: "https://dooncodingacademy.in" } },
+  });
+  const sitemapEntries = await sitemap.default();
+  assert.equal(sitemapEntries.some(({ url }) => url.endsWith("/outcomes")), false);
+
+  moduleCache.delete(navPath);
+  const approvedNav = loadTypeScript("src/lib/nav.ts", {
+    "@/lib/outcomes": { hasPublishedOutcomeContent: () => true },
+  }).NAV_LINKS;
+  assert.equal(approvedNav.some(({ href }) => href === "/outcomes"), true);
+
+  moduleCache.delete(sitemapPath);
+  const approvedSitemap = loadTypeScript("src/app/sitemap.ts", {
+    "@/lib/courses": { getCourses: async () => [], isCourseModeAvailable: () => false },
+    "@/lib/blog": { getAllBlogPosts: async () => [], getPostLastModified: async () => undefined },
+    "@/lib/lab/challenges": { getPublishedChallenges: () => [] },
+    "@/lib/lab/challenge-utils": { getChallengePath: () => "" },
+    "@/lib/projects": { getPublishedProjects: () => [], getProjectPath: () => "" },
+    "@/lib/outcomes": { hasPublishedOutcomeContent: () => true },
+    "@/lib/site-config": { SITE: { url: "https://dooncodingacademy.in" } },
+  });
+  assert.equal(
+    (await approvedSitemap.default()).some(({ url }) => url.endsWith("/outcomes")),
+    true,
+  );
+});
+
+test("approved evidence enables canonical metadata and renders the page", () => {
+  const pagePath = path.resolve(repositoryRoot, "src/app/outcomes/page.tsx");
+  moduleCache.delete(pagePath);
+  const approvedContent = outcomes.getPublishedOutcomeContent([metric()], [story()]);
+  const page = loadTypeScript("src/app/outcomes/page.tsx", {
+    "@/components/outcomes/OutcomesContent": { __esModule: true, default: () => null },
+    "@/lib/outcomes": {
+      getPublishedOutcomeContent: () => approvedContent,
+      hasPublishedOutcomeContent: () => true,
+    },
+    "@/lib/site-config": { SITE: { url: "https://dooncodingacademy.in" } },
+    "next/navigation": {
+      notFound() {
+        throw new Error("NEXT_NOT_FOUND");
+      },
+    },
+  });
+  const metadata = page.generateMetadata();
+
+  assert.equal(metadata.alternates.canonical, "https://dooncodingacademy.in/outcomes");
+  assert.ok(metadata.description.length > 0);
+  const html = `
+    <html>
+      <head>
+        <title>${metadata.title}</title>
+        <meta name="description" content="${metadata.description}">
+        <link rel="canonical" href="${metadata.alternates.canonical}">
+        <script type="application/ld+json">${JSON.stringify(
+          outcomes.buildOutcomeItemListSchema(approvedContent),
+        )}</script>
+      </head>
+      <body><main><h1>Outcomes and measurement methodology</h1></main></body>
+    </html>
+  `;
+  assert.deepEqual(
+    analyzeRenderedPage(html, "/outcomes"),
+    [],
+  );
+  assert.doesNotThrow(() => page.default());
+});
+
+test("Outcomes title uses the root layout template exactly once", () => {
+  const pagePath = path.resolve(repositoryRoot, "src/app/outcomes/page.tsx");
+  const layoutPath = path.resolve(repositoryRoot, "src/app/layout.tsx");
+  moduleCache.delete(pagePath);
+  moduleCache.delete(layoutPath);
+
+  const page = loadTypeScript("src/app/outcomes/page.tsx", {
+    "@/components/outcomes/OutcomesContent": { __esModule: true, default: () => null },
+    "@/lib/outcomes": outcomes,
+    "@/lib/site-config": { SITE: { url: "https://dooncodingacademy.in" } },
+    "next/navigation": {
+      notFound() {
+        throw new Error("NEXT_NOT_FOUND");
+      },
+    },
+  });
+  const rootLayout = loadTypeScript("src/app/layout.tsx", {
+    "./globals.css": {},
+    "@/components/layout/HeaderClient": { __esModule: true, default: () => null },
+    "@/components/layout/Footer": { __esModule: true, default: () => null },
+    "next/script": { __esModule: true, default: () => null },
+    "@/lib/courses": { getCourses: async () => [] },
+    "@/lib/pricing": { formatINR: () => "" },
+    "@/lib/lab/analytics-metadata": { PUBLISHED_LAB_ANALYTICS_METADATA: [] },
+  });
+
+  const pageTitle = page.generateMetadata().title;
+  const titleTemplate = rootLayout.metadata.title.template;
+
+  assert.equal(pageTitle, "Learner Outcomes and Measurement Methodology");
+  assert.equal(titleTemplate, "%s | Doon Coding Academy");
+  assert.equal(
+    titleTemplate.replace("%s", pageTitle),
+    "Learner Outcomes and Measurement Methodology | Doon Coding Academy",
+  );
+});
+
+test("SEO QA requires visible approved evidence and matching ItemList schema", () => {
+  const html = `
+    <html>
+      <head>
+        <title>Learner Outcomes | Doon Coding Academy</title>
+        <meta name="description" content="Verified outcomes are presented with clear cohort definitions, source checks, measurement periods, and limitations.">
+        <link rel="canonical" href="https://dooncodingacademy.in/outcomes">
+      </head>
+      <body><main><h1>Outcomes and measurement methodology</h1></main></body>
+    </html>
+  `;
+  assert.ok(
+    analyzeRenderedPage(html, "/outcomes").some((issue) =>
+      issue.includes("missing ItemList JSON-LD"),
+    ),
+  );
+});
+
+test("existing testimonial empty state and JSON-LD consent gate remain intact", () => {
+  const testimonialModule = loadTypeScript("src/lib/testimonials.ts");
+  const schemaModule = loadTypeScript("src/lib/schema.ts", {
+    "./courses": { isCourseModeAvailable: () => false },
+    "./pricing": { courseDurationToIso: () => "", formatCourseDuration: () => "" },
+    "./site-config": { SITE: { url: "https://dooncodingacademy.in" } },
+  });
+  const testimonialPage = loadTypeScript("src/app/testimonials/page.tsx", {
+    "@/lib/testimonials": testimonialModule,
+    "@/lib/schema": schemaModule,
+    "next/script": { __esModule: true, default: () => null },
+    "next/link": {
+      __esModule: true,
+      default: ({ href, children }) => React.createElement("a", { href }, children),
+    },
+  });
+  const markup = renderToStaticMarkup(
+    React.createElement(testimonialPage.default),
+  );
+
+  assert.deepEqual(testimonialModule.testimonials, []);
+  assert.equal(schemaModule.generateTestimonialSchema(testimonialModule.testimonials), null);
+  assert.match(markup, /Verified, permissioned testimonials will appear here when available\./);
+  assert.doesNotMatch(markup, /AggregateRating|Review/);
+});

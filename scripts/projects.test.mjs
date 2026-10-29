@@ -469,6 +469,7 @@ test("sitemap adds the index and detail URLs only after project publication gate
         getPublishedProjects(projects, ".", screenshotExists),
       getProjectPath,
     },
+    "@/lib/outcomes": { hasPublishedOutcomeContent: () => false },
     "@/lib/site-config": { SITE: { url: "https://dooncodingacademy.in" } },
   });
 

@@ -4,6 +4,7 @@ import { getAllBlogPosts, getPostLastModified } from '@/lib/blog'
 import { getPublishedChallenges } from '@/lib/lab/challenges'
 import { getChallengePath } from '@/lib/lab/challenge-utils'
 import { getPublishedProjects, getProjectPath } from '@/lib/projects'
+import { hasPublishedOutcomeContent } from '@/lib/outcomes'
 import { SITE } from '@/lib/site-config'
 
 const BASE_URL = SITE.url
@@ -37,6 +38,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         : path.startsWith('/locations') ? 0.8
         : 0.7,
       // Optional: omit lastModified for static pages or use a build-time value if you have one
+    })
+  }
+
+  if (hasPublishedOutcomeContent()) {
+    entries.push({
+      url: `${BASE_URL}/outcomes`,
+      changeFrequency: 'monthly',
+      priority: 0.7,
     })
   }
 
