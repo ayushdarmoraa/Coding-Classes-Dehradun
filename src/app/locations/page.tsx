@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { breadcrumbLd } from "@/lib/seo";
-import Card from "@/components/ui/Card";
-import Button from "@/components/ui/Button";
+import LocationTabs, { type LocationTile } from "@/components/features/LocationTabs";
 
 export const metadata = {
   title: "Locations – Learn Online or Visit Dehradun | Doon Coding Academy (DCA)",
@@ -22,24 +21,13 @@ export const metadata = {
   twitter: { card: "summary_large_image" },
 };
 
-interface Tile {
-  name: string;
-  badge: string;
-  href: string;
-  blurb: string;
-  primaryHref: string;
-  primaryText: string;
-  secondaryHref: string;
-  secondaryText: string;
-}
-
 export default function LocationsIndexPage() {
   const crumbs = breadcrumbLd([
     { name: "Home", url: "https://dooncodingacademy.in/" },
     { name: "Locations", url: "https://dooncodingacademy.in/locations" },
   ]);
 
-  const tiles: Tile[] = [
+  const tiles: LocationTile[] = [
     {
       name: "Dehradun",
       badge: "On-Campus",
@@ -76,25 +64,25 @@ export default function LocationsIndexPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-panel">
+    <div className="min-h-screen">
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }}
       />
-      <main className="max-w-6xl mx-auto px-4 py-10">
+      <main className="container py-14 sm:py-20">
         {/* Hero */}
-        <header className="cd-hero mb-8 rounded-dca-lg p-6 sm:p-9">
-          <h1 className="mt-3 text-3xl font-bold text-ink sm:text-4xl">Our Locations &amp; Online Cohorts</h1>
-          <p className="mt-3 text-gray-700">
+        <header className="mb-10 rounded-dca-lg border border-brand-soft bg-gradient-to-br from-white to-bg-grid p-6 shadow-soft-blue sm:p-10">
+          <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Our Locations &amp; Online Cohorts</h1>
+          <p className="mt-3 max-w-4xl text-lg leading-7 text-ink-2">
             Learn on-campus in <strong>Dehradun</strong> or join our {""}
-            <Link href="/online-courses" className="text-blue-700 hover:underline">
+            <Link href="/online-courses" className="font-semibold text-brand-dark hover:underline">
               live online courses
             </Link>{" "}
             from cities like Noida and Bangalore. Not sure which to pick? Start with {""}
             <Link
               href="/blog/live-vs-recorded-coding-classes-india"
-              className="text-blue-700 hover:underline"
+              className="font-semibold text-brand-dark hover:underline"
             >
               Live vs Recorded
             </Link>
@@ -104,28 +92,28 @@ export default function LocationsIndexPage() {
 
         {/* Popular courses (details) — internal links for SEO + UX */}
         <section className="mt-10">
-          <h2 className="text-2xl font-semibold tracking-tight mb-4">
+          <h2 className="mb-4 text-2xl font-semibold tracking-tight text-ink">
             Popular DCA courses (details)
           </h2>
 
-          <ul className="list-disc pl-6 space-y-2">
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <li>
-              <Link href="/courses/full-stack" className="underline hover:no-underline">
+              <Link href="/courses/full-stack" className="surface-card block p-4 font-semibold text-brand-dark underline decoration-brand/30 underline-offset-4 hover:bg-brand-soft">
                 Full-Stack Development (with Gen AI)
               </Link>
             </li>
             <li>
-              <Link href="/courses/data-science" className="underline hover:no-underline">
+              <Link href="/courses/data-science" className="surface-card block p-4 font-semibold text-brand-dark underline decoration-brand/30 underline-offset-4 hover:bg-brand-soft">
                 Data Science & AI
               </Link>
             </li>
             <li>
-              <Link href="/courses/python" className="underline hover:no-underline">
+              <Link href="/courses/python" className="surface-card block p-4 font-semibold text-brand-dark underline decoration-brand/30 underline-offset-4 hover:bg-brand-soft">
                 Python Programming
               </Link>
             </li>
             <li>
-              <Link href="/courses/java" className="underline hover:no-underline">
+              <Link href="/courses/java" className="surface-card block p-4 font-semibold text-brand-dark underline decoration-brand/30 underline-offset-4 hover:bg-brand-soft">
                 Java & Spring Boot
               </Link>
             </li>
@@ -134,76 +122,35 @@ export default function LocationsIndexPage() {
 
         {/* Choose Your Path */}
         <section aria-labelledby="choose-path" className="mb-10">
-          <h2 id="choose-path" className="text-2xl font-semibold">
+          <h2 id="choose-path" className="text-2xl font-semibold text-ink">
             Choose Your Path
           </h2>
 
-            <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {tiles.map((t) => (
-                <Card key={t.name} className="flex flex-col p-0 transition hover:-translate-y-1 hover:shadow-soft-blue">
-                  <div className="p-6 pb-4 flex items-center justify-between">
-                    <h3 className="text-xl font-semibold text-gray-900">{t.name}</h3>
-                    <span className="text-xs rounded-full bg-blue-50 text-blue-700 px-2 py-1 border border-blue-100">
-                      {t.badge}
-                    </span>
-                  </div>
-                  <div className="px-6 text-gray-700">
-                    <p>{t.blurb}</p>
-                    <p className="mt-3 text-sm">
-                      Start with {""}
-                      <Link href="/courses/full-stack" className="text-blue-700 hover:underline">
-                        Full-Stack
-                      </Link>{" "}
-                      or browse {""}
-                      <Link href="/online-courses" className="text-blue-700 hover:underline">
-                        Online Courses
-                      </Link>
-                      .
-                    </p>
-                  </div>
-                  <div className="px-6 pt-5 flex gap-2">
-                    <Button href={t.primaryHref} size="sm" className="flex-1">
-                      {t.primaryText}
-                    </Button>
-                    <Button href={t.href} variant="secondary" size="sm" className="flex-1">
-                      Learn More
-                    </Button>
-                  </div>
-                  <div className="px-6 pt-3 pb-6">
-                    <Link
-                      href={t.secondaryHref}
-                      className="text-blue-700 hover:underline text-sm"
-                    >
-                      {t.secondaryText}
-                    </Link>
-                  </div>
-                </Card>
-              ))}
-            </div>
+            <LocationTabs tiles={tiles} />
         </section>
 
         {/* CTA row */}
         <section className="mb-2">
           <div className="flex flex-wrap gap-3">
-            <Link href="/online-courses" className="text-blue-700 hover:underline">
+            <Link href="/online-courses" className="text-brand-dark hover:underline">
               Explore Online Courses
             </Link>
-            <span className="text-gray-400">•</span>
+            <span className="text-ink-3">•</span>
             <Link
               href="/blog/live-vs-recorded-coding-classes-india"
-              className="text-blue-700 hover:underline"
+              className="text-brand-dark hover:underline"
             >
               Live vs Recorded: Which is right for you?
             </Link>
-            <span className="text-gray-400">•</span>
+            <span className="text-ink-3">•</span>
             <Link
               href="/blog/visit-dca-campus-dehradun-guide"
-              className="text-blue-700 hover:underline"
+              className="text-brand-dark hover:underline"
             >
               Planning a campus visit (Dehradun)?
             </Link>
-            <span className="text-gray-400">•</span>
-            <Link href="/faq" className="text-blue-700 hover:underline">
+            <span className="text-ink-3">•</span>
+            <Link href="/faq" className="text-brand-dark hover:underline">
               Read FAQs
             </Link>
           </div>

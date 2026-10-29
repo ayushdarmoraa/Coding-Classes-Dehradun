@@ -22,25 +22,25 @@ const PricingDisplay: React.FC<PricingDisplayProps> = ({
   return (
     <div className={`${containerClass} ${className}`}>
       <div className="pricing-option">
-        <div className="text-2xl font-bold text-brand">
+        <div className="font-mono text-2xl font-bold text-brand-dark">
           {formatINR(coursePricing.packageRate)}
         </div>
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-ink-2">
           {formatCourseDuration(duration)} package rate
         </div>
       </div>
       {coursePricing.monthlyRate !== undefined && (
         <>
-          <div className="text-gray-400 text-sm">or</div>
+          <div className="text-sm text-ink-3">or</div>
           <div className="pricing-option">
-            <div className="text-xl font-semibold text-gray-800">
+            <div className="font-mono text-xl font-semibold text-ink">
               {formatINR(coursePricing.monthlyRate)}/month
             </div>
-            <div className="text-sm text-gray-600">Monthly rate</div>
+            <div className="text-sm text-ink-2">Monthly rate</div>
           </div>
         </>
       )}
-      <div className="text-sm text-gray-500 font-medium">
+      <div className="font-mono text-sm font-medium text-ink-2">
         Duration: {formatCourseDuration(duration)}
       </div>
     </div>

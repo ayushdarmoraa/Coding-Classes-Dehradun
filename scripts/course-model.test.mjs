@@ -166,6 +166,10 @@ test("course cards show canonical facts, course and contact links, and only supp
   const CourseCard = loadTypeScript("src/components/features/CourseCard.tsx", {
     "@/components/ui/Card": MockCard,
     "@/components/ui/Button": MockButton,
+    "@/components/features/CourseCardFlip": {
+      __esModule: true,
+      default: ({ children }) => React.createElement("div", null, children),
+    },
     "@/lib/pricing": pricingModule,
   }).default;
   const fullStack = getCourseBySlug("full-stack");
@@ -182,10 +186,10 @@ test("course cards show canonical facts, course and contact links, and only supp
   assert.match(fullStackMarkup, new RegExp(fullStack.description));
   assert.match(fullStackMarkup, /6 months/);
   assert.match(fullStackMarkup, /Beginner to Advanced/);
-  assert.match(fullStackMarkup, /Explore the listed curriculum to see what the course covers/);
+  assert.match(fullStackMarkup, /HTML, CSS, Tailwind fundamentals/);
   assert.match(fullStackMarkup, /₹25,000 package rate/);
   assert.match(fullStackMarkup, /href="\/courses\/full-stack"/);
-  assert.match(fullStackMarkup, /View Course/);
+  assert.match(fullStackMarkup, /View Details/);
   assert.match(fullStackMarkup, /href="\/lab\/javascript\/discount-calculation-bug"/);
   assert.match(fullStackMarkup, /Try Related Challenge/);
   assert.match(fullStackMarkup, /Practical work/);
@@ -569,7 +573,8 @@ test("course display consumers use structured canonical facts", async () => {
   const consumers = [
     ["src/app/page.tsx", /const courses = getCourses\(\)/],
     ["src/app/page.tsx", /<HomeCourses courses=\{courses\} \/>/],
-    ["src/components/home/HomeCourses.tsx", /courses\.map\(\(course, index\)/],
+    ["src/components/home/HomeCourses.tsx", /isCourseModeAvailable\(course, activeMode\)/],
+    ["src/components/home/HomeCourses.tsx", /filteredCourses\.map\(\(course, index\)/],
     ["src/components/home/HomeCourses.tsx", /<CourseCard[\s\S]*?course=\{course\}/],
     ["src/components/home/HomeCourses.tsx", /analyticsLocation="home_course_preview"/],
     ["src/app/page.tsx", /import \{ SITE \} from "@\/lib\/site-config"/],
@@ -686,7 +691,7 @@ test("course display consumers use structured canonical facts", async () => {
   assert.match(courseDetail, /Python Course in Dehradun \| Doon Coding Academy/);
   assert.match(courseDetail, /Learning stage: \{course\.level\}/);
   assert.match(courseDetail, /LearningProgressionNote/);
-  assert.match(courseDetail, /course\.curriculum\.map/);
+  assert.match(courseDetail, /<CurriculumTimeline items=\{course\.curriculum\}/);
   assert.match(courseDetail, /course\.outcomes\.map/);
   assert.doesNotMatch(courseDetail, /Projects you’ll build|Console Banking App|Auth-ready MERN Starter/);
   const coursesPage = await readFile(

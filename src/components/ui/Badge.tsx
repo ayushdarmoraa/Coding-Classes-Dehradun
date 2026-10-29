@@ -7,13 +7,13 @@ interface BadgeProps {
 }
 
 const Badge: React.FC<BadgeProps> = ({ children, variant = 'primary', className = '' }) => {
-  const baseClasses = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold';
+  const baseClasses = 'chip';
   
   const variantClasses = {
-    primary: 'bg-blue-100 text-blue-800',
-    secondary: 'bg-gray-100 text-gray-800',
-    success: 'bg-green-100 text-green-800',
-    info: 'bg-cyan-100 text-cyan-800'
+    primary: 'text-brand-dark',
+    secondary: 'text-ink-2',
+    success: 'border-green-200 bg-green-50 text-green-800',
+    info: 'border-sky-200 bg-sky-50 text-sky-800'
   };
 
   return (

@@ -3,9 +3,10 @@ import { NAV_LINKS, COURSE_LINKS } from "@/lib/nav";
 
 type HeaderProps = {
   currentPath?: string;
+  compact?: boolean;
 };
 
-export default function Header({ currentPath = "/" }: HeaderProps) {
+export default function Header({ currentPath = "/", compact = false }: HeaderProps) {
   const isActive = (href: string) =>
     href === "/" ? currentPath === "/" : currentPath.startsWith(href);
   const isCurrent = (href: string) => currentPath === href;
@@ -17,7 +18,7 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
         <Link
           href="/courses"
           aria-current={isCurrent("/courses") ? "page" : undefined}
-          className={`block rounded-md px-4 py-2 font-semibold text-yellow-300 transition-colors hover:bg-blue-600/60 focus-visible:bg-blue-600/60 ${
+          className={`block rounded-xl px-4 py-2 font-semibold text-brand-dark transition-colors hover:bg-brand-soft focus-visible:bg-brand-soft ${
             isActive("/courses") ? "underline underline-offset-4" : ""
           }`}
         >
@@ -28,22 +29,22 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
         <Link
           href="/online-courses"
           aria-current={isCurrent("/online-courses") ? "page" : undefined}
-          className={`block rounded-md px-4 py-2 transition-colors hover:bg-blue-600/60 focus-visible:bg-blue-600/60 ${
+          className={`block rounded-xl px-4 py-2 text-ink-2 transition-colors hover:bg-brand-soft focus-visible:bg-brand-soft ${
             isActive("/online-courses") ? "font-semibold underline underline-offset-4" : ""
           }`}
         >
           Online (India)
         </Link>
       </li>
-      <li className="mx-4 my-1 border-t border-white/15" aria-hidden="true" />
+      <li className="mx-4 my-1 border-t border-brand-soft" aria-hidden="true" />
       {COURSE_LINKS.map((course) => (
         <li key={course.href}>
           <Link
             href={course.href}
             aria-current={isCurrent(course.href) ? "page" : undefined}
-            className={`block rounded-md px-4 py-2 transition-colors hover:bg-blue-600/60 focus-visible:bg-blue-600/60 ${
+            className={`block rounded-xl px-4 py-2 text-ink-2 transition-colors hover:bg-brand-soft focus-visible:bg-brand-soft ${
               isActive(course.href) ? "font-semibold underline underline-offset-4" : ""
-            } ${course.accent ? "font-semibold text-yellow-300" : ""}`}
+            } ${course.accent ? "font-semibold text-brand-dark" : ""}`}
           >
             {course.label}
           </Link>
@@ -53,17 +54,21 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
   );
 
   return (
-    <header className="sticky top-0 z-50 bg-navy-grad text-white shadow-md">
-      <div className="container relative">
-        <div className="flex h-14 items-center justify-between sm:h-16">
+    <header
+      className={`site-header sticky top-0 z-50 border-b border-brand-soft/80 bg-white/95 text-ink backdrop-blur ${
+        compact ? "h-14 shadow-[0_8px_24px_rgba(30,70,160,.12)]" : "h-16 shadow-[0_8px_24px_rgba(30,70,160,.06)]"
+      }`}
+    >
+      <div className="container relative h-full">
+        <div className="flex h-full items-center justify-between">
           <Link
             href="/"
-            className="group inline-flex min-w-0 items-center gap-2"
+            className="group inline-flex min-w-0 items-center gap-2 outline-none focus-visible:ring-2 focus-visible:ring-[#2F7BF0] focus-visible:ring-offset-2 rounded-lg"
             aria-label="Doon Coding Academy Home"
             title="Doon Coding Academy"
           >
-            <span className="text-xl font-extrabold tracking-tight sm:text-2xl">&lt;/&gt;</span>
-            <span className="hidden whitespace-nowrap text-base font-semibold leading-tight tracking-tight sm:inline sm:text-lg">
+            <span className="text-xl font-extrabold tracking-tight text-brand-dark sm:text-2xl">&lt;/&gt;</span>
+            <span className="hidden whitespace-nowrap text-base font-semibold leading-tight tracking-tight text-ink sm:inline sm:text-lg">
               Doon Coding Academy
             </span>
           </Link>
@@ -76,15 +81,15 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
                     <details className="group relative">
                       <summary
                         aria-controls="desktop-course-menu"
-                        className={`cursor-pointer list-none rounded-md px-2 py-2 transition-colors hover:text-yellow-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 [&::-webkit-details-marker]:hidden ${
-                          isCourseSectionActive ? "font-semibold underline underline-offset-4" : ""
+                        className={`relative cursor-pointer list-none rounded-lg px-2 py-2 transition-colors hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand [&::-webkit-details-marker]:hidden after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-gradient-to-r after:from-[#4b3fd8] after:to-[#2fa8f0] after:transition-transform after:content-[''] group-open:after:scale-x-100 ${
+                          isCourseSectionActive ? "font-semibold text-brand-dark after:scale-x-100" : ""
                         }`}
                       >
                         {item.label}
                       </summary>
                       <ul
                         id="desktop-course-menu"
-                        className="absolute left-0 top-full z-20 mt-2 w-64 rounded-2xl border border-white/10 bg-[#10264b]/95 p-2 text-sm shadow-soft-blue backdrop-blur"
+                        className="animate-menu-in absolute left-0 top-full z-20 mt-2 w-72 rounded-dca-sm border border-brand-soft bg-white p-2 text-sm text-ink shadow-soft-blue"
                       >
                         {courseLinks}
                       </ul>
@@ -95,8 +100,8 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
                     <Link
                       href={item.href}
                       aria-current={isCurrent(item.href) ? "page" : undefined}
-                      className={`rounded-md py-2 transition-colors hover:text-yellow-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${
-                        isActive(item.href) ? "font-semibold underline underline-offset-4" : ""
+                      className={`relative rounded-lg px-2 py-2 transition-colors hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-gradient-to-r after:from-[#4b3fd8] after:to-[#2fa8f0] after:transition-transform after:content-[''] hover:after:scale-x-100 ${
+                        isActive(item.href) ? "font-semibold text-brand-dark after:scale-x-100" : ""
                       }`}
                     >
                       {item.label}
@@ -110,22 +115,22 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
           <div className="hidden items-center gap-2 xl:flex">
             <Link
               href="/lab/javascript/discount-calculation-bug"
-              className="whitespace-nowrap rounded-full bg-yellow-300 px-4 py-2 text-sm font-semibold text-blue-950 hover:bg-yellow-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-blue-700 2xl:px-5"
+              className="whitespace-nowrap rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
             >
               Try Free Challenge
             </Link>
             <Link
               href="/contact"
-              className="whitespace-nowrap rounded-full border border-white/70 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-blue-700 2xl:px-5"
+              className="whitespace-nowrap rounded-full border border-brand px-4 py-2 text-sm font-semibold text-brand-dark transition-colors hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
             >
               Talk to Mentor
             </Link>
           </div>
 
-          <details className="relative ml-auto lg:ml-4 xl:hidden">
+          <details className="relative ml-auto xl:hidden">
             <summary
               aria-controls="mobile-menu"
-              className="flex cursor-pointer list-none items-center gap-2 rounded-lg p-2 text-sm hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 [&::-webkit-details-marker]:hidden"
+              className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-brand-soft px-4 py-2 text-sm font-medium text-ink-2 transition-colors hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand [&::-webkit-details-marker]:hidden"
             >
               <span>Menu</span>
               <svg
@@ -145,7 +150,7 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
             <nav
               id="mobile-menu"
               aria-label="Mobile navigation"
-              className="absolute right-0 top-full z-20 mt-2 max-h-[85vh] w-[min(22rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain rounded-2xl border border-white/10 bg-[#10264b]/95 p-2 shadow-soft-blue backdrop-blur"
+              className="animate-menu-in absolute right-0 top-full z-20 mt-2 max-h-[85vh] w-[min(22rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain rounded-dca-md border border-brand-soft bg-white p-2 text-ink shadow-soft-blue"
             >
               <ul className="flex flex-col">
                 {NAV_LINKS.map((item) =>
@@ -154,13 +159,13 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
                       <details>
                         <summary
                           aria-controls="mobile-course-menu"
-                          className={`cursor-pointer list-none rounded-xl px-4 py-3 transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 [&::-webkit-details-marker]:hidden ${
-                            isCourseSectionActive ? "font-semibold underline underline-offset-4" : ""
+                          className={`cursor-pointer list-none rounded-xl px-4 py-3 transition-colors hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand [&::-webkit-details-marker]:hidden ${
+                            isCourseSectionActive ? "font-semibold text-brand-dark" : ""
                           }`}
                         >
                           Courses
                         </summary>
-                        <ul id="mobile-course-menu" className="pb-2 pl-3">
+                        <ul id="mobile-course-menu" className="animate-menu-in pb-2 pl-3">
                           {courseLinks}
                         </ul>
                       </details>
@@ -170,8 +175,8 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
                       <Link
                         href={item.href}
                         aria-current={isCurrent(item.href) ? "page" : undefined}
-                        className={`my-0.5 block rounded-xl px-4 py-3 transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${
-                          isActive(item.href) ? "bg-white/5 font-semibold underline underline-offset-4" : ""
+                        className={`my-0.5 block rounded-xl px-4 py-3 transition-colors hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+                          isActive(item.href) ? "bg-brand-soft font-semibold text-brand-dark" : ""
                         }`}
                       >
                         {item.label}
@@ -179,10 +184,10 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
                     </li>
                   ),
                 )}
-                <li className="mt-2 border-t border-white/15 pt-2">
+                <li className="mt-2 border-t border-brand-soft pt-2">
                   <Link
                     href="/lab/javascript/discount-calculation-bug"
-                    className="my-0.5 block rounded-xl bg-yellow-300 px-4 py-3 font-semibold text-blue-950 hover:bg-yellow-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    className="my-0.5 block rounded-full bg-brand px-4 py-3 text-center font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     Try Free Challenge
                   </Link>
@@ -190,7 +195,7 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
                 <li>
                   <Link
                     href="/contact"
-                    className="my-0.5 block rounded-xl px-4 py-3 font-semibold text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    className="my-0.5 block rounded-full border border-brand px-4 py-3 text-center font-semibold text-brand-dark transition-colors hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     Talk to Mentor
                   </Link>

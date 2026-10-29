@@ -1,27 +1,35 @@
 "use client";
 
+import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
 import { useReducedMotion } from "framer-motion";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 interface CarouselProps {
   children: React.ReactNode;
   className?: string;
   ariaLabel: string;
+  autoplay?: boolean;
 }
 
 export default function Carousel({
   children,
   className = "",
   ariaLabel,
+  autoplay = false,
 }: CarouselProps) {
   const reduceMotion = useReducedMotion();
-  const [viewportRef, emblaApi] = useEmblaCarousel({
-    align: "start",
-    dragFree: false,
-    duration: reduceMotion ? 0 : 25,
-    loop: false,
-  });
+  const autoplayPlugin = useMemo(
+    () =>
+      autoplay && !reduceMotion
+        ? Autoplay({ delay: 5000, stopOnInteraction: false, stopOnMouseEnter: true, stopOnFocusIn: true })
+        : undefined,
+    [autoplay, reduceMotion],
+  );
+  const [viewportRef, emblaApi] = useEmblaCarousel(
+    { align: "start", dragFree: false, loop: false },
+    autoplayPlugin ? [autoplayPlugin] : [],
+  );
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [snapCount, setSnapCount] = useState(0);
 
@@ -42,7 +50,7 @@ export default function Carousel({
     };
   }, [emblaApi, onSelect]);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
       emblaApi?.scrollPrev();
@@ -54,12 +62,20 @@ export default function Carousel({
 
   return (
     <div
-      className={className}
       role="region"
       aria-roledescription="carousel"
       aria-label={ariaLabel}
       tabIndex={0}
-      onKeyDown={handleKeyDown}
+      className={`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${className}`}
+      onKeyDown={onKeyDown}
+      onMouseEnter={() => autoplayPlugin?.stop()}
+      onMouseLeave={() => autoplayPlugin?.play()}
+      onFocus={() => autoplayPlugin?.stop()}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          autoplayPlugin?.play();
+        }
+      }}
     >
       <div className="cf-viewport overflow-hidden" ref={viewportRef}>
         <div className="flex touch-pan-y">{children}</div>
@@ -68,7 +84,7 @@ export default function Carousel({
         <div className="relative z-10 mt-5 flex items-center justify-center gap-3">
           <button
             type="button"
-            className="rounded-full border border-blue-100 p-2 text-brand-dark hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            className="pill border border-brand-soft p-2 text-brand-dark hover:bg-brand-soft"
             aria-label="Previous slide"
             onClick={() => emblaApi?.scrollPrev()}
           >
@@ -76,13 +92,13 @@ export default function Carousel({
               <path d="m15 18-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-          <div className="flex items-center gap-2" role="group" aria-label="Choose slide">
+          <div className="flex items-center gap-2">
             {Array.from({ length: snapCount }, (_, index) => (
               <button
                 key={index}
                 type="button"
-                className={`h-2.5 w-2.5 rounded-full transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${selectedIndex === index ? "scale-x-[2.4] bg-brand" : "bg-blue-100"}`}
-                aria-label={`Go to slide ${index + 1}`}
+                className={`h-2.5 w-2.5 rounded-full transition-transform ${selectedIndex === index ? "scale-x-[2.4] bg-brand" : "bg-brand-soft"}`}
+                aria-label={`Go to slide ${index + 1} of ${snapCount}`}
                 aria-current={selectedIndex === index ? "true" : undefined}
                 onClick={() => emblaApi?.scrollTo(index)}
               />
@@ -90,7 +106,7 @@ export default function Carousel({
           </div>
           <button
             type="button"
-            className="rounded-full border border-blue-100 p-2 text-brand-dark hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            className="pill border border-brand-soft p-2 text-brand-dark hover:bg-brand-soft"
             aria-label="Next slide"
             onClick={() => emblaApi?.scrollNext()}
           >

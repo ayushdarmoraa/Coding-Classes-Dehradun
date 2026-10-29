@@ -1,4 +1,6 @@
 import TrackedLink from "@/components/analytics/TrackedLink";
+import SectionHeader from "@/components/motion/SectionHeader";
+import GrowReveal from "@/components/motion/GrowReveal";
 
 const paths = [
   {
@@ -33,7 +35,7 @@ export default function AudiencePaths() {
       aria-labelledby="audience-paths-heading"
       className="container py-16 sm:py-20"
     >
-      <div className="max-w-2xl">
+      <SectionHeader className="max-w-2xl">
         <p className="section-label">
           Choose a starting point
         </p>
@@ -43,26 +45,28 @@ export default function AudiencePaths() {
         >
           Where are you starting from?
         </h2>
-      </div>
+      </SectionHeader>
       <ul className="mt-8 grid gap-4 md:grid-cols-2">
-        {paths.map((path) => (
+        {paths.map((path, index) => (
           <li key={path.title}>
-            <article className="surface-card flex h-full flex-col p-6 transition hover:-translate-y-0.5 hover:shadow-soft-blue sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-              <div>
-                <h3 className="text-lg font-bold text-ink">{path.title}</h3>
-                <p className="mt-2 max-w-md leading-6 text-gray-600">
-                  {path.description}
-                </p>
-              </div>
-              <TrackedLink
-                href={path.href}
-                event="cta_home_audience_path"
-                eventParams={{ path: path.title }}
-                className="mt-5 inline-flex min-h-11 shrink-0 items-center font-semibold text-brand-dark underline decoration-blue-300 underline-offset-4 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:mt-0"
-              >
-                {path.action}
-              </TrackedLink>
-            </article>
+            <GrowReveal delay={index * 0.1} className="h-full">
+              <article className="surface-card flex h-full flex-col p-6 transition-transform duration-300 hover:-translate-y-1 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+                <div>
+                  <h3 className="text-lg font-bold text-ink">{path.title}</h3>
+                  <p className="mt-2 max-w-md leading-6 text-ink-2">
+                    {path.description}
+                  </p>
+                </div>
+                <TrackedLink
+                  href={path.href}
+                  event="cta_home_audience_path"
+                  eventParams={{ path: path.title }}
+                  className="mt-5 inline-flex min-h-11 shrink-0 items-center font-semibold text-brand-dark underline decoration-brand/40 underline-offset-4 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:mt-0"
+                >
+                  {path.action}
+                </TrackedLink>
+              </article>
+            </GrowReveal>
           </li>
         ))}
       </ul>

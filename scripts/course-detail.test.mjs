@@ -145,6 +145,19 @@ function loadTypeScript(relativePath) {
         default: loadTypeScript("src/components/features/CourseTabsNav.tsx").default,
       };
     }
+    if (specifier === "@/components/features/CurriculumTimeline") {
+      return {
+        __esModule: true,
+        default: ({ items }) =>
+          React.createElement(
+            "ol",
+            null,
+            items.map((item, index) =>
+              React.createElement("li", { key: index }, item),
+            ),
+          ),
+      };
+    }
     if (specifier === "@/lib/courses") return coursesModule;
     if (specifier === "@/lib/course-catalog") return courseCatalogModule;
     if (specifier === "@/lib/course-experience-content") return courseExperienceModule;

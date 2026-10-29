@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ChallengeCard from "@/components/lab/ChallengeCard";
 import { LabPageImpression, LabTrackedLink } from "@/components/lab/LabTrackedLink";
+import GrowReveal from "@/components/motion/GrowReveal";
 import { getPublishedChallenges } from "@/lib/lab/challenges";
 import { SITE } from "@/lib/site-config";
 
@@ -56,105 +57,111 @@ export default function LabPage() {
     : undefined;
 
   return (
-    <main className="container mx-auto max-w-6xl px-4 py-14 sm:py-20">
+    <main className="container mx-auto max-w-8xl px-4 py-10 sm:py-16">
       {featuredAnalyticsContext && (
         <LabPageImpression context={featuredAnalyticsContext} />
       )}
-      <header className="max-w-3xl">
-        <p className="section-label">
-          Doon Coding Academy
-        </p>
-        <h1 className="mt-3 text-4xl font-bold tracking-tight text-ink sm:text-5xl">
-          DCA Lab
-        </h1>
-        <p className="mt-5 text-xl leading-8 text-gray-700">
-          Learn by solving real coding problems. Debug bugs, fix logic and
-          practise software problem solving directly in your browser.
-        </p>
-        <p className="mt-3 leading-7 text-gray-600">
-          Start without signing up: choose a published mission and work through
-          its scenario, code and checks.
-        </p>
-        {featuredChallenge && featuredAnalyticsContext && (
-          <LabTrackedLink
-            event="start"
-            context={featuredAnalyticsContext}
-            href={`/lab/${featuredChallenge.track}/${featuredChallenge.slug}`}
-            className="mt-7 inline-flex min-h-12 items-center justify-center rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
-          >
-            Start First Challenge
-          </LabTrackedLink>
-        )}
+      <header className="surface-card overflow-hidden bg-white/90 p-6 sm:p-10">
+        <div className="max-w-4xl">
+          <p className="section-label">Doon Coding Academy</p>
+          <h1 className="mt-4 text-4xl font-bold tracking-tight text-ink sm:text-6xl">
+            DCA <span className="text-gradient">Lab</span>
+          </h1>
+          <p className="mt-5 max-w-3xl text-xl leading-8 text-ink-2">
+            Learn by solving real coding problems. Debug bugs, fix logic and
+            practise software problem solving directly in your browser.
+          </p>
+          <p className="mt-3 max-w-3xl leading-7 text-ink-2">
+            Start without signing up: choose a published mission and work through
+            its scenario, code and checks.
+          </p>
+          {featuredChallenge && featuredAnalyticsContext && (
+            <LabTrackedLink
+              event="start"
+              context={featuredAnalyticsContext}
+              href={`/lab/${featuredChallenge.track}/${featuredChallenge.slug}`}
+              className="mt-7 inline-flex min-h-12 items-center justify-center rounded-full bg-navy-grad px-6 py-3 font-semibold text-white shadow-soft-blue transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+            >
+              Start First Challenge
+            </LabTrackedLink>
+          )}
+        </div>
       </header>
 
       <section aria-labelledby="how-lab-works" className="mt-16">
-        <h2 id="how-lab-works" className="text-2xl font-bold text-gray-950">
+        <h2 id="how-lab-works" className="text-3xl font-bold text-ink">
           How the Lab works
         </h2>
         <ol className="mt-6 grid gap-4 md:grid-cols-3">
           {processSteps.map((step, index) => (
             <li
               key={step.title}
-              className="surface-card p-5"
+              className="h-full"
             >
-              <p className="text-sm font-semibold text-blue-700">
-                Step 0{index + 1}
-              </p>
-              <h3 className="mt-3 text-lg font-semibold text-gray-950">
-                {step.title}
-              </h3>
-              <p className="mt-2 leading-6 text-gray-600">
-                {step.description}
-              </p>
+              <GrowReveal className="h-full" delay={index * 0.06}>
+                <div className="surface-card h-full bg-white p-5 sm:p-6">
+                  <p className="chip border-transparent bg-tint-blue font-semibold text-brand-dark">
+                    Step 0{index + 1}
+                  </p>
+                  <h3 className="mt-4 text-xl font-semibold text-ink">
+                    {step.title}
+                  </h3>
+                  <p className="mt-2 leading-6 text-ink-2">
+                    {step.description}
+                  </p>
+                </div>
+              </GrowReveal>
             </li>
           ))}
         </ol>
       </section>
 
       {featuredChallenge && (
-        <section aria-labelledby="featured-mission" className="mt-16">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
-            Featured beginner mission
-          </p>
-          <h2
-            id="featured-mission"
-            className="mt-2 text-2xl font-bold text-gray-950"
-          >
-            {featuredChallenge.title}
-          </h2>
-          <p className="mt-3 max-w-2xl leading-7 text-gray-600">
-            {featuredChallenge.shortDescription}
-          </p>
+        <section
+          aria-labelledby="featured-mission"
+          className="mt-16 overflow-hidden rounded-dca-lg bg-violet-grad p-6 text-white shadow-soft-blue sm:p-9"
+        >
+          <GrowReveal>
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-white/75">
+              Featured beginner mission
+            </p>
+            <h2 id="featured-mission" className="mt-2 text-3xl font-bold text-white">
+              {featuredChallenge.title}
+            </h2>
+            <p className="mt-3 max-w-2xl leading-7 text-white/80">
+              {featuredChallenge.shortDescription}
+            </p>
+          </GrowReveal>
         </section>
       )}
 
       <section aria-labelledby="published-challenges" className="mt-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
-              Published challenges
-            </p>
+            <p className="section-label">Published challenges</p>
             <h2
               id="published-challenges"
-              className="mt-2 text-2xl font-bold text-gray-950"
+              className="mt-3 text-3xl font-bold text-ink"
             >
-              Choose a mission
+              Choose a <span className="text-gradient">mission</span>
             </h2>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm font-medium text-ink-2">
             {challenges.length} {challenges.length === 1 ? "mission" : "missions"} available
           </p>
         </div>
         {challenges.length > 0 ? (
           <ul className="mt-6 grid gap-5 md:grid-cols-2">
-            {challenges.map((challenge) => (
+            {challenges.map((challenge, index) => (
               <li key={challenge.id}>
-                <ChallengeCard challenge={challenge} />
+                <GrowReveal delay={index * 0.05} className="h-full">
+                  <ChallengeCard challenge={challenge} />
+                </GrowReveal>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="mt-6 rounded-xl border border-gray-200 bg-white p-5 text-gray-700">
+          <p className="surface-card mt-6 p-5 text-ink-2">
             No coding challenges are currently available. Check back later or
             explore the courses below.
           </p>
@@ -164,11 +171,11 @@ export default function LabPage() {
       {categories.length > 0 && (
         <nav
           aria-labelledby="challenge-categories-heading"
-          className="mt-14 rounded-xl bg-slate-50 p-5 sm:p-7"
+          className="mt-14 rounded-dca-md border border-brand-soft bg-tint-blue p-5 sm:p-7"
         >
           <h2
             id="challenge-categories-heading"
-            className="text-xl font-bold text-gray-950"
+            className="text-2xl font-bold text-ink"
           >
             Browse challenge categories
           </h2>
@@ -182,7 +189,7 @@ export default function LabPage() {
                 <li key={category}>
                   <Link
                     href={`/lab/${categoryChallenge.track}/${categoryChallenge.slug}`}
-                    className="inline-flex min-h-11 items-center rounded-lg border border-gray-300 bg-white px-4 py-2 font-medium text-gray-800 hover:border-blue-400 hover:text-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+                    className="pill inline-flex min-h-11 items-center border border-brand-soft bg-white px-4 py-2 font-medium text-ink-2 transition-colors hover:border-brand hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     {category}
                   </Link>
@@ -195,23 +202,23 @@ export default function LabPage() {
 
       <section
         aria-labelledby="lab-course-connection"
-        className="mt-14 flex flex-col gap-5 rounded-xl border border-blue-100 bg-blue-50 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8"
+        className="mt-14 flex flex-col gap-5 rounded-dca-lg border border-brand-soft bg-navy-grad p-6 text-white shadow-soft-blue sm:flex-row sm:items-center sm:justify-between sm:p-8"
       >
         <div>
           <h2
             id="lab-course-connection"
-            className="text-xl font-bold text-gray-950"
+            className="text-2xl font-bold text-white"
           >
             Want a structured learning path?
           </h2>
-          <p className="mt-2 max-w-2xl leading-6 text-gray-700">
+          <p className="mt-2 max-w-2xl leading-6 text-white/80">
             Compare course topics, duration, fees and delivery options before
             choosing what to study next.
           </p>
         </div>
         <Link
           href="/courses"
-          className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg border border-blue-700 bg-white px-5 py-3 font-semibold text-blue-800 hover:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+          className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-white/60 bg-white px-6 py-3 font-semibold text-brand-dark transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-dark"
         >
           Explore courses
         </Link>
