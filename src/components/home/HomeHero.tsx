@@ -49,7 +49,7 @@ export default function HomeHero() {
             href="/contact"
             className="mt-5 inline-flex min-h-11 items-center font-semibold text-blue-800 underline decoration-blue-300 underline-offset-4 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
           >
-            Contact the Academy
+            Talk to a Mentor
           </Link>
         </div>
 
