@@ -22,7 +22,7 @@ const PricingDisplay: React.FC<PricingDisplayProps> = ({
   return (
     <div className={`${containerClass} ${className}`}>
       <div className="pricing-option">
-        <div className="text-2xl font-bold text-blue-600">
+        <div className="text-2xl font-bold text-brand">
           {formatINR(coursePricing.packageRate)}
         </div>
         <div className="text-sm text-gray-600">

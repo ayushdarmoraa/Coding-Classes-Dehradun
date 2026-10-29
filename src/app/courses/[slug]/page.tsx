@@ -9,6 +9,7 @@ import { getAllBlogPosts } from "@/lib/blog";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+import CourseTabsNav from "@/components/features/CourseTabsNav";
 import LearningProgressionNote from "@/components/features/LearningProgressionNote";
 import { getCourseJsonLd } from "@/lib/schema";
 import { formatCourseDuration, formatCourseModes, formatCoursePrice } from "@/lib/pricing";
@@ -196,8 +197,8 @@ export default async function CoursePage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       {/* Hero */}
-      <header className="mb-6">
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-3">{course.title}</h1>
+      <header className="cd-hero mb-8 rounded-dca-lg p-6 sm:p-9">
+        <h1 className="text-3xl font-extrabold text-ink md:text-4xl">{course.title}</h1>
         {course.level && (
           <p className="mb-3 text-sm font-medium text-gray-700">
             Learning stage: {course.level}
@@ -258,32 +259,12 @@ export default async function CoursePage({ params }: Props) {
           </div>
         ) : null}
 
-        {/* In-page nav */}
-        <nav className="mt-6">
-          <div className="rounded-2xl bg-gray-50 ring-1 ring-gray-200 p-3">
-            <div className="flex flex-wrap gap-2">
-              <a href="#overview" className="text-sm font-medium text-blue-700 hover:underline">Overview</a>
-              <span aria-hidden="true" className="text-gray-300">•</span>
-              <a href="#who-for" className="text-sm font-medium text-blue-700 hover:underline">Who this is for</a>
-              <span aria-hidden="true" className="text-gray-300">•</span>
-              <a href="#curriculum" className="text-sm font-medium text-blue-700 hover:underline">Curriculum</a>
-              <span aria-hidden="true" className="text-gray-300">•</span>
-              <a href="#prereq" className="text-sm font-medium text-blue-700 hover:underline">Prerequisites</a>
-              <span aria-hidden="true" className="text-gray-300">•</span>
-              <a href="#projects" className="text-sm font-medium text-blue-700 hover:underline">Projects</a>
-              <span aria-hidden="true" className="text-gray-300">•</span>
-              <a href="#learning-works" className="text-sm font-medium text-blue-700 hover:underline">How learning works</a>
-              <span aria-hidden="true" className="text-gray-300">•</span>
-              <a href="#outcomes" className="text-sm font-medium text-blue-700 hover:underline">Outcomes</a>
-              <span aria-hidden="true" className="text-gray-300">•</span>
-              <a href="#faqs" className="text-sm font-medium text-blue-700 hover:underline">FAQs</a>
-            </div>
-          </div>
-        </nav>
       </header>
 
+      <CourseTabsNav />
+
       {/* Overview */}
-      <section id="overview" className="mb-8">
+      <section id="overview" className="surface-card mb-8 p-6 sm:p-8">
         <h2 className="text-2xl font-semibold mb-2">Overview</h2>
         <p className="text-gray-700">
           {course.description}

@@ -39,12 +39,12 @@ export default function IntentCards() {
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
+          <p className="section-label">
             Find your next step
           </p>
           <h2
             id="intent-heading"
-            className="mt-3 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl"
+            className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl"
           >
             What would you like to do?
           </h2>
@@ -60,18 +60,18 @@ export default function IntentCards() {
               href={intent.href}
               event="cta_home_intent"
               eventParams={{ intent: intent.number }}
-              className="group flex h-full min-h-52 flex-col rounded-xl border border-gray-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-950/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+              className="surface-card group flex h-full min-h-52 flex-col p-6 transition hover:-translate-y-1 hover:border-blue-300 hover:shadow-soft-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
             >
-              <span className="text-sm font-semibold text-blue-700">
+              <span className="font-mono text-sm font-semibold text-brand">
                 {intent.number}
               </span>
-              <span className="mt-4 text-lg font-bold text-gray-950">
+              <span className="mt-4 text-lg font-bold text-ink">
                 {intent.title}
               </span>
               <span className="mt-2 flex-1 leading-6 text-gray-600">
                 {intent.description}
               </span>
-              <span className="mt-5 inline-flex items-center gap-2 font-semibold text-blue-800">
+              <span className="mt-5 inline-flex items-center gap-2 font-semibold text-brand-dark">
                 {intent.action}
                 <span aria-hidden="true" className="transition group-hover:translate-x-1">
                   →

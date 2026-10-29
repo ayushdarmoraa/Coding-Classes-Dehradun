@@ -6,6 +6,15 @@ const config = {
   theme: {
     extend: {
       colors: {
+        brand: "#2f7bf0",
+        "brand-dark": "#1d5fd1",
+        "brand-soft": "#e6f0ff",
+        ink: "#0f1b33",
+        "ink-2": "#4b5b78",
+        "ink-3": "#7c8aa5",
+        panel: "#f6f9ff",
+        "tint-blue": "#dcebff",
+        "tint-lavender": "#e6deff",
         primary: {
           50: '#eff6ff',
           100: '#dbeafe',
@@ -50,6 +59,17 @@ const config = {
       maxWidth: {
         '8xl': '88rem',
       },
+      borderRadius: {
+        "dca-sm": "0.75rem",
+        "dca-lg": "1.5rem",
+      },
+      backgroundImage: {
+        "navy-grad": "linear-gradient(135deg, #0a1a38, #173f7a)",
+        "brand-soft-grad": "linear-gradient(135deg, #f3f8ff, #ffffff)",
+      },
+      boxShadow: {
+        "soft-blue": "0 20px 50px rgba(30, 70, 160, 0.12)",
+      },
       animation: {
         'fade-in-up': 'fadeInUp 0.6s ease-out',
         'bounce-slow': 'bounce 2s infinite',
@@ -60,4 +80,3 @@ const config = {
 };
 
 export default config;
-

@@ -281,7 +281,7 @@ export default function ChallengeWorkspace({
         <MissionPreview previewResult={previewResult} />
       </div>
 
-      <div className="min-w-0 overflow-hidden rounded-xl border border-gray-300 focus-within:ring-2 focus-within:ring-blue-700 focus-within:ring-offset-2 lg:col-span-2">
+      <div className="min-w-0 overflow-hidden rounded-dca-sm border border-slate-300 shadow-sm focus-within:ring-2 focus-within:ring-brand focus-within:ring-offset-2 lg:col-span-2">
         <CodeEditor value={code} onChange={handleCodeChange} readOnly={!progressReady} />
       </div>
       {!progressReady && (

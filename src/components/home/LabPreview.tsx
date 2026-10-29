@@ -6,14 +6,14 @@ export default function LabPreview() {
       aria-labelledby="lab-preview-heading"
       className="container py-16 sm:py-20"
     >
-      <div className="grid items-center gap-8 rounded-2xl border border-blue-100 bg-blue-50 p-6 sm:p-9 lg:grid-cols-[1fr_auto] lg:p-12">
+      <div className="grid items-center gap-8 rounded-dca-lg border border-blue-100 bg-brand-soft-grad p-6 shadow-soft-blue sm:p-9 lg:grid-cols-[1fr_auto] lg:p-12">
         <div className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
+          <p className="section-label">
             One real mission to try
           </p>
           <h2
             id="lab-preview-heading"
-            className="mt-3 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl"
+            className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl"
           >
             Try Coding Before You Enrol
           </h2>
@@ -39,7 +39,7 @@ export default function LabPreview() {
             href="/lab/javascript/discount-calculation-bug"
             event="cta_home_lab_start"
             eventParams={{ location: "home_lab_preview" }}
-            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white transition hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+            className="inline-flex min-h-11 items-center justify-center rounded-full bg-brand px-6 py-3 font-semibold text-white transition hover:bg-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
           >
             Start the challenge
           </TrackedLink>
@@ -47,7 +47,7 @@ export default function LabPreview() {
             href="/lab"
             event="cta_home_lab_explore"
             eventParams={{ location: "home_lab_preview" }}
-            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-blue-700 bg-white px-5 py-3 font-semibold text-blue-800 transition hover:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+            className="inline-flex min-h-11 items-center justify-center rounded-full border border-brand bg-white px-6 py-3 font-semibold text-brand-dark transition hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
           >
             Explore DCA Lab
           </TrackedLink>

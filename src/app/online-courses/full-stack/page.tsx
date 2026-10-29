@@ -45,7 +45,7 @@ export default function OnlineFullStackPage() {
   return (
     <main className="min-h-screen">
       {/* H1 — required: Online + India + value proposition */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white pt-10 pb-16">
+      <section className="bg-navy-grad text-white pt-12 pb-16">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
             Online Full-Stack Development (MERN) in India

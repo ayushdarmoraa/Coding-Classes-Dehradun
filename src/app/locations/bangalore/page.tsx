@@ -58,7 +58,7 @@ export default function Page() {
   ]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-panel">
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
@@ -66,8 +66,8 @@ export default function Page() {
       />
       <main className="max-w-6xl mx-auto px-4 py-10">
         {/* Hero */}
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold">
+        <header className="cd-hero mb-8 rounded-dca-lg p-6 sm:p-9">
+          <h1 className="mt-3 text-3xl font-bold text-ink sm:text-4xl">
             Coding Classes in Bangalore – Learn Online with Live Mentors
           </h1>
           <p className="mt-3 text-gray-700">

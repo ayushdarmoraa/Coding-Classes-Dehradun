@@ -39,7 +39,7 @@ export default function OnlineDataSciencePage() {
   return (
     <main className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white pt-10 pb-16">
+      <section className="bg-navy-grad text-white pt-12 pb-16">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-5 leading-tight">
             Data Science &amp; AI Course Details
@@ -69,7 +69,7 @@ export default function OnlineDataSciencePage() {
       {/* Key points */}
       <section className="py-12">
         <div className="max-w-5xl mx-auto px-4 grid md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+          <div className="surface-card p-6">
             <h2 className="text-xl font-semibold mb-2">What you’ll learn</h2>
             <ul className="text-gray-700 space-y-1">
               {course?.curriculum.map((item) => (
@@ -77,14 +77,14 @@ export default function OnlineDataSciencePage() {
               ))}
             </ul>
           </div>
-          <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+          <div className="surface-card p-6">
             <h2 className="text-xl font-semibold mb-2">Course details</h2>
             <p className="text-gray-700">
               {course && `Level: ${course.level} · ${formatCourseDuration(course.duration)} · ${formatCourseModes(course)}`}
             </p>
             {course && <p className="mt-2 text-sm text-gray-600">Fees: {formatCoursePrice(course.pricing)}</p>}
           </div>
-          <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+          <div className="surface-card p-6">
             <h2 className="text-xl font-semibold mb-2">Course outcomes</h2>
             <ul className="text-gray-700 space-y-1">
               {course?.outcomes.map((item) => (

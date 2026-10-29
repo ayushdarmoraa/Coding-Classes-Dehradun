@@ -53,7 +53,7 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
   );
 
   return (
-    <header className="sticky top-0 z-50 bg-blue-600 text-white shadow-md">
+    <header className="sticky top-0 z-50 bg-navy-grad text-white shadow-md">
       <div className="container relative">
         <div className="flex h-14 items-center justify-between sm:h-16">
           <Link
@@ -84,7 +84,7 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
                       </summary>
                       <ul
                         id="desktop-course-menu"
-                        className="absolute left-0 top-full z-20 mt-2 w-64 rounded-lg bg-blue-700/95 p-2 text-sm shadow-lg backdrop-blur"
+                        className="absolute left-0 top-full z-20 mt-2 w-64 rounded-2xl border border-white/10 bg-[#10264b]/95 p-2 text-sm shadow-soft-blue backdrop-blur"
                       >
                         {courseLinks}
                       </ul>
@@ -110,13 +110,13 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
           <div className="hidden items-center gap-2 xl:flex">
             <Link
               href="/lab/javascript/discount-calculation-bug"
-              className="whitespace-nowrap rounded-lg bg-yellow-300 px-3 py-2 text-sm font-semibold text-blue-950 hover:bg-yellow-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-blue-600 2xl:px-4"
+              className="whitespace-nowrap rounded-full bg-yellow-300 px-4 py-2 text-sm font-semibold text-blue-950 hover:bg-yellow-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-blue-700 2xl:px-5"
             >
               Try Free Challenge
             </Link>
             <Link
               href="/contact"
-              className="whitespace-nowrap rounded-lg border border-white/70 px-3 py-2 text-sm font-semibold text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-blue-600 2xl:px-4"
+              className="whitespace-nowrap rounded-full border border-white/70 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-blue-700 2xl:px-5"
             >
               Talk to Mentor
             </Link>
@@ -145,7 +145,7 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
             <nav
               id="mobile-menu"
               aria-label="Mobile navigation"
-              className="absolute right-0 top-full z-20 mt-2 max-h-[85vh] w-[min(22rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain rounded-2xl border-t border-white/10 bg-blue-700/95 p-2 shadow-lg backdrop-blur"
+              className="absolute right-0 top-full z-20 mt-2 max-h-[85vh] w-[min(22rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain rounded-2xl border border-white/10 bg-[#10264b]/95 p-2 shadow-soft-blue backdrop-blur"
             >
               <ul className="flex flex-col">
                 {NAV_LINKS.map((item) =>

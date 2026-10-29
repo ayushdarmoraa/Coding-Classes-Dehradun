@@ -121,7 +121,7 @@ export default function HomeFAQ({ courses }: { courses: Course[] }) {
           Quick answers about on-campus and online cohorts. Still unsure?{" "}
           <Link
             href="/contact"
-            className="inline-block rounded-full bg-blue-600 px-3 py-1 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition"
+            className="inline-block rounded-full bg-brand px-3 py-1 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
           >
             Talk to us
           </Link>
@@ -132,13 +132,13 @@ export default function HomeFAQ({ courses }: { courses: Course[] }) {
         {faqs.map((item, i) => {
           const isOpen = openIdx === i;
           return (
-            <li key={i} className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <li key={i} className="surface-card overflow-hidden">
               <button
                 type="button"
                 aria-expanded={isOpen}
                 aria-controls={`faq-panel-${i}`}
                 onClick={() => setOpenIdx(isOpen ? -1 : i)}
-                className="flex w-full items-center justify-between gap-4 rounded-2xl px-5 py-4 text-left"
+                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
               >
                 <span className="text-lg font-semibold leading-6">{item.q}</span>
                 <span className="text-gray-500">
@@ -167,19 +167,19 @@ export default function HomeFAQ({ courses }: { courses: Course[] }) {
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link
           href="/faq"
-          className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-gray-50"
+          className="rounded-full border border-gray-200 bg-white px-5 py-2 text-sm font-semibold shadow-sm hover:bg-gray-50"
         >
           View all FAQs
         </Link>
         <Link
           href="/online-courses"
-          className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+          className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-dark"
         >
           Explore online courses
         </Link>
         <Link
           href="/courses"
-          className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black"
+          className="rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black"
         >
           Explore on-campus courses
         </Link>

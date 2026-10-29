@@ -61,10 +61,10 @@ export default function LabPage() {
         <LabPageImpression context={featuredAnalyticsContext} />
       )}
       <header className="max-w-3xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
+        <p className="section-label">
           Doon Coding Academy
         </p>
-        <h1 className="mt-3 text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+        <h1 className="mt-3 text-4xl font-bold tracking-tight text-ink sm:text-5xl">
           DCA Lab
         </h1>
         <p className="mt-5 text-xl leading-8 text-gray-700">
@@ -95,7 +95,7 @@ export default function LabPage() {
           {processSteps.map((step, index) => (
             <li
               key={step.title}
-              className="rounded-xl border border-gray-200 bg-white p-5"
+              className="surface-card p-5"
             >
               <p className="text-sm font-semibold text-blue-700">
                 Step 0{index + 1}

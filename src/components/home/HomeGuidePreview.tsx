@@ -16,17 +16,17 @@ export default function HomeGuidePreview({
   return (
     <section
       aria-labelledby="home-guides-heading"
-      className="bg-slate-50 py-16 sm:py-20"
+      className="bg-panel py-16 sm:py-20"
     >
       <div className="container">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
+            <p className="section-label">
               Guides
             </p>
             <h2
               id="home-guides-heading"
-              className="mt-3 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl"
+              className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl"
             >
               Helpful guides for coding learners
             </h2>
@@ -35,7 +35,7 @@ export default function HomeGuidePreview({
             href="/blog"
             event="cta_home_view_guides"
             eventParams={{ location: "home_guide_preview" }}
-            className="inline-flex min-h-11 items-center font-semibold text-blue-800 underline decoration-blue-300 underline-offset-4 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+            className="inline-flex min-h-11 items-center font-semibold text-brand-dark underline decoration-blue-300 underline-offset-4 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             Browse all guides
           </TrackedLink>
@@ -43,16 +43,16 @@ export default function HomeGuidePreview({
         <ul className="mt-8 grid gap-4 md:grid-cols-3">
           {guides.map((guide) => (
             <li key={guide.slug}>
-              <article className="flex h-full flex-col rounded-xl border border-gray-200 bg-white p-6">
-                <p className="text-sm font-semibold text-blue-700">
+              <article className="surface-card flex h-full flex-col p-6 transition hover:-translate-y-1 hover:shadow-soft-blue">
+                <p className="text-sm font-semibold text-brand-dark">
                   {guide.category} · {guide.readingTime} min read
                 </p>
-                <h3 className="mt-3 text-lg font-bold leading-6 text-gray-950">
+                <h3 className="mt-3 text-lg font-bold leading-6 text-ink">
                   <TrackedLink
                     href={`/blog/${guide.slug}`}
                     event="cta_home_read_guide"
                     eventParams={{ guide_slug: guide.slug }}
-                    className="rounded-sm hover:text-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+                    className="rounded-sm hover:text-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     {guide.title}
                   </TrackedLink>
@@ -64,7 +64,7 @@ export default function HomeGuidePreview({
                   href={`/blog/${guide.slug}`}
                   event="cta_home_read_guide"
                   eventParams={{ guide_slug: guide.slug }}
-                  className="mt-5 inline-flex min-h-11 items-center font-semibold text-blue-800 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+                  className="mt-5 inline-flex min-h-11 items-center font-semibold text-brand-dark hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
                   Read guide
                   <span className="sr-only">: {guide.title}</span>

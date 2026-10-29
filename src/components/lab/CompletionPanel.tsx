@@ -22,7 +22,7 @@ export default function CompletionPanel({
   if (!completed) return null;
 
   return (
-    <section aria-labelledby="completion-heading" className="space-y-5 rounded-xl border border-green-300 bg-green-50 p-5">
+    <section aria-labelledby="completion-heading" className="surface-card space-y-5 border-green-300 bg-green-50 p-5">
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         Mission complete. All mission tests passed.
       </p>
@@ -39,7 +39,7 @@ export default function CompletionPanel({
       <nav aria-label="Next steps" className="flex flex-wrap gap-3">
         <Link
           href="/lab"
-          className="rounded-lg border border-blue-700 px-4 py-3 font-semibold text-blue-800 hover:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+          className="rounded-full border border-brand px-5 py-3 font-semibold text-brand-dark hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           Explore DCA Lab
         </Link>
@@ -48,7 +48,7 @@ export default function CompletionPanel({
           context={analyticsContext}
           relatedCourseSlug="full-stack"
           href="/courses/full-stack"
-          className="rounded-lg bg-blue-700 px-4 py-3 font-semibold text-white hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+          className="rounded-full bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           Explore Full-Stack Course
         </LabTrackedLink>
@@ -56,7 +56,7 @@ export default function CompletionPanel({
           event="contact"
           context={analyticsContext}
           href="/contact"
-          className="rounded-lg border border-gray-400 px-4 py-3 font-semibold text-gray-900 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+          className="rounded-full border border-gray-400 px-5 py-3 font-semibold text-gray-900 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           Talk to Mentor
         </LabTrackedLink>

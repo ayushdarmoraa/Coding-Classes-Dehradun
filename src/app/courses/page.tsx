@@ -89,7 +89,7 @@ export default function CoursesPage() {
   } as const;
 
   return (
-    <main className="min-h-screen bg-gray-50" id="top">
+    <main className="min-h-screen bg-panel" id="top">
       <script
         id="courses-breadcrumb"
         type="application/ld+json"
@@ -102,8 +102,8 @@ export default function CoursesPage() {
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <header className="mx-auto max-w-6xl px-4 pt-8">
-        <h1 className="text-3xl font-bold text-gray-900">
+      <header className="cd-hero mx-auto max-w-6xl rounded-dca-lg px-6 py-10 sm:px-10">
+        <h1 className="mt-3 text-3xl font-bold text-ink sm:text-4xl">
           Explore Coding Courses
         </h1>
         <p className="mt-2 max-w-2xl text-gray-700">

@@ -8,7 +8,7 @@ export default function ChallengeCard({
   challenge: LabChallenge;
 }) {
   return (
-    <article className="flex h-full flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+    <article className="surface-card flex h-full flex-col p-6 transition hover:-translate-y-1 hover:shadow-soft-blue">
       <div className="flex flex-wrap gap-2 text-xs font-semibold">
         <span className="rounded-full bg-blue-50 px-3 py-1 text-blue-800">
           {challenge.difficulty}
@@ -45,7 +45,7 @@ export default function ChallengeCard({
           difficulty: challenge.difficulty,
         }}
         href={getChallengePath(challenge)}
-        className="mt-6 inline-flex min-h-11 items-center justify-center rounded-lg bg-blue-700 px-4 py-3 font-semibold text-white hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+        className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
       >
         Start challenge
       </LabTrackedLink>
