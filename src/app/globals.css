@@ -58,6 +58,33 @@ html {
   text-transform: uppercase;
 }
 
+.cf-viewport {
+  padding: 0.5rem 0.5rem 1.5rem;
+}
+
+.cf-slide {
+  flex: 0 0 86%;
+  padding-inline: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .cf-slide {
+    flex-basis: 55%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cf-slide {
+    flex-basis: 33.333%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-slide {
+    scroll-behavior: auto;
+  }
+}
+
 .text-gradient {
   background: linear-gradient(90deg, #4b3fd8, #2fa8f0);
   background-clip: text;

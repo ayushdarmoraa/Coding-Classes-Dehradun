@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import HomeFAQ from "@/components/faq/HomeFAQ";
-import CourseCard from "@/components/features/CourseCard";
 import ProjectCard from "@/components/projects/ProjectCard";
 import AudiencePaths from "@/components/home/AudiencePaths";
+import HomeCourses from "@/components/home/HomeCourses";
 import HomeGuidePreview from "@/components/home/HomeGuidePreview";
 import HomeHero from "@/components/home/HomeHero";
 import IntentCards from "@/components/home/IntentCards";
@@ -82,15 +82,8 @@ export default function HomePage() {
             before you decide.
           </p>
         </div>
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {courses.map((course, index) => (
-            <CourseCard
-              key={course.id}
-              course={course}
-              featured={index === 0}
-              analyticsLocation="home_course_preview"
-            />
-          ))}
+        <div className="mt-8">
+          <HomeCourses courses={courses} />
         </div>
         <div className="mt-8 text-center">
           <TrackedLink

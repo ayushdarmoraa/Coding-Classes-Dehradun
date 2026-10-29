@@ -568,8 +568,10 @@ test("sitemap includes only published Lab routes from the challenge registry", a
 test("course display consumers use structured canonical facts", async () => {
   const consumers = [
     ["src/app/page.tsx", /const courses = getCourses\(\)/],
-    ["src/app/page.tsx", /courses\.map\(\(course, index\)/],
-    ["src/app/page.tsx", /<CourseCard[\s\S]*?course=\{course\}/],
+    ["src/app/page.tsx", /<HomeCourses courses=\{courses\} \/>/],
+    ["src/components/home/HomeCourses.tsx", /courses\.map\(\(course, index\)/],
+    ["src/components/home/HomeCourses.tsx", /<CourseCard[\s\S]*?course=\{course\}/],
+    ["src/components/home/HomeCourses.tsx", /analyticsLocation="home_course_preview"/],
     ["src/app/page.tsx", /import \{ SITE \} from "@\/lib\/site-config"/],
     ["src/app/page.tsx", /canonical: `\$\{SITE\.url\}\/`/],
     ["src/components/features/CourseCard.tsx", /SITE\.whatsappUrl/],
