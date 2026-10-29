@@ -18,7 +18,8 @@
     "test:pr3": "npm run test:lab && node --test scripts/navigation.test.mjs",
     "test:guides": "node --test scripts/guides.test.mjs",
     "test:projects": "node --test scripts/projects.test.mjs",
-    "test": "npm run test:pr3 && npm run test:guides && npm run test:projects",
+    "test:outcomes": "node --test scripts/outcomes.test.mjs",
+    "test": "npm run test:pr3 && npm run test:guides && npm run test:projects && npm run test:outcomes",
     "check:analytics": "node ./scripts/check-analytics.js",
     "gsc:submit": "node scripts/gsc-submit-sitemap.mjs",
     "gsc:submit:domain": "node scripts/gsc-submit-sitemap-domain.mjs"

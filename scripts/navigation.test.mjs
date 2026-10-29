@@ -18,7 +18,11 @@ const compiled = ts.transpileModule(source, {
   },
 }).outputText;
 const navModule = { exports: {} };
-new Function("require", "module", "exports", compiled)(require, navModule, navModule.exports);
+const localRequire = (specifier) =>
+  specifier === "@/lib/outcomes"
+    ? { hasPublishedOutcomeContent: () => false }
+    : require(specifier);
+new Function("require", "module", "exports", compiled)(localRequire, navModule, navModule.exports);
 
 test("primary navigation matches the approved product destinations", () => {
   assert.deepEqual(

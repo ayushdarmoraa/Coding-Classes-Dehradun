@@ -250,6 +250,7 @@ test("sitemap includes Lab index and published missions but excludes drafts", as
       getPublishedProjects: () => [],
       getProjectPath: ({ slug }) => `/projects/${slug}`,
     },
+    "@/lib/outcomes": { hasPublishedOutcomeContent: () => false },
     "@/lib/site-config": { SITE: { url: "https://dooncodingacademy.in" } },
   });
 

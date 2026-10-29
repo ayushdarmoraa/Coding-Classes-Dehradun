@@ -58,6 +58,9 @@ function loadTypeScript(relativePath, overrides = {}) {
         getProjectPath: ({ slug }) => `/projects/${slug}`,
       };
     }
+    if (specifier === "@/lib/outcomes") {
+      return { hasPublishedOutcomeContent: () => false };
+    }
     if (specifier === "next/link") {
       return function Link({ children, ...props }) {
         return React.createElement("a", props, children);

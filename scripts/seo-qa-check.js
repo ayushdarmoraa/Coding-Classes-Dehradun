@@ -40,8 +40,7 @@ export function getPublishedGuideRoutes() {
     .sort((left, right) => left.localeCompare(right));
 }
 
-function getPublishedProjectRoutes() {
-  const relativePath = "src/lib/projects.ts";
+function loadTypeScriptModule(relativePath, mocks = {}) {
   const source = fs.readFileSync(path.resolve(process.cwd(), relativePath), "utf8");
   const compiled = ts.transpileModule(source, {
     compilerOptions: {
@@ -50,17 +49,35 @@ function getPublishedProjectRoutes() {
       target: ts.ScriptTarget.ES2020,
     },
   }).outputText;
-  const projectModule = { exports: {} };
+  const loadedModule = { exports: {} };
+  const localRequire = (specifier) =>
+    Object.hasOwn(mocks, specifier) ? mocks[specifier] : require(specifier);
   new Function("require", "module", "exports", compiled)(
-    require,
-    projectModule,
-    projectModule.exports,
+    localRequire,
+    loadedModule,
+    loadedModule.exports,
   );
-  const { getProjectPath, getPublishedProjects } = projectModule.exports;
+  return loadedModule.exports;
+}
+
+function getPublishedProjectRoutes() {
+  const { getProjectPath, getPublishedProjects } = loadTypeScriptModule(
+    "src/lib/projects.ts",
+  );
   const projects = getPublishedProjects();
   return projects.length
     ? ["/projects", ...projects.map((project) => getProjectPath(project))]
     : [];
+}
+
+export function getPublishedOutcomeRoutes() {
+  const testimonials = loadTypeScriptModule("src/lib/testimonials.ts");
+  const { getPublishedOutcomeContent } = loadTypeScriptModule(
+    "src/lib/outcomes.ts",
+    { "./testimonials": testimonials },
+  );
+  const { metrics, stories } = getPublishedOutcomeContent();
+  return metrics.length > 0 || stories.length > 0 ? ["/outcomes"] : [];
 }
 
 function getAttributes(tag) {
@@ -288,13 +305,15 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
   const isBlogIndex = route === "/blog";
   const isBlogPost = /^\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(route);
   const isProjectsIndex = route === "/projects";
+  const isOutcomesIndex = route === "/outcomes";
   if (
     isHomePage ||
     isLabIndex ||
     isLabChallenge ||
     isBlogIndex ||
     isBlogPost ||
-    isProjectsIndex
+    isProjectsIndex ||
+    isOutcomesIndex
   ) {
     if (!getPageTitle(html)) issues.push("page is missing a non-empty <title>");
     const description = getMetaDescription(html);
@@ -355,6 +374,9 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
   }
   if (isBlogPost && !types.has("BlogPosting")) {
     issues.push("guide detail is missing BlogPosting JSON-LD");
+  }
+  if (isOutcomesIndex && !types.has("ItemList")) {
+    issues.push("outcomes page is missing ItemList JSON-LD");
   }
   if (isBlogPost && !types.has("BreadcrumbList")) {
     issues.push("guide detail is missing BreadcrumbList JSON-LD");
@@ -423,6 +445,7 @@ export async function getPageRoutes() {
     .sort((left, right) => left.localeCompare(right));
   routes.push(...getPublishedGuideRoutes());
   routes.push(...getPublishedProjectRoutes());
+  routes.push(...getPublishedOutcomeRoutes());
   if (
     !routes.includes("/") ||
     !routes.includes("/blog") ||

@@ -64,6 +64,9 @@ function loadTypeScript(relativePath, overrides = {}) {
         getProjectPath: ({ slug }) => `/projects/${slug}`,
       };
     }
+    if (specifier === "@/lib/outcomes") {
+      return { hasPublishedOutcomeContent: () => false };
+    }
     return nativeRequire(specifier);
   };
 

@@ -75,6 +75,16 @@ const testimonialRecords: Testimonial[] = [
   },
 ];
 
-export const testimonials = testimonialRecords.filter(
-  (testimonial) => testimonial.verified && testimonial.consentVerified
-);
+export function getPublishableTestimonials(
+  records: readonly Testimonial[] = testimonialRecords,
+): Testimonial[] {
+  return records.filter(
+    (testimonial) =>
+      testimonial.verified &&
+      testimonial.consentVerified &&
+      Boolean(testimonial.author.trim()) &&
+      Boolean(testimonial.text.trim()),
+  );
+}
+
+export const testimonials = getPublishableTestimonials();
