@@ -87,7 +87,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                 eventParams={analyticsLocation ? { location: analyticsLocation, course_slug: course.slug } : undefined}
                 className="cf-btn"
               >
-                View Details
+                View Course
               </Button>
               {relatedChallengeHref && (
                 <Button

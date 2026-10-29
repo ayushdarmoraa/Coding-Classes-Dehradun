@@ -32,6 +32,10 @@ spring.svg
 tailwindcss.svg
 typescript.svg
 vscode.svg
+cplusplus.svg
+django.svg
+postman.svg
+tensorflow.svg
 
 Source: https://github.com/devicons/devicon
 

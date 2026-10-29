@@ -156,7 +156,7 @@ function routeExists(href) {
 }
 
 test("homepage presents one clear value proposition and valid primary actions", () => {
-  assert.match(markup, /<h1[^>]*>Learn Coding\. Fix Real Problems\. Build Real Skills\.<\/h1>/);
+  assert.match(markup, /<h1[^>]*>Learn Coding\. Fix <span class="text-shimmer">Real Problems\.<\/span> Build Real Skills\.<\/h1>/);
   assert.match(markup, />Learn\. Debug\. Build\. Prove\.</);
   assert.match(markup, /href="\/lab\/javascript\/discount-calculation-bug"[^>]*>Try a Free Coding Challenge/);
   assert.match(markup, /href="\/courses"[^>]*>Explore Courses/);

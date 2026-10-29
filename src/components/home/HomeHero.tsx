@@ -38,7 +38,7 @@ export default function HomeHero() {
               id="home-hero-heading"
               className="mt-6 max-w-2xl text-4xl font-bold leading-tight tracking-tight text-ink sm:text-5xl lg:text-6xl hero-stagger-2"
             >
-              Learn Coding. Fix Real Problems. Build Real Skills.
+              Learn Coding. Fix <span className="text-shimmer">Real Problems.</span> Build Real Skills.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-ink-2 hero-stagger-3">
               Structured coding courses and practical coding challenges to help

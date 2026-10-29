@@ -189,7 +189,7 @@ test("course cards show canonical facts, course and contact links, and only supp
   assert.match(fullStackMarkup, /HTML, CSS, Tailwind fundamentals/);
   assert.match(fullStackMarkup, /₹25,000 package rate/);
   assert.match(fullStackMarkup, /href="\/courses\/full-stack"/);
-  assert.match(fullStackMarkup, /View Details/);
+  assert.match(fullStackMarkup, /View Course/);
   assert.match(fullStackMarkup, /href="\/lab\/javascript\/discount-calculation-bug"/);
   assert.match(fullStackMarkup, /Try Related Challenge/);
   assert.match(fullStackMarkup, /Practical work/);
