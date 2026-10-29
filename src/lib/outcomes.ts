@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  getPublishableTestimonials,
+  testimonials,
+  type Testimonial,
+} from "./testimonials";
 
 const dateSchema = z
   .string()
@@ -10,6 +15,8 @@ const dateSchema = z
     return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
   }, "Expected a real calendar date");
 
+// References and boolean flags are recorded workflow attestations. This validates their
+// structure and presence, but cannot independently authenticate a source or human approval.
 const evidenceSchema = z.object({
   slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   sourceEvidenceReference: z.string().trim().min(1),
@@ -74,47 +81,42 @@ const outcomeMetricSchema = evidenceSchema
     },
   );
 
-const outcomeStorySchema = evidenceSchema.extend({
-  attribution: z.string().trim().min(1),
-  quote: z.string().trim().min(1),
-  sourceLabel: z.string().trim().min(1),
-  consentEvidenceReference: z.string().trim().min(1),
-  consentVerified: z.boolean(),
-  consentScope: z.array(z.enum(["quote", "attribution", "profile", "image"])),
-});
-
 export type OutcomeMetric = z.infer<typeof outcomeMetricSchema>;
-export type OutcomeStory = z.infer<typeof outcomeStorySchema>;
+export interface OutcomeStory {
+  slug: string;
+  attribution: string;
+  quote: string;
+  sourceLabel: string;
+  sourceUrl?: string;
+}
+
 export interface PublishedOutcomeContent {
   metrics: OutcomeMetric[];
   stories: OutcomeStory[];
 }
 
 export const OUTCOME_METRICS: readonly OutcomeMetric[] = [];
-export const OUTCOME_STORIES: readonly OutcomeStory[] = [];
 
 export function validateOutcomeEvidence(
   metrics: readonly unknown[],
-  stories: readonly unknown[],
-): PublishedOutcomeContent {
+): OutcomeMetric[] {
   const parsedMetrics = z.array(outcomeMetricSchema).parse(metrics);
-  const parsedStories = z.array(outcomeStorySchema).parse(stories);
-  const slugs = [...parsedMetrics, ...parsedStories].map(({ slug }) => slug);
+  const slugs = parsedMetrics.map(({ slug }) => slug);
 
   if (new Set(slugs).size !== slugs.length) {
     throw new Error("Outcome evidence slugs must be unique");
   }
 
-  return { metrics: parsedMetrics, stories: parsedStories };
+  return parsedMetrics;
 }
 
 export function getPublishedOutcomeContent(
   metrics: readonly unknown[] = OUTCOME_METRICS,
-  stories: readonly unknown[] = OUTCOME_STORIES,
+  testimonialRecords: readonly Testimonial[] = testimonials,
 ): PublishedOutcomeContent {
-  const validated = validateOutcomeEvidence(metrics, stories);
+  const validatedMetrics = validateOutcomeEvidence(metrics);
   return {
-    metrics: validated.metrics.filter(
+    metrics: validatedMetrics.filter(
       (metric) =>
         metric.published &&
         metric.sourceVerified &&
@@ -125,17 +127,36 @@ export function getPublishedOutcomeContent(
             (metric.consentScope?.includes("project") === true ||
               metric.consentScope?.includes("aggregate") === true))),
     ),
-    stories: validated.stories.filter(
-      (story) =>
-        story.published &&
-        story.sourceVerified &&
-        story.claimVerified &&
-        story.consentVerified &&
-        story.consentScope.includes("quote") &&
-        story.consentScope.includes("attribution") &&
-        story.businessApproved,
+    stories: getPublishableTestimonials(testimonialRecords).flatMap(
+      (testimonial, index) => {
+        const sourceLabel = testimonial.source?.trim();
+        if (
+          !sourceLabel ||
+          (testimonial.sourceUrl && !isSafeSourceUrl(testimonial.sourceUrl))
+        ) {
+          return [];
+        }
+
+        return [
+          {
+            slug: `testimonial-${index + 1}`,
+            attribution: testimonial.author,
+            quote: testimonial.text,
+            sourceLabel,
+            ...(testimonial.sourceUrl ? { sourceUrl: testimonial.sourceUrl } : {}),
+          },
+        ];
+      },
     ),
   };
+}
+
+function isSafeSourceUrl(value: string): boolean {
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
 export function hasPublishedOutcomeContent(): boolean {

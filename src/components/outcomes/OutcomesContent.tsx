@@ -163,8 +163,22 @@ export default function OutcomesContent({
                     {story.attribution}
                   </cite>
                   <span className="mt-1 block text-sm text-gray-600">
-                    Source: {story.sourceLabel}. The quote and attribution have
-                    verified publication permission.
+                    Source:{" "}
+                    {story.sourceUrl ? (
+                      <a
+                        href={story.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                      >
+                        {story.sourceLabel}
+                        <span className="sr-only"> (opens in a new tab)</span>
+                      </a>
+                    ) : (
+                      story.sourceLabel
+                    )}
+                    . The quote and attribution have verified publication
+                    permission.
                   </span>
                 </figcaption>
               </figure>

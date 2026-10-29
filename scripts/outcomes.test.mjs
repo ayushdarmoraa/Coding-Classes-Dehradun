@@ -32,7 +32,11 @@ function loadTypeScript(relativePath, mocks = {}) {
     },
   }).outputText;
   const localRequire = (specifier) =>
-    Object.hasOwn(mocks, specifier) ? mocks[specifier] : nativeRequire(specifier);
+    Object.hasOwn(mocks, specifier)
+      ? mocks[specifier]
+      : specifier === "./testimonials"
+        ? testimonialsModule
+        : nativeRequire(specifier);
 
   new Function("require", "module", "exports", compiled)(
     localRequire,
@@ -42,6 +46,7 @@ function loadTypeScript(relativePath, mocks = {}) {
   return loadedModule.exports;
 }
 
+const testimonialsModule = loadTypeScript("src/lib/testimonials.ts");
 const outcomes = loadTypeScript("src/lib/outcomes.ts");
 
 function metric(overrides = {}) {
@@ -72,23 +77,13 @@ function metric(overrides = {}) {
   };
 }
 
-function story(overrides = {}) {
+function testimonial(overrides = {}) {
   return {
-    slug: "test-story",
-    attribution: "Test-only learner",
-    quote: "Test-only quote; not a real testimonial.",
-    sourceLabel: "Test-only testimonial source",
-    sourceEvidenceReference: "test-story-source-ref",
-    sourceVerified: true,
-    claimVerified: true,
-    verificationOwner: "Test verifier",
-    verifiedAt: "2025-04-01",
-    consentEvidenceReference: "test-consent-ref",
+    author: "Test-only learner",
+    text: "Test-only quote; not a real testimonial.",
+    source: "Test-only testimonial source",
     consentVerified: true,
-    consentScope: ["quote", "attribution"],
-    businessApprovalReference: "test-story-approval-ref",
-    businessApproved: true,
-    published: true,
+    verified: true,
     ...overrides,
   };
 }
@@ -100,16 +95,15 @@ test("production outcomes registry contains no demo or development-only records"
 });
 
 test("metric validation requires coherent counts and a valid measurement period", () => {
-  assert.doesNotThrow(() => outcomes.validateOutcomeEvidence([metric()], []));
+  assert.doesNotThrow(() => outcomes.validateOutcomeEvidence([metric()]));
   assert.throws(
-    () => outcomes.validateOutcomeEvidence([metric({ numerator: 5 })], []),
+    () => outcomes.validateOutcomeEvidence([metric({ numerator: 5 })]),
     /numerator/i,
   );
   assert.throws(
     () =>
       outcomes.validateOutcomeEvidence(
         [metric({ periodStart: "2025-04-01", periodEnd: "2025-03-31" })],
-        [],
       ),
     /period/i,
   );
@@ -117,88 +111,157 @@ test("metric validation requires coherent counts and a valid measurement period"
     () =>
       outcomes.validateOutcomeEvidence(
         [metric({ periodStart: "2025-02-31" })],
-        [],
       ),
     /calendar date/i,
   );
   assert.throws(
-    () => outcomes.validateOutcomeEvidence([metric({ kind: "placement" })], []),
+    () => outcomes.validateOutcomeEvidence([metric({ kind: "placement" })]),
     /what counts as placed/i,
   );
   assert.doesNotThrow(() =>
     outcomes.validateOutcomeEvidence(
       [metric({ kind: "placement", published: false })],
-      [],
     ),
   );
   assert.doesNotThrow(() =>
     outcomes.validateOutcomeEvidence(
       [metric({ kind: "placement", placementDefinition: "Test-only placement definition." })],
-      [],
     ),
   );
   assert.throws(
     () =>
       outcomes.validateOutcomeEvidence(
         [metric({ kind: "project-completion" })],
-        [],
       ),
     /publication permission/i,
   );
   assert.doesNotThrow(() =>
     outcomes.validateOutcomeEvidence(
       [metric({ kind: "project-completion", published: false })],
-      [],
     ),
   );
 });
 
-test("publication requires verified sources, claim checks, business approval, and consent", () => {
-  const content = outcomes.getPublishedOutcomeContent(
-    [
-      metric(),
-      metric({ slug: "unverified-source", sourceVerified: false }),
-      metric({ slug: "unverified-claim", claimVerified: false }),
-      metric({ slug: "unapproved", businessApproved: false }),
-      metric({ slug: "draft", published: false }),
-      metric({
-        slug: "project-no-permission",
-        kind: "project-completion",
-        published: false,
-      }),
-      metric({
-        slug: "approved-project",
-        kind: "project-completion",
-        consentEvidenceReference: "test-project-consent-ref",
-        consentVerified: true,
-        consentScope: ["aggregate"],
-      }),
-    ],
-    [
-      story(),
-      story({ slug: "no-consent", consentVerified: false }),
-      story({ slug: "no-quote-permission", consentScope: ["attribution"] }),
-      story({ slug: "no-attribution-permission", consentScope: ["quote"] }),
-      story({ slug: "unapproved-story", businessApproved: false }),
-    ],
-  );
+test("publication excludes metrics without verified sources, claims, or business approval", () => {
+  const ineligibleMetrics = [
+    metric({ sourceVerified: false }),
+    metric({ claimVerified: false }),
+    metric({ businessApproved: false }),
+  ];
 
-  assert.deepEqual(
-    content.metrics.map(({ slug }) => slug),
-    ["test-completion", "approved-project"],
-  );
-  assert.deepEqual(content.stories.map(({ slug }) => slug), ["test-story"]);
+  for (const ineligibleMetric of ineligibleMetrics) {
+    const content = outcomes.getPublishedOutcomeContent([ineligibleMetric], []);
+    assert.deepEqual(content.metrics, []);
+  }
 });
 
-test("duplicate evidence slugs are rejected across metrics and stories", () => {
+test("publication fails closed when project-completion permission is missing or unverified", () => {
+  const missingPermission = metric({
+    kind: "project-completion",
+    consentVerified: true,
+    consentScope: ["project"],
+  });
+  const unverifiedPermission = metric({
+    kind: "project-completion",
+    consentEvidenceReference: "test-project-consent-ref",
+    consentVerified: false,
+    consentScope: ["project"],
+  });
+
+  for (const projectMetric of [missingPermission, unverifiedPermission]) {
+    assert.throws(
+      () => outcomes.getPublishedOutcomeContent([projectMetric], []),
+      /publication permission/i,
+    );
+  }
+});
+
+test("Outcomes stories derive only from verified, consented central testimonials", () => {
+  const rejectedTestimonials = [
+    testimonial({ author: "Unverified learner", verified: false }),
+    testimonial({ author: "No-consent learner", consentVerified: false }),
+    testimonial({ author: "", verified: true, consentVerified: true }),
+    testimonial({ author: "No-quote learner", text: " " }),
+    testimonial({ author: "No-source learner", source: "" }),
+    testimonial({
+      author: "Unsafe-source learner",
+      sourceUrl: "javascript:alert(1)",
+    }),
+  ];
+  const content = outcomes.getPublishedOutcomeContent(
+    [metric()],
+    [testimonial(), ...rejectedTestimonials],
+  );
+
+  assert.deepEqual(content.metrics.map(({ slug }) => slug), ["test-completion"]);
+  assert.deepEqual(content.stories, [
+    {
+      slug: "testimonial-1",
+      attribution: "Test-only learner",
+      quote: "Test-only quote; not a real testimonial.",
+      sourceLabel: "Test-only testimonial source",
+    },
+  ]);
+  const schema = outcomes.buildOutcomeItemListSchema(content);
+  assert.deepEqual(
+    schema.itemListElement.map(({ item }) => item.name),
+    ["Test-only completion metric", "Test-only learner"],
+  );
+  const OutcomesContent = loadTypeScript("src/components/outcomes/OutcomesContent.tsx", {
+    "@/lib/outcomes": outcomes,
+  }).default;
+  const markup = renderToStaticMarkup(
+    React.createElement(OutcomesContent, content),
+  );
+  for (const rejected of rejectedTestimonials) {
+    if (rejected.author) assert.doesNotMatch(markup, new RegExp(rejected.author));
+  }
+});
+
+test("eligible central testimonial source links are carried into Outcomes safely", () => {
+  const content = outcomes.getPublishedOutcomeContent(
+    [],
+    [testimonial({ sourceUrl: "https://reviews.example.test/testimonial/1" })],
+  );
+  const OutcomesContent = loadTypeScript("src/components/outcomes/OutcomesContent.tsx", {
+    "@/lib/outcomes": outcomes,
+  }).default;
+  const markup = renderToStaticMarkup(
+    React.createElement(OutcomesContent, content),
+  );
+
+  assert.match(markup, /href="https:\/\/reviews\.example\.test\/testimonial\/1"/);
+  assert.match(markup, /rel="noopener noreferrer"/);
+  assert.match(markup, /opens in a new tab/);
+});
+
+test("canonical testimonial registry enforces its existing verification and consent flags", () => {
+  const sourceRecords = [
+    testimonial(),
+    testimonial({ author: "Unverified", verified: false }),
+    testimonial({ author: "No consent", consentVerified: false }),
+    testimonial({ author: "Empty quote", text: " " }),
+  ];
+  assert.deepEqual(
+    testimonialsModule.getPublishableTestimonials(sourceRecords),
+    [sourceRecords[0]],
+  );
+  assert.deepEqual(testimonialsModule.testimonials, []);
+});
+
+test("duplicate metric evidence slugs are rejected", () => {
   assert.throws(
-    () => outcomes.validateOutcomeEvidence([metric()], [story({ slug: "test-completion" })]),
+    () =>
+      outcomes.validateOutcomeEvidence([
+        metric(),
+        metric({ slug: "test-completion" }),
+      ]),
     /unique|duplicate/i,
   );
 });
 
 test("outcomes UI is accessible and JSON-LD contains exactly its visible approved evidence", () => {
-  const content = outcomes.getPublishedOutcomeContent([metric()], [story()]);
+  const content = outcomes.getPublishedOutcomeContent([metric()], [testimonial()]);
   const OutcomesContent = loadTypeScript("src/components/outcomes/OutcomesContent.tsx", {
     "@/lib/outcomes": outcomes,
   }).default;
@@ -294,7 +357,10 @@ test("empty outcomes remain absent from indexable routes and public discovery", 
 test("approved evidence enables canonical metadata and renders the page", () => {
   const pagePath = path.resolve(repositoryRoot, "src/app/outcomes/page.tsx");
   moduleCache.delete(pagePath);
-  const approvedContent = outcomes.getPublishedOutcomeContent([metric()], [story()]);
+  const approvedContent = outcomes.getPublishedOutcomeContent(
+    [metric()],
+    [testimonial()],
+  );
   const page = loadTypeScript("src/app/outcomes/page.tsx", {
     "@/components/outcomes/OutcomesContent": { __esModule: true, default: () => null },
     "@/lib/outcomes": {

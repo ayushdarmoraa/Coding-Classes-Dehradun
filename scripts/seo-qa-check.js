@@ -40,7 +40,7 @@ export function getPublishedGuideRoutes() {
     .sort((left, right) => left.localeCompare(right));
 }
 
-function loadTypeScriptModule(relativePath) {
+function loadTypeScriptModule(relativePath, mocks = {}) {
   const source = fs.readFileSync(path.resolve(process.cwd(), relativePath), "utf8");
   const compiled = ts.transpileModule(source, {
     compilerOptions: {
@@ -50,8 +50,10 @@ function loadTypeScriptModule(relativePath) {
     },
   }).outputText;
   const loadedModule = { exports: {} };
+  const localRequire = (specifier) =>
+    Object.hasOwn(mocks, specifier) ? mocks[specifier] : require(specifier);
   new Function("require", "module", "exports", compiled)(
-    require,
+    localRequire,
     loadedModule,
     loadedModule.exports,
   );
@@ -69,8 +71,10 @@ function getPublishedProjectRoutes() {
 }
 
 export function getPublishedOutcomeRoutes() {
+  const testimonials = loadTypeScriptModule("src/lib/testimonials.ts");
   const { getPublishedOutcomeContent } = loadTypeScriptModule(
     "src/lib/outcomes.ts",
+    { "./testimonials": testimonials },
   );
   const { metrics, stories } = getPublishedOutcomeContent();
   return metrics.length > 0 || stories.length > 0 ? ["/outcomes"] : [];
