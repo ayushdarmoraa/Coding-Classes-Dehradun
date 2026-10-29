@@ -263,14 +263,14 @@ export default function ChallengeWorkspace({
       <div className="lg:col-span-2">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 id="workspace-heading" className="text-2xl font-bold text-gray-900">
+            <h2 id="workspace-heading" className="text-2xl font-bold text-ink">
               Challenge workspace
             </h2>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-ink-2">
               Edit the function, then run the deterministic checks.
             </p>
           </div>
-          <p className="text-sm text-gray-600" aria-live="polite">
+          <p className="pill bg-tint-lavender px-3 py-1 text-sm text-ink-2" aria-live="polite">
             Attempts: {attempts}
           </p>
         </div>
@@ -281,11 +281,11 @@ export default function ChallengeWorkspace({
         <MissionPreview previewResult={previewResult} />
       </div>
 
-      <div className="min-w-0 overflow-hidden rounded-dca-sm border border-slate-300 shadow-sm focus-within:ring-2 focus-within:ring-brand focus-within:ring-offset-2 lg:col-span-2">
+      <div className="min-w-0 overflow-hidden rounded-dca-md border border-brand-soft bg-[#0A0F1C] shadow-lg focus-within:ring-2 focus-within:ring-brand focus-within:ring-offset-2 lg:col-span-2">
         <CodeEditor value={code} onChange={handleCodeChange} readOnly={!progressReady} />
       </div>
       {!progressReady && (
-        <p role="status" aria-live="polite" className="lg:col-span-2 text-sm text-gray-600">
+        <p role="status" aria-live="polite" className="lg:col-span-2 text-sm text-ink-2">
           Loading saved progress…
         </p>
       )}

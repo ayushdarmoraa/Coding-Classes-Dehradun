@@ -78,22 +78,22 @@ export default function ChallengePage({ params }: ChallengePageProps) {
   );
 
   return (
-    <main className="container mx-auto max-w-7xl px-4 py-12 sm:py-16">
+    <main className="container mx-auto max-w-8xl px-4 py-8 sm:py-12">
       <LabChallengeImpression context={analyticsContext} />
-      <nav aria-label="Breadcrumb" className="mb-3">
-        <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-700">
+      <nav aria-label="Breadcrumb" className="mb-5">
+        <ol className="flex flex-wrap items-center gap-2 text-sm text-ink-2">
           {breadcrumbItems.map(({ name, href, current }, index) => (
             <Fragment key={name}>
               {index > 0 && <li aria-hidden="true">/</li>}
               <li>
                 {current ? (
-                  <span aria-current="page" className="font-semibold text-gray-950">
+                  <span aria-current="page" className="font-semibold text-ink">
                     {name}
                   </span>
                 ) : (
                   <Link
                     href={href}
-                    className="rounded-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+                    className="rounded-full border border-brand-soft bg-white px-3 py-1.5 transition-colors hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     {name}
                   </Link>
@@ -106,7 +106,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
       <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
         {challenge.title}
       </h1>
-      <p className="mt-3 max-w-3xl leading-7 text-gray-700">
+      <p className="mt-3 max-w-3xl leading-7 text-ink-2">
         {challenge.shortDescription}
       </p>
       {challenge.runner === "discount-calculation-v1" ? (

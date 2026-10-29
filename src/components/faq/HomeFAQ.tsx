@@ -63,7 +63,7 @@ export default function HomeFAQ({ courses }: { courses: Course[] }) {
       a: (
         <>
           We’re in Herbertpur (Dehradun district) (near DR School). Explore on-campus courses or online course options. See{" "}
-          <Link className="text-blue-600 underline underline-offset-2" href="/locations/dehradun">
+          <Link className="text-brand-dark underline underline-offset-2" href="/locations/dehradun">
             directions &amp; details
           </Link>
           .
@@ -79,7 +79,7 @@ export default function HomeFAQ({ courses }: { courses: Course[] }) {
           {courseFees.map(({ course }, index) => (
             <span key={course.id}>
               {index > 0 ? "; " : ""}
-              <Link className="text-blue-600 underline" href={`/courses/${course.slug}`}>
+              <Link className="text-brand-dark underline" href={`/courses/${course.slug}`}>
                 {course.shortTitle}
               </Link>
               : {formatCoursePrice(course.pricing)}
@@ -112,16 +112,16 @@ export default function HomeFAQ({ courses }: { courses: Course[] }) {
   const [openIdx, setOpenIdx] = useState<number>(0);
 
   return (
-    <section className="mx-auto max-w-5xl px-4 py-12" aria-labelledby="home-faq-heading">
+    <section className="mx-auto max-w-5xl px-4 py-16 md:py-24" aria-labelledby="home-faq-heading">
       <div className="mx-auto mb-8 max-w-2xl text-center">
-        <h2 id="home-faq-heading" className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        <h2 id="home-faq-heading" className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
           Frequently Asked Questions
         </h2>
-        <p className="mt-3 text-base text-gray-600">
+        <p className="mt-3 text-base text-ink-2">
           Quick answers about on-campus and online cohorts. Still unsure?{" "}
           <Link
             href="/contact"
-            className="inline-block rounded-full bg-brand px-3 py-1 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark"
+            className="inline-block rounded-full bg-brand px-3 py-1 text-sm font-medium text-white shadow-sm transition hover:bg-brand-dark"
           >
             Talk to us
           </Link>
@@ -141,7 +141,7 @@ export default function HomeFAQ({ courses }: { courses: Course[] }) {
                 className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
               >
                 <span className="text-lg font-semibold leading-6">{item.q}</span>
-                <span className="text-gray-500">
+                <span className="text-ink-3">
                   <Chevron open={isOpen} />
                 </span>
               </button>
@@ -153,7 +153,7 @@ export default function HomeFAQ({ courses }: { courses: Course[] }) {
                   isOpen ? "grid-rows-[1fr] py-0 pb-5" : "grid-rows-[0fr]"
                 }`}
               >
-                <div className="min-h-0 overflow-hidden text-gray-700">
+                <div className="min-h-0 overflow-hidden text-ink-2">
                   <div className="prose prose-sm max-w-none pt-0 leading-relaxed">
                     {item.a}
                   </div>
@@ -167,19 +167,19 @@ export default function HomeFAQ({ courses }: { courses: Course[] }) {
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link
           href="/faq"
-          className="rounded-full border border-gray-200 bg-white px-5 py-2 text-sm font-semibold shadow-sm hover:bg-gray-50"
+          className="rounded-full border border-brand bg-white px-4 py-2 text-sm font-medium text-brand-dark hover:bg-brand-soft"
         >
           View all FAQs
         </Link>
         <Link
           href="/online-courses"
-          className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-dark"
+          className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-dark"
         >
           Explore online courses
         </Link>
         <Link
           href="/courses"
-          className="rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black"
+          className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1d2b45]"
         >
           Explore on-campus courses
         </Link>

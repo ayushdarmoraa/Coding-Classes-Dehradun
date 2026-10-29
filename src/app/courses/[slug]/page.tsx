@@ -10,6 +10,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import CourseTabsNav from "@/components/features/CourseTabsNav";
+import CurriculumTimeline from "@/components/features/CurriculumTimeline";
 import LearningProgressionNote from "@/components/features/LearningProgressionNote";
 import { getCourseJsonLd } from "@/lib/schema";
 import { formatCourseDuration, formatCourseModes, formatCoursePrice } from "@/lib/pricing";
@@ -307,11 +308,7 @@ export default async function CoursePage({ params }: Props) {
 
       <section id="curriculum" className="mt-8">
         <h2 className="text-2xl font-semibold mb-2">What you&apos;ll learn</h2>
-        <ul className="list-disc ml-6 text-gray-700 space-y-1">
-          {course.curriculum.map((item, index) => (
-            <li key={`${course.id}-curriculum-${index}`}>{item}</li>
-          ))}
-        </ul>
+        <CurriculumTimeline items={course.curriculum} courseId={course.id} />
       </section>
 
       <section id="projects" className="mt-8" aria-labelledby="projects-heading">

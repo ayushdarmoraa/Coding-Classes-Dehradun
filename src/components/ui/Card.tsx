@@ -8,7 +8,7 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ children, className = '', hover = false }) => {
   const baseClasses = 'surface-card';
-  const hoverClasses = hover ? 'transition-all duration-300 hover:-translate-y-1 hover:shadow-lg' : '';
+  const hoverClasses = hover ? 'transition-transform duration-300 hover:-translate-y-1' : '';
   
   return (
     <div className={`${baseClasses} ${hoverClasses} ${className}`}>

@@ -1,4 +1,5 @@
 import LoopProgress, { LoopStepBadge } from "@/components/home/LoopProgress";
+import SectionHeader from "@/components/motion/SectionHeader";
 
 const steps = [
   {
@@ -30,13 +31,13 @@ export default function LearningLoop() {
       className="bg-navy-grad py-16 text-white sm:py-20"
     >
       <div className="container">
-        <div className="max-w-2xl">
-          <p className="section-label !text-blue-200">
+        <SectionHeader className="max-w-2xl">
+          <p className="section-label !text-blue-100">
             The DCA learning loop
           </p>
           <h2
             id="learning-loop-heading"
-            className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+            className="mt-3 text-3xl font-bold tracking-tight !text-white sm:text-4xl"
           >
             Learn. Debug. Build. Prove.
           </h2>
@@ -44,15 +45,20 @@ export default function LearningLoop() {
             Connect structured study with practical work and visible evidence of
             what you have practiced.
           </p>
-        </div>
+        </SectionHeader>
         <LoopProgress>
           <ol className="relative grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((step, index) => (
               <li
                 key={step.title}
-                className="relative z-10 rounded-dca-lg border border-white/15 bg-white/[0.06] p-6 backdrop-blur-sm"
+                className="relative z-10 rounded-xl border border-white/15 bg-[#10264b]/90 p-5 shadow-soft-blue transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_16px_36px_rgba(10,26,56,0.4)]"
               >
-                <LoopStepBadge index={index} className="font-mono text-sm text-blue-200">
+                <LoopStepBadge
+                  index={index}
+                  className={`grid h-10 w-10 place-items-center rounded-xl font-mono text-sm font-bold text-ink ${
+                    ["bg-tint-blue", "bg-tint-lavender", "bg-tint-mint", "bg-tint-peach"][index]
+                  }`}
+                >
                   {step.number}
                 </LoopStepBadge>
                 {index < steps.length - 1 && (
@@ -63,7 +69,7 @@ export default function LearningLoop() {
                     →
                   </span>
                 )}
-                <h3 className="mt-5 text-xl font-bold">{step.title}</h3>
+                <h3 className="mt-5 text-xl font-bold !text-white">{step.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-blue-100">
                   {step.description}
                 </p>

@@ -6,6 +6,27 @@ import Script from "next/script";
 import { getCourses } from "@/lib/courses";
 import { formatINR } from "@/lib/pricing";
 import { PUBLISHED_LAB_ANALYTICS_METADATA } from "@/lib/lab/analytics-metadata";
+import { Figtree, JetBrains_Mono, Outfit } from "next/font/google";
+import MotionProvider from "@/components/motion/MotionProvider";
+import FloatingWhatsApp from "@/components/layout/FloatingWhatsApp";
+import StickyCtaBar from "@/components/layout/StickyCtaBar";
+import RevealOnScroll from "@/components/motion/RevealOnScroll";
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-outfit",
+});
+const figtree = Figtree({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-figtree",
+});
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-jetbrains-mono",
+});
 
 const PUBLISHED_LAB_PATHS = PUBLISHED_LAB_ANALYTICS_METADATA.map(
   ({ track, slug }) => `/lab/${track}/${slug}`,
@@ -50,14 +71,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      className={`${outfit.variable} ${figtree.variable} ${jetBrainsMono.variable}`}
+    >
       <head>
-        {/* Using system fonts - no external font preconnects needed */}
       </head>
-      <body>
-        <HeaderClient />
-        {children}
-        <Footer />
+      <body className="font-sans">
+        <MotionProvider>
+          <HeaderClient />
+          {children}
+          <Footer />
+          <FloatingWhatsApp />
+          <StickyCtaBar />
+          <RevealOnScroll />
+        </MotionProvider>
 
         {/* GA4 (gated by env var; no-op if env is missing) */}
         {process.env.NEXT_PUBLIC_GA_ID ? (

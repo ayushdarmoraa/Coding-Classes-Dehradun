@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 
 interface GrowRevealProps {
@@ -9,17 +9,7 @@ interface GrowRevealProps {
   delay?: number;
 }
 
-export default function GrowReveal({
-  children,
-  className = "",
-  delay = 0,
-}: GrowRevealProps) {
-  const reduceMotion = useReducedMotion();
-
-  if (reduceMotion) {
-    return <div className={className}>{children}</div>;
-  }
-
+export default function GrowReveal({ children, className = "", delay = 0 }: GrowRevealProps) {
   return (
     <>
       <motion.div

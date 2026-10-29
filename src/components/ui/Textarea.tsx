@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
@@ -11,36 +11,39 @@ const Textarea: React.FC<TextareaProps> = ({
   error, 
   required, 
   className = '', 
+  id,
+  'aria-describedby': describedBy,
   ...props 
 }) => {
+  const generatedId = useId();
+  const textareaId = id ?? generatedId;
+  const errorId = `${textareaId}-error`;
   const textareaClasses = `
-    w-full px-4 py-3 border rounded-xl text-gray-900 placeholder-gray-500
+    w-full min-h-[120px] resize-y rounded-xl border bg-white px-4 py-3 text-ink placeholder-ink-3
     focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent
-    transition-all duration-200 resize-vertical min-h-[120px]
-    ${error ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'}
+    transition-all duration-200
+    ${error ? 'border-error bg-red-50' : 'border-brand-soft hover:border-brand'}
     ${className}
   `;
 
   return (
     <div className="space-y-2">
       {label && (
-        <label htmlFor={props.id} className="block text-sm font-medium text-gray-700">
+        <label htmlFor={textareaId} className="block text-sm font-medium text-ink-2">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="ml-1 text-error">*</span>}
         </label>
       )}
       <textarea
-        className={textareaClasses}
         {...props}
-        aria-invalid={error ? true : props["aria-invalid"]}
-        aria-describedby={
-          [props["aria-describedby"], error && props.id ? `${props.id}-error` : undefined]
-            .filter(Boolean)
-            .join(" ") || undefined
-        }
+        id={textareaId}
+        className={textareaClasses}
+        required={required}
+        aria-invalid={error ? true : props['aria-invalid']}
+        aria-describedby={[describedBy, error ? errorId : undefined].filter(Boolean).join(' ') || undefined}
       />
       {error && (
-        <p id={props.id ? `${props.id}-error` : undefined} className="text-sm text-red-600 flex items-center">
+        <p id={errorId} className="flex items-center text-sm text-error">
           <span className="mr-1">⚠</span>
           {error}
         </p>
