@@ -23,8 +23,8 @@ const Select: React.FC<SelectProps> = ({
   ...props 
 }) => {
   const selectClasses = `
-    w-full px-4 py-3 border rounded-lg text-gray-900 bg-white
-    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+    w-full px-4 py-3 border rounded-xl text-gray-900 bg-white
+    focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent
     transition-all duration-200 cursor-pointer
     ${error ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'}
     ${className}

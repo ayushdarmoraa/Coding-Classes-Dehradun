@@ -43,7 +43,8 @@ export default function OnlinePythonPage() {
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-12">
-      <h1 className="text-3xl md:text-4xl font-bold mb-4">
+      <header className="cd-hero mb-8 rounded-dca-lg p-6 sm:p-9">
+      <h1 className="mt-3 text-3xl md:text-4xl font-bold text-ink mb-4">
         Online Python Course in India
       </h1>
       <p className="text-lg text-gray-700 mb-6">
@@ -67,21 +68,22 @@ export default function OnlinePythonPage() {
         <Button href="/contact" size="lg" variant="primary">Ask about this course</Button>
         <Button href="/courses/python" size="lg" variant="secondary">On-Campus (Dehradun)</Button>
       </div>
+      </header>
 
       <section className="mb-8 grid gap-6 sm:grid-cols-2">
-        <div>
+        <div className="surface-card p-6">
           <h2 className="text-xl font-semibold mb-2">Course curriculum</h2>
           <ul className="list-disc ml-5 text-gray-700 space-y-1">
             {course?.curriculum.map((item) => <li key={item}>{item}</li>)}
           </ul>
         </div>
-        <div>
+        <div className="surface-card p-6">
           <h2 className="text-xl font-semibold mb-2">Prerequisites</h2>
           <ul className="list-disc ml-5 text-gray-700 space-y-1">
             {course?.prerequisites.map((item) => <li key={item}>{item}</li>)}
           </ul>
         </div>
-        <div>
+        <div className="surface-card p-6">
           <h2 className="text-xl font-semibold mb-2">Course outcomes</h2>
           <ul className="list-disc ml-5 text-gray-700 space-y-1">
             {course?.outcomes.map((item) => <li key={item}>{item}</li>)}

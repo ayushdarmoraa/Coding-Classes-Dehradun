@@ -40,8 +40,8 @@ export default function JavaOnlinePage() {
 
   return (
     <main className="min-h-screen">
-      <section className="py-12 md:py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4">
+      <section className="bg-panel py-12 md:py-16">
+        <div className="cd-hero max-w-4xl mx-auto rounded-dca-lg px-6 py-8 sm:px-9">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
             Online Java Course in India
           </h1>

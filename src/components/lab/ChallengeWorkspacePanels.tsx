@@ -39,7 +39,7 @@ export function WorkspaceControls({
           type="button"
           onClick={onRunTests}
           disabled={running || !progressReady}
-          className="rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800 disabled:cursor-wait disabled:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+          className="rounded-full bg-brand px-6 py-3 font-semibold text-white hover:bg-brand-dark disabled:cursor-wait disabled:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           {running ? "Running…" : hasRun ? "Run Again" : "Run Tests"}
         </button>
@@ -47,7 +47,7 @@ export function WorkspaceControls({
           type="button"
           onClick={onReset}
           disabled={running}
-          className="rounded-lg border border-gray-400 px-5 py-3 font-semibold text-gray-800 hover:bg-gray-50 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+          className="rounded-full border border-gray-400 px-6 py-3 font-semibold text-gray-800 hover:bg-gray-50 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           Reset mission
         </button>
@@ -83,7 +83,7 @@ export function MissionResults({
 }: MissionResultsProps) {
   const passed = results?.filter((result) => result.status === "passed").length ?? 0;
   return (
-    <section aria-labelledby="results-heading" className="rounded-xl border border-gray-200 bg-white p-5">
+    <section aria-labelledby="results-heading" className="surface-card p-5">
       <h3 id="results-heading" className="text-lg font-semibold text-gray-900">Test results</h3>
       {!hasRun && <p className="mt-2 text-gray-600">Run the tests to check your function.</p>}
       {running && <p className="mt-2 text-gray-700" role="status" aria-live="polite">Running mission tests…</p>}
@@ -133,7 +133,7 @@ export function MissionResults({
 export function MissionPreview({ previewResult }: { previewResult: number | null }) {
   const firstCase = MISSION_TESTS[0];
   return (
-    <section aria-labelledby="preview-heading" className="rounded-xl border border-blue-200 bg-blue-50 p-5">
+    <section aria-labelledby="preview-heading" className="rounded-dca-sm border border-blue-200 bg-brand-soft p-5">
       <h3 id="preview-heading" className="text-lg font-semibold text-gray-900">Trusted preview</h3>
       <p className="mt-1 text-sm text-gray-700">A live reference for the first fixed mission case.</p>
       <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import HomeFAQ from "@/components/faq/HomeFAQ";
-import CourseCard from "@/components/features/CourseCard";
 import ProjectCard from "@/components/projects/ProjectCard";
 import AudiencePaths from "@/components/home/AudiencePaths";
+import HomeCourses from "@/components/home/HomeCourses";
 import HomeGuidePreview from "@/components/home/HomeGuidePreview";
 import HomeHero from "@/components/home/HomeHero";
 import IntentCards from "@/components/home/IntentCards";
@@ -68,12 +68,12 @@ export default function HomePage() {
         className="container py-16 sm:py-20"
       >
         <div className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
+          <p className="section-label">
             Explore courses
           </p>
           <h2
             id="learning-paths-heading"
-            className="mt-3 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl"
+            className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl"
           >
             Choose Your Learning Path
           </h2>
@@ -82,22 +82,15 @@ export default function HomePage() {
             before you decide.
           </p>
         </div>
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {courses.map((course, index) => (
-            <CourseCard
-              key={course.id}
-              course={course}
-              featured={index === 0}
-              analyticsLocation="home_course_preview"
-            />
-          ))}
+        <div className="mt-8">
+          <HomeCourses courses={courses} />
         </div>
         <div className="mt-8 text-center">
           <TrackedLink
             href="/courses"
             event="cta_home_view_all_courses"
             eventParams={{ location: "home_course_preview" }}
-            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-blue-700 px-5 py-3 font-semibold text-blue-800 transition hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+            className="inline-flex min-h-11 items-center justify-center rounded-full border border-brand px-6 py-3 font-semibold text-brand-dark transition hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
           >
             Compare all courses
           </TrackedLink>
@@ -109,24 +102,24 @@ export default function HomePage() {
       {projects.length > 0 && (
         <section
           aria-labelledby="home-projects-heading"
-          className="bg-slate-50 py-16 sm:py-20"
+          className="bg-panel py-16 sm:py-20"
         >
           <div className="container">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div className="max-w-2xl">
-                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
+                <p className="section-label">
                   Verified project work
                 </p>
                 <h2
                   id="home-projects-heading"
-                  className="mt-3 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl"
+                  className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl"
                 >
                   See What Practical Learning Looks Like
                 </h2>
               </div>
               <Link
                 href="/projects"
-                className="inline-flex min-h-11 items-center font-semibold text-blue-800 underline decoration-blue-300 underline-offset-4 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+                className="inline-flex min-h-11 items-center font-semibold text-brand-dark underline decoration-blue-300 underline-offset-4 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               >
                 View all projects
               </Link>
@@ -144,16 +137,16 @@ export default function HomePage() {
 
       <section
         aria-labelledby="practical-learning-heading"
-        className="bg-slate-50 py-16 sm:py-20"
+        className="bg-brand-soft-grad py-16 sm:py-20"
       >
         <div className="container">
           <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
+            <p className="section-label">
               Practical learning
             </p>
             <h2
               id="practical-learning-heading"
-              className="mt-3 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl"
+              className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl"
             >
               Practical learning you can inspect
             </h2>
@@ -166,12 +159,12 @@ export default function HomePage() {
             {evidencePoints.map((point, index) => (
               <li
                 key={point.title}
-                className="rounded-xl border border-gray-200 bg-white p-6"
+                className="surface-card p-6"
               >
-                <span className="text-sm font-semibold text-blue-700">
+                <span className="font-mono text-sm font-semibold text-brand">
                   0{index + 1}
                 </span>
-                <h3 className="mt-3 text-lg font-semibold text-gray-950">
+                <h3 className="mt-3 text-lg font-semibold text-ink">
                   {point.title}
                 </h3>
                 <p className="mt-2 leading-6 text-gray-600">
@@ -193,19 +186,19 @@ export default function HomePage() {
         >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
+              <p className="section-label">
                 Verified learner stories
               </p>
               <h2
                 id="home-testimonials-heading"
-                className="mt-3 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl"
+                className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl"
               >
                 Verified Testimonials
               </h2>
             </div>
             <Link
               href="/testimonials"
-              className="inline-flex min-h-11 items-center font-semibold text-blue-800 underline decoration-blue-300 underline-offset-4 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+              className="inline-flex min-h-11 items-center font-semibold text-brand-dark underline decoration-blue-300 underline-offset-4 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
               Read all testimonials
             </Link>
@@ -214,12 +207,12 @@ export default function HomePage() {
             {testimonials.slice(0, 3).map((testimonial, index) => (
               <li
                 key={`${testimonial.author}-${index}`}
-                className="flex h-full flex-col rounded-xl border border-gray-200 bg-white p-6"
+                className="surface-card flex h-full flex-col p-6"
               >
                 <blockquote className="flex-1 text-gray-700">
                   <p>{testimonial.text}</p>
                 </blockquote>
-                <cite className="mt-5 font-semibold not-italic text-gray-950">
+                <cite className="mt-5 font-semibold not-italic text-ink">
                   {testimonial.author}
                 </cite>
               </li>
@@ -232,11 +225,11 @@ export default function HomePage() {
 
       <section
         aria-labelledby="home-final-cta-heading"
-        className="bg-blue-950 py-16 text-white sm:py-20"
+        className="bg-navy-grad py-16 text-white sm:py-20"
       >
         <div className="container flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
           <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-200">
+            <p className="section-label !text-blue-200">
               Start with a practical step
             </p>
             <h2

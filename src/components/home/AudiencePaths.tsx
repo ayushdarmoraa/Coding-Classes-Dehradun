@@ -34,12 +34,12 @@ export default function AudiencePaths() {
       className="container py-16 sm:py-20"
     >
       <div className="max-w-2xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
+        <p className="section-label">
           Choose a starting point
         </p>
         <h2
           id="audience-paths-heading"
-          className="mt-3 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl"
+          className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl"
         >
           Where are you starting from?
         </h2>
@@ -47,9 +47,9 @@ export default function AudiencePaths() {
       <ul className="mt-8 grid gap-4 md:grid-cols-2">
         {paths.map((path) => (
           <li key={path.title}>
-            <article className="flex h-full flex-col rounded-xl border border-gray-200 p-6 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+            <article className="surface-card flex h-full flex-col p-6 transition hover:-translate-y-0.5 hover:shadow-soft-blue sm:flex-row sm:items-center sm:justify-between sm:gap-6">
               <div>
-                <h3 className="text-lg font-bold text-gray-950">{path.title}</h3>
+                <h3 className="text-lg font-bold text-ink">{path.title}</h3>
                 <p className="mt-2 max-w-md leading-6 text-gray-600">
                   {path.description}
                 </p>
@@ -58,7 +58,7 @@ export default function AudiencePaths() {
                 href={path.href}
                 event="cta_home_audience_path"
                 eventParams={{ path: path.title }}
-                className="mt-5 inline-flex min-h-11 shrink-0 items-center font-semibold text-blue-800 underline decoration-blue-300 underline-offset-4 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 sm:mt-0"
+                className="mt-5 inline-flex min-h-11 shrink-0 items-center font-semibold text-brand-dark underline decoration-blue-300 underline-offset-4 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:mt-0"
               >
                 {path.action}
               </TrackedLink>

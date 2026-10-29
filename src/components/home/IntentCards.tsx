@@ -1,4 +1,6 @@
 import TrackedLink from "@/components/analytics/TrackedLink";
+import Carousel from "@/components/ui/Carousel";
+import GrowReveal from "@/components/motion/GrowReveal";
 
 const intents = [
   {
@@ -32,6 +34,42 @@ const intents = [
 ];
 
 export default function IntentCards() {
+  const renderCard = (intent: (typeof intents)[number]) => (
+    <TrackedLink
+      href={intent.href}
+      event="cta_home_intent"
+      eventParams={{ intent: intent.number }}
+      className="surface-card group flex h-full min-h-52 flex-col p-6 transition hover:-translate-y-1 hover:border-blue-300 hover:shadow-soft-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+    >
+      <span className="font-mono text-sm font-semibold text-brand">
+        {intent.number}
+      </span>
+      <span className="mt-4 text-lg font-bold text-ink">
+        {intent.title}
+      </span>
+      <span className="mt-2 flex-1 leading-6 text-gray-600">
+        {intent.description}
+      </span>
+      <span className="mt-5 inline-flex items-center gap-2 font-semibold text-brand-dark">
+        {intent.action}
+        <span aria-hidden="true" className="transition group-hover:translate-x-1">
+          →
+        </span>
+      </span>
+    </TrackedLink>
+  );
+
+  const mobileCards = intents.map((intent, index) => (
+    <div
+      key={intent.href}
+      className="min-w-0 flex-[0_0_88%] pl-3 sm:flex-[0_0_65%]"
+    >
+      <GrowReveal delay={index * 0.08} className="h-full">
+        {renderCard(intent)}
+      </GrowReveal>
+    </div>
+  ));
+
   return (
     <section
       aria-labelledby="intent-heading"
@@ -39,12 +77,12 @@ export default function IntentCards() {
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-700">
+          <p className="section-label">
             Find your next step
           </p>
           <h2
             id="intent-heading"
-            className="mt-3 text-3xl font-bold tracking-tight text-gray-950 sm:text-4xl"
+            className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl"
           >
             What would you like to do?
           </h2>
@@ -53,31 +91,15 @@ export default function IntentCards() {
           Start with the path that fits what you want to learn today.
         </p>
       </div>
-      <ul className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {intents.map((intent) => (
-          <li key={intent.href}>
-            <TrackedLink
-              href={intent.href}
-              event="cta_home_intent"
-              eventParams={{ intent: intent.number }}
-              className="group flex h-full min-h-52 flex-col rounded-xl border border-gray-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-950/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
-            >
-              <span className="text-sm font-semibold text-blue-700">
-                {intent.number}
-              </span>
-              <span className="mt-4 text-lg font-bold text-gray-950">
-                {intent.title}
-              </span>
-              <span className="mt-2 flex-1 leading-6 text-gray-600">
-                {intent.description}
-              </span>
-              <span className="mt-5 inline-flex items-center gap-2 font-semibold text-blue-800">
-                {intent.action}
-                <span aria-hidden="true" className="transition group-hover:translate-x-1">
-                  →
-                </span>
-              </span>
-            </TrackedLink>
+      <div className="mt-8 md:hidden">
+        <Carousel ariaLabel="Homepage actions">{mobileCards}</Carousel>
+      </div>
+      <ul className="mt-8 hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-4">
+        {intents.map((intent, index) => (
+          <li key={intent.href} className="h-full">
+            <GrowReveal delay={index * 0.1} className="h-full">
+              {renderCard(intent)}
+            </GrowReveal>
           </li>
         ))}
       </ul>

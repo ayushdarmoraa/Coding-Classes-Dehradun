@@ -14,8 +14,8 @@ const Textarea: React.FC<TextareaProps> = ({
   ...props 
 }) => {
   const textareaClasses = `
-    w-full px-4 py-3 border rounded-lg text-gray-900 placeholder-gray-500
-    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+    w-full px-4 py-3 border rounded-xl text-gray-900 placeholder-gray-500
+    focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent
     transition-all duration-200 resize-vertical min-h-[120px]
     ${error ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'}
     ${className}

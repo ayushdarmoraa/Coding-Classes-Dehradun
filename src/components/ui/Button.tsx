@@ -25,12 +25,12 @@ const Button: React.FC<ButtonProps> = ({
   eventParams,
   ...props
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
+  const baseClasses = 'inline-flex min-h-11 items-center justify-center font-semibold rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
   
   const variantClasses = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-md hover:shadow-lg',
-    secondary: 'bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50 focus:ring-blue-500',
-    ghost: 'text-blue-600 hover:bg-blue-50 focus:ring-blue-500'
+    primary: 'bg-brand text-white hover:bg-brand-dark focus-visible:ring-brand shadow-sm hover:shadow-md',
+    secondary: 'bg-white text-brand-dark border border-brand hover:bg-brand-soft focus-visible:ring-brand',
+    ghost: 'text-brand-dark hover:bg-brand-soft focus-visible:ring-brand'
   };
 
   const sizeClasses = {

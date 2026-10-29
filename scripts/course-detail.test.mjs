@@ -139,6 +139,12 @@ function loadTypeScript(relativePath) {
         default: () => React.createElement("p", null, "Learning progression"),
       };
     }
+    if (specifier === "@/components/features/CourseTabsNav") {
+      return {
+        __esModule: true,
+        default: loadTypeScript("src/components/features/CourseTabsNav.tsx").default,
+      };
+    }
     if (specifier === "@/lib/courses") return coursesModule;
     if (specifier === "@/lib/course-catalog") return courseCatalogModule;
     if (specifier === "@/lib/course-experience-content") return courseExperienceModule;
@@ -228,7 +234,9 @@ test("all canonical course detail routes render their registry facts and metadat
       : undefined;
 
     const decodedMarkup = decodeHtml(markup);
-    assert.ok(decodedMarkup.includes(`<h1 class="text-3xl md:text-4xl font-extrabold mb-3">${course.title}</h1>`));
+    const courseHeading = decodedMarkup.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/);
+    assert.ok(courseHeading, `Expected a course heading for ${course.slug}`);
+    assert.equal(decodeHtml(courseHeading[1]), course.title);
     assert.ok(decodedMarkup.includes(course.description));
     assert.ok(decodedMarkup.includes(course.prerequisites[0]));
     assert.ok(decodedMarkup.includes(course.curriculum[0]));
@@ -247,6 +255,33 @@ test("all canonical course detail routes render their registry facts and metadat
       assert.equal(markup.includes('id="course-structured-data"'), false);
     }
   }
+});
+
+test("course section navigation stays accessible and outside the hero for sticky behavior", async () => {
+  const markup = await renderCourse("full-stack");
+  const navStart = markup.indexOf('<nav aria-label="Course sections"');
+  const heroEnd = markup.indexOf("</header>");
+
+  assert.ok(navStart > heroEnd, "course section navigation follows the hero");
+
+  const navEnd = markup.indexOf("</nav>", navStart);
+  const navMarkup = markup.slice(navStart, navEnd);
+  assert.match(navMarkup, /class="sticky top-16/);
+  assert.match(navMarkup, /focus-visible:ring-2/);
+  assert.match(navMarkup, /aria-current="location"/);
+  assert.deepEqual(
+    [...navMarkup.matchAll(/<a[^>]+href="#([^"]+)"/g)].map(([, id]) => id),
+    [
+      "overview",
+      "who-for",
+      "curriculum",
+      "prereq",
+      "projects",
+      "learning-works",
+      "outcomes",
+      "faqs",
+    ],
+  );
 });
 
 test("unknown course slugs retain not-found behavior", async () => {

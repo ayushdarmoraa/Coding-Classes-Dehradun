@@ -76,7 +76,7 @@ export default function LocationsIndexPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-panel">
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
@@ -84,8 +84,8 @@ export default function LocationsIndexPage() {
       />
       <main className="max-w-6xl mx-auto px-4 py-10">
         {/* Hero */}
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold">Our Locations &amp; Online Cohorts</h1>
+        <header className="cd-hero mb-8 rounded-dca-lg p-6 sm:p-9">
+          <h1 className="mt-3 text-3xl font-bold text-ink sm:text-4xl">Our Locations &amp; Online Cohorts</h1>
           <p className="mt-3 text-gray-700">
             Learn on-campus in <strong>Dehradun</strong> or join our {""}
             <Link href="/online-courses" className="text-blue-700 hover:underline">
@@ -140,7 +140,7 @@ export default function LocationsIndexPage() {
 
             <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {tiles.map((t) => (
-                <Card key={t.name} className="flex flex-col p-0">
+                <Card key={t.name} className="flex flex-col p-0 transition hover:-translate-y-1 hover:shadow-soft-blue">
                   <div className="p-6 pb-4 flex items-center justify-between">
                     <h3 className="text-xl font-semibold text-gray-900">{t.name}</h3>
                     <span className="text-xs rounded-full bg-blue-50 text-blue-700 px-2 py-1 border border-blue-100">

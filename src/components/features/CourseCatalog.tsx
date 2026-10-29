@@ -34,7 +34,7 @@ export default function CourseCatalog({
   return (
     <>
       <section
-        className="mx-auto max-w-6xl px-4 py-8"
+        className="mx-auto max-w-6xl px-4 py-10"
         aria-labelledby="learning-path-heading"
       >
         <h2 id="learning-path-heading" className="text-2xl font-bold">
@@ -57,8 +57,8 @@ export default function CourseCatalog({
               aria-pressed={path === coursePath.id}
               className={`rounded-full border px-4 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 ${
                 path === coursePath.id
-                  ? "border-blue-700 bg-blue-700 text-white"
-                  : "border-gray-300 bg-white text-gray-800 hover:bg-gray-50"
+                  ? "border-brand bg-brand text-white"
+                  : "border-gray-300 bg-white text-gray-800 hover:border-brand hover:bg-brand-soft"
               }`}
             >
               {coursePath.label}
@@ -73,7 +73,7 @@ export default function CourseCatalog({
             type="button"
             onClick={() => setSortOrder("recommended")}
             aria-pressed={sortOrder === "recommended"}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+            className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm hover:border-brand hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             Recommended order
           </button>
@@ -81,7 +81,7 @@ export default function CourseCatalog({
             type="button"
             onClick={() => setSortOrder("duration")}
             aria-pressed={sortOrder === "duration"}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+            className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm hover:border-brand hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             Shortest duration
           </button>
@@ -89,7 +89,7 @@ export default function CourseCatalog({
             type="button"
             onClick={() => setSortOrder("fees")}
             aria-pressed={sortOrder === "fees"}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+            className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm hover:border-brand hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             Lowest fees
           </button>
@@ -97,7 +97,7 @@ export default function CourseCatalog({
       </section>
 
       <section
-        className="mx-auto max-w-6xl px-4 py-8"
+        className="mx-auto max-w-6xl px-4 py-10"
         id="all-courses"
         aria-label="Course options"
       >
@@ -122,7 +122,7 @@ export default function CourseCatalog({
       </section>
 
       <section
-        className="bg-white py-12"
+        className="bg-panel py-12"
         id="comparison"
         aria-labelledby="course-comparison-heading"
       >
@@ -140,9 +140,9 @@ export default function CourseCatalog({
             aria-label="Scrollable course comparison"
             tabIndex={0}
           >
-            <table className="w-full min-w-[42rem] bg-white text-left text-sm">
+            <table className="w-full min-w-[42rem] overflow-hidden rounded-xl bg-white text-left text-sm shadow-sm">
               <caption className="sr-only">Course comparison</caption>
-              <thead className="bg-blue-700 text-white">
+              <thead className="bg-navy-grad text-white">
                 <tr>
                   <th className="px-4 py-3">Course</th>
                   <th className="px-4 py-3">Level</th>

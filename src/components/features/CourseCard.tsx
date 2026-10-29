@@ -21,22 +21,22 @@ const CourseCard: React.FC<CourseCardProps> = ({
   analyticsLocation,
   showProjectSummary = false,
 }) => {
-  const cardClass = featured ? 'border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white' : '';
+  const cardClass = featured ? 'border-2 border-blue-200 bg-brand-soft-grad' : '';
   const courseContent = getCourseExperienceContent(course);
   
   return (
     <Card className={`p-6 flex flex-col justify-between ${cardClass}`} hover>
       <div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">
+        <h3 className="text-xl font-bold text-ink mb-2">
           {course.title}
         </h3>
         <p className="text-sm leading-6 text-gray-700">{course.description}</p>
         <div className="flex flex-wrap gap-2">
-          <span className="inline-block rounded bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700">
+          <span className="chip border-blue-100 bg-brand-soft font-semibold text-brand-dark">
             {formatCourseDuration(course.duration)}
           </span>
           {course.level && (
-            <span className="inline-block rounded bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
+            <span className="chip border-gray-200 bg-gray-50 font-semibold text-gray-700">
               {course.level}
             </span>
           )}
@@ -77,7 +77,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
               ? { location: analyticsLocation, course_slug: course.slug }
               : undefined
           }
-          className="bg-blue-600 text-white hover:bg-blue-700"
+          className="bg-brand text-white hover:bg-brand-dark"
         >
           View Course
         </Button>
@@ -90,7 +90,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
           href={`${SITE.whatsappUrl}?text=${encodeURIComponent(`Hi, I'm interested in the ${course.title} course`)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+          className="btn-wa px-4 py-2 font-semibold transition hover:text-brand-dark"
         >
           WhatsApp
         </Button>

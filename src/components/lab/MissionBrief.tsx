@@ -15,7 +15,7 @@ export default function MissionBrief({
     : undefined;
 
   return (
-    <article className="h-full rounded-xl border border-gray-200 bg-white p-5 sm:p-7">
+    <article className="surface-card h-full p-5 sm:p-7">
       <div className="flex flex-wrap gap-2 text-sm text-gray-700">
         <span className="rounded-full bg-gray-100 px-3 py-1">
           {challenge.difficulty}

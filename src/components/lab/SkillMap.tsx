@@ -31,7 +31,7 @@ export default function SkillMap({
   }, [onViewed]);
 
   return (
-    <section ref={sectionRef} aria-labelledby="skill-map-heading" className="rounded-xl border border-gray-200 bg-white p-5">
+    <section ref={sectionRef} aria-labelledby="skill-map-heading" className="surface-card p-5">
       <h3 id="skill-map-heading" className="text-lg font-semibold text-gray-900">Skill Map</h3>
       <ul className="mt-4 space-y-3">
         {skills.map(({ id, label, status }) => (

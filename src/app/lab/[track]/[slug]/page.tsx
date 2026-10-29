@@ -103,7 +103,7 @@ export default function ChallengePage({ params }: ChallengePageProps) {
           ))}
         </ol>
       </nav>
-      <h1 className="text-3xl font-bold text-gray-950 sm:text-4xl">
+      <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
         {challenge.title}
       </h1>
       <p className="mt-3 max-w-3xl leading-7 text-gray-700">

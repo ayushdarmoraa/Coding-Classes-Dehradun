@@ -9,17 +9,17 @@ export default function HomeHero() {
   return (
     <section
       aria-labelledby="home-hero-heading"
-      className="overflow-hidden bg-slate-50"
+      className="cd-hero overflow-hidden"
     >
       <div className="container grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-24">
         <div>
-          <p className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-3 py-1.5 text-sm font-semibold text-blue-800">
+          <p className="cd-pill">
             <span aria-hidden="true" className="h-2 w-2 rounded-full bg-blue-600" />
             Learn. Debug. Build. Prove.
           </p>
           <h1
             id="home-hero-heading"
-            className="mt-6 max-w-2xl text-4xl font-bold leading-tight tracking-tight text-gray-950 sm:text-5xl lg:text-6xl"
+            className="mt-6 max-w-2xl text-4xl font-bold leading-tight tracking-tight text-ink sm:text-5xl lg:text-6xl"
           >
             Learn Coding. Fix Real Problems. Build Real Skills.
           </h1>
@@ -32,7 +32,7 @@ export default function HomeHero() {
               href="/lab/javascript/discount-calculation-bug"
               event="cta_home_try_challenge"
               eventParams={{ location: "home_hero" }}
-              className="inline-flex min-h-12 items-center justify-center rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white transition hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+              className="inline-flex min-h-12 items-center justify-center rounded-full bg-brand px-6 py-3 font-semibold text-white transition hover:bg-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
             >
               Try a Free Coding Challenge
             </TrackedLink>
@@ -40,14 +40,14 @@ export default function HomeHero() {
               href="/courses"
               event="cta_home_explore_courses"
               eventParams={{ location: "home_hero" }}
-              className="inline-flex min-h-12 items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-3 font-semibold text-gray-900 transition hover:border-blue-300 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+              className="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-300 bg-white px-6 py-3 font-semibold text-ink transition hover:border-brand hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
             >
               Explore Courses
             </TrackedLink>
           </div>
           <Link
             href="/contact"
-            className="mt-5 inline-flex min-h-11 items-center font-semibold text-blue-800 underline decoration-blue-300 underline-offset-4 hover:text-blue-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+            className="mt-5 inline-flex min-h-11 items-center font-semibold text-brand-dark underline decoration-blue-300 underline-offset-4 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             Talk to a Mentor
           </Link>
@@ -57,7 +57,7 @@ export default function HomeHero() {
           aria-labelledby="mission-preview-heading"
           className="relative mx-auto w-full max-w-xl"
         >
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xl shadow-blue-950/10 sm:p-7">
+          <div className="surface-card rounded-dca-lg p-5 shadow-soft-blue sm:p-7">
             <div className="flex items-center justify-between border-b border-gray-100 pb-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-700">
@@ -101,7 +101,7 @@ export default function HomeHero() {
               href="/lab/javascript/discount-calculation-bug"
               event="cta_home_try_challenge"
               eventParams={{ location: "home_hero_preview" }}
-              className="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-yellow-300 px-4 py-3 font-semibold text-blue-950 transition hover:bg-yellow-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
+              className="btn-lime mt-5 inline-flex min-h-11 w-full items-center justify-center px-4 py-3 font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
             >
               Start Mission
             </TrackedLink>

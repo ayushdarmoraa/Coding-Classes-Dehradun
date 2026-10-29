@@ -34,7 +34,7 @@ export default function OnlineCoursesPage() {
   return (
     <main className="min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white pt-10 pb-16">
+      <section className="bg-navy-grad text-white pt-12 pb-16">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
             Online Coding Courses in India
@@ -55,10 +55,10 @@ export default function OnlineCoursesPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-6">
             {onlineCourses.map((course) => (
-              <Card key={course.id} className="p-6" hover>
+              <Card key={course.id} className="p-6 transition hover:-translate-y-1 hover:shadow-soft-blue" hover>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900">{course.title}</h2>
+                    <h2 className="text-xl font-bold text-ink">{course.title}</h2>
                     <p className="text-gray-700 mt-1">{course.description}</p>
                     <p className="text-sm text-gray-500 mt-2">
                       Level: {course.level} ·{" "}
