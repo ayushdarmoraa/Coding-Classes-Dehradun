@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ChallengeCard from "@/components/lab/ChallengeCard";
 import { LabPageImpression, LabTrackedLink } from "@/components/lab/LabTrackedLink";
-import GrowReveal from "@/components/motion/GrowReveal";
+import Reveal from "@/components/motion/Reveal";
 import { getPublishedChallenges } from "@/lib/lab/challenges";
 import { SITE } from "@/lib/site-config";
 
@@ -98,7 +98,7 @@ export default function LabPage() {
               key={step.title}
               className="h-full"
             >
-              <GrowReveal className="h-full" delay={index * 0.06}>
+              <Reveal className="h-full" delay={index * 0.06}>
                 <div className="surface-card h-full bg-white p-5 sm:p-6">
                   <p className="chip border-transparent bg-tint-blue font-semibold text-brand-dark">
                     Step 0{index + 1}
@@ -110,7 +110,7 @@ export default function LabPage() {
                     {step.description}
                   </p>
                 </div>
-              </GrowReveal>
+              </Reveal>
             </li>
           ))}
         </ol>
@@ -121,7 +121,7 @@ export default function LabPage() {
           aria-labelledby="featured-mission"
           className="mt-16 overflow-hidden rounded-dca-lg bg-violet-grad p-6 text-white shadow-soft-blue sm:p-9"
         >
-          <GrowReveal>
+          <Reveal>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-white/75">
               Featured beginner mission
             </p>
@@ -131,7 +131,7 @@ export default function LabPage() {
             <p className="mt-3 max-w-2xl leading-7 text-white/80">
               {featuredChallenge.shortDescription}
             </p>
-          </GrowReveal>
+          </Reveal>
         </section>
       )}
 
@@ -154,9 +154,9 @@ export default function LabPage() {
           <ul className="mt-6 grid gap-5 md:grid-cols-2">
             {challenges.map((challenge, index) => (
               <li key={challenge.id}>
-                <GrowReveal delay={index * 0.05} className="h-full">
+                <Reveal delay={index * 0.05} className="h-full">
                   <ChallengeCard challenge={challenge} />
-                </GrowReveal>
+                </Reveal>
               </li>
             ))}
           </ul>
