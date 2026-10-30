@@ -36,7 +36,9 @@ const {
   MIN_PUBLISHED_PROJECTS,
   PROJECTS,
   getProjectOriginLabel,
+  getProjectForEnvironment,
   getProjectPath,
+  getProjectsForEnvironment,
   getPublishedProjectBySlug,
   getPublishedProjects,
   getProjectsByTag,
@@ -109,20 +111,111 @@ function loadTypeScript(relativePath, overrides = {}) {
   return loadedModule.exports;
 }
 
-test("candidate registry records verified facts as an unpublished Personal Project", () => {
-  assert.equal(PROJECTS.length, 1);
-  assert.equal(PROJECTS[0].slug, "ai-resume-builder");
-  assert.equal(PROJECTS[0].origin, "personal-project");
-  assert.equal(PROJECTS[0].published, false);
-  assert.deepEqual(PROJECTS[0].screenshots, []);
-  assert.equal(PROJECTS[0].repositoryUrl, undefined);
-  assert.equal(PROJECTS[0].demoUrl, undefined);
-  assert.ok(PROJECTS[0].technologies.includes("Express"));
-  assert.ok(PROJECTS[0].features.some((feature) => feature.includes("Gemini")));
-  assert.equal(getProjectOriginLabel(PROJECTS[0].origin), "Personal Project");
+test("registry contains the three supplied projects without inventing missing details", () => {
+  assert.deepEqual(
+    PROJECTS.map(({ slug }) => slug),
+    ["e-commerce-website", "ai-resume-builder", "standupsync"],
+  );
+  assert.deepEqual(
+    PROJECTS.map(({ published }) => published),
+    [true, true, true],
+  );
+  assert.deepEqual(PROJECTS[0].technologies, [
+    "MongoDB",
+    "Express.js",
+    "React.js",
+    "Node.js",
+  ]);
+  assert.deepEqual(PROJECTS[0].features, []);
+  assert.deepEqual(PROJECTS[1].technologies, [
+    "MongoDB",
+    "Express.js",
+    "React.js",
+    "Node.js",
+  ]);
+  assert.deepEqual(PROJECTS[1].features, []);
+  assert.equal(PROJECTS[0].demoUrl, "https://e-commerce-seven-mu-27.vercel.app/");
+  assert.equal(PROJECTS[1].demoUrl, "https://ai-resume-builder-omega-one.vercel.app/");
+  assert.equal(PROJECTS[2].demoUrl, "https://standup-live.vercel.app/feed");
+  assert.deepEqual(PROJECTS.map(({ repositoryUrl }) => repositoryUrl), [
+    undefined,
+    undefined,
+    undefined,
+  ]);
+  assert.deepEqual(
+    PROJECTS.map(({ screenshots }) => screenshots.length),
+    [2, 2, 2],
+  );
+  assert.deepEqual(
+    PROJECTS.map(({ screenshots }) => screenshots.map(({ src }) => src)),
+    [
+      [
+        "/projects/e-commerce-website/pro1.webp",
+        "/projects/e-commerce-website/pro2.webp",
+      ],
+      [
+        "/projects/ai-resume-builder/pro1.webp",
+        "/projects/ai-resume-builder/pro2.webp",
+      ],
+      ["/projects/standupsync/pro1.webp", "/projects/standupsync/pro2.webp"],
+    ],
+  );
+  assert.equal(PROJECTS[2].origin, "internship-project");
+  assert.deepEqual(PROJECTS[2].technologies, [
+    "MongoDB",
+    "Express.js",
+    "React.js",
+    "Node.js",
+    "Socket.io",
+    "Gemini API",
+  ]);
+  assert.deepEqual(PROJECTS[2].features, [
+    "Real-time communication using Socket.io.",
+    "AI-powered productivity insights.",
+    "Weekly productivity summaries.",
+    "Team standup and update management.",
+  ]);
+  assert.equal(getProjectOriginLabel("personal-project"), undefined);
+  assert.equal(getProjectOriginLabel("internship-project"), "Internship Project");
+  assert.equal(PROJECTS[0].seo.title, "E-Commerce Website");
+  assert.equal(PROJECTS[1].seo.title, "AI Resume Builder");
   assert.equal(MIN_PUBLISHED_PROJECTS, 3);
-  assert.deepEqual(getPublishedProjects(), []);
-  assert.equal(getPublishedProjectBySlug(PROJECTS[0].slug), undefined);
+  assert.deepEqual(
+    getPublishedProjects().map(({ slug }) => slug),
+    ["e-commerce-website", "ai-resume-builder", "standupsync"],
+  );
+  assert.equal(
+    getPublishedProjectBySlug("e-commerce-website")?.slug,
+    "e-commerce-website",
+  );
+  assert.deepEqual(
+    getProjectsForEnvironment("development").map(({ slug }) => slug),
+    ["e-commerce-website", "ai-resume-builder", "standupsync"],
+  );
+  assert.equal(
+    getProjectForEnvironment("standupsync", "development")?.origin,
+    "internship-project",
+  );
+  assert.deepEqual(
+    getProjectsForEnvironment("production").map(({ slug }) => slug),
+    ["e-commerce-website", "ai-resume-builder", "standupsync"],
+  );
+  assert.equal(
+    getProjectForEnvironment("standupsync", "production")?.origin,
+    "internship-project",
+  );
+  const unconsentedStudentDraft = makeProject("unconsented-student-draft", {
+    origin: "student",
+    published: false,
+    contributors: [{ name: "Unverified learner", consentVerified: false }],
+  });
+  assert.deepEqual(
+    getProjectsForEnvironment("development", [
+      makeProject("personal-preview", { published: false }),
+      unconsentedStudentDraft,
+    ]).map(({ slug }) => slug),
+    ["personal-preview"],
+  );
 });
 
 test("registry rejects duplicate slugs, unsafe screenshot paths, and invalid student consent", () => {
@@ -390,13 +483,24 @@ test("project pages use publication gating and stay out of public navigation and
     "utf8",
   );
 
-  assert.match(indexPage, /getPublishedProjects\(\)/);
+  assert.match(indexPage, /getProjectsForEnvironment\(\)/);
+  assert.match(indexPage, /process\.env\.NODE_ENV === "development"/);
   assert.match(indexPage, /if \(projects\.length === 0\) notFound\(\)/);
   assert.match(indexPage, /canonical: `\$\{SITE\.url\}\/projects`/);
-  assert.match(detailPage, /getPublishedProjectBySlug\(params\.slug\)/);
+  const projectIndex = readFileSync(
+    path.join(repositoryRoot, "src/components/projects/ProjectsIndex.tsx"),
+    "utf8",
+  );
+  assert.match(
+    projectIndex,
+    /showPendingRepository=\{localPreview \|\| !project\.repositoryUrl\}/,
+  );
+  assert.match(detailPage, /getProjectForEnvironment\(params\.slug\)/);
+  assert.match(detailPage, /process\.env\.NODE_ENV === "development"/);
   assert.match(detailPage, /if \(!project\) notFound\(\)/);
   assert.match(detailPage, /generateStaticParams/);
   assert.match(detailPage, /canonical/);
+  assert.match(detailPage, /showPendingRepository=\{!project\.repositoryUrl\}/);
   assert.match(sitemap, /getPublishedProjects\(\)/);
   assert.match(seoQa, /getPublishedProjectRoutes/);
   assert.doesNotMatch(navigation, /\/projects/);

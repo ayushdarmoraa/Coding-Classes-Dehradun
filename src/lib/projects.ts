@@ -9,7 +9,7 @@ const routeSegmentSchema = z
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 
 const projectScreenshotSchema = z.object({
-  src: z.string().min(1),
+  src: z.string().min(1).optional(),
   alt: z.string().trim().min(1).max(200),
 });
 const httpsUrlSchema = z
@@ -21,14 +21,20 @@ export const projectSchema = z.object({
   slug: routeSegmentSchema,
   title: z.string().trim().min(1).max(120),
   summary: z.string().trim().min(1).max(320),
-  origin: z.enum(["student", "instructor-demo", "dca-demo", "personal-project"]),
+  origin: z.enum([
+    "student",
+    "instructor-demo",
+    "dca-demo",
+    "personal-project",
+    "internship-project",
+  ]),
   published: z.boolean(),
   category: z.string().trim().min(1).max(60),
   tags: z.array(z.string().trim().min(1).max(40)).min(1),
   problem: z.string().trim().min(1).max(1000),
   solution: z.string().trim().min(1).max(1000),
-  technologies: z.array(z.string().trim().min(1).max(60)).min(1),
-  features: z.array(z.string().trim().min(1).max(240)).min(1),
+  technologies: z.array(z.string().trim().min(1).max(60)),
+  features: z.array(z.string().trim().min(1).max(240)),
   screenshots: z.array(projectScreenshotSchema),
   technicalApproach: z.string().trim().min(1).max(1200).optional(),
   lessons: z.array(z.string().trim().min(1).max(300)).optional(),
@@ -55,7 +61,10 @@ export const projectSchema = z.object({
   }),
 }).superRefine((project, context) => {
   project.screenshots.forEach((screenshot, index) => {
-    if (!resolveProjectScreenshotPath(project.slug, screenshot.src)) {
+    if (
+      screenshot.src &&
+      !resolveProjectScreenshotPath(project.slug, screenshot.src)
+    ) {
       context.addIssue({
         code: "custom",
         message:
@@ -84,40 +93,103 @@ export type ProjectOrigin = Project["origin"];
 
 const projectRecords: unknown[] = [
   {
+    slug: "e-commerce-website",
+    title: "E-Commerce Website",
+    summary:
+      "A full-stack e-commerce web application designed to provide users with an online shopping experience, including product discovery and shopping workflows.",
+    origin: "personal-project",
+    published: true,
+    category: "Full-Stack Web Development",
+    tags: ["Full-Stack Web Development"],
+    problem: "Provides an online platform for users to explore and purchase products.",
+    solution: "A web-based shopping experience with an integrated user interface.",
+    technologies: ["MongoDB", "Express.js", "React.js", "Node.js"],
+    features: [],
+    screenshots: [
+      {
+        src: "/projects/e-commerce-website/pro1.webp",
+        alt: "E-Commerce Website screenshot 1",
+      },
+      {
+        src: "/projects/e-commerce-website/pro2.webp",
+        alt: "E-Commerce Website screenshot 2",
+      },
+    ],
+    demoUrl: "https://e-commerce-seven-mu-27.vercel.app/",
+    seo: {
+      title: "E-Commerce Website",
+      description:
+        "A full-stack e-commerce web application for online product discovery and shopping workflows.",
+    },
+  },
+  {
     slug: "ai-resume-builder",
     title: "AI Resume Builder",
     summary:
-      "A personal web application for creating and managing resumes, with an API feature that generates professional summaries using Gemini.",
+      "An AI-powered resume-building application intended to help users create and improve professional resumes.",
     origin: "personal-project",
-    published: false,
-    category: "Resume tools",
-    tags: ["React", "Node.js", "MongoDB", "AI-assisted writing"],
+    published: true,
+    category: "AI-Powered Web Application",
+    tags: ["AI-Powered Web Application"],
     problem:
-      "The application supports creating and managing resume content and generating a professional summary from supplied text.",
+      "Creating a professional resume can be time-consuming and challenging.",
     solution:
-      "A React interface works with an Express API for resume operations and a Gemini-powered summary-generation endpoint.",
+      "A web-based interface to assist users in preparing resumes.",
+    technologies: ["MongoDB", "Express.js", "React.js", "Node.js"],
+    features: [],
+    screenshots: [
+      {
+        src: "/projects/ai-resume-builder/pro1.webp",
+        alt: "AI Resume Builder screenshot 1",
+      },
+      {
+        src: "/projects/ai-resume-builder/pro2.webp",
+        alt: "AI Resume Builder screenshot 2",
+      },
+    ],
+    demoUrl: "https://ai-resume-builder-omega-one.vercel.app/",
+    seo: {
+      title: "AI Resume Builder",
+      description:
+        "An AI-powered resume-building application intended to help users create and improve professional resumes.",
+    },
+  },
+  {
+    slug: "standupsync",
+    title: "StandupSync",
+    summary:
+      "A MERN-stack productivity application designed to help teams manage standup updates, collaborate in real time, and understand team productivity.",
+    origin: "internship-project",
+    published: true,
+    category: "Full-Stack Productivity Application",
+    tags: ["Full-Stack Productivity Application"],
+    problem:
+      "Managing team updates and tracking productivity across a team can become difficult.",
+    solution:
+      "A centralized productivity platform with real-time collaboration and AI-assisted insights.",
     technologies: [
-      "React",
-      "Vite",
-      "Node.js",
-      "Express",
       "MongoDB",
-      "Mongoose",
+      "Express.js",
+      "React.js",
+      "Node.js",
+      "Socket.io",
       "Gemini API",
     ],
     features: [
-      "Create, retrieve, update, and delete resumes through the API",
-      "Store resume sections including experience, education, skills, and projects",
-      "Generate a professional resume summary from supplied text using Gemini",
+      "Real-time communication using Socket.io.",
+      "AI-powered productivity insights.",
+      "Weekly productivity summaries.",
+      "Team standup and update management.",
     ],
-    screenshots: [],
-    technicalApproach:
-      "The repository contains a React/Vite frontend, an Express API, Mongoose resume and user models, and a Gemini summary-generation endpoint.",
-    courseSlug: "full-stack",
+    screenshots: [
+      { src: "/projects/standupsync/pro1.webp", alt: "StandupSync screenshot 1" },
+      { src: "/projects/standupsync/pro2.webp", alt: "StandupSync screenshot 2" },
+    ],
+    demoUrl: "https://standup-live.vercel.app/feed",
     seo: {
-      title: "AI Resume Builder | Personal Project",
+      title: "StandupSync | Internship Project",
       description:
-        "A personal project exploring a React resume interface, an Express API, MongoDB persistence, and Gemini-powered summary generation.",
+        "A team productivity application for standup updates, real-time collaboration, and AI-assisted insights.",
     },
   },
 ];
@@ -150,6 +222,7 @@ function screenshotExists(
   projectSlug: string,
   publicDirectory: string,
 ): boolean {
+  if (!screenshot.src) return false;
   const resolvedPath = resolveProjectScreenshotPath(
     projectSlug,
     screenshot.src,
@@ -239,10 +312,18 @@ function hasPublishableContent(
     project.screenshots.every((screenshot) =>
       screenshotIsPresent(screenshot, project.slug),
     ) &&
-    (project.origin !== "student" ||
-      (project.contributors !== undefined &&
-        project.contributors.length > 0 &&
-        project.contributors.every(({ consentVerified }) => consentVerified))) &&
+    hasVerifiedContributorConsent(project)
+  );
+}
+
+function hasVerifiedContributorConsent(project: Project): boolean {
+  const studentConsent =
+    project.origin !== "student" ||
+    (project.contributors !== undefined &&
+      project.contributors.length > 0 &&
+      project.contributors.every(({ consentVerified }) => consentVerified));
+  return (
+    studentConsent &&
     project.contributors?.every(({ consentVerified }) => consentVerified) !==
       false
   );
@@ -261,6 +342,26 @@ export function getPublishedProjects(
   );
 
   return eligible.length >= MIN_PUBLISHED_PROJECTS ? eligible : [];
+}
+
+export function getProjectsForEnvironment(
+  nodeEnvironment = process.env.NODE_ENV,
+  records: readonly Project[] = PROJECTS,
+): Project[] {
+  return nodeEnvironment === "development"
+    ? records.filter(hasVerifiedContributorConsent)
+    : getPublishedProjects(records);
+}
+
+export function getProjectForEnvironment(
+  slug: string,
+  nodeEnvironment = process.env.NODE_ENV,
+  records: readonly Project[] = PROJECTS,
+): Project | undefined {
+  if (!routeSegmentSchema.safeParse(slug).success) return undefined;
+  return getProjectsForEnvironment(nodeEnvironment, records).find(
+    (project) => project.slug === slug,
+  );
 }
 
 export function getPublishedProjectBySlug(
@@ -301,12 +402,14 @@ export function getProjectPath(project: Pick<Project, "slug">): string {
   return `/projects/${slug}`;
 }
 
-export function getProjectOriginLabel(origin: ProjectOrigin): string {
-  const labels: Record<ProjectOrigin, string> = {
+export function getProjectOriginLabel(
+  origin: ProjectOrigin,
+): string | undefined {
+  const labels: Partial<Record<ProjectOrigin, string>> = {
     student: "Student Project",
     "instructor-demo": "Instructor Demo",
     "dca-demo": "DCA Lab Demo",
-    "personal-project": "Personal Project",
+    "internship-project": "Internship Project",
   };
   return labels[origin];
 }

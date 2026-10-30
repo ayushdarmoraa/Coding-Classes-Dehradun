@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ProjectDetail from "@/components/projects/ProjectDetail";
 import {
-  getPublishedProjectBySlug,
-  getPublishedProjects,
+  getProjectForEnvironment,
+  getProjectsForEnvironment,
 } from "@/lib/projects";
 import { SITE } from "@/lib/site-config";
 
@@ -12,11 +12,11 @@ type Props = { params: { slug: string } };
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return getPublishedProjects().map(({ slug }) => ({ slug }));
+  return getProjectsForEnvironment().map(({ slug }) => ({ slug }));
 }
 
 export function generateMetadata({ params }: Props): Metadata {
-  const project = getPublishedProjectBySlug(params.slug);
+  const project = getProjectForEnvironment(params.slug);
   if (!project) {
     return {
       title: "Project Not Found | Doon Coding Academy",
@@ -36,12 +36,20 @@ export function generateMetadata({ params }: Props): Metadata {
       type: "article",
       siteName: SITE.name,
     },
-    robots: { index: true, follow: true },
+    robots:
+      process.env.NODE_ENV === "development"
+        ? { index: false, follow: false }
+        : { index: true, follow: true },
   };
 }
 
 export default function ProjectPage({ params }: Props) {
-  const project = getPublishedProjectBySlug(params.slug);
+  const project = getProjectForEnvironment(params.slug);
   if (!project) notFound();
-  return <ProjectDetail project={project} />;
+  return (
+    <ProjectDetail
+      project={project}
+      showPendingRepository={!project.repositoryUrl}
+    />
+  );
 }

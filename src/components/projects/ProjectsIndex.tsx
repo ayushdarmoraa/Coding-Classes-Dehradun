@@ -10,9 +10,14 @@ import {
 type Props = {
   projects: Project[];
   selectedTag?: string;
+  localPreview?: boolean;
 };
 
-export default function ProjectsIndex({ projects, selectedTag }: Props) {
+export default function ProjectsIndex({
+  projects,
+  selectedTag,
+  localPreview = false,
+}: Props) {
   const tags = getProjectTags(projects);
   const filteredProjects = getProjectsByTag(selectedTag, projects);
 
@@ -27,8 +32,15 @@ export default function ProjectsIndex({ projects, selectedTag }: Props) {
         </h1>
         <p className="mt-4 max-w-3xl leading-7 text-gray-700">
           Explore verified projects and the technologies behind them. Each
-          project is labelled by its actual origin.
+          project is described using its provided purpose, technologies, and
+          learning links.
         </p>
+        {localPreview && (
+          <p className="mt-4 max-w-3xl rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+            Local preview only. Changes are not live on the public website
+            until merged and deployed.
+          </p>
+        )}
       </header>
 
       <section
@@ -43,7 +55,10 @@ export default function ProjectsIndex({ projects, selectedTag }: Props) {
           <ul className="mt-6 grid list-none gap-5 p-0 sm:grid-cols-2 lg:grid-cols-3">
             {filteredProjects.map((project) => (
               <li key={project.slug}>
-                <ProjectCard project={project} />
+                <ProjectCard
+                  project={project}
+                  showPendingRepository={localPreview || !project.repositoryUrl}
+                />
               </li>
             ))}
           </ul>

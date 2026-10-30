@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ProjectsIndex from "@/components/projects/ProjectsIndex";
-import { getPublishedProjects } from "@/lib/projects";
+import { getProjectsForEnvironment } from "@/lib/projects";
 import { SITE } from "@/lib/site-config";
 
 type Props = {
@@ -21,14 +21,24 @@ export const metadata: Metadata = {
     type: "website",
     siteName: SITE.name,
   },
+  robots:
+    process.env.NODE_ENV === "development"
+      ? { index: false, follow: false }
+      : undefined,
 };
 
 export default function ProjectsPage({ searchParams }: Props) {
-  const projects = getPublishedProjects();
+  const projects = getProjectsForEnvironment();
   if (projects.length === 0) notFound();
 
   const selectedTag =
     typeof searchParams?.tag === "string" ? searchParams.tag : undefined;
 
-  return <ProjectsIndex projects={projects} selectedTag={selectedTag} />;
+  return (
+    <ProjectsIndex
+      projects={projects}
+      selectedTag={selectedTag}
+      localPreview={process.env.NODE_ENV === "development"}
+    />
+  );
 }

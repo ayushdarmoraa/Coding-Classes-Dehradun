@@ -6,9 +6,12 @@ import {
 } from "@/lib/projects";
 import ProjectScreenshot from "./ProjectScreenshot";
 
-type Props = { project: Project };
+type Props = { project: Project; showPendingRepository?: boolean };
 
-export default function ProjectCard({ project }: Props) {
+export default function ProjectCard({
+  project,
+  showPendingRepository = false,
+}: Props) {
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-gray-200 transition-shadow hover:shadow-md">
       <Link
@@ -17,6 +20,7 @@ export default function ProjectCard({ project }: Props) {
         aria-label={`View ${project.title}`}
       >
         <ProjectScreenshot
+          projectSlug={project.slug}
           src={project.screenshots[0]?.src}
           alt={project.screenshots[0]?.alt ?? `${project.title} project preview`}
           className="rounded-none"
@@ -24,7 +28,10 @@ export default function ProjectCard({ project }: Props) {
       </Link>
       <div className="flex flex-1 flex-col p-5">
         <p className="text-sm font-semibold text-blue-800">
-          {getProjectOriginLabel(project.origin)} · {project.category}
+          {getProjectOriginLabel(project.origin)
+            ? `${getProjectOriginLabel(project.origin)} · `
+            : ""}
+          {project.category}
         </p>
         <h2 className="mt-2 text-xl font-bold text-gray-900">
           <Link
@@ -45,12 +52,27 @@ export default function ProjectCard({ project }: Props) {
             </li>
           ))}
         </ul>
-        <Link
-          href={getProjectPath(project)}
-          className="mt-5 inline-flex w-fit rounded-lg font-semibold text-blue-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
-        >
-          View project
-        </Link>
+        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <Link
+            href={getProjectPath(project)}
+            className="inline-flex w-fit rounded-lg font-semibold text-blue-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+          >
+            View project
+          </Link>
+          {project.demoUrl && (
+            <a
+              href={project.demoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-fit rounded-lg font-semibold text-blue-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700"
+            >
+              Live demo
+            </a>
+          )}
+          {showPendingRepository && !project.repositoryUrl && (
+            <span className="text-sm text-gray-600">GitHub: link pending</span>
+          )}
+        </div>
       </div>
     </article>
   );

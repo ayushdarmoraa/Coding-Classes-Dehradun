@@ -12,9 +12,15 @@ import { getChallengePath } from "@/lib/lab/challenge-utils";
 import { getPublishedChallenges } from "@/lib/lab/challenges";
 import ProjectScreenshot from "./ProjectScreenshot";
 
-type Props = { project: Project };
+type Props = {
+  project: Project;
+  showPendingRepository?: boolean;
+};
 
-export default function ProjectDetail({ project }: Props) {
+export default function ProjectDetail({
+  project,
+  showPendingRepository = false,
+}: Props) {
   const projectPath = getProjectPath(project);
   const breadcrumbs = [
     { label: "Home", href: "/" },
@@ -57,7 +63,10 @@ export default function ProjectDetail({ project }: Props) {
       <article className="mx-auto max-w-5xl">
         <header className="mb-8">
           <p className="text-sm font-semibold text-blue-800">
-            {getProjectOriginLabel(project.origin)} · {project.category}
+            {getProjectOriginLabel(project.origin)
+              ? `${getProjectOriginLabel(project.origin)} · `
+              : ""}
+            {project.category}
           </p>
           <h1 className="mt-2 text-3xl font-extrabold text-gray-950 sm:text-4xl">
             {project.title}
@@ -77,11 +86,16 @@ export default function ProjectDetail({ project }: Props) {
           </ul>
         </header>
 
-        <ProjectScreenshot
-          src={project.screenshots[0]?.src}
-          alt={project.screenshots[0]?.alt ?? `${project.title} project screenshot`}
-          className="mb-8"
-        />
+        <div className="mb-8 grid gap-4 sm:grid-cols-2">
+          {project.screenshots.map((screenshot, index) => (
+            <ProjectScreenshot
+              key={`${project.slug}-screenshot-${index + 1}`}
+              projectSlug={project.slug}
+              src={screenshot.src}
+              alt={screenshot.alt}
+            />
+          ))}
+        </div>
 
         <div className="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(16rem,1fr)]">
           <div className="space-y-8">
@@ -102,9 +116,13 @@ export default function ProjectDetail({ project }: Props) {
                 Features
               </h2>
               <ul className="mt-3 list-disc space-y-2 pl-6 leading-7 text-gray-700">
-                {project.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
+                {project.features.length > 0 ? (
+                  project.features.map((feature) => (
+                    <li key={feature}>{feature}</li>
+                  ))
+                ) : (
+                  <li>Confirmed features to be added.</li>
+                )}
               </ul>
             </section>
             {project.technicalApproach && (
@@ -154,19 +172,25 @@ export default function ProjectDetail({ project }: Props) {
               >
                 Technologies
               </h2>
-              <ul className="mt-3 flex flex-wrap gap-2">
-                {project.technologies.map((technology) => (
-                  <li
-                    key={technology}
-                    className="rounded-full bg-white px-3 py-1 text-sm text-gray-800 ring-1 ring-gray-200"
-                  >
-                    {technology}
-                  </li>
-                ))}
-              </ul>
+              {project.technologies.length > 0 ? (
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {project.technologies.map((technology) => (
+                    <li
+                      key={technology}
+                      className="rounded-full bg-white px-3 py-1 text-sm text-gray-800 ring-1 ring-gray-200"
+                    >
+                      {technology}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-3 text-sm text-gray-600">To be confirmed.</p>
+              )}
             </section>
 
-            {(project.demoUrl || project.repositoryUrl) && (
+            {(project.demoUrl ||
+              project.repositoryUrl ||
+              showPendingRepository) && (
               <section
                 className="mt-6 border-t border-gray-200 pt-5"
                 aria-labelledby="project-links-heading"
@@ -197,6 +221,11 @@ export default function ProjectDetail({ project }: Props) {
                       >
                         View source repository (opens in a new tab)
                       </a>
+                    </li>
+                  )}
+                  {showPendingRepository && !project.repositoryUrl && (
+                    <li className="text-sm text-gray-600">
+                      GitHub repository link pending
                     </li>
                   )}
                 </ul>
