@@ -49,7 +49,7 @@ export default function ProjectPage({ params }: Props) {
   return (
     <ProjectDetail
       project={project}
-      showPendingRepository={process.env.NODE_ENV === "development"}
+      showPendingRepository={!project.repositoryUrl}
     />
   );
 }

@@ -487,11 +487,20 @@ test("project pages use publication gating and stay out of public navigation and
   assert.match(indexPage, /process\.env\.NODE_ENV === "development"/);
   assert.match(indexPage, /if \(projects\.length === 0\) notFound\(\)/);
   assert.match(indexPage, /canonical: `\$\{SITE\.url\}\/projects`/);
+  const projectIndex = readFileSync(
+    path.join(repositoryRoot, "src/components/projects/ProjectsIndex.tsx"),
+    "utf8",
+  );
+  assert.match(
+    projectIndex,
+    /showPendingRepository=\{localPreview \|\| !project\.repositoryUrl\}/,
+  );
   assert.match(detailPage, /getProjectForEnvironment\(params\.slug\)/);
   assert.match(detailPage, /process\.env\.NODE_ENV === "development"/);
   assert.match(detailPage, /if \(!project\) notFound\(\)/);
   assert.match(detailPage, /generateStaticParams/);
   assert.match(detailPage, /canonical/);
+  assert.match(detailPage, /showPendingRepository=\{!project\.repositoryUrl\}/);
   assert.match(sitemap, /getPublishedProjects\(\)/);
   assert.match(seoQa, /getPublishedProjectRoutes/);
   assert.doesNotMatch(navigation, /\/projects/);

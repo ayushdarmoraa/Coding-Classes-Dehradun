@@ -57,7 +57,7 @@ export default function ProjectsIndex({
               <li key={project.slug}>
                 <ProjectCard
                   project={project}
-                  showPendingRepository={localPreview}
+                  showPendingRepository={localPreview || !project.repositoryUrl}
                 />
               </li>
             ))}
