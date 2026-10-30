@@ -4,9 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import InstructorsGrid from "@/components/features/InstructorsGrid";
 import { INSTRUCTORS } from "@/lib/instructors";
+import { getCourses } from "@/lib/courses";
+import { formatCourseDuration, formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
 
-const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
+const BASE = SITE.url;
 // Temporary toggle to hide instructors section while no teachers are available
 const SHOW_INSTRUCTORS = false;
 
@@ -21,6 +23,8 @@ export const metadata: Metadata = {
 };
 
 export default function AboutPage() {
+  const courses = getCourses();
+
   return (
     <main className="pt-8">
       {/* Hero */}
@@ -62,7 +66,7 @@ export default function AboutPage() {
             <ul className="mt-6 grid gap-3 sm:grid-cols-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
                 <span className="mt-1 h-2 w-2 rounded-full bg-yellow-400"></span>
-                Outcome-based, project-first learning
+                Course curriculum details available
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-1 h-2 w-2 rounded-full bg-yellow-400"></span>
@@ -108,10 +112,9 @@ export default function AboutPage() {
           <div className="lg:col-span-2">
             <div className="grid sm:grid-cols-2 gap-6">
               <div className="rounded-2xl p-5 ring-1 ring-gray-200">
-                <h3 className="font-semibold">Project-First Curriculum</h3>
+                <h3 className="font-semibold">Practical Work</h3>
                 <p className="mt-2 text-gray-700">
-                  Build real projects from week one. You’ll practice fundamentals and ship small
-                  features that add up to a strong portfolio.
+                  Review each course page for current curriculum and practical-work details.
                 </p>
               </div>
               <div className="rounded-2xl p-5 ring-1 ring-gray-200">
@@ -161,7 +164,7 @@ export default function AboutPage() {
           <CourseCard
             title="Python"
             href="/courses/python"
-            points={["Beginner-friendly", "Problem-solving focus", "Automation & scripts"]}
+            points={["Flexible learning stages", "Problem-solving focus", "Automation & scripts"]}
           />
           <CourseCard
             title="Java"
@@ -185,14 +188,12 @@ export default function AboutPage() {
         <div className="rounded-2xl ring-1 ring-gray-200 p-6">
           <h2 className="text-2xl font-bold">What to Expect</h2>
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <Stat label="Hands-on Projects" value="10+" />
-            <Stat label="Curriculum Hours" value="100–150" />
             <Stat label="Doubt-Clear Sessions" value="Weekly" />
-            <Stat label="Flexible Plans" value="Monthly/One-time" />
+            <Stat label="Flexible Plans" value="Monthly/Package" />
           </div>
           <p className="mt-6 text-gray-700">
-            You’ll finish with <span className="font-semibold">portfolio-ready work</span>, clarity
-            on fundamentals, and the confidence to keep building.
+            Review the course curriculum for details about practical work, and contact the academy
+            with questions before enrolling.
           </p>
         </div>
       </section>
@@ -247,10 +248,11 @@ export default function AboutPage() {
                 Pricing & Duration (quick glance)
               </summary>
               <div className="mt-3 text-sm text-gray-700">
-                <p>Full-Stack with Gen AI: 6 months · ₹25,000 (or ₹5,000/month)</p>
-                <p>Data Science: 6 months · ₹30,000 (or ₹6,000/month)</p>
-                <p>Python: 4 months · ₹12,000 (or ₹4,000/month)</p>
-                <p>Java: 4 months · ₹12,000 (or ₹4,000/month)</p>
+                {courses.map((course) => (
+                  <p key={course.id}>
+                    {course.shortTitle}: {formatCourseDuration(course.duration)} · {formatCoursePrice(course.pricing)}
+                  </p>
+                ))}
               </div>
             </details>
           </div>

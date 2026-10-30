@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -11,27 +11,39 @@ const Input: React.FC<InputProps> = ({
   error, 
   required, 
   className = '', 
+  id,
+  'aria-describedby': describedBy,
   ...props 
 }) => {
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
+  const errorId = `${inputId}-error`;
   const inputClasses = `
-    w-full px-4 py-3 border rounded-lg text-gray-900 placeholder-gray-500
-    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+    w-full rounded-xl border bg-white px-4 py-3 text-ink placeholder-ink-3
+    focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent
     transition-all duration-200
-    ${error ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'}
+    ${error ? 'border-error bg-red-50' : 'border-brand-soft hover:border-brand'}
     ${className}
   `;
 
   return (
     <div className="space-y-2">
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label htmlFor={inputId} className="block text-sm font-medium text-ink-2">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="ml-1 text-error">*</span>}
         </label>
       )}
-      <input className={inputClasses} {...props} />
+      <input
+        {...props}
+        id={inputId}
+        className={inputClasses}
+        required={required}
+        aria-invalid={error ? true : props['aria-invalid']}
+        aria-describedby={[describedBy, error ? errorId : undefined].filter(Boolean).join(' ') || undefined}
+      />
       {error && (
-        <p className="text-sm text-red-600 flex items-center">
+        <p id={errorId} className="flex items-center text-sm text-error">
           <span className="mr-1">⚠</span>
           {error}
         </p>
@@ -41,4 +53,3 @@ const Input: React.FC<InputProps> = ({
 };
 
 export default Input;
-

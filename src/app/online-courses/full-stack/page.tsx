@@ -1,37 +1,35 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Script from "next/script";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import LearningProgressionNote from "@/components/features/LearningProgressionNote";
 import { getCourseBySlug } from "@/lib/courses";
 import { getCourseJsonLd } from "@/lib/schema";
 import { breadcrumbLd } from "@/lib/seo";
+import { formatCourseDuration, formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
 
-// Normalize base URL → https + apex (no trailing slash)
-const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
-const APEX = BASE.replace(/^https:\/\/www\./, "https://");
-const CANON = `${APEX}/online-courses/full-stack`;
+const CANON = `${SITE.url}/online-courses/full-stack`;
 
 // ---- Page Metadata ----
 export const metadata: Metadata = {
-  title: "Online Full-Stack Development (MERN) in India (Live + Projects)",
+  title: "Online Full-Stack Development (MERN) in India",
   description:
-    "Explore the live online Full-Stack (MERN) curriculum, duration, and program details.",
+    "Explore the online Full-Stack curriculum, duration, and fees.",
   alternates: { canonical: CANON },
   openGraph: {
-    title: "Online Full-Stack Development (MERN) in India (Live + Projects)",
+    title: "Online Full-Stack Development (MERN) in India",
     description:
-      "Explore the live online Full-Stack (MERN) curriculum, duration, and program details.",
+      "Explore the online Full-Stack curriculum, duration, and fees.",
     url: CANON,
     type: "website",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Online Full-Stack Development (MERN) in India (Live + Projects)",
+    title: "Online Full-Stack Development (MERN) in India",
     description:
-      "Explore the live online Full-Stack (MERN) curriculum, duration, and program details.",
+      "Explore the online Full-Stack curriculum, duration, and fees.",
   },
 };
 
@@ -45,20 +43,24 @@ export default function OnlineFullStackPage() {
   // breadcrumbs injected via inline <script> at the bottom
 
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen">
       {/* H1 — required: Online + India + value proposition */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white pt-10 pb-16">
+      <section className="bg-navy-grad text-white pt-12 pb-16">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
             Online Full-Stack Development (MERN) in India
           </h1>
           <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto">
-            Live, cohort-based training with <strong>projects</strong>, <strong>recordings</strong>,
-            and <strong>mentor hours</strong>. Review the course page for program details. {" "}
+            Review the canonical Full-Stack curriculum and details for the confirmed online offering.{" "}
             <Link href="/courses/full-stack" className="underline text-yellow-200 hover:text-white">
               Prefer on-campus? See Dehradun Full-Stack
             </Link>
           </p>
+          <p className="mt-3 text-sm text-blue-100">
+            Ask the team about upcoming batches, class timings, learning support, and
+            other current online arrangements.
+          </p>
+          <LearningProgressionNote className="mt-3 text-blue-100" />
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <Button
               href="/contact"
@@ -67,7 +69,7 @@ export default function OnlineFullStackPage() {
               event="cta_enroll_click"
               eventParams={{ page_type: 'online_course', course_slug: 'full-stack', city: 'india', variant: 'hero_primary' }}
             >
-              Talk to a Mentor
+              Ask about this course
             </Button>
             <Button
               href="/courses/full-stack"
@@ -79,63 +81,35 @@ export default function OnlineFullStackPage() {
               Prefer On-Campus (Dehradun)?
             </Button>
           </div>
-          <div className="mt-6 text-sm text-blue-200">
-            <span className="inline-block px-3 py-1 rounded-full bg-white/10 mr-2">Duration: 6 months</span>
-            <span className="inline-block px-3 py-1 rounded-full bg-white/10 mr-2">Fees: ₹25,000</span>
-          </div>
+          {course && (
+            <div className="mt-6 text-sm text-blue-200">
+              <span className="inline-block px-3 py-1 rounded-full bg-white/10 mr-2">
+                Level: {course.level}
+              </span>
+              <span className="inline-block px-3 py-1 rounded-full bg-white/10 mr-2">
+                Duration: {formatCourseDuration(course.duration)}
+              </span>
+              <span className="inline-block px-3 py-1 rounded-full bg-white/10 mr-2">
+                Fees: {formatCoursePrice(course.pricing)}
+              </span>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Key Outcomes / What you learn */}
-      <section className="py-12">
-        <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-6">
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">Outcomes</h2>
-            <ul className="list-disc ml-5 text-gray-700 space-y-1">
-              <li>Build and deploy full MERN apps (Auth, CRUD, payments).</li>
-              <li>Use modern JS/TS, React, routing, state & API patterns.</li>
-              <li>Git/GitHub workflow, CI basics, and production hygiene.</li>
-            </ul>
-          </Card>
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">Delivery (Online)</h2>
-            <ul className="list-disc ml-5 text-gray-700 space-y-1">
-              <li>Live sessions + full recordings for every class.</li>
-              <li>Weekly mentor hours & project reviews.</li>
-              <li>Private community & doubt support between classes.</li>
-            </ul>
-          </Card>
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">Placement Support</h2>
-            <ul className="list-disc ml-5 text-gray-700 space-y-1">
-              <li>Portfolio & resume polishing with real project artifacts.</li>
-              <li>Mock interviews & DSA refreshers.</li>
-              <li>Referrals where relevant; interview prep plan.</li>
-            </ul>
-          </Card>
-        </div>
-      </section>
-
-      {/* High-level syllabus snapshot */}
+      {/* Course outline */}
       <section className="py-6">
         <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-6">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-2">Syllabus Overview</h3>
+            <h3 className="text-lg font-semibold mb-2">Course curriculum</h3>
             <ol className="list-decimal ml-5 text-gray-700 space-y-1">
-              <li>HTML/CSS, Tailwind, modern JS & TypeScript basics</li>
-              <li>React, Hooks, routing, state, forms, data fetching</li>
-              <li>Node.js, Express, REST APIs, MongoDB (Mongoose)</li>
-              <li>Auth, sessions/JWT, role-based access, validation</li>
-              <li>Payments, file uploads, emails, background jobs</li>
-              <li>Deployment, envs, logs, perf & production checklists</li>
+              {course?.curriculum.map((item) => <li key={item}>{item}</li>)}
             </ol>
           </Card>
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-2">Cohort & Tools</h3>
+            <h3 className="text-lg font-semibold mb-2">Course outcomes</h3>
             <ul className="list-disc ml-5 text-gray-700 space-y-1">
-              <li>Live on Zoom/Meet; repo reviews on GitHub.</li>
-              <li>Issue-driven sprints; weekly demos.</li>
-              <li>Recordings, notes & tasks inside the cohort space.</li>
+              {course?.outcomes.map((item) => <li key={item}>{item}</li>)}
             </ul>
             <div className="mt-4 flex gap-3">
               <Button
@@ -176,28 +150,28 @@ export default function OnlineFullStackPage() {
 
       {/* JSON-LD (Course) */}
       {courseJsonLd && (
-        <Script
+        <script
           id="jsonld-course-online-fullstack"
           type="application/ld+json"
-          strategy="afterInteractive"
+          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
         />
       )}
 
-      <Script
+      <script
         id="breadcrumbs-online-courses-full-stack"
         type="application/ld+json"
-        strategy="afterInteractive"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(
             breadcrumbLd([
-              { name: "Home", url: APEX },
-              { name: "Online Courses", url: `${APEX}/online-courses` },
+              { name: "Home", url: SITE.url },
+              { name: "Online Courses", url: `${SITE.url}/online-courses` },
               { name: "Online Full-Stack Development (MERN) in India", url: CANON },
             ])
           ),
         }}
       />
-    </div>
+    </main>
   );
 }

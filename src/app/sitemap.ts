@@ -1,12 +1,16 @@
 import type { MetadataRoute } from 'next'
-import { getCourses } from '@/lib/courses'
+import { getCourses, isCourseModeAvailable } from '@/lib/courses'
 import { getAllBlogPosts, getPostLastModified } from '@/lib/blog'
+import { getPublishedChallenges } from '@/lib/lab/challenges'
+import { getChallengePath } from '@/lib/lab/challenge-utils'
+import { getPublishedProjects, getProjectPath } from '@/lib/projects'
+import { hasPublishedOutcomeContent } from '@/lib/outcomes'
+import { SITE } from '@/lib/site-config'
 
-const BASE_URL = 'https://dooncodingacademy.in'
+const BASE_URL = SITE.url
 
 // If you keep these elsewhere, import instead
 const VS_SLUGS = ['coding-ninjas', 'scaler'] as const
-const ONLINE_COURSE_SLUGS = new Set(['full-stack', 'data-science', 'python', 'java'])
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = []
@@ -18,6 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/about',
     '/courses',
     '/online-courses',
+    '/lab',
     '/faq',
     '/contact',
     '/testimonials',
@@ -33,6 +38,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         : path.startsWith('/locations') ? 0.8
         : 0.7,
       // Optional: omit lastModified for static pages or use a build-time value if you have one
+    })
+  }
+
+  if (hasPublishedOutcomeContent()) {
+    entries.push({
+      url: `${BASE_URL}/outcomes`,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    })
+  }
+
+  const projects = getPublishedProjects()
+  if (projects.length > 0) {
+    entries.push({
+      url: `${BASE_URL}/projects`,
+      changeFrequency: 'monthly',
+      priority: 0.7,
     })
   }
 
@@ -76,10 +98,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   }
 
-  // --- Online courses (programmatic; limited to the 4 online slugs) ---
+  // --- Online courses (only when the canonical record confirms online delivery) ---
   const courses = await getCourses()
   for (const c of courses) {
-    if (!ONLINE_COURSE_SLUGS.has(c.slug)) continue
+    if (!isCourseModeAvailable(c, 'Online')) continue
     entries.push({
       url: `${BASE_URL}/online-courses/${c.slug}`,
       // Fallback lastModified: omit or use new Date() if you prefer freshness signals
@@ -88,8 +110,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   }
 
+  for (const challenge of getPublishedChallenges()) {
+    entries.push({
+      url: `${BASE_URL}${getChallengePath(challenge)}`,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    })
+  }
+
+  for (const project of projects) {
+    entries.push({
+      url: `${BASE_URL}${getProjectPath(project)}`,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    })
+  }
+
   // --- Offline (on-campus) course detail pages /courses/[slug] ---
   for (const c of courses) {
+    if (!isCourseModeAvailable(c, 'On-Campus')) continue
     entries.push({
       url: `${BASE_URL}/courses/${c.slug}`,
       lastModified: now,
@@ -108,5 +147,3 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return entries
 }
-
-

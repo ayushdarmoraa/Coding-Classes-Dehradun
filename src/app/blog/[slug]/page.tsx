@@ -2,24 +2,26 @@
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { breadcrumbLd } from "@/lib/seo";
 import Image from "next/image";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import {
   getAllBlogPosts,
+  getRelatedCourseLinks,
   getPostBySlug,
   getPostHtmlBySlug,
+  extractMarkdownFaqs,
+  parseEditorialDate,
   relatedPosts,
 } from "@/lib/blog";
 import { nextPrevInSeries } from "@/lib/blog";
+import { SITE } from "@/lib/site-config";
 import Link from "next/link";
 
 // --- date helpers (safe in SSR & JSON-LD) ---
 const parseDate = (input?: string): Date | null => {
-  if (!input) return null;
-  const d = new Date(input);
-  return Number.isNaN(d.getTime()) ? null : d;
+  const date = parseEditorialDate(input);
+  return date ? new Date(`${date}T00:00:00.000Z`) : null;
 };
 const toISO = (d: Date | null): string | undefined => (d ? d.toISOString() : undefined);
 
@@ -32,16 +34,13 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const post = getPostBySlug(params.slug);
   if (!post || post.draft) return {};
 
-  // ✅ keep ONLY this base/url block
-  const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-  const base = rawBase.replace(/^http:\/\//, "https://");
+  const base = SITE.url;
   const url = `${base}/blog/${post.slug}`;
 
     // Fallback ensures every post gets a unique, click-friendly description
     const makeFallbackDescription = (title: string) => {
       const baseLine = `${title} — insights from Doon Coding Academy (Dehradun).`;
-      const extra = " Compare options, syllabus, fees, and outcomes. Updated 2025.";
-      const text = `${baseLine}${extra}`;
+      const text = baseLine;
       return text.length > 160 ? text.slice(0, 157) + "…" : text;
     };
 
@@ -67,7 +66,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
         description,
         url,
         type: "article",
-        siteName: "Doon Coding Academy",
+        siteName: SITE.name,
       },
       twitter: {
         card: "summary",
@@ -77,17 +76,6 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     };
 }
 
-// Heuristic: derive the best-matching course key for online/offline CTAs
-type CourseKey = "full-stack" | "data-science" | "python" | "java";
-function pickCourseKey(post: { title: string; description: string; keywords?: string[] }): CourseKey {
-  const hay = `${post.title} ${post.description} ${(post.keywords || []).join(" ")}`.toLowerCase();
-  if (/(data\s*science|machine\s*learning|ml|ai|pandas|numpy|statistics)/.test(hay)) return "data-science";
-  if (/(full[-\s]?stack|mern|react|node|express|mongodb|next\.?js)/.test(hay)) return "full-stack";
-  if (/(python|pythonic|cli|scripts)/.test(hay)) return "python";
-  if (/(java|spring|oop|collections)/.test(hay)) return "java";
-  return "full-stack";
-}
-
 export default async function BlogPostPage({ params, searchParams }: { params: { slug: string }; searchParams?: { preview?: string } }) {
   const post = await getPostHtmlBySlug(params.slug);
   if (!post) notFound();
@@ -95,15 +83,18 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
   if (post.draft && !preview) notFound();
 
 
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = SITE.url;
   const url = `${base}/blog/${post.slug}`;
   const publishedDate = parseDate(post.date);
   const updatedDate = parseDate(post.lastModified);
-  const showUpdated = !!(updatedDate && publishedDate && updatedDate.getTime() > publishedDate.getTime());
+  const editorialUpdateDate =
+    updatedDate && publishedDate && updatedDate.getTime() > publishedDate.getTime()
+      ? updatedDate
+      : null;
 
   const crumbs = [
     { label: "Home", href: "/" },
-    { label: "Blog", href: "/blog" },
+    { label: "Guides", href: "/blog" },
     { label: post.title, href: `/blog/${post.slug}` },
   ];
 
@@ -113,6 +104,7 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
   const prev = idx < all.length - 1 ? all[idx + 1] : undefined;
   const next = idx > 0 ? all[idx - 1] : undefined;
   const related = relatedPosts(post.slug, 3);
+  const relatedCourseLinks = getRelatedCourseLinks(post);
   const { prevInSeries, nextInSeries } = nextPrevInSeries(post.slug);
 
   // JSON-LD for BlogPosting
@@ -123,7 +115,7 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
   })();
   const authorNode = post.authorName
     ? { "@type": "Person", name: post.authorName, url: post.authorUrl || base }
-    : { "@type": "Organization", name: "Doon Coding Academy", url: base };
+    : { "@type": "Organization", name: SITE.name, url: base };
 
   const blogPostingJsonLd = {
     // Stable org id for cross-entity linking (matches layout.tsx @id)
@@ -137,7 +129,7 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
     headline: post.title,
     description: post.description,
     datePublished: toISO(publishedDate),
-    dateModified: toISO(updatedDate ?? publishedDate),
+    ...(editorialUpdateDate ? { dateModified: toISO(editorialUpdateDate) } : {}),
     author: authorNode,
     publisher: { "@id": `${base}/#organization` },
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
@@ -150,14 +142,15 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
   // Build resilient breadcrumb via shared helper (adds top-level name and nested item.name)
   const breadcrumbJsonLd = breadcrumbLd([
     { name: "Home", url: `${base}/` },
-    { name: "Blog", url: `${base}/blog` },
+    { name: "Guides", url: `${base}/blog` },
     { name: post.title || "Blog Post", url },
   ]);
-  const faqJsonLd = post.faqs && post.faqs.length > 0
+  const faqs = post.faqs?.length ? post.faqs : extractMarkdownFaqs(post.content);
+  const faqJsonLd = faqs.length > 0
     ? {
         "@context": "https://schema.org",
         "@type": "FAQPage",
-        mainEntity: post.faqs.map((f) => ({
+        mainEntity: faqs.map((f) => ({
           "@type": "Question",
           name: f.q,
           acceptedAnswer: { "@type": "Answer", text: f.a },
@@ -189,7 +182,7 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
     : null;
 
   return (
-    <div className="container mx-auto p-4">
+    <main className="container mx-auto p-4">
       <Breadcrumbs items={crumbs} />
       {post.draft ? (
         <p className="mb-3 text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-md px-2 py-1 inline-block">
@@ -218,9 +211,9 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
         ) : (
           <>Originally published — date unavailable</>
         )}
-        {showUpdated && updatedDate ? (
+        {editorialUpdateDate ? (
           <>
-            {" "}• <span className="font-medium">Updated on {updatedDate.toLocaleDateString("en-IN")}</span>
+            {" "}• <span className="font-medium">Updated on {editorialUpdateDate.toLocaleDateString("en-IN")}</span>
           </>
         ) : null}
         {" "}• {post.readingTime} min read •{" "}
@@ -312,39 +305,26 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
         )}
       </div>
 
-      {/* Conversion CTA: separate online/offline course links + FAQs */}
-  <section className="mt-10 rounded-2xl border border-blue-700/20 bg-blue-600/5 p-5 defer-visibility">
-        {(() => {
-          const key = pickCourseKey(post);
-          const utm = `utm_source=blog&utm_medium=cta&utm_campaign=blog_to_course&utm_content=${encodeURIComponent(post.slug)}`;
-          const onlineHref = `/online-courses/${key}?${utm}`;
-          const offlineHref = `/courses/${key}?${utm}`;
-          return (
-            <>
-              <h2 className="text-xl font-semibold mb-2">Ready to go deeper?</h2>
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href={onlineHref}
-                  className="inline-flex items-center rounded-xl bg-blue-700 px-4 py-2 text-white text-sm font-semibold shadow-sm hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-blue-700/30"
-                >
-                  View online course
-                </Link>
-                <Link
-                  href={offlineHref}
-                  className="inline-flex items-center rounded-xl border border-blue-700 px-4 py-2 text-blue-700 text-sm font-semibold hover:bg-blue-700/5 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
-                >
-                  View offline course
-                </Link>
-                <Link
-                  href="/faq"
-                  className="inline-flex items-center rounded-xl border border-blue-700 px-4 py-2 text-blue-700 text-sm font-semibold hover:bg-blue-700/5 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
-                >
-                  Read FAQs
-                </Link>
-              </div>
-            </>
-          );
-        })()}
+      {/* Course links are repeated here only when the guide already links to that course. */}
+      <section className="mt-10 rounded-2xl border border-blue-700/20 bg-blue-600/5 p-5 defer-visibility">
+        <h2 className="text-xl font-semibold mb-2">Continue learning</h2>
+        <div className="flex flex-wrap gap-3">
+          {relatedCourseLinks.map(({ href, mode, title }) => (
+            <Link
+              key={href}
+              href={href}
+              className="inline-flex items-center rounded-xl bg-blue-700 px-4 py-2 text-white text-sm font-semibold shadow-sm hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-blue-700/30"
+            >
+              Explore {mode === "Online" ? "online" : "on-campus"} course: {title}
+            </Link>
+          ))}
+          <Link
+            href="/faq"
+            className="inline-flex items-center rounded-xl border border-blue-700 px-4 py-2 text-blue-700 text-sm font-semibold hover:bg-blue-700/5 focus:outline-none focus:ring-2 focus:ring-blue-700/20"
+          >
+            Read FAQs
+          </Link>
+        </div>
       </section>
 
       {/* HowTo steps (render only when provided) */}
@@ -437,7 +417,7 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
       {/* Related */}
       {related.length > 0 && (
         <section className="mt-10 defer-visibility">
-          <h2 className="text-2xl font-semibold mb-3">Related posts</h2>
+          <h2 className="text-2xl font-semibold mb-3">Related guides</h2>
           <ul className="list-disc ml-6 space-y-1">
             {related.map((p) => (
               <li key={p.slug}>
@@ -451,36 +431,30 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
       )}
 
       {/* JSON-LD */}
-      <Script
+      <script
         id="blogposting-jsonld"
         type="application/ld+json"
-        strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd) }}
       />
-      <Script
+      <script
         id="breadcrumb-jsonld"
         type="application/ld+json"
-        strategy="afterInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {faqJsonLd ? (
-        <Script
+        <script
           id="faq-jsonld"
           type="application/ld+json"
-          strategy="afterInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       ) : null}
       {howToJsonLd ? (
-        <Script
+        <script
           id="howto-jsonld"
           type="application/ld+json"
-          strategy="afterInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
         />
       ) : null}
-    </div>
+    </main>
   );
 }
-
-

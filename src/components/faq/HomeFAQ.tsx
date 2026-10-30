@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import type { Course } from "@/lib/courses";
+import { formatCourseDuration, formatCourseModes, formatCoursePrice } from "@/lib/pricing";
+import { generateFAQPageSchema } from "@/lib/schema";
 
 function Chevron({ open }: { open: boolean }) {
   return (
@@ -18,127 +21,107 @@ function Chevron({ open }: { open: boolean }) {
   );
 }
 
-export default function HomeFAQ() {
+export default function HomeFAQ({ courses }: { courses: Course[] }) {
+  const deliveryOptions = courses.map((course) => ({
+    course,
+    text: `${course.shortTitle}: ${formatCourseModes(course)}`,
+  }));
+  const courseFees = courses.map((course) => ({
+    course,
+    text: `${course.shortTitle}: ${formatCoursePrice(course.pricing)}`,
+  }));
+  const courseDurations = courses.map((course) => ({
+    course,
+    text: `${course.shortTitle}: ${formatCourseDuration(course.duration)}`,
+  }));
   const faqs = [
     {
-      q: "Do you offer online coding classes across India?",
+      q: "What delivery options are available?",
       a: (
         <>
-          Yes. We run live online cohorts with recordings for{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/online-courses/full-stack"
-          >
-            Full-Stack
-          </Link>
-          ,{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/online-courses/data-science"
-          >
-            Data Science &amp; AI
-          </Link>
-          ,{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/online-courses/python"
-          >
-            Python
-          </Link>
-          , and{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/online-courses/java"
-          >
-            Java
-          </Link>
-          . Join from anywhere in India.
+          {deliveryOptions.map(({ course, text }, index) => (
+            <span key={course.id}>
+              {index > 0 ? "; " : ""}
+              {text}
+            </span>
+          ))}
         </>
       ),
+      schemaAnswer: deliveryOptions.map(({ text }) => text).join("; "),
     },
     {
       q: "Are classes live or recorded?",
       a: (
         <>
-          Sessions are live with mentors, and every class is recorded so you can revise in your own time. We also run
-          weekly doubt-clearing and project review slots.
+          Contact us to confirm the current class format for the course you are considering.
         </>
       ),
+      schemaAnswer: "Contact us to confirm the current class format for the course you are considering.",
     },
     {
       q: "Where is your Dehradun campus?",
       a: (
         <>
           We’re in Herbertpur (Dehradun district) (near DR School). Explore on-campus courses or online course options. See{" "}
-          <Link className="text-blue-600 underline underline-offset-2" href="/locations/dehradun">
+          <Link className="text-brand-dark underline underline-offset-2" href="/locations/dehradun">
             directions &amp; details
           </Link>
           .
         </>
       ),
+      schemaAnswer:
+        "We’re in Herbertpur (Dehradun district) (near DR School). Explore on-campus courses or online course options. See directions & details.",
     },
     {
       q: "What are the fees for each course?",
       a: (
         <>
-          Typical ranges: Full-Stack ₹25,000; Data Science ₹30,000; Python ₹12,000; Java ₹12,000. See each syllabus for
-          the latest pricing:{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/courses/full-stack"
-          >
-            Full-Stack (On-Campus)
-          </Link>
-          ,{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/courses/data-science"
-          >
-            Data Science (On-Campus)
-          </Link>
-          ,{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/courses/python"
-          >
-            Python (On-Campus)
-          </Link>
-          ,{" "}
-          <Link
-            className="inline-block rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-            href="/courses/java"
-          >
-            Java (On-Campus)
-          </Link>
-          .
+          {courseFees.map(({ course }, index) => (
+            <span key={course.id}>
+              {index > 0 ? "; " : ""}
+              <Link className="text-brand-dark underline" href={`/courses/${course.slug}`}>
+                {course.shortTitle}
+              </Link>
+              : {formatCoursePrice(course.pricing)}
+            </span>
+          ))}
         </>
       ),
+      schemaAnswer: courseFees.map(({ text }) => text).join("; "),
     },
     {
       q: "How long are the programs?",
       a: (
         <>
-          Full-Stack &amp; Data Science ~6 months; Python &amp; Java ~4 months. All tracks include hands-on projects and
-          assessments.
+          {courseDurations.map(({ course, text }, index) => (
+            <span key={course.id}>
+              {index > 0 ? "; " : ""}
+              {text}
+            </span>
+          ))}
         </>
       ),
+      schemaAnswer: courseDurations.map(({ text }) => text).join("; "),
     },
   ];
+  const faqSchema = generateFAQPageSchema(
+    faqs.map(({ q, schemaAnswer }) => ({ question: q, answer: schemaAnswer })),
+  );
 
   // one-open-at-a-time, first item open by default
   const [openIdx, setOpenIdx] = useState<number>(0);
 
   return (
-    <section className="mx-auto max-w-5xl px-4 py-12" aria-labelledby="home-faq-heading">
+    <section className="mx-auto max-w-5xl px-4 py-16 md:py-24" aria-labelledby="home-faq-heading">
       <div className="mx-auto mb-8 max-w-2xl text-center">
-        <h2 id="home-faq-heading" className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        <h2 id="home-faq-heading" className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
           Frequently Asked Questions
         </h2>
-        <p className="mt-3 text-base text-gray-600">
+        <p className="mt-3 text-base text-ink-2">
           Quick answers about on-campus and online cohorts. Still unsure?{" "}
           <Link
             href="/contact"
-            className="inline-block rounded-full bg-blue-600 px-3 py-1 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition"
+            className="inline-block rounded-full bg-brand px-3 py-1 text-sm font-medium text-white shadow-sm transition hover:bg-brand-dark"
           >
             Talk to us
           </Link>
@@ -149,16 +132,16 @@ export default function HomeFAQ() {
         {faqs.map((item, i) => {
           const isOpen = openIdx === i;
           return (
-            <li key={i} className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <li key={i} className="surface-card overflow-hidden">
               <button
                 type="button"
                 aria-expanded={isOpen}
                 aria-controls={`faq-panel-${i}`}
                 onClick={() => setOpenIdx(isOpen ? -1 : i)}
-                className="flex w-full items-center justify-between gap-4 rounded-2xl px-5 py-4 text-left"
+                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
               >
                 <span className="text-lg font-semibold leading-6">{item.q}</span>
-                <span className="text-gray-500">
+                <span className="text-ink-3">
                   <Chevron open={isOpen} />
                 </span>
               </button>
@@ -170,7 +153,7 @@ export default function HomeFAQ() {
                   isOpen ? "grid-rows-[1fr] py-0 pb-5" : "grid-rows-[0fr]"
                 }`}
               >
-                <div className="min-h-0 overflow-hidden text-gray-700">
+                <div className="min-h-0 overflow-hidden text-ink-2">
                   <div className="prose prose-sm max-w-none pt-0 leading-relaxed">
                     {item.a}
                   </div>
@@ -184,23 +167,28 @@ export default function HomeFAQ() {
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link
           href="/faq"
-          className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-gray-50"
+          className="rounded-full border border-brand bg-white px-4 py-2 text-sm font-medium text-brand-dark hover:bg-brand-soft"
         >
           View all FAQs
         </Link>
         <Link
           href="/online-courses"
-          className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+          className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-dark"
         >
           Explore online courses
         </Link>
         <Link
           href="/courses"
-          className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black"
+          className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#1d2b45]"
         >
           Explore on-campus courses
         </Link>
       </div>
+      <script
+        id="home-faq-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
     </section>
   );
 }

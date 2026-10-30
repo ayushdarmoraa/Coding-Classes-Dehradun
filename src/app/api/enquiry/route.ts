@@ -2,19 +2,12 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
-import fs from "fs";
-import path from "path";
+import {
+  enquiryHoneypotSchema,
+  enquirySchema,
+} from "@/lib/enquiry-schema";
 
-type EnquiryPayload = {
-  name: string;
-  email: string;
-  phone?: string;
-  course?: string;
-  message: string;
-  website?: string; // honeypot
-};
-
-// Simple in-memory IP rate limiter (process scoped; resets on deploy)
+// Process-scoped only: resets on restart/deploy and is not distributed protection.
 type Bucket = { count: number; first: number };
 const RATE_BUCKETS = new Map<string, Bucket>();
 const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
@@ -46,40 +39,49 @@ function rateLimit(ip: string) {
   return b.count > MAX_REQ;
 }
 
-function validate(payload: Partial<EnquiryPayload>) {
-  const errors: { field: keyof EnquiryPayload; message: string }[] = [];
-  const name = (payload.name || "").trim();
-  const email = (payload.email || "").trim();
-  const phone = (payload.phone || "").trim();
-  const course = (payload.course || "").trim();
-  const message = (payload.message || "").trim();
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => {
+    const entities: Record<string, string> = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return entities[character];
+  });
+}
 
-  if (!name) errors.push({ field: "name", message: "Name is required" });
-  else if (name.length < 2) errors.push({ field: "name", message: "Name must be at least 2 characters" });
+function getSafeErrorDetails(error: unknown): {
+  name: string;
+  code?: string;
+} {
+  if (!error || typeof error !== "object") return { name: "UnknownError" };
 
-  if (!email) errors.push({ field: "email", message: "Email is required" });
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push({ field: "email", message: "Invalid email format" });
+  const errorName =
+    "name" in error && typeof error.name === "string"
+      ? error.name.slice(0, 80)
+      : "UnknownError";
+  const errorCode =
+    "code" in error && typeof error.code === "string"
+      ? error.code.slice(0, 80)
+      : undefined;
 
-  if (phone && !/^\+?[\d\s-()]{10,}$/.test(phone)) errors.push({ field: "phone", message: "Invalid phone format" });
-
-  // course is optional; if provided, validate known options
-  if (course && !["full-stack", "data-science", "python", "java", "other"].includes(course)) {
-    errors.push({ field: "course", message: "Invalid course selection" });
-  }
-
-  if (!message) errors.push({ field: "message", message: "Message is required" });
-
-  return { valid: errors.length === 0, errors };
+  return { name: errorName, ...(errorCode ? { code: errorCode } : {}) };
 }
 
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as Partial<EnquiryPayload>;
+    const body: unknown = await req.json();
     const ip = getClientIp(req);
 
     // Honeypot check (treat as success to avoid tipping off bots)
-    if (body.website && String(body.website).trim().length > 0) {
-      return NextResponse.json({ success: true });
+    if (body && typeof body === "object" && !Array.isArray(body)) {
+      const website = (body as Record<string, unknown>).website;
+      const parsedHoneypot = enquiryHoneypotSchema.safeParse(website);
+      if (parsedHoneypot.success && parsedHoneypot.data.trim().length > 0) {
+        return NextResponse.json({ success: true });
+      }
     }
 
     // Rate limiting
@@ -91,43 +93,38 @@ export async function POST(req: Request) {
     }
 
     // Field validation
-    const { valid, errors } = validate(body);
-    if (!valid) {
+    const parsed = enquirySchema.safeParse(body);
+    if (!parsed.success) {
+      const errors = parsed.error.issues.map((issue) => ({
+        field: typeof issue.path[0] === "string" ? issue.path[0] : "form",
+        message: issue.message,
+      }));
       return NextResponse.json(
         { success: false, error: "Validation failed", errors },
         { status: 400 }
       );
     }
 
-    const { name, email, phone, course, message } = body as EnquiryPayload;
-
-    // Write enquiry to local JSON (backup)
-    const dataFile = path.join(process.cwd(), "data", "enquiries.json");
-    type StoredEnquiry = {
-      name: string;
-      email: string;
-      phone?: string;
-      course?: string;
-      message: string;
-      createdAt: string;
-    };
-    const existing: StoredEnquiry[] = fs.existsSync(dataFile)
-      ? (JSON.parse(fs.readFileSync(dataFile, "utf8")) as StoredEnquiry[])
-      : [];
-    existing.push({
+    const {
       name,
       email,
       phone,
       course,
       message,
-      createdAt: new Date().toISOString(),
-    });
-    // Ensure directory exists before writing
-    const dataDir = path.dirname(dataFile);
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true });
-    }
-    fs.writeFileSync(dataFile, JSON.stringify(existing, null, 2));
+      source,
+      challenge,
+      track,
+      relatedCourse,
+    } = parsed.data;
+    const contextLines =
+      source === "lab"
+        ? [
+            "Origin: DCA Lab",
+            `Challenge: ${challenge}`,
+            `Track: ${track}`,
+            `Related course: ${relatedCourse}`,
+          ]
+        : [];
 
     // Configure Nodemailer SMTP
     const transportOptions: SMTPTransport.Options = {
@@ -145,32 +142,37 @@ export async function POST(req: Request) {
     await transporter.sendMail({
       from: `"${process.env.SMTP_FROM_NAME || "Doon Coding Academy"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
       to: process.env.CONTACT_EMAIL || "dooncodingacademy@gmail.com",
-      subject: `New Enquiry from ${name}`,
+      subject: "New website enquiry",
       text: `
 Name: ${name}
 Email: ${email}
 Phone: ${phone || "N/A"}
 Course: ${course || "N/A"}
-Message: ${message}
+User message (untrusted, JSON-encoded): ${JSON.stringify(message)}
+
+Verified lead context:
+${contextLines.length ? contextLines.join("\n") : "None"}
       `,
       html: `
         <h2>New Enquiry</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone || "N/A"}</p>
-        <p><strong>Course:</strong> ${course || "N/A"}</p>
-        <p><strong>Message:</strong><br/>${message}</p>
+        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(phone || "N/A")}</p>
+        <p><strong>Course:</strong> ${escapeHtml(course || "N/A")}</p>
+        <p><strong>Message:</strong><br/>${escapeHtml(message).replace(/\r?\n/g, "<br/>")}</p>
+        ${contextLines.length ? `<p>${contextLines.map(escapeHtml).join("<br/>")}</p>` : ""}
       `,
     });
 
     return NextResponse.json({ success: true });
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : "Internal Server Error";
-    console.error("Enquiry error:", err);
+  } catch (error: unknown) {
+    console.error("Enquiry delivery failed", getSafeErrorDetails(error));
     return NextResponse.json(
-      { success: false, error: msg },
+      {
+        success: false,
+        error: "Unable to send enquiry. Please try again.",
+      },
       { status: 500 }
     );
   }
 }
-

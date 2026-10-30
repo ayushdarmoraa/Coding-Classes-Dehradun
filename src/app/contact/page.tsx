@@ -2,9 +2,13 @@ import type { Metadata } from "next";
 import EnquiryForm from "@/components/features/EnquiryForm";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import {
+  enquiryLeadContextSchema,
+  type EnquiryLeadContext,
+} from "@/lib/enquiry-schema";
+import { SITE } from "@/lib/site-config";
 
-const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
+const BASE = SITE.url;
 
 export const metadata: Metadata = {
   title: "Contact Us - Doon Coding Academy",
@@ -54,9 +58,30 @@ const contactInfo = [
   },
 ];
 
-export default function ContactPage() {
+type ContactPageProps = {
+  searchParams?: Record<string, string | string[] | undefined>;
+};
+
+function getSingleSearchParam(
+  value: string | string[] | undefined,
+): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
+export default function ContactPage({ searchParams = {} }: ContactPageProps) {
+  const parsedLeadContext = enquiryLeadContextSchema.safeParse({
+    source: getSingleSearchParam(searchParams.source),
+    challenge: getSingleSearchParam(searchParams.challenge),
+    track: getSingleSearchParam(searchParams.track),
+    relatedCourse: getSingleSearchParam(searchParams.relatedCourse),
+  });
+  const leadContext: EnquiryLeadContext | undefined =
+    parsedLeadContext.success && parsedLeadContext.data.source === "lab"
+      ? parsedLeadContext.data
+      : undefined;
+
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <main className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
@@ -167,7 +192,7 @@ export default function ContactPage() {
 
           {/* Contact Form */}
           <div className="lg:col-span-2">
-            <EnquiryForm />
+            <EnquiryForm leadContext={leadContext} />
           </div>
         </div>
 
@@ -200,7 +225,7 @@ export default function ContactPage() {
                   Can I pay in installments?
                 </h3>
                 <p className="text-gray-600 text-sm mb-4">
-                  Yes, we offer flexible payment options including monthly installments for all our courses.
+                  Course pricing includes monthly rates and package rates. Please refer to each course page for its current pricing.
                 </p>
                 
                 <h3 className="font-semibold text-gray-900 mb-2">
@@ -220,6 +245,6 @@ export default function ContactPage() {
           </Card>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

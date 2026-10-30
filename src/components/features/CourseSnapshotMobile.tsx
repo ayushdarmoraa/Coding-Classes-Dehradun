@@ -1,11 +1,12 @@
 "use client";
 
 export type Row = {
-  name: string;  // e.g., "Full-Stack (with Gen AI)"
-  mode: string;  // e.g., "On-Campus / Online"
-  duration: string; // e.g., "6 months"
-  fees: string;  // e.g., "₹25,000"
-  outcome?: string; // optional short outcome note
+  name: string;
+  level: string;
+  mode: string;
+  duration: string;
+  fees: string;
+  outcome?: string;
   ctaHref?: string;
 };
 
@@ -16,6 +17,7 @@ export default function CourseSnapshotMobile({ rows }: { rows: Row[] }) {
         <article key={r.name} className="rounded-2xl border p-4 shadow-sm">
           <h3 className="text-lg font-semibold">{r.name}</h3>
           <dl className="mt-2 grid grid-cols-2 gap-2 text-sm">
+            <dt className="text-gray-500">Course level</dt><dd>{r.level}</dd>
             <dt className="text-gray-500">Mode</dt><dd>{r.mode}</dd>
             <dt className="text-gray-500">Duration</dt><dd>{r.duration}</dd>
             <dt className="text-gray-500">Fees</dt><dd>{r.fees}</dd>

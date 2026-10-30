@@ -7,8 +7,8 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ children, className = '', hover = false }) => {
-  const baseClasses = 'bg-white rounded-xl shadow-md border border-gray-100';
-  const hoverClasses = hover ? 'hover:shadow-lg hover:-translate-y-1 transition-all duration-300' : '';
+  const baseClasses = 'surface-card';
+  const hoverClasses = hover ? 'transition-transform duration-300 hover:-translate-y-1' : '';
   
   return (
     <div className={`${baseClasses} ${hoverClasses} ${className}`}>
@@ -18,4 +18,3 @@ const Card: React.FC<CardProps> = ({ children, className = '', hover = false }) 
 };
 
 export default Card;
-

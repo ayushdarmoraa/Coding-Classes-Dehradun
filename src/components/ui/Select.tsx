@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 interface SelectOption {
   value: string;
@@ -20,25 +20,37 @@ const Select: React.FC<SelectProps> = ({
   options,
   placeholder = 'Select an option',
   className = '', 
+  id,
+  'aria-describedby': describedBy,
   ...props 
 }) => {
+  const generatedId = useId();
+  const selectId = id ?? generatedId;
+  const errorId = `${selectId}-error`;
   const selectClasses = `
-    w-full px-4 py-3 border rounded-lg text-gray-900 bg-white
-    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-    transition-all duration-200 cursor-pointer
-    ${error ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'}
+    w-full cursor-pointer rounded-xl border bg-white px-4 py-3 text-ink
+    focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent
+    transition-all duration-200
+    ${error ? 'border-error bg-red-50' : 'border-brand-soft hover:border-brand'}
     ${className}
   `;
 
   return (
     <div className="space-y-2">
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label htmlFor={selectId} className="block text-sm font-medium text-ink-2">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="ml-1 text-error">*</span>}
         </label>
       )}
-      <select className={selectClasses} {...props}>
+      <select
+        {...props}
+        id={selectId}
+        className={selectClasses}
+        required={required}
+        aria-invalid={error ? true : props['aria-invalid']}
+        aria-describedby={[describedBy, error ? errorId : undefined].filter(Boolean).join(' ') || undefined}
+      >
         <option value="">{placeholder}</option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -47,7 +59,7 @@ const Select: React.FC<SelectProps> = ({
         ))}
       </select>
       {error && (
-        <p className="text-sm text-red-600 flex items-center">
+        <p id={errorId} className="flex items-center text-sm text-error">
           <span className="mr-1">⚠</span>
           {error}
         </p>
@@ -57,4 +69,3 @@ const Select: React.FC<SelectProps> = ({
 };
 
 export default Select;
-

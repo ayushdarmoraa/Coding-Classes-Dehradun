@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
+import { getCourseBySlug } from "@/lib/courses";
+import { formatCourseDuration, formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
 
-const RAW = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const HTTPS = RAW.replace(/^http:\/\//, "https://");
-const APEX = HTTPS.replace(/^https:\/\/www\./, "https://");
-const CANON = `${APEX}/vs/coding-ninjas`;
+const CANON = `${SITE.url}/vs/coding-ninjas`;
 
 export const metadata: Metadata = {
   title: "Doon Coding Academy vs Coding Ninjas (2025)",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
       "Compare DCA and Coding Ninjas: format (live vs recorded), batch size, mentoring, projects, pricing approach, and who each option fits best.",
     url: CANON,
     type: "article",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
   },
   twitter: {
     card: "summary_large_image",
@@ -29,8 +29,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
+  const fullStack = getCourseBySlug("full-stack");
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
+    <main className="max-w-5xl mx-auto px-4 py-10">
       <header className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold">
           Doon Coding Academy vs Coding Ninjas (2025)
@@ -60,12 +61,12 @@ export default function Page() {
             <tbody className="[&>tr>td]:px-4 [&>tr>td]:py-3 divide-y divide-gray-100">
               <tr>
                 <td>Format</td>
-                <td>Live cohorts with recordings, mentor hours, project reviews.</td>
+                <td>See current course details for delivery information.</td>
                 <td>Varies by track; mixes live/recorded depending on program.</td>
               </tr>
               <tr>
                 <td>Focus</td>
-                <td>MERN + Gen AI, job-ready projects, small-group support.</td>
+                <td>MERN + Gen AI; review the canonical course curriculum and outcomes.</td>
                 <td>Broad catalog across tracks; depth varies by specialization.</td>
               </tr>
               <tr>
@@ -75,27 +76,27 @@ export default function Page() {
               </tr>
               <tr>
                 <td>Mentoring</td>
-                <td>Direct mentor hours, code reviews, interview prep.</td>
+                <td>Contact DCA for current learner-support details.</td>
                 <td>Mentor support available; cadence & ratio vary by course.</td>
               </tr>
               <tr>
                 <td>Projects</td>
-                <td>Hands-on portfolio projects with feedback.</td>
+                <td>See the course curriculum and listed outcomes.</td>
                 <td>Project work included; requirements vary by track.</td>
               </tr>
               <tr>
                 <td>Duration</td>
-                <td>Full-Stack: ~6 months (live + projects).</td>
+                <td>Full-Stack: {fullStack ? formatCourseDuration(fullStack.duration) : "See course details"}.</td>
                 <td>Program lengths vary; check specific track.</td>
               </tr>
               <tr>
                 <td>Pricing</td>
-                <td>Transparent, city-friendly; e.g., Full-Stack ₹25,000.</td>
+                <td>Full-Stack: {fullStack ? formatCoursePrice(fullStack.pricing) : "See course details"}.</td>
                 <td>Varies by track/plan; see official pricing pages.</td>
               </tr>
               <tr>
                 <td>Who it fits</td>
-                <td>Learners who want close guidance and a smaller cohort.</td>
+                <td>Learners comparing the course curriculum and current delivery details.</td>
                 <td>Learners who prefer a large national platform’s ecosystem.</td>
               </tr>
             </tbody>
@@ -112,11 +113,11 @@ export default function Page() {
         <h2 id="who-which" className="text-2xl font-semibold mb-3">Who should pick which?</h2>
         <div className="space-y-3 text-gray-800">
           <p>
-            Choose <strong>DCA</strong> if you want a small-batch, mentor-led{" "}
+            Choose <strong>DCA</strong> to review the current{" "}
             <Link href="/online-courses/full-stack" className="text-blue-700 hover:underline">
-              Online Full-Stack (Live + Projects)
+              Online Full-Stack course details
             </Link>{" "}
-            experience with recordings, weekly touchpoints, and focused placement prep.
+            and compare its curriculum and delivery information.
           </p>
           <p>
             Consider <strong>Coding Ninjas</strong> if you prefer a large catalog and a national
@@ -160,7 +161,7 @@ export default function Page() {
           event="cta_enroll_click"
           eventParams={{ page_type: "vs_page", course_slug: "full-stack", variant: "body_primary" }}
         >
-          Start Online Full-Stack (Live + Projects)
+          Explore Online Full-Stack Course
         </Button>
         <Button
           href="/blog/best-full-stack-course-dehradun-2025"
@@ -188,7 +189,7 @@ export default function Page() {
       <section aria-labelledby="vs-coding-ninjas-conclusion" className="mt-10 border-t pt-8">
         <h2 id="vs-coding-ninjas-conclusion" className="text-xl font-semibold mb-3">Conclusion</h2>
         <p className="text-gray-700">
-          For hands-on mentorship, smaller cohorts, and structured project reviews choose the {" "}
+          To review the course curriculum and current details, see the{" "}
           <Link href="/courses/full-stack" className="text-blue-700 hover:underline">Full-Stack Bootcamp (On-Campus)</Link>.
         </p>
         <p className="mt-2 text-sm text-gray-600">
@@ -220,7 +221,7 @@ export default function Page() {
                 "@type": "ListItem",
                 position: 1,
                 name: "Home",
-                item: APEX,
+                item: SITE.url,
               },
               {
                 "@type": "ListItem",
@@ -232,6 +233,6 @@ export default function Page() {
           }),
         }}
       />
-    </div>
+    </main>
   );
 }

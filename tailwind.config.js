@@ -6,58 +6,47 @@ const config = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-        },
-        accent: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
-        },
-        info: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-        }
+        bg: 'var(--bg)',
+        'bg-grid': 'var(--bg-grid)',
+        panel: 'var(--panel)',
+        ink: 'var(--ink)',
+        'ink-2': 'var(--ink-2)',
+        'ink-3': 'var(--ink-3)',
+        brand: 'var(--brand)',
+        'brand-dark': 'var(--brand-dark)',
+        'brand-soft': 'var(--brand-soft)',
+        success: 'var(--success)',
+        error: 'var(--error)',
+        whatsapp: 'var(--whatsapp)',
+        'tint-blue': 'var(--tint-blue)',
+        'tint-lavender': 'var(--tint-lavender)',
+        'tint-mint': 'var(--tint-mint)',
+        'tint-peach': 'var(--tint-peach)',
       },
       fontFamily: {
-        'sans': ['Inter', 'system-ui', 'sans-serif'],
-        'display': ['Poppins', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-figtree)', 'sans-serif'],
+        display: ['var(--font-outfit)', 'sans-serif'],
+        mono: ['var(--font-jetbrains-mono)', 'monospace'],
+      },
+      backgroundImage: {
+        'grad-text': 'var(--grad-text)',
+        'navy-grad': 'var(--navy-grad)',
+        'violet-grad': 'var(--violet-grad)',
+      },
+      borderRadius: {
+        'dca-sm': '12px',
+        'dca-md': '20px',
+        'dca-lg': '28px',
+      },
+      boxShadow: {
+        'soft-blue': 'var(--shadow-soft-blue)',
       },
       maxWidth: {
         '8xl': '88rem',
       },
-      animation: {
-        'fade-in-up': 'fadeInUp 0.6s ease-out',
-        'bounce-slow': 'bounce 2s infinite',
-      }
     },
   },
   plugins: [],
 };
 
 export default config;
-

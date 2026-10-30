@@ -1,40 +1,62 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/layout/Header";
+import HeaderClient from "@/components/layout/HeaderClient";
 import Footer from "@/components/layout/Footer";
 import Script from "next/script";
+import { getCourses } from "@/lib/courses";
+import { formatINR } from "@/lib/pricing";
+import { PUBLISHED_LAB_ANALYTICS_METADATA } from "@/lib/lab/analytics-metadata";
+import { Figtree, JetBrains_Mono, Outfit } from "next/font/google";
+import MotionProvider from "@/components/motion/MotionProvider";
+import FloatingWhatsApp from "@/components/layout/FloatingWhatsApp";
+import StickyCtaBar from "@/components/layout/StickyCtaBar";
+import RevealOnScroll from "@/components/motion/RevealOnScroll";
+import { SITE } from "@/lib/site-config";
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-outfit",
+});
+const figtree = Figtree({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-figtree",
+});
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-jetbrains-mono",
+});
+
+const PUBLISHED_LAB_PATHS = PUBLISHED_LAB_ANALYTICS_METADATA.map(
+  ({ track, slug }) => `/lab/${track}/${slug}`,
+);
 
 // Using system fonts for maximum performance
 
-// Site-wide metadata: force https + non-www canonical via metadataBase, standardize brand
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://dooncodingacademy.in").replace(/\/$/, "").replace(/^http:\/\//, "https://").replace(/^https:\/\/www\./, "https://");
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy";
-const SITE_DESC =
-  process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
-  "Leading coding institute in Dehradun – Full Stack with Gen AI, Data Science, Python, Java.";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
+  metadataBase: new URL(SITE.url),
   title: {
-    default: SITE_NAME,
-    template: `%s | ${SITE_NAME}`,
+    default: SITE.name,
+    template: `%s | ${SITE.name}`,
   },
-  description: SITE_DESC,
+  description: SITE.description,
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    url: SITE_URL,
-    siteName: SITE_NAME,
-    title: SITE_NAME,
-    description: SITE_DESC,
+    url: SITE.url,
+    siteName: SITE.name,
+    title: SITE.name,
+    description: SITE.description,
     type: "website",
     locale: "en_IN",
   },
   twitter: {
     card: "summary_large_image",
-    title: SITE_NAME,
-    description: SITE_DESC,
+    title: SITE.name,
+    description: SITE.description,
   },
   verification: process.env.NEXT_PUBLIC_GSC_VERIFICATION
     ? { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION }
@@ -43,14 +65,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      className={`${outfit.variable} ${figtree.variable} ${jetBrainsMono.variable}`}
+    >
       <head>
-        {/* Using system fonts - no external font preconnects needed */}
       </head>
-      <body>
-        <Header />
-        {children}
-        <Footer />
+      <body className="font-sans">
+        <MotionProvider>
+          <HeaderClient />
+          {children}
+          <Footer />
+          <FloatingWhatsApp />
+          <StickyCtaBar />
+          <RevealOnScroll />
+        </MotionProvider>
 
         {/* GA4 (gated by env var; no-op if env is missing) */}
         {process.env.NEXT_PUBLIC_GA_ID ? (
@@ -100,6 +129,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
                   function pageTypeFromPath(path) {
                     if (path === '/' || path === '') return 'home';
+                    var normalizedLabPath = path.replace(/\/+$/, '') || '/';
+                    if (normalizedLabPath === '/lab') return 'lab_index';
+                    if (publishedLabPaths.indexOf(normalizedLabPath) !== -1) return 'lab_challenge';
                     if (path.startsWith('/online-courses/')) return 'online_course';
                     if (path === '/online-courses') return 'online_course';
                     if (path.startsWith('/courses/')) return 'course';
@@ -110,6 +142,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     if (path.startsWith('/locations/')) return 'locations';
                     return 'home';
                   }
+
+                  var publishedLabPaths = ${JSON.stringify(PUBLISHED_LAB_PATHS)};
 
                   function courseSlugFromPath(path) {
                     // /courses/[slug] OR /online-courses/[slug]
@@ -165,6 +199,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       // Find closest anchor
                       var a = el && (el.closest ? el.closest('a') : null);
                       if (!a) return;
+                      if (a.getAttribute('data-event')) return;
 
                       var href = a.getAttribute('href') || '';
 
@@ -209,12 +244,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              "@id": `${SITE_URL.replace(/\/$/, "")}/#website`,
-              name: process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy",
-              url: SITE_URL,
+              "@id": `${SITE.url}/#website`,
+              name: SITE.name,
+              url: SITE.url,
               potentialAction: {
                 "@type": "SearchAction",
-                target: `${SITE_URL.replace(/\/$/, "")}/blog?q={search_term_string}`,
+                target: `${SITE.url}/blog?q={search_term_string}`,
                 "query-input": "required name=search_term_string",
               },
             }),
@@ -230,9 +265,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "EducationalOrganization",
-              "@id": `${SITE_URL.replace(/\/$/, "")}/#organization`,
-              name: process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy",
-              url: SITE_URL,
+              "@id": `${SITE.url}/#organization`,
+              name: SITE.name,
+              url: SITE.url,
               email: "dooncodingacademy@gmail.com",
               foundingDate: "2019-01-01",
               // Social profiles (env-gated, filtered for presence)
@@ -297,7 +332,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify((() => {
-              const base = SITE_URL.replace(/\/$/, "");
+              const base = SITE.url;
+              const coursePrices = getCourses().map((course) => course.pricing.packageRate);
               const sameAs = [
                 process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,
                 process.env.NEXT_PUBLIC_INSTAGRAM_URL || undefined,
@@ -323,7 +359,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 telephone: process.env.NEXT_PUBLIC_PHONE ? `+${process.env.NEXT_PUBLIC_PHONE.replace(/\D/g, '')}` : "+917037905464",
                 email: process.env.CONTACT_EMAIL || "dooncodingacademy@gmail.com",
                 hasMap: process.env.NEXT_PUBLIC_GBP_URL || "https://maps.app.goo.gl/Rj1U1jwERHwkfB8Y9",
-                priceRange: "₹2000–₹30000",
+                priceRange: `${formatINR(Math.min(...coursePrices))}–${formatINR(Math.max(...coursePrices))}`,
                 paymentAccepted: "Cash, UPI, Debit Card, Credit Card, Net Banking, Wallets (Paytm, PhonePe, GPay), EMI",
                 address: {
                   "@type": "PostalAddress",

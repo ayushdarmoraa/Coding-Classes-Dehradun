@@ -1,48 +1,119 @@
-import React from 'react';
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
-import { Course } from '@/lib/courses';
+import React from "react";
+import type { Course } from "@/lib/courses";
+import { formatCourseDuration, formatCourseModes, formatCoursePrice, formatINR } from "@/lib/pricing";
+import { getCourseExperienceContent } from "@/lib/course-experience-content";
+import { SITE } from "@/lib/site-config";
+import Button from "@/components/ui/Button";
+import CourseCardFlip from "@/components/features/CourseCardFlip";
 
 interface CourseCardProps {
   course: Course;
   featured?: boolean;
+  relatedChallengeHref?: string;
+  analyticsLocation?: string;
+  showProjectSummary?: boolean;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, featured = false }) => {
-  const cardClass = featured ? 'border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white' : '';
-  
+const COURSE_GLYPHS: Record<string, string> = {
+  "full-stack": "</>",
+  "data-science": "DS",
+  python: "PY",
+  java: "JV",
+};
+
+const CourseCard: React.FC<CourseCardProps> = ({
+  course,
+  featured = false,
+  relatedChallengeHref,
+  analyticsLocation,
+  showProjectSummary = false,
+}) => {
+  const iconGlyph = (course.slug ? COURSE_GLYPHS[course.slug] : undefined) ?? "</>";
+  const courseContent = getCourseExperienceContent(course);
+
   return (
-    <Card className={`p-6 flex flex-col justify-between ${cardClass}`} hover>
-      <div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">
-          {course.title}
-        </h3>
-        <span className="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded">
-          {course.duration}
-        </span>
-        <ul className="mt-3 text-sm text-gray-600 space-y-1">
-          {course.curriculum.slice(0, 3).map((item, index) => (
-            <li key={index} className="flex items-start">
-              <span className="text-green-500 mr-2">✓</span>
-              {item}
-            </li>
-          ))}
-        </ul>
+    <CourseCardFlip>
+      <div className={`cf ${featured ? "ring-2 ring-brand/40" : ""}`} data-accent={course.slug}>
+        <div className="cf-inner">
+          <div className="cf-face cf-front">
+            <div className="cf-top">
+              <span className="cf-icon" aria-hidden="true">{iconGlyph}</span>
+              <span className="cf-badge">{formatCourseDuration(course.duration)}</span>
+            </div>
+            <h3 className="cf-title">{course.title}</h3>
+            <p className="mt-3 line-clamp-3 text-sm leading-6 text-ink-2">{course.description}</p>
+            <p className="mt-2 text-xs leading-5 text-ink-2">
+              Explore the listed curriculum to see what the course covers.
+            </p>
+            {course.level && <span className="cf-badge">{course.level}</span>}
+            <div className="cf-stats">
+              <div>{formatCourseDuration(course.duration)}</div>
+              <div>{formatINR(course.pricing.packageRate)} pkg</div>
+              <div>
+                {course.pricing.monthlyRate !== undefined
+                  ? `${formatINR(course.pricing.monthlyRate)}/mo`
+                  : formatCourseModes(course)}
+              </div>
+            </div>
+          </div>
+
+          <div className="cf-face cf-back">
+            <div className="cf-dots" aria-hidden="true"><i /><i /><i /></div>
+            <p className="cf-price">
+              Fees: {formatCoursePrice(course.pricing)}
+            </p>
+            <p className="cf-delivery">
+              Delivery: {formatCourseModes(course)}
+            </p>
+            <p className="mt-3 text-sm font-semibold text-ink">Topics covered</p>
+            <ul className="cf-lines">
+              {course.curriculum.slice(0, 3).map((item, index) => (
+                <li key={index} className="cf-line">
+                  {item}
+                </li>
+              ))}
+            </ul>
+            {showProjectSummary && (
+              <p className="mt-3 text-sm leading-5 text-ink-2">
+                <span className="font-semibold text-ink">Practical work:</span>{" "}
+                {courseContent.projectSummary}
+              </p>
+            )}
+            <div className="cf-actions">
+              <Button
+                variant="ghost"
+                href={`/courses/${course.slug}`}
+                event={analyticsLocation ? "cta_home_course_details" : undefined}
+                eventParams={analyticsLocation ? { location: analyticsLocation, course_slug: course.slug } : undefined}
+                className="cf-btn"
+              >
+                View Course
+              </Button>
+              {relatedChallengeHref && (
+                <Button
+                  variant="ghost"
+                  href={relatedChallengeHref}
+                  event="cta_related_challenge"
+                  eventParams={{ course_slug: course.slug }}
+                  className="cf-btn cf-btn-ghost"
+                >
+                  Try Related Challenge
+                </Button>
+              )}
+              <a
+                href={`${SITE.whatsappUrl}?text=${encodeURIComponent(`Hi, I'm interested in the ${course.title} course`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cf-btn cf-btn-ghost"
+              >
+                WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="mt-4 flex space-x-2">
-        <Button href={`/courses/${course.slug}`} className="bg-blue-600 text-white hover:bg-blue-700">
-          View Details
-        </Button>
-        <Button
-          href={`https://wa.me/917037905464?text=Hi, I'm interested in the ${course.title} course`}
-          className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
-        >
-          WhatsApp
-        </Button>
-      </div>
-    </Card>
+    </CourseCardFlip>
   );
 };
 
 export default CourseCard;
-

@@ -6,8 +6,10 @@ const GBP_URL =
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
-import { getCourses } from "@/lib/courses";
+import { getCourses, isCourseModeAvailable } from "@/lib/courses";
 import { testimonials } from "@/lib/testimonials";
+import { formatCourseDuration, formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
 
 const SERVICE_AREAS = [
   "Herbertpur",
@@ -37,14 +39,14 @@ export const metadata: Metadata = {
   title: "Coding Classes in Dehradun | Doon Coding Academy",
   description:
     "Explore Full-Stack, Data Science, Python, and Java courses at Doon Coding Academy in Herbertpur, Dehradun.",
-  alternates: { canonical: "https://dooncodingacademy.in/locations/dehradun" },
+  alternates: { canonical: `${SITE.url}/locations/dehradun` },
   openGraph: {
     title: "Coding Classes in Dehradun | Doon Coding Academy",
     description:
       "Explore Full-Stack, Data Science, Python, and Java courses at Doon Coding Academy in Herbertpur, Dehradun.",
-    url: "https://dooncodingacademy.in/locations/dehradun",
+    url: `${SITE.url}/locations/dehradun`,
     type: "website",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
   },
   twitter: {
     card: "summary_large_image",
@@ -84,15 +86,18 @@ const nearbyAreas = [
 
 export default function DehradunLocationPage() {
   const crumbs = breadcrumbLd([
-    { name: "Home", url: "https://dooncodingacademy.in/" },
-    { name: "Dehradun", url: "https://dooncodingacademy.in/locations/dehradun" },
+    { name: "Home", url: `${SITE.url}/` },
+    { name: "Dehradun", url: `${SITE.url}/locations/dehradun` },
   ]);
   const courses = getCourses();
+  const onCampusCourses = courses.filter((course) =>
+    isCourseModeAvailable(course, "On-Campus")
+  );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-panel">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white py-16">
+      <section className="bg-navy-grad text-white py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
             <Badge variant="success" className="mb-4 bg-green-500 text-white">
@@ -316,9 +321,8 @@ export default function DehradunLocationPage() {
             <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Where You’ll Study</h3>
               <p className="text-gray-700">
-                Our campus environment stays focused and practical: short theory blocks, lots of hands-on coding,
-                and immediate feedback from instructors. You’ll build portfolio projects and practice interviews
-                so you’re ready for real roles in web development and data.
+                Our campus is in Herbertpur, near DR School. Review the course curriculum and contact us
+                for details about current class schedules and learner support.
               </p>
             </div>
 
@@ -348,26 +352,14 @@ export default function DehradunLocationPage() {
 
           <h3 className="text-2xl font-semibold text-gray-900 mb-3">Courses You Can Join On-Campus</h3>
           <p className="text-gray-700 mb-4">
-            Pick the track that fits your goals. All programs include practical projects and mentor support:
-            <Link href="/courses/full-stack" className="text-blue-700 hover:underline font-medium"> Full-Stack (MERN + Gen AI)</Link>,
-            <Link href="/courses/data-science" className="text-blue-700 hover:underline font-medium"> Data Science &amp; AI</Link>,
-            <Link href="/courses/python" className="text-blue-700 hover:underline font-medium"> Python</Link>, and
-            <Link href="/courses/java" className="text-blue-700 hover:underline font-medium"> Java</Link>.
+            Courses with confirmed on-campus delivery:
           </p>
           <ul className="grid md:grid-cols-2 gap-6 text-gray-700 mb-8">
-            <li className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-              <strong>Full-Stack (6 months)</strong> — Modern front-end + back-end with real deployments, teamwork, and
-              Gen-AI aids for productivity.
-            </li>
-            <li className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-              <strong>Data Science (6 months)</strong> — Python, data wrangling, visualization, and foundations for ML workflows.
-            </li>
-            <li className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-              <strong>Python (4 months)</strong> — Beginner-friendly path into programming and automation.
-            </li>
-            <li className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-              <strong>Java (4 months)</strong> — Strong OOP base used widely in enterprise development.
-            </li>
+            {onCampusCourses.map((course) => (
+              <li key={course.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                <strong>{course.shortTitle} ({formatCourseDuration(course.duration)})</strong> — {course.description}
+              </li>
+            ))}
           </ul>
 
           <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 mb-8">
@@ -388,7 +380,7 @@ export default function DehradunLocationPage() {
               href="/online-courses"
               className="inline-flex items-center justify-center rounded-lg px-6 py-3 text-base font-medium border-2 border-blue-600 text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              See Online Cohorts (Live + Projects)
+              View Online Course Details
             </Link>
           </div>
         </div>
@@ -407,7 +399,7 @@ export default function DehradunLocationPage() {
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">
-            {courses.slice(0, 4).map((course) => (
+            {onCampusCourses.map((course) => (
               <Card key={course.id} className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
                   {course.title}
@@ -417,8 +409,8 @@ export default function DehradunLocationPage() {
                 </p>
                 
                 <div className="flex items-center justify-between mb-4">
-                  <Badge variant="info">{course.duration}</Badge>
-                  <span className="font-semibold text-blue-600">{course.price}</span>
+                  <Badge variant="info">{formatCourseDuration(course.duration)}</Badge>
+                  <span className="font-semibold text-blue-600">{formatCoursePrice(course.pricing)}</span>
                 </div>
                 
                 <div className="flex gap-3">
@@ -541,6 +533,6 @@ export default function DehradunLocationPage() {
           }),
         }}
       />
-    </div>
+    </main>
   );
 }

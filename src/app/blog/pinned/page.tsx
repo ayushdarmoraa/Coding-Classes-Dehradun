@@ -4,13 +4,14 @@ import Script from "next/script";
 import { getAllBlogPosts, paginate } from "@/lib/blog";
 import PrevNextLinks from "@/components/seo/PrevNextLinks";
 import FeedLinks from "@/components/seo/FeedLinks";
+import { SITE } from "@/lib/site-config";
 
 export async function generateMetadata({
   searchParams,
 }: {
   searchParams?: { q?: string; page?: string };
 }): Promise<Metadata> {
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = SITE.url;
   const q = searchParams?.q?.trim();
   const page = Number(searchParams?.page || "1");
   const self = page > 1 ? `${base}/blog/pinned?page=${page}` : `${base}/blog/pinned`;
@@ -43,7 +44,7 @@ export default function PinnedPostsPage({
   }
 
   const { items, totalPages } = paginate(posts, page, 9);
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = SITE.url;
 
   const makeUrl = (n: number) => {
     const query = new URLSearchParams();

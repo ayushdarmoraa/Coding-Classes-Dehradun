@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { breadcrumbLd } from "@/lib/seo";
 import Button from "@/components/ui/Button";
+import { SITE } from "@/lib/site-config";
 
 // Bangalore service areas and local FAQ
 const SERVICE_AREAS_BANGALORE = [
@@ -37,15 +38,15 @@ export const metadata: Metadata = {
   description:
     "Learn coding from Bangalore with DCA’s live online cohorts—mentor-led sessions, projects, and placement support. Our physical campus is in Dehradun.",
   alternates: {
-    canonical: "https://dooncodingacademy.in/locations/bangalore",
+    canonical: `${SITE.url}/locations/bangalore`,
   },
   openGraph: {
     title: "Coding Classes in Bangalore (Online) – Doon Coding Academy",
     description:
       "Live online cohorts for learners in Bangalore. Mentor support, projects, and career guidance. Visit our Dehradun campus if you’re nearby.",
-    url: "https://dooncodingacademy.in/locations/bangalore",
+    url: `${SITE.url}/locations/bangalore`,
     type: "website",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
     images: [{ url: "/images/og-image.png", width: 1200, height: 630 }],
   },
   twitter: { card: "summary_large_image" },
@@ -53,12 +54,12 @@ export const metadata: Metadata = {
 
 export default function Page() {
   const crumbs = breadcrumbLd([
-    { name: "Home", url: "https://dooncodingacademy.in/" },
-    { name: "Bangalore", url: "https://dooncodingacademy.in/locations/bangalore" },
+    { name: "Home", url: `${SITE.url}/` },
+    { name: "Bangalore", url: `${SITE.url}/locations/bangalore` },
   ]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-panel">
       <script
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
@@ -66,8 +67,8 @@ export default function Page() {
       />
       <main className="max-w-6xl mx-auto px-4 py-10">
         {/* Hero */}
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold">
+        <header className="cd-hero mb-8 rounded-dca-lg p-6 sm:p-9">
+          <h1 className="mt-3 text-3xl font-bold text-ink sm:text-4xl">
             Coding Classes in Bangalore – Learn Online with Live Mentors
           </h1>
           <p className="mt-3 text-gray-700">
@@ -227,7 +228,7 @@ export default function Page() {
             </li>
             <li>
               <Link href="/courses/python" className="text-blue-700 hover:underline">
-                Python Course (beginner-friendly)
+                Python Course
               </Link>
             </li>
             <li>

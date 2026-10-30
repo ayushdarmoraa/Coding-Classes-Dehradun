@@ -1,37 +1,34 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
 import Card from "@/components/ui/Card";
+import LearningProgressionNote from "@/components/features/LearningProgressionNote";
 import { getCourseBySlug } from "@/lib/courses";
 import { getCourseJsonLd } from "@/lib/schema";
 import { breadcrumbLd } from "@/lib/seo";
+import { formatCourseDuration, formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
 
-// Build apex base URL: https + no trailing slash + drop www
-const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
-const APEX = BASE.replace(/^https:\/\/www\./, "https://");
-
-const PAGE_URL = `${APEX}/online-courses/java`;
+const PAGE_URL = `${SITE.url}/online-courses/java`;
 
 export const metadata: Metadata = {
-  title: "Online Java Course in India (Live + Projects)",
+  title: "Online Java Course in India",
   description:
-    "Explore the live online Java curriculum, duration, and program details.",
+    "Explore the online Java curriculum, duration, and fees.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
-    title: "Online Java Course in India (Live + Projects)",
+    title: "Online Java Course in India",
     description:
-      "Explore the live online Java curriculum, duration, and program details.",
+      "Explore the online Java curriculum, duration, and fees.",
     url: PAGE_URL,
     type: "website",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Online Java Course in India (Live + Projects)",
+    title: "Online Java Course in India",
     description:
-      "Explore the live online Java curriculum, duration, and program details.",
+      "Explore the online Java curriculum, duration, and fees.",
   },
 };
 
@@ -42,43 +39,51 @@ export default function JavaOnlinePage() {
     : undefined;
 
   return (
-    <div className="min-h-screen">
-      <section className="py-12 md:py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4">
+    <main className="min-h-screen">
+      <section className="bg-panel py-12 md:py-16">
+        <div className="cd-hero max-w-4xl mx-auto rounded-dca-lg px-6 py-8 sm:px-9">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-            Online Java Course in India <span className="text-blue-600">(Live + Projects)</span>
+            Online Java Course in India
           </h1>
           <p className="mt-4 text-lg text-gray-700">
-            Learn core Java, OOP, collections, JDBC, and hands-on project work in a live online cohort.
-            Every session includes recordings, mentor hours, and weekly feedback so you keep progressing. {" "}
+            Review the canonical Java course curriculum and details for the confirmed online offering.{" "}
             <Link href="/courses/java" className="underline text-blue-700">Prefer on-campus? See Java in Dehradun</Link>
           </p>
+          <p className="mt-2 text-sm text-gray-600">
+            Ask the team about upcoming batches, class timings, learning support, and
+            other current online arrangements.
+          </p>
+          <LearningProgressionNote className="mt-3 text-gray-600" />
 
-          <div className="mt-8 grid md:grid-cols-2 gap-6">
+          <div className="mt-8 grid gap-6 md:grid-cols-2">
             <Card className="p-6">
               <h2 className="text-xl font-semibold text-gray-900">At a glance</h2>
               <ul className="mt-3 space-y-2 text-gray-700 text-sm">
-                <li>✅ Mode: <strong>Online (Live)</strong> + recordings</li>
-                <li>✅ Duration: <strong>4 months</strong></li>
-                <li>✅ Fees: <strong>₹12,000</strong></li>
-                <li>✅ Support: mentor hours, project reviews, interview prep</li>
+                <li>✅ Mode: <strong>Online</strong></li>
+                {course && <li>✅ Level: <strong>{course.level}</strong></li>}
+                {course && <li>✅ Duration: <strong>{formatCourseDuration(course.duration)}</strong></li>}
+                {course && <li>✅ Fees: <strong>{formatCoursePrice(course.pricing)}</strong></li>}
+                {course?.curriculum.map((item) => <li key={item}>• {item}</li>)}
               </ul>
             </Card>
 
             <Card className="p-6">
               <h2 className="text-xl font-semibold text-gray-900">What you’ll learn</h2>
               <ul className="mt-3 space-y-2 text-gray-700 text-sm">
-                <li>• Java syntax, OOP, exceptions, generics</li>
-                <li>• Collections, streams, I/O</li>
-                <li>• JDBC & basic persistence concepts</li>
-                <li>• Build-and-run projects with modern tooling</li>
+                {course?.outcomes.map((item) => <li key={item}>• {item}</li>)}
+              </ul>
+            </Card>
+            <Card className="p-6">
+              <h2 className="text-xl font-semibold text-gray-900">Prerequisites</h2>
+              <ul className="mt-3 space-y-2 text-gray-700 text-sm">
+                {course?.prerequisites.map((item) => <li key={item}>• {item}</li>)}
               </ul>
             </Card>
           </div>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
             <Button href="/contact" size="lg" className="bg-blue-600 text-white hover:bg-blue-700">
-              Talk to a Mentor
+              Ask about this course
             </Button>
             <Button href="/courses/java" size="lg" variant="secondary">
               See On-Campus Java (Dehradun)
@@ -88,24 +93,24 @@ export default function JavaOnlinePage() {
       </section>
 
       {jsonLd && (
-        <Script
+        <script
           id="jsonld-course-java-online"
           type="application/ld+json"
-          strategy="afterInteractive"
+          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
 
-      <Script
+      <script
         id="breadcrumbs-online-courses-java"
         type="application/ld+json"
-        strategy="afterInteractive"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(
             breadcrumbLd([
-              { name: "Home", url: APEX },
-              { name: "Online Courses", url: `${APEX}/online-courses` },
-              { name: "Online Java Course in India (Live + Projects)", url: PAGE_URL },
+              { name: "Home", url: SITE.url },
+              { name: "Online Courses", url: `${SITE.url}/online-courses` },
+              { name: "Online Java Course in India", url: PAGE_URL },
             ])
           ),
         }}
@@ -113,6 +118,6 @@ export default function JavaOnlinePage() {
       <div className="mt-8 text-center pb-12">
         <Link href="/locations" className="underline text-blue-700 text-sm">See campus & cities</Link>
       </div>
-    </div>
+    </main>
   );
 }
