@@ -4,9 +4,9 @@ import { generateTestimonialSchema } from "@/lib/schema";
 import Script from "next/script";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { SITE } from "@/lib/site-config";
 
-const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
+const BASE = SITE.url;
 
 export const metadata: Metadata = {
   title: "Student Testimonials | Doon Coding Academy",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
       "Student testimonials are published after their authenticity and permission are verified.",
     url: BASE + "/testimonials",
     type: "article",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
   },
   twitter: {
     card: "summary",

@@ -5,6 +5,7 @@ import Script from "next/script";
 import { listHowToPosts, paginate } from "@/lib/blog";
 import PrevNextLinks from "@/components/seo/PrevNextLinks";
 import FeedLinks from "@/components/seo/FeedLinks";
+import { SITE } from "@/lib/site-config";
 
 // dynamic metadata handled via generateMetadata below
 
@@ -13,7 +14,7 @@ export async function generateMetadata({
 }: {
   searchParams?: { q?: string; page?: string };
 }): Promise<Metadata> {
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = SITE.url;
   const q = searchParams?.q?.trim();
   const page = Number(searchParams?.page || "1");
   const self = page > 1 ? `${base}/blog/how-to?page=${page}` : `${base}/blog/how-to`;
@@ -44,7 +45,7 @@ export default function HowToIndex({
   }
 
   const { items, totalPages } = paginate(posts, page, 9);
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = SITE.url;
 
   const makeUrl = (n: number) => {
     const query = new URLSearchParams();

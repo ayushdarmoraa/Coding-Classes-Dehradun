@@ -3,6 +3,7 @@ import Link from "next/link";
 import FeedLinks from "@/components/seo/FeedLinks";
 import Script from "next/script";
 import { getSeriesPosts, listSeries } from "@/lib/blog";
+import { SITE } from "@/lib/site-config";
 
 type Params = { series: string };
 
@@ -12,7 +13,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const series = decodeURIComponent(params.series);
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = SITE.url;
   const url = `${base}/blog/series/${encodeURIComponent(series)}`;
   return {
     title: `${series} (Series) | Doon Coding Academy`,
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default function SeriesPage({ params }: { params: Params }) {
   const series = decodeURIComponent(params.series);
   const posts = getSeriesPosts(series);
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = SITE.url;
 
   const itemListSchema = {
     "@context": "https://schema.org",

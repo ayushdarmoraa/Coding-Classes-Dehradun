@@ -1,4 +1,5 @@
 import { getAllBlogPosts } from "@/lib/blog";
+import { SITE } from "@/lib/site-config";
 
 /** Type we actually need for the feed (keeps TS strict & no `any`) */
 type Postish = {
@@ -10,13 +11,6 @@ type Postish = {
   keywords?: string[];
   lastModified?: string | null;
 };
-
-/** Normalize a base URL: no trailing slash, force https */
-function normalizeBase(input?: string) {
-  const raw = (input || "http://localhost:3000").replace(/\/$/, "");
-  return raw.replace(/^http:\/\//, "https://");
-}
-const SITE = normalizeBase(process.env.NEXT_PUBLIC_SITE_URL);
 
 /** Escape text nodes for RSS XML */
 function escText(s: unknown): string {
@@ -60,10 +54,10 @@ export async function GET() {
       return bt - at;
     });
 
-  const channelTitle = "Doon Coding Academy — Blog";
-  const channelLink = `${SITE}/blog`;
+  const channelTitle = `${SITE.name} — Blog`;
+  const channelLink = `${SITE.url}/blog`;
   const channelDesc =
-    "Guides on Full-Stack (MERN + Gen AI), Data Science, Python, and Java from Doon Coding Academy, Dehradun.";
+    `Guides on Full-Stack (MERN + Gen AI), Data Science, Python, and Java from ${SITE.name}, Dehradun.`;
 
   const newest = posts[0];
   const lastBuildDate = newest
@@ -72,12 +66,12 @@ export async function GET() {
 
   const itemsXml = posts
     .map((p) => {
-      const link = `${SITE}/blog/${p.slug}`;
+      const link = `${SITE.url}/blog/${p.slug}`;
       const title = escText(p.title);
       const pubDate = toRFC822(p.date);
       const description =
         p.description ||
-        `${p.title} — insights from Doon Coding Academy (Dehradun). Compare options, syllabus, fees, and outcomes.`;
+        `${p.title} — insights from ${SITE.name} (Dehradun). Compare options, syllabus, fees, and outcomes.`;
       const categories = Array.isArray(p.keywords) ? p.keywords : [];
 
       return `
@@ -100,8 +94,8 @@ export async function GET() {
     <description>${escText(channelDesc)}</description>
     <language>en-IN</language>
     <lastBuildDate>${lastBuildDate}</lastBuildDate>
-    <generator>Doon Coding Academy RSS</generator>
-    <atom:link href="${escAttr(`${SITE}/blog/rss`)}" rel="self" type="application/rss+xml" />
+    <generator>${escText(`${SITE.name} RSS`)}</generator>
+    <atom:link href="${escAttr(`${SITE.url}/blog/rss`)}" rel="self" type="application/rss+xml" />
     ${itemsXml}
   </channel>
 </rss>`;

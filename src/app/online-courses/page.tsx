@@ -16,7 +16,7 @@ export const metadata: Metadata = {
       "Explore coding courses with currently confirmed online delivery from Doon Coding Academy.",
     url: `${SITE.url}/online-courses`,
     type: "website",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
   },
   twitter: {
     card: "summary_large_image",
@@ -92,8 +92,8 @@ export default function OnlineCoursesPage() {
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Home", item: "https://dooncodingacademy.in" },
-              { "@type": "ListItem", position: 2, name: "Online Coding Courses in India", item: "https://dooncodingacademy.in/online-courses" }
+              { "@type": "ListItem", position: 1, name: "Home", item: SITE.url },
+              { "@type": "ListItem", position: 2, name: "Online Coding Courses in India", item: `${SITE.url}/online-courses` }
             ]
           })
         }}

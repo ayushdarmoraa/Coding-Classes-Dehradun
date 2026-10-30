@@ -1,21 +1,22 @@
 import Link from "next/link";
 import { breadcrumbLd } from "@/lib/seo";
 import LocationTabs, { type LocationTile } from "@/components/features/LocationTabs";
+import { SITE } from "@/lib/site-config";
 
 export const metadata = {
   title: "Locations – Learn Online or Visit Dehradun | Doon Coding Academy (DCA)",
   description:
     "Choose your path with Doon Coding Academy (DCA): visit our Dehradun campus for on-campus classes or join our live online cohorts from cities like Noida and Bangalore.",
   alternates: {
-    canonical: "https://dooncodingacademy.in/locations",
+    canonical: `${SITE.url}/locations`,
   },
   openGraph: {
     title: "Locations – Learn Online or Visit Dehradun | Doon Coding Academy (DCA)",
     description:
       "Explore Doon Coding Academy (DCA) locations and online cohorts. On-campus in Dehradun, live online from anywhere in India including Noida and Bangalore.",
-    url: "https://dooncodingacademy.in/locations",
+    url: `${SITE.url}/locations`,
     type: "website",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
     images: [{ url: "/images/og-image.png", width: 1200, height: 630 }],
   },
   twitter: { card: "summary_large_image" },
@@ -23,8 +24,8 @@ export const metadata = {
 
 export default function LocationsIndexPage() {
   const crumbs = breadcrumbLd([
-    { name: "Home", url: "https://dooncodingacademy.in/" },
-    { name: "Locations", url: "https://dooncodingacademy.in/locations" },
+    { name: "Home", url: `${SITE.url}/` },
+    { name: "Locations", url: `${SITE.url}/locations` },
   ]);
 
   const tiles: LocationTile[] = [

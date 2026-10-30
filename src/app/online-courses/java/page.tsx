@@ -22,7 +22,7 @@ export const metadata: Metadata = {
       "Explore the online Java curriculum, duration, and fees.",
     url: PAGE_URL,
     type: "website",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
   },
   twitter: {
     card: "summary_large_image",

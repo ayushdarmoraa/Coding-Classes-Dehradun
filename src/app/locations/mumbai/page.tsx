@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { breadcrumbLd } from "@/lib/seo";
 import Button from "@/components/ui/Button";
+import { SITE } from "@/lib/site-config";
 
 // Mumbai service areas and local FAQ
 const SERVICE_AREAS_MUMBAI = [
@@ -38,15 +39,15 @@ export const metadata: Metadata = {
   description:
     "Learn coding from Mumbai with DCA’s live online cohorts—mentor-led sessions, hands-on projects, and placement support. Our physical campus is in Dehradun.",
   alternates: {
-    canonical: "https://dooncodingacademy.in/locations/mumbai",
+    canonical: `${SITE.url}/locations/mumbai`,
   },
   openGraph: {
     title: "Coding Classes in Mumbai (Online) – Doon Coding Academy",
     description:
       "Live online cohorts for learners in Mumbai. Mentor support, projects, and career guidance. Visit our Dehradun campus if you’re nearby.",
-    url: "https://dooncodingacademy.in/locations/mumbai",
+    url: `${SITE.url}/locations/mumbai`,
     type: "website",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
     images: [{ url: "/images/og-image.png", width: 1200, height: 630 }],
   },
   twitter: { card: "summary_large_image" },
@@ -54,8 +55,8 @@ export const metadata: Metadata = {
 
 export default function Page() {
   const crumbs = breadcrumbLd([
-    { name: "Home", url: "https://dooncodingacademy.in/" },
-    { name: "Mumbai", url: "https://dooncodingacademy.in/locations/mumbai" },
+    { name: "Home", url: `${SITE.url}/` },
+    { name: "Mumbai", url: `${SITE.url}/locations/mumbai` },
   ]);
 
   return (

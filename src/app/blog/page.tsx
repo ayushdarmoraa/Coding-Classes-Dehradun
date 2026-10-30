@@ -46,7 +46,7 @@ export async function generateMetadata({
       description: "Beginner-friendly, practical, and useful resources to help you learn clearly.",
       url: BASE + "/blog",
       type: "website",
-      siteName: "Doon Coding Academy"
+      siteName: SITE.name
     },
     twitter: {
       card: "summary",

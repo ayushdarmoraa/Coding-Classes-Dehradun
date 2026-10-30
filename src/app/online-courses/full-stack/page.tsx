@@ -23,7 +23,7 @@ export const metadata: Metadata = {
       "Explore the online Full-Stack curriculum, duration, and fees.",
     url: CANON,
     type: "website",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
   },
   twitter: {
     card: "summary_large_image",

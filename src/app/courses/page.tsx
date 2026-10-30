@@ -37,7 +37,7 @@ export const metadata: Metadata = {
       "Browse Full-Stack, Data Science, Python, and Java courses in Dehradun. See curriculum, duration, and fees.",
     url: `${SITE.url}/courses`,
     type: "website",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
   },
   twitter: {
     card: "summary",

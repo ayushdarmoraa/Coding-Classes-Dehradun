@@ -1,7 +1,5 @@
 import { getAllBlogPosts } from "@/lib/blog";
-
-const rawBase = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const SITE = rawBase.replace(/^http:\/\//, "https://");
+import { SITE } from "@/lib/site-config";
 
 // ---- helpers ----
 const safeStr = (v: unknown) => (typeof v === "string" ? v : v == null ? "" : String(v));
@@ -26,19 +24,19 @@ export async function GET() {
         +new Date(a.lastModified ?? a.date ?? 0)
     );
 
-  const feedId = `${SITE}/blog/atom`;
-  const feedSelf = `${SITE}/blog/atom`;
-  const feedHome = `${SITE}/blog`;
-  const feedTitle = "Doon Coding Academy Blog";
+  const feedId = `${SITE.url}/blog/atom`;
+  const feedSelf = `${SITE.url}/blog/atom`;
+  const feedHome = `${SITE.url}/blog`;
+  const feedTitle = `${SITE.name} Blog`;
   const feedUpdated = toISO(posts[0]?.lastModified ?? posts[0]?.date);
 
 const entries = posts.map((p) => {
-  const link = `${SITE}/blog/${p.slug}`;
+  const link = `${SITE.url}/blog/${p.slug}`;
   const title = escText(p.title);
   const updated = toISO(p.lastModified ?? p.date);
   const summary = escText(
     p.description ||
-      `${String(p.title)} — insights from Doon Coding Academy (Dehradun). Compare options, syllabus, fees, and outcomes.`
+      `${String(p.title)} — insights from ${SITE.name} (Dehradun). Compare options, syllabus, fees, and outcomes.`
   );
 
   return `

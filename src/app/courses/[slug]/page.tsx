@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           "Review the MERN, React, Node.js, and Gen AI topics in the Full-Stack Development curriculum.",
         url,
         type: "article",
-        siteName: "Doon Coding Academy",
+        siteName: SITE.name,
       },
       twitter: {
         card: "summary",
@@ -70,7 +70,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           "Review the Data Science & AI curriculum and course details.",
         url,
         type: "article",
-        siteName: "Doon Coding Academy",
+        siteName: SITE.name,
       },
       twitter: {
         card: "summary",
@@ -93,7 +93,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           "Review the Python Programming curriculum and course details.",
         url,
         type: "article",
-        siteName: "Doon Coding Academy",
+        siteName: SITE.name,
       },
       twitter: {
         card: "summary",
