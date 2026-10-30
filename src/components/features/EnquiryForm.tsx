@@ -6,6 +6,10 @@ import Textarea from '@/components/ui/Textarea';
 import Select from '@/components/ui/Select';
 import Card from '@/components/ui/Card';
 import { derivePageContext, trackLeadClick, trackForm } from '@/lib/analytics';
+import {
+  enquirySchema,
+  type EnquiryLeadContext,
+} from '@/lib/enquiry-schema';
 
 interface FormData {
   name: string;
@@ -20,6 +24,55 @@ interface FormErrors {
   [key: string]: string;
 }
 
+type EnquiryStatusProps = {
+  message: string;
+  statusRef: React.MutableRefObject<HTMLDivElement | null>;
+};
+
+export function EnquirySuccessNotice({
+  message,
+  statusRef,
+}: EnquiryStatusProps) {
+  return (
+    <div
+      ref={statusRef}
+      tabIndex={-1}
+      className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="flex items-center">
+        <span className="text-green-500 text-xl mr-3" aria-hidden="true">
+          ✓
+        </span>
+        <p className="text-green-800">{message}</p>
+      </div>
+    </div>
+  );
+}
+
+export function EnquiryErrorNotice({
+  message,
+  statusRef,
+}: EnquiryStatusProps) {
+  return (
+    <div
+      ref={statusRef}
+      tabIndex={-1}
+      className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
+      role="alert"
+      aria-live="assertive"
+    >
+      <div className="flex items-center">
+        <span className="text-red-500 text-xl mr-3" aria-hidden="true">
+          ⚠
+        </span>
+        <p className="text-red-800">{message}</p>
+      </div>
+    </div>
+  );
+}
+
 const courseOptions = [
   { value: 'full-stack', label: 'Full-Stack Development (MERN + Gen AI)' },
   { value: 'data-science', label: 'Data Science & AI' },
@@ -28,7 +81,22 @@ const courseOptions = [
   { value: 'other', label: 'Other / General Inquiry' }
 ];
 
-const EnquiryForm: React.FC = () => {
+const fieldNames = new Set([
+  'name',
+  'email',
+  'phone',
+  'course',
+  'message',
+  'website',
+  'source',
+  'challenge',
+  'track',
+  'relatedCourse',
+]);
+
+const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
+  leadContext,
+}) => {
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -76,28 +144,21 @@ const EnquiryForm: React.FC = () => {
 
   const validateForm = (): FormErrors => {
     const newErrors: FormErrors = {};
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters';
+
+    const parsed = enquirySchema.safeParse({ ...formData, ...leadContext });
+    if (!parsed.success) {
+      for (const issue of parsed.error.issues) {
+        const field = issue.path[0];
+        if (
+          typeof field === 'string' &&
+          fieldNames.has(field) &&
+          !newErrors[field]
+        ) {
+          newErrors[field] = issue.message;
+        }
+      }
     }
-    
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-    // Phone is optional; if provided, validate format
-    if (formData.phone.trim() && !/^\+?[\d\s-()]{10,}$/.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number';
-    }
-    // Course is optional for API; keep free-form/select but no required error
-    // Message is required to align with API
-    if (!formData.message.trim()) {
-      newErrors.message = 'Message is required';
-    }
-    
+
     setErrors(newErrors);
     return newErrors;
   };
@@ -133,7 +194,7 @@ const EnquiryForm: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, ...leadContext }),
       });
       
       const result = await response.json();
@@ -153,7 +214,8 @@ const EnquiryForm: React.FC = () => {
           email: '',
           phone: '',
           course: '',
-          message: ''
+          message: '',
+          website: '',
         });
       } else {
         setSubmitStatus('error');
@@ -225,34 +287,11 @@ const EnquiryForm: React.FC = () => {
       </div>
 
       {submitStatus === 'success' && (
-        <div ref={statusRef} tabIndex={-1} className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg" role="status" aria-live="polite">
-          <div className="flex items-center mb-2">
-            <span className="text-green-500 text-xl mr-3">✓</span>
-            <p className="text-green-800">{submitMessage}</p>
-          </div>
-          {/* Google Review CTA */}
-          <div className="mt-2">
-            <a
-              href="https://g.page/r/CQkQwQwQwQwQEAI/review" // Replace with actual GBP review link
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition"
-              aria-label="Leave a Google review for Doon Coding Academy (opens in a new tab)"
-            >
-              ⭐ Leave a Google Review
-            </a>
-            <span className="sr-only">Opens in a new tab</span>
-          </div>
-        </div>
+        <EnquirySuccessNotice message={submitMessage} statusRef={statusRef} />
       )}
 
       {submitStatus === 'error' && (
-        <div ref={statusRef} tabIndex={-1} className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg" role="alert" aria-live="assertive">
-          <div className="flex items-center">
-            <span className="text-red-500 text-xl mr-3">⚠</span>
-            <p className="text-red-800">{submitMessage}</p>
-          </div>
-        </div>
+        <EnquiryErrorNotice message={submitMessage} statusRef={statusRef} />
       )}
 
       <form
@@ -276,6 +315,7 @@ const EnquiryForm: React.FC = () => {
             onChange={handleChange}
             error={errors.name}
             required
+            maxLength={100}
             placeholder="Enter your full name"
           />
           
@@ -288,6 +328,7 @@ const EnquiryForm: React.FC = () => {
             onChange={handleChange}
             error={errors.email}
             required
+            maxLength={254}
             placeholder="your.email@example.com"
             aria-describedby="email-help"
           />
@@ -305,6 +346,7 @@ const EnquiryForm: React.FC = () => {
             value={formData.phone}
             onChange={handleChange}
             error={errors.phone}
+            maxLength={30}
             placeholder="+91 9876543210"
           />
           
@@ -329,6 +371,7 @@ const EnquiryForm: React.FC = () => {
           placeholder="Tell us about your background, goals, or any questions you have..."
           rows={4}
           required
+          maxLength={2000}
           error={errors.message}
         />
 

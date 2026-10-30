@@ -55,7 +55,7 @@ export default function CompletionPanel({
         <LabTrackedLink
           event="contact"
           context={analyticsContext}
-          href="/contact"
+          href="/contact?source=lab&challenge=discount-calculation-bug&track=javascript&relatedCourse=full-stack"
           className="pill border border-brand-soft bg-white/70 px-5 py-3 font-semibold text-ink hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         >
           Talk to Mentor
