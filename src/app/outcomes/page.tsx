@@ -7,9 +7,9 @@ import {
 } from "@/lib/outcomes";
 import { SITE } from "@/lib/site-config";
 
-const title = "Learner Outcomes and Measurement Methodology";
+const title = "Learner Stories";
 const description =
-  "Explore verified learner outcomes from Doon Coding Academy with cohort definitions, measurement methods, source checks, permissions, and limitations.";
+  "Read verified learner feedback shared with publication permission by Doon Coding Academy students.";
 
 export function generateMetadata(): Metadata {
   if (!hasPublishedOutcomeContent()) {

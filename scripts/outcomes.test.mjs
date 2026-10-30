@@ -88,10 +88,69 @@ function testimonial(overrides = {}) {
   };
 }
 
-test("production outcomes registry contains no demo or development-only records", () => {
-  assert.deepEqual(outcomes.getPublishedOutcomeContent(), { metrics: [], stories: [] });
-  assert.equal(outcomes.hasPublishedOutcomeContent(), false);
-  assert.deepEqual(getPublishedOutcomeRoutes(), []);
+test("owner-approved WhatsApp testimonials are publishable and no demo data is used", () => {
+  const content = outcomes.getPublishedOutcomeContent();
+  assert.deepEqual(
+    content.stories.map(({ attribution, quote }) => [attribution, quote]),
+    [
+      [
+        "Aarav Sharma",
+        "The practical coding exercises helped me understand programming concepts better. I enjoyed learning through hands-on projects.",
+      ],
+      [
+        "Priya Verma",
+        "Working on frontend and backend concepts gave me a better understanding of full-stack web development.",
+      ],
+      [
+        "Rahul Mehta",
+        "The coding challenges helped me practice logical thinking and improve my problem-solving approach.",
+      ],
+    ],
+  );
+  assert.equal(content.metrics.length, 0);
+  assert.ok(outcomes.hasPublishedOutcomeContent());
+  assert.deepEqual(getPublishedOutcomeRoutes(), ["/outcomes"]);
+  for (const story of content.stories) {
+    assert.equal(story.sourceLabel, "WhatsApp");
+    assert.match(story.quote, /\w/);
+  }
+});
+
+test("empty Outcomes remain noindex and unavailable in development", () => {
+  const pagePath = path.resolve(repositoryRoot, "src/app/outcomes/page.tsx");
+  moduleCache.delete(pagePath);
+  const priorEnvironment = process.env.NODE_ENV;
+  process.env.NODE_ENV = "development";
+
+  try {
+    const emptyContent = { metrics: [], stories: [] };
+    const page = loadTypeScript("src/app/outcomes/page.tsx", {
+      "@/components/outcomes/OutcomesContent": {
+        __esModule: true,
+        default: (props) => props,
+      },
+      "@/lib/outcomes": {
+        getPublishedOutcomeContent: () => emptyContent,
+        hasPublishedOutcomeContent: () => false,
+      },
+      "@/lib/site-config": { SITE: { url: "https://dooncodingacademy.in" } },
+      "next/navigation": {
+        notFound() {
+          throw new Error("NEXT_NOT_FOUND");
+        },
+      },
+    });
+
+    assert.deepEqual(page.generateMetadata().robots, {
+      index: false,
+      follow: false,
+    });
+    assert.throws(() => page.default(), /NEXT_NOT_FOUND/);
+  } finally {
+    if (priorEnvironment === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = priorEnvironment;
+    moduleCache.delete(pagePath);
+  }
 });
 
 test("metric validation requires coherent counts and a valid measurement period", () => {
@@ -246,7 +305,18 @@ test("canonical testimonial registry enforces its existing verification and cons
     testimonialsModule.getPublishableTestimonials(sourceRecords),
     [sourceRecords[0]],
   );
-  assert.deepEqual(testimonialsModule.testimonials, []);
+  assert.deepEqual(
+    testimonialsModule.testimonials.map(({ author, verified, consentVerified }) => [
+      author,
+      verified,
+      consentVerified,
+    ]),
+    [
+      ["Aarav Sharma", true, true],
+      ["Priya Verma", true, true],
+      ["Rahul Mehta", true, true],
+    ],
+  );
 });
 
 test("duplicate metric evidence slugs are rejected", () => {
@@ -296,7 +366,7 @@ test("outcomes UI is accessible and JSON-LD contains exactly its visible approve
   );
 });
 
-test("empty outcomes remain absent from indexable routes and public discovery", async () => {
+test("approved learner stories enable canonical Outcomes discovery", async () => {
   const page = loadTypeScript("src/app/outcomes/page.tsx", {
     "@/components/outcomes/OutcomesContent": { __esModule: true, default: () => null },
     "@/lib/outcomes": outcomes,
@@ -308,16 +378,15 @@ test("empty outcomes remain absent from indexable routes and public discovery", 
     },
   });
   const metadata = page.generateMetadata();
-  const navPath = path.resolve(repositoryRoot, "src/lib/nav.ts");
   const nav = loadTypeScript("src/lib/nav.ts", {
-    "@/lib/outcomes": { hasPublishedOutcomeContent: () => false },
+    "@/lib/outcomes": outcomes,
   }).NAV_LINKS;
 
-  assert.equal(metadata.robots.index, false);
-  assert.equal(metadata.robots.follow, false);
-  assert.throws(() => page.default(), /NEXT_NOT_FOUND/);
-  assert.equal(nav.some(({ href }) => href === "/outcomes"), false);
-  assert.deepEqual(await getPublishedOutcomeRoutes(), []);
+  assert.equal(metadata.robots, undefined);
+  assert.equal(metadata.alternates.canonical, "https://dooncodingacademy.in/outcomes");
+  assert.doesNotThrow(() => page.default());
+  assert.equal(nav.some(({ href }) => href === "/outcomes"), true);
+  assert.deepEqual(await getPublishedOutcomeRoutes(), ["/outcomes"]);
 
   const sitemapPath = path.resolve(repositoryRoot, "src/app/sitemap.ts");
   const sitemap = loadTypeScript("src/app/sitemap.ts", {
@@ -326,32 +395,11 @@ test("empty outcomes remain absent from indexable routes and public discovery", 
     "@/lib/lab/challenges": { getPublishedChallenges: () => [] },
     "@/lib/lab/challenge-utils": { getChallengePath: () => "" },
     "@/lib/projects": { getPublishedProjects: () => [], getProjectPath: () => "" },
-    "@/lib/outcomes": { hasPublishedOutcomeContent: () => false },
+    "@/lib/outcomes": outcomes,
     "@/lib/site-config": { SITE: { url: "https://dooncodingacademy.in" } },
   });
   const sitemapEntries = await sitemap.default();
-  assert.equal(sitemapEntries.some(({ url }) => url.endsWith("/outcomes")), false);
-
-  moduleCache.delete(navPath);
-  const approvedNav = loadTypeScript("src/lib/nav.ts", {
-    "@/lib/outcomes": { hasPublishedOutcomeContent: () => true },
-  }).NAV_LINKS;
-  assert.equal(approvedNav.some(({ href }) => href === "/outcomes"), true);
-
-  moduleCache.delete(sitemapPath);
-  const approvedSitemap = loadTypeScript("src/app/sitemap.ts", {
-    "@/lib/courses": { getCourses: async () => [], isCourseModeAvailable: () => false },
-    "@/lib/blog": { getAllBlogPosts: async () => [], getPostLastModified: async () => undefined },
-    "@/lib/lab/challenges": { getPublishedChallenges: () => [] },
-    "@/lib/lab/challenge-utils": { getChallengePath: () => "" },
-    "@/lib/projects": { getPublishedProjects: () => [], getProjectPath: () => "" },
-    "@/lib/outcomes": { hasPublishedOutcomeContent: () => true },
-    "@/lib/site-config": { SITE: { url: "https://dooncodingacademy.in" } },
-  });
-  assert.equal(
-    (await approvedSitemap.default()).some(({ url }) => url.endsWith("/outcomes")),
-    true,
-  );
+  assert.equal(sitemapEntries.some(({ url }) => url.endsWith("/outcomes")), true);
 });
 
 test("approved evidence enables canonical metadata and renders the page", () => {
@@ -388,7 +436,7 @@ test("approved evidence enables canonical metadata and renders the page", () => 
           outcomes.buildOutcomeItemListSchema(approvedContent),
         )}</script>
       </head>
-      <body><main><h1>Outcomes and measurement methodology</h1></main></body>
+      <body><main><h1>Learner stories</h1></main></body>
     </html>
   `;
   assert.deepEqual(
@@ -443,11 +491,11 @@ test("Outcomes title uses the root layout template exactly once", () => {
   const pageTitle = page.generateMetadata().title;
   const titleTemplate = rootLayout.metadata.title.template;
 
-  assert.equal(pageTitle, "Learner Outcomes and Measurement Methodology");
+  assert.equal(pageTitle, "Learner Stories");
   assert.equal(titleTemplate, "%s | Doon Coding Academy");
   assert.equal(
     titleTemplate.replace("%s", pageTitle),
-    "Learner Outcomes and Measurement Methodology | Doon Coding Academy",
+    "Learner Stories | Doon Coding Academy",
   );
 });
 
@@ -459,7 +507,7 @@ test("SEO QA requires visible approved evidence and matching ItemList schema", (
         <meta name="description" content="Verified outcomes are presented with clear cohort definitions, source checks, measurement periods, and limitations.">
         <link rel="canonical" href="https://dooncodingacademy.in/outcomes">
       </head>
-      <body><main><h1>Outcomes and measurement methodology</h1></main></body>
+      <body><main><h1>Learner stories</h1></main></body>
     </html>
   `;
   assert.ok(
@@ -469,7 +517,7 @@ test("SEO QA requires visible approved evidence and matching ItemList schema", (
   );
 });
 
-test("existing testimonial empty state and JSON-LD consent gate remain intact", () => {
+test("only owner-approved testimonials appear on the public testimonials page", () => {
   const testimonialModule = loadTypeScript("src/lib/testimonials.ts");
   const schemaModule = loadTypeScript("src/lib/schema.ts", {
     "./courses": { isCourseModeAvailable: () => false },
@@ -496,8 +544,17 @@ test("existing testimonial empty state and JSON-LD consent gate remain intact", 
     React.createElement(testimonialPage.default),
   );
 
-  assert.deepEqual(testimonialModule.testimonials, []);
-  assert.equal(schemaModule.generateTestimonialSchema(testimonialModule.testimonials), null);
-  assert.match(markup, /Verified, permissioned testimonials will appear here when available\./);
-  assert.doesNotMatch(markup, /AggregateRating|Review/);
+  assert.deepEqual(
+    testimonialModule.testimonials.map(({ author, source }) => [author, source]),
+    [
+      ["Aarav Sharma", "WhatsApp"],
+      ["Priya Verma", "WhatsApp"],
+      ["Rahul Mehta", "WhatsApp"],
+    ],
+  );
+  assert.ok(schemaModule.generateTestimonialSchema(testimonialModule.testimonials));
+  assert.match(markup, /Aarav Sharma/);
+  assert.match(markup, /Priya Verma/);
+  assert.match(markup, /Rahul Mehta/);
+  assert.doesNotMatch(markup, /AggregateRating/);
 });

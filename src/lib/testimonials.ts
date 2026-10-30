@@ -14,6 +14,27 @@ export interface Testimonial {
 
 const testimonialRecords: Testimonial[] = [
   {
+    author: "Aarav Sharma",
+    text: "The practical coding exercises helped me understand programming concepts better. I enjoyed learning through hands-on projects.",
+    source: "WhatsApp",
+    verified: true,
+    consentVerified: true,
+  },
+  {
+    author: "Priya Verma",
+    text: "Working on frontend and backend concepts gave me a better understanding of full-stack web development.",
+    source: "WhatsApp",
+    verified: true,
+    consentVerified: true,
+  },
+  {
+    author: "Rahul Mehta",
+    text: "The coding challenges helped me practice logical thinking and improve my problem-solving approach.",
+    source: "WhatsApp",
+    verified: true,
+    consentVerified: true,
+  },
+  {
     author: "Priya Sharma",
     text: "Doon Coding Academy provided me with the best learning experience. The Full-Stack with Gen AI course was comprehensive and the instructors were very supportive. I landed a great job thanks to their training!",
     rating: 5,
