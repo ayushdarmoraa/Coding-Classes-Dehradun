@@ -34,6 +34,19 @@ test("validates canonical, main heading, and nested Course JSON-LD in rendered H
   assert.deepEqual(analyzeRenderedPage(html, "/courses/full-stack"), []);
 });
 
+test("contact canonical remains the clean path for standard and Lab-attributed URLs", () => {
+  const html = page("/contact", [], "<main><h1>Contact</h1></main>");
+
+  assert.deepEqual(analyzeRenderedPage(html, "/contact"), []);
+  assert.deepEqual(
+    analyzeRenderedPage(
+      html,
+      "/contact?source=lab&challenge=discount-calculation-bug&track=javascript&relatedCourse=full-stack",
+    ),
+    [],
+  );
+});
+
 test("validates Lab index metadata, canonical and unique H1 without Course schema", () => {
   const html = page("/lab", [], "<main><h1>DCA Lab</h1><p>Published challenges</p></main>");
   assert.deepEqual(analyzeRenderedPage(html, "/lab"), []);
@@ -352,6 +365,7 @@ test("discovers and deduplicates all affected page routes", async () => {
 
   for (const route of [
     "/",
+    "/contact",
     "/courses",
     "/blog",
     "/online-courses",

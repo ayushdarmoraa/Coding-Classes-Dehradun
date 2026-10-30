@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -11,19 +12,19 @@ import ts from "typescript";
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const require = createRequire(import.meta.url);
 let sendMail = async () => ({ messageId: "test-message" });
-let writtenEnquiries = [];
 let mailOptions = [];
+const analyticsEvents = [];
+let requestNumber = 0;
+const historicalEnquiriesPath = path.join(
+  repositoryRoot,
+  "data",
+  "enquiries.json",
+);
+const historicalEnquiriesHash = createHash("sha256")
+  .update(readFileSync(historicalEnquiriesPath))
+  .digest("hex");
 
-const fsMock = {
-  existsSync: () => false,
-  mkdirSync: () => {},
-  readFileSync: () => JSON.stringify(writtenEnquiries),
-  writeFileSync: (_filename, contents) => {
-    writtenEnquiries = JSON.parse(contents);
-  },
-};
-
-const nativeRequire = (specifier) => {
+function nativeRequire(specifier, parentFilename) {
   if (specifier === "next/server") {
     return {
       NextResponse: {
@@ -47,10 +48,22 @@ const nativeRequire = (specifier) => {
       },
     };
   }
-  if (specifier === "fs") return { __esModule: true, default: fsMock };
-  if (specifier === "path") return { __esModule: true, default: path };
+  if (specifier.startsWith("@/")) {
+    const relativePath = specifier.slice(2).replaceAll("/", path.sep);
+    return loadTypeScript(`src/${relativePath}.ts`);
+  }
+  if (specifier.startsWith(".")) {
+    const resolved = path.resolve(path.dirname(parentFilename), specifier);
+    const typescriptPath = resolved.endsWith(".ts")
+      ? resolved
+      : `${resolved}.ts`;
+    if (existsSync(typescriptPath)) {
+      return loadTypeScript(path.relative(repositoryRoot, typescriptPath));
+    }
+    return require(resolved);
+  }
   return require(specifier);
-};
+}
 
 function loadTypeScript(relativePath) {
   const filename = path.resolve(repositoryRoot, relativePath);
@@ -63,8 +76,9 @@ function loadTypeScript(relativePath) {
     },
   }).outputText;
   const loadedModule = { exports: {} };
+  const moduleRequire = (specifier) => nativeRequire(specifier, filename);
   new Function("require", "module", "exports", compiled)(
-    nativeRequire,
+    moduleRequire,
     loadedModule,
     loadedModule.exports,
   );
@@ -72,6 +86,10 @@ function loadTypeScript(relativePath) {
 }
 
 const { POST } = loadTypeScript("src/app/api/enquiry/route.ts");
+const {
+  enquiryLeadContextSchema,
+  enquirySchema,
+} = loadTypeScript("src/lib/enquiry-schema.ts");
 const components = new Map();
 
 function loadComponent(relativePath) {
@@ -93,8 +111,11 @@ function loadComponent(relativePath) {
       return {
         derivePageContext: () => ({ page_type: "contact", course_slug: undefined }),
         trackLeadClick: () => {},
-        trackForm: () => {},
+        trackForm: (step, params) => analyticsEvents.push({ step, params }),
       };
+    }
+    if (specifier === "@/lib/enquiry-schema") {
+      return { enquirySchema };
     }
     if (specifier.startsWith("@/components/ui/")) {
       return loadComponent(
@@ -117,66 +138,139 @@ function loadComponent(relativePath) {
 
 test.beforeEach(() => {
   sendMail = async () => ({ messageId: "test-message" });
-  writtenEnquiries = [];
   mailOptions = [];
+  analyticsEvents.length = 0;
 });
 
-test("enquiry API persists and sends a valid enquiry through the configured handler", async () => {
-  const response = await POST(
-    new Request("http://localhost/api/enquiry", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        name: "Test Learner",
-        email: "learner@example.test",
-        phone: "",
-        course: "python",
-        message: "Please share course details.",
-      }),
+function validPayload(overrides = {}) {
+  return {
+    name: "Test Learner",
+    email: "learner@example.test",
+    phone: "",
+    course: "python",
+    message: "Please share course details.",
+    ...overrides,
+  };
+}
+
+function requestFor(payload, ip) {
+  requestNumber += 1;
+  return new Request("http://localhost/api/enquiry", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-forwarded-for": ip ?? `198.51.100.${requestNumber}`,
+    },
+    body: JSON.stringify(payload),
+  });
+}
+
+function currentHistoricalEnquiriesHash() {
+  return createHash("sha256")
+    .update(readFileSync(historicalEnquiriesPath))
+    .digest("hex");
+}
+
+test("shared enquiry schema accepts documented field limits and rejects oversized values", () => {
+  const maximumEmail =
+    `${"a".repeat(64)}@${"b".repeat(63)}.${"c".repeat(63)}.${"d".repeat(61)}`;
+  const accepted = enquirySchema.safeParse(
+    validPayload({
+      name: "N".repeat(100),
+      email: maximumEmail,
+      phone: `+${"1".repeat(29)}`,
+      message: "m".repeat(2000),
     }),
+  );
+  assert.equal(accepted.success, true);
+
+  for (const payload of [
+    validPayload({ name: "n".repeat(101) }),
+    validPayload({ email: `${"a".repeat(250)}@x.com` }),
+    validPayload({ phone: `+${"1".repeat(30)}` }),
+    validPayload({ message: "m".repeat(2001) }),
+  ]) {
+    assert.equal(enquirySchema.safeParse(payload).success, false);
+  }
+});
+
+test("shared schema preserves course values and allowlists complete Lab lead context", () => {
+  for (const course of ["", "full-stack", "data-science", "python", "java", "other"]) {
+    assert.equal(enquirySchema.safeParse(validPayload({ course })).success, true);
+  }
+  assert.equal(
+    enquirySchema.safeParse(
+      validPayload({
+        source: "lab",
+        challenge: "discount-calculation-bug",
+        track: "javascript",
+        relatedCourse: "full-stack",
+      }),
+    ).success,
+    true,
+  );
+  assert.equal(
+    enquiryLeadContextSchema.safeParse({
+      source: "lab",
+      challenge: "unknown-challenge",
+      track: "javascript",
+      relatedCourse: "full-stack",
+    }).success,
+    false,
+  );
+  assert.equal(
+    enquirySchema.safeParse({
+      ...validPayload(),
+      learnerCode: "return secret;",
+    }).success,
+    false,
+  );
+});
+
+test("enquiry API sends a valid enquiry through SMTP without persisting it locally", async () => {
+  const response = await POST(
+    requestFor(validPayload()),
   );
 
   assert.equal(response.status, 200);
   assert.equal(response.body.success, true);
-  assert.equal(writtenEnquiries.length, 1);
-  assert.equal(writtenEnquiries[0].email, "learner@example.test");
   assert.equal(mailOptions.length, 1);
   assert.equal(mailOptions[0].to, process.env.CONTACT_EMAIL || "dooncodingacademy@gmail.com");
+  assert.equal(mailOptions[0].subject, "New website enquiry");
+  assert.equal("replyTo" in mailOptions[0], false);
+  assert.equal(currentHistoricalEnquiriesHash(), historicalEnquiriesHash);
 });
 
-test("enquiry API reports SMTP failure instead of returning success", async () => {
+test("enquiry API returns a generic error and redacted diagnostics when SMTP fails", async () => {
   sendMail = async () => {
-    throw new Error("test SMTP failure");
+    const error = new Error("SMTP private detail Test Learner learner@example.test");
+    error.code = "ETIMEDOUT";
+    throw error;
   };
-  const response = await POST(
-    new Request("http://localhost/api/enquiry", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        name: "Test Learner",
-        email: "learner@example.test",
-        message: "Please share course details.",
-      }),
-    }),
-  );
+  const diagnostics = [];
+  const originalConsoleError = console.error;
+  console.error = (...args) => diagnostics.push(args);
+  let response;
+  try {
+    response = await POST(requestFor(validPayload()));
+  } finally {
+    console.error = originalConsoleError;
+  }
 
   assert.equal(response.status, 500);
   assert.equal(response.body.success, false);
-  assert.equal(writtenEnquiries.length, 1);
+  assert.equal(response.body.error, "Unable to send enquiry. Please try again.");
+  assert.doesNotMatch(JSON.stringify(response.body), /SMTP private detail|learner@example\.test/);
+  assert.match(JSON.stringify(diagnostics), /ETIMEDOUT/);
+  assert.doesNotMatch(JSON.stringify(diagnostics), /SMTP private detail|Test Learner|learner@example\.test/);
 });
 
-test("enquiry API rejects invalid fields without sending an email", async () => {
-  const response = await POST(
-    new Request("http://localhost/api/enquiry", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        name: "A",
-        email: "invalid",
-        message: "",
-      }),
-    }),
-  );
+test("enquiry API rejects invalid and oversized fields with compatible field errors", async () => {
+  const response = await POST(requestFor({
+    name: "A",
+    email: "invalid",
+    message: "",
+  }));
 
   assert.equal(response.status, 400);
   assert.equal(response.body.success, false);
@@ -185,6 +279,178 @@ test("enquiry API rejects invalid fields without sending an email", async () => 
     ["name", "email", "message"],
   );
   assert.equal(mailOptions.length, 0);
+
+  const tooLongResponse = await POST(
+    requestFor(validPayload({ message: "m".repeat(2001) })),
+  );
+  assert.equal(tooLongResponse.status, 400);
+  assert.ok(
+    tooLongResponse.body.errors.some(({ field }) => field === "message"),
+  );
+  assert.equal(mailOptions.length, 0);
+});
+
+test("enquiry API safely escapes HTML email content and rejects header injection", async () => {
+  const response = await POST(
+    requestFor(
+      validPayload({
+        name: `<img src="x">`,
+        message: `<script>alert("x")</script>\n&`,
+      }),
+    ),
+  );
+  assert.equal(response.status, 200);
+  assert.match(mailOptions[0].html, /&lt;img src=&quot;x&quot;&gt;/);
+  assert.match(
+    mailOptions[0].html,
+    /&lt;script&gt;alert\(&quot;x&quot;\)&lt;\/script&gt;<br\/>&amp;/,
+  );
+  assert.doesNotMatch(mailOptions[0].html, /<script>|<img/);
+  assert.doesNotMatch(mailOptions[0].subject, /Test Learner|<img/);
+
+  const injectionResponse = await POST(
+    requestFor(validPayload({ name: "Learner\r\nBcc: attacker@example.test" })),
+  );
+  assert.equal(injectionResponse.status, 400);
+  assert.equal(mailOptions.length, 1);
+});
+
+test("enquiry honeypot responds successfully without sending email", async () => {
+  const response = await POST(requestFor({ website: "bot-filled" }));
+  assert.equal(response.status, 200);
+  assert.deepEqual(response.body, { success: true });
+  assert.equal(mailOptions.length, 0);
+});
+
+test("enquiry API preserves HTTP 429 behavior after five requests in one process window", async () => {
+  let response;
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    response = await POST(
+      requestFor(
+        validPayload(),
+        "203.0.113.42",
+      ),
+    );
+  }
+  assert.equal(response.status, 429);
+  assert.equal(response.body.success, false);
+  assert.equal(mailOptions.length, 5);
+});
+
+test("enquiry API includes only approved Lab context in the staff email", async () => {
+  const response = await POST(
+    requestFor(
+      validPayload({
+        source: "lab",
+        challenge: "discount-calculation-bug",
+        track: "javascript",
+        relatedCourse: "full-stack",
+      }),
+    ),
+  );
+  assert.equal(response.status, 200);
+  assert.match(mailOptions[0].text, /Origin: DCA Lab/);
+  assert.match(mailOptions[0].text, /Challenge: discount-calculation-bug/);
+  assert.match(mailOptions[0].text, /Track: javascript/);
+  assert.match(mailOptions[0].text, /Related course: full-stack/);
+  assert.doesNotMatch(mailOptions[0].html, /learnerCode|student code|assessment answer/i);
+});
+
+test("plain-text email delimits multiline user messages from verified Lab context", async () => {
+  const forgedMessage =
+    "Please help.\nOrigin: DCA Lab\nChallenge: discount-calculation-bug\nTrack: javascript\nRelated course: full-stack";
+  const response = await POST(
+    requestFor(validPayload({ message: forgedMessage })),
+  );
+
+  assert.equal(response.status, 200);
+  assert.ok(mailOptions[0].text.includes(
+    `User message (untrusted, JSON-encoded): ${JSON.stringify(forgedMessage)}`,
+  ));
+  assert.match(mailOptions[0].text, /Verified lead context:\r?\nNone/);
+  assert.doesNotMatch(mailOptions[0].text, /Origin: DCA Lab\r?\nChallenge:/);
+});
+
+test("form analytics retains event context and filters PII and staff-only data", () => {
+  const { trackForm } = loadTypeScript("src/lib/analytics.ts");
+  const events = [];
+  const previousWindow = globalThis.window;
+  globalThis.window = {
+    gtag: (...args) => events.push(args),
+  };
+  try {
+    trackForm("submit", {
+      page_type: "contact",
+      course_slug: "(none)",
+      city: "(unknown)",
+      page_path: "/contact",
+      has_message: true,
+      name: "Test Learner",
+      email: "learner@example.test",
+      phone: "+91 9876543210",
+      message: "private message",
+      learnerCode: "return private;",
+      source: "lab",
+      challenge: "discount-calculation-bug",
+      relatedCourse: "full-stack",
+      field_errors: ["email", "private free text"],
+    });
+  } finally {
+    if (previousWindow === undefined) {
+      delete globalThis.window;
+    } else {
+      globalThis.window = previousWindow;
+    }
+  }
+
+  assert.equal(events[0][0], "event");
+  assert.equal(events[0][1], "lead_form_submit");
+  assert.deepEqual(events[0][2], {
+    page_type: "contact",
+    course_slug: "(none)",
+    city: "(unknown)",
+    page_path: "/contact",
+    has_message: true,
+    field_errors: ["email"],
+  });
+  assert.doesNotMatch(JSON.stringify(events), /Test Learner|learner@example\.test|private message|return private|discount-calculation-bug/);
+});
+
+test("enquiry form preserves accessible feedback and removes the placeholder review CTA", () => {
+  const EnquiryFormModule = loadComponent(
+    "src/components/features/EnquiryForm.tsx",
+  );
+  const EnquiryForm = EnquiryFormModule.default;
+  const markup = renderToStaticMarkup(
+    React.createElement(EnquiryForm, {}),
+  );
+  assert.match(markup, /<form[^>]*aria-busy="false"/);
+  assert.match(markup, /maxLength="100"/);
+  assert.match(markup, /maxLength="254"/);
+  assert.match(markup, /maxLength="30"/);
+  assert.match(markup, /maxLength="2000"/);
+  assert.doesNotMatch(markup, /g\.page\/r\/|Leave a Google Review/);
+  const successMarkup = renderToStaticMarkup(
+    React.createElement(EnquiryFormModule.EnquirySuccessNotice, {
+      message: "Thanks, we received your enquiry.",
+      statusRef: { current: null },
+    }),
+  );
+  const errorMarkup = renderToStaticMarkup(
+    React.createElement(EnquiryFormModule.EnquiryErrorNotice, {
+      message: "Unable to send enquiry. Please try again.",
+      statusRef: { current: null },
+    }),
+  );
+  assert.match(successMarkup, /role="status" aria-live="polite"/);
+  assert.match(successMarkup, /Thanks, we received your enquiry\./);
+  assert.match(errorMarkup, /role="alert" aria-live="assertive"/);
+  assert.match(errorMarkup, /Unable to send enquiry\. Please try again\./);
+  assert.doesNotMatch(successMarkup, /g\.page\/r\/|Leave a Google Review/);
+});
+
+test("historical enquiry JSON remains byte-for-byte unchanged", () => {
+  assert.equal(currentHistoricalEnquiriesHash(), historicalEnquiriesHash);
 });
 
 test("enquiry form controls have associated labels and accessible field errors", () => {

@@ -72,8 +72,84 @@ export function trackEnrollClick(params: { page_type: string; course_slug?: stri
   track('cta_enroll_click', { page_type, course_slug, city, variant });
 }
 
+const FORM_ANALYTICS_FIELD_NAMES = new Set([
+  "name",
+  "email",
+  "phone",
+  "course",
+  "message",
+  "website",
+  "source",
+  "challenge",
+  "track",
+  "relatedCourse",
+]);
+const FORM_ANALYTICS_PAGE_TYPES = new Set([
+  "generic",
+  "contact",
+  "course_detail",
+  "online_course_detail",
+  "comparison",
+  "blog_post",
+  "lab_index",
+  "lab_challenge",
+]);
+const FORM_ANALYTICS_COURSE_SLUGS = new Set([
+  "(none)",
+  "full-stack",
+  "data-science",
+  "python",
+  "java",
+]);
+
+function safeFormAnalyticsParams(extra: GAParams): GAParams {
+  const safe: GAParams = {};
+
+  if (
+    typeof extra.page_type === "string" &&
+    FORM_ANALYTICS_PAGE_TYPES.has(extra.page_type)
+  ) {
+    safe.page_type = extra.page_type;
+  }
+  if (
+    typeof extra.course_slug === "string" &&
+    FORM_ANALYTICS_COURSE_SLUGS.has(extra.course_slug)
+  ) {
+    safe.course_slug = extra.course_slug;
+  }
+  if (
+    extra.city === "dehradun" ||
+    extra.city === "india" ||
+    extra.city === "(unknown)"
+  ) {
+    safe.city = extra.city;
+  }
+  if (
+    typeof extra.page_path === "string" &&
+    extra.page_path.length <= 200 &&
+    /^\/[a-zA-Z0-9/_-]*$/.test(extra.page_path)
+  ) {
+    safe.page_path = extra.page_path;
+  }
+  if (extra.error_origin === "validation" || extra.error_origin === "server") {
+    safe.error_origin = extra.error_origin;
+  }
+  if (Array.isArray(extra.field_errors)) {
+    const fieldErrors = extra.field_errors.filter(
+      (field): field is string =>
+        typeof field === "string" && FORM_ANALYTICS_FIELD_NAMES.has(field),
+    );
+    if (fieldErrors.length > 0) safe.field_errors = fieldErrors;
+  }
+  if (typeof extra.has_message === "boolean") {
+    safe.has_message = extra.has_message;
+  }
+
+  return safe;
+}
+
 export function trackForm(step: 'start' | 'submit' | 'error', extra: GAParams = {}) {
-  track(`lead_form_${step}`, extra);
+  track(`lead_form_${step}`, safeFormAnalyticsParams(extra));
 }
 
 export function trackLabAttempt(challengeId: string): void {

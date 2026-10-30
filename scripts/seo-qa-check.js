@@ -15,12 +15,15 @@ const GLOB_PATTERNS = [
   "src/app/courses/**/page.tsx",
   "src/app/online-courses/**/page.tsx",
   "src/app/blog/page.tsx",
+  "src/app/contact/page.tsx",
   "src/app/vs/**/page.tsx",
   "src/app/locations/**/page.tsx",
   "src/app/locations/page.tsx",
   "src/app/lab/page.tsx",
 ];
 export const PRODUCTION_ORIGIN = "https://dooncodingacademy.in";
+const CONTACT_LAB_QUERY_ROUTE =
+  "/contact?source=lab&challenge=discount-calculation-bug&track=javascript&relatedCourse=full-stack";
 const BLOG_CONTENT_DIRECTORY = path.join(process.cwd(), "src", "content", "blog");
 const EXCLUDED_BLOG_SLUGS = new Set(["sample-1", "sample-2"]);
 const require = createRequire(path.join(process.cwd(), "package.json"));
@@ -298,14 +301,16 @@ function hasAccessibleSearchInput(html) {
 
 export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_ORIGIN) {
   const issues = [];
+  const routePath = new URL(route, productionOrigin).pathname;
   const canonicalLinks = getCanonicalLinks(html);
-  const isHomePage = route === "/";
-  const isLabIndex = route === "/lab";
-  const isLabChallenge = /^\/lab\/[^/]+\/[^/]+$/.test(route);
-  const isBlogIndex = route === "/blog";
-  const isBlogPost = /^\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(route);
-  const isProjectsIndex = route === "/projects";
-  const isOutcomesIndex = route === "/outcomes";
+  const isHomePage = routePath === "/";
+  const isLabIndex = routePath === "/lab";
+  const isLabChallenge = /^\/lab\/[^/]+\/[^/]+$/.test(routePath);
+  const isBlogIndex = routePath === "/blog";
+  const isBlogPost = /^\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(routePath);
+  const isProjectsIndex = routePath === "/projects";
+  const isOutcomesIndex = routePath === "/outcomes";
+  const isContactPage = routePath === "/contact";
   if (
     isHomePage ||
     isLabIndex ||
@@ -313,7 +318,8 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
     isBlogIndex ||
     isBlogPost ||
     isProjectsIndex ||
-    isOutcomesIndex
+    isOutcomesIndex ||
+    isContactPage
   ) {
     if (!getPageTitle(html)) issues.push("page is missing a non-empty <title>");
     const description = getMetaDescription(html);
@@ -339,7 +345,7 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
   } else {
     try {
       const canonical = new URL(canonicalLinks[0]);
-      const expected = new URL(route, productionOrigin);
+      const expected = new URL(routePath, productionOrigin);
       if (canonical.origin !== productionOrigin || canonical.href !== expected.href) {
         issues.push(`canonical must be ${expected.href}, found ${canonical.href}`);
       }
@@ -358,16 +364,16 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
   const schemas = getJsonLd(html, issues);
   const types = collectTypes(schemas);
   const isCourseDetail =
-    (route.startsWith("/courses/") && route !== "/courses/") ||
-    (route.startsWith("/online-courses/") && route !== "/online-courses/");
+    (routePath.startsWith("/courses/") && routePath !== "/courses/") ||
+    (routePath.startsWith("/online-courses/") && routePath !== "/online-courses/");
   const visibleText = html
     .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
     .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;|&#160;/gi, " ");
   const courseAvailabilityUnconfirmed =
-    (route === "/courses/data-science" ||
-      route === "/online-courses/data-science") &&
+    (routePath === "/courses/data-science" ||
+      routePath === "/online-courses/data-science") &&
     /delivery availability not confirmed/i.test(visibleText);
   if (isCourseDetail && !types.has("Course") && !courseAvailabilityUnconfirmed) {
     issues.push("course detail is missing Course JSON-LD");
@@ -388,11 +394,12 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
     issues.push("visible homepage FAQ section is missing FAQPage JSON-LD");
   }
 
-  const isLocation = route === "/locations" || route.startsWith("/locations/");
+  const isLocation =
+    routePath === "/locations" || routePath.startsWith("/locations/");
   if (isLocation && !types.has("BreadcrumbList")) {
     issues.push("location page is missing BreadcrumbList JSON-LD");
   }
-  if (route.startsWith("/locations/") && hasFaqHeading(html) && !types.has("FAQPage")) {
+  if (routePath.startsWith("/locations/") && hasFaqHeading(html) && !types.has("FAQPage")) {
     issues.push("visible location FAQ section is missing FAQPage JSON-LD");
   }
 
@@ -410,7 +417,7 @@ export function analyzeRenderedPage(html, route, productionOrigin = PRODUCTION_O
       issues.push("Lab challenge is missing BreadcrumbList JSON-LD");
     } else if (
       canonicalLinks.length === 1 &&
-      !hasMatchingLabBreadcrumb(html, route, canonicalLinks[0], schemas)
+      !hasMatchingLabBreadcrumb(html, routePath, canonicalLinks[0], schemas)
     ) {
       issues.push(
         "Lab challenge BreadcrumbList does not match the visible breadcrumb and canonical route",
@@ -451,10 +458,12 @@ export async function getPageRoutes() {
     !routes.includes("/blog") ||
     !routes.includes("/courses") ||
     !routes.includes("/locations") ||
-    !routes.includes("/lab")
+    !routes.includes("/lab") ||
+    !routes.includes("/contact")
   ) {
     throw new Error(`SEO QA route discovery was incomplete: ${routes.join(", ")}`);
   }
+  routes.push(CONTACT_LAB_QUERY_ROUTE);
   return routes;
 }
 

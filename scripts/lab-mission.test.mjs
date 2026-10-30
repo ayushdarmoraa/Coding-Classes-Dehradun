@@ -224,7 +224,10 @@ test("completed mission integrates the limited Skill Map and existing next-step 
   assert.match(completionPanel, /Explore DCA Lab/);
   assert.match(completionPanel, /href="\/courses\/full-stack"/);
   assert.match(completionPanel, /Explore Full-Stack Course/);
-  assert.match(completionPanel, /href="\/contact"/);
+  assert.match(
+    completionPanel,
+    /href="\/contact\?source=lab&challenge=discount-calculation-bug&track=javascript&relatedCourse=full-stack"/,
+  );
   assert.match(completionPanel, /Talk to Mentor/);
   assert.match(skillMapComponent, /This Skill Map reflects what you demonstrated in this mission only\. It is not a complete assessment of your programming ability or job readiness\./);
   assert.match(skillMapComponent, /Not demonstrated yet/);
