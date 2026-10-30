@@ -9,6 +9,7 @@ import Badge from "@/components/ui/Badge";
 import { getCourses, isCourseModeAvailable } from "@/lib/courses";
 import { testimonials } from "@/lib/testimonials";
 import { formatCourseDuration, formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
 
 const SERVICE_AREAS = [
   "Herbertpur",
@@ -38,14 +39,14 @@ export const metadata: Metadata = {
   title: "Coding Classes in Dehradun | Doon Coding Academy",
   description:
     "Explore Full-Stack, Data Science, Python, and Java courses at Doon Coding Academy in Herbertpur, Dehradun.",
-  alternates: { canonical: "https://dooncodingacademy.in/locations/dehradun" },
+  alternates: { canonical: `${SITE.url}/locations/dehradun` },
   openGraph: {
     title: "Coding Classes in Dehradun | Doon Coding Academy",
     description:
       "Explore Full-Stack, Data Science, Python, and Java courses at Doon Coding Academy in Herbertpur, Dehradun.",
-    url: "https://dooncodingacademy.in/locations/dehradun",
+    url: `${SITE.url}/locations/dehradun`,
     type: "website",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
   },
   twitter: {
     card: "summary_large_image",
@@ -85,8 +86,8 @@ const nearbyAreas = [
 
 export default function DehradunLocationPage() {
   const crumbs = breadcrumbLd([
-    { name: "Home", url: "https://dooncodingacademy.in/" },
-    { name: "Dehradun", url: "https://dooncodingacademy.in/locations/dehradun" },
+    { name: "Home", url: `${SITE.url}/` },
+    { name: "Dehradun", url: `${SITE.url}/locations/dehradun` },
   ]);
   const courses = getCourses();
   const onCampusCourses = courses.filter((course) =>

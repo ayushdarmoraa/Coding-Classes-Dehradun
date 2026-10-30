@@ -6,9 +6,9 @@ import InstructorsGrid from "@/components/features/InstructorsGrid";
 import { INSTRUCTORS } from "@/lib/instructors";
 import { getCourses } from "@/lib/courses";
 import { formatCourseDuration, formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
 
-const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
+const BASE = SITE.url;
 // Temporary toggle to hide instructors section while no teachers are available
 const SHOW_INSTRUCTORS = false;
 

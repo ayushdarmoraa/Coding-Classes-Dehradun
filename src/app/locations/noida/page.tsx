@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { breadcrumbLd } from "@/lib/seo";
 import Button from "@/components/ui/Button";
+import { SITE } from "@/lib/site-config";
 
 // Noida service areas and local FAQ
 const SERVICE_AREAS_NOIDA = [
@@ -37,15 +38,15 @@ export const metadata: Metadata = {
   description:
     "Learn coding from Noida with DCA’s live online cohorts—mentor-led sessions, projects, and placement support. Our physical campus is in Dehradun.",
   alternates: {
-    canonical: "https://dooncodingacademy.in/locations/noida",
+    canonical: `${SITE.url}/locations/noida`,
   },
   openGraph: {
     title: "Coding Classes in Noida (Online) – Doon Coding Academy",
     description:
       "Live online cohorts for learners in Noida. Mentor support, projects, and career guidance. Visit our Dehradun campus if you’re nearby.",
-    url: "https://dooncodingacademy.in/locations/noida",
+    url: `${SITE.url}/locations/noida`,
     type: "website",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
     images: [{ url: "/images/og-image.png", width: 1200, height: 630 }],
   },
   twitter: { card: "summary_large_image" },
@@ -53,8 +54,8 @@ export const metadata: Metadata = {
 
 export default function Page() {
   const crumbs = breadcrumbLd([
-    { name: "Home", url: "https://dooncodingacademy.in/" },
-    { name: "Noida", url: "https://dooncodingacademy.in/locations/noida" },
+    { name: "Home", url: `${SITE.url}/` },
+    { name: "Noida", url: `${SITE.url}/locations/noida` },
   ]);
 
   return (

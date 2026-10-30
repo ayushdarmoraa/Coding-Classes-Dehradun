@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
 import Script from "next/script";
 import { getCourses } from "@/lib/courses";
 import { formatCourseDuration, formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
+
+const BASE = SITE.url;
   // ...existing code...
   // Place after <header>, before first <section>
   {/* FAQPage JSON-LD */}

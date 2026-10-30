@@ -18,7 +18,7 @@ export const metadata: Metadata = {
       "Compare DCA and Coding Ninjas: format (live vs recorded), batch size, mentoring, projects, pricing approach, and who each option fits best.",
     url: CANON,
     type: "article",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
   },
   twitter: {
     card: "summary_large_image",

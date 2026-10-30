@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAllBlogPosts } from "@/lib/blog";
+import { SITE } from "@/lib/site-config";
 
 export const revalidate = 300; // 5 min
 export const dynamic = "force-static";
@@ -36,7 +37,7 @@ export async function GET(req: Request) {
   // Sort newest first
   posts.sort((a, b) => +new Date(b.date) - +new Date(a.date));
 
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = SITE.url;
   const body = posts.slice(0, 25).map((p) => ({
     ...pick(p, ["slug", "title", "description", "date", "category", "keywords", "readingTime"]),
     url: `${base}/blog/${p.slug}`,

@@ -277,6 +277,75 @@ test("guide detail renders publication date without a synthetic updated date", a
   assert.doesNotMatch(markup, /Updated on/);
 });
 
+test("RSS feed uses centralized site URL and name in its self-link, generator, and fallback description", async () => {
+  const configuredSite = {
+    url: "https://canonical.example",
+    name: "Configured & Academy",
+  };
+  const rssRoute = loadTypeScript("src/app/blog/rss/route.ts", {
+    "@/lib/blog": {
+      getAllBlogPosts: () => [{
+        slug: "feed-test",
+        title: "Feed Test",
+        description: "",
+        date: "2025-09-02",
+        keywords: [],
+        draft: false,
+      }],
+    },
+    "@/lib/site-config": { SITE: configuredSite },
+  });
+
+  const response = await rssRoute.GET();
+  const xml = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(xml, /<generator>Configured &amp; Academy RSS<\/generator>/);
+  assert.match(
+    xml,
+    /<atom:link href="https:\/\/canonical\.example\/blog\/rss" rel="self" type="application\/rss\+xml" \/>/,
+  );
+  assert.doesNotMatch(xml, /\[object Object\]/);
+  assert.match(
+    xml,
+    /<!\[CDATA\[Feed Test — insights from Configured & Academy \(Dehradun\)\. Compare options, syllabus, fees, and outcomes\.\]\]>/,
+  );
+});
+
+test("BlogPosting organization fallback uses the centralized site name", async () => {
+  const post = blogModule.getPostBySlug("best-full-stack-course-dehradun-2025");
+  assert.ok(post);
+  const siteConfig = loadTypeScript("src/lib/site-config.ts");
+  const originalSiteName = siteConfig.SITE.name;
+  const originalGetPostHtmlBySlug = blogModule.getPostHtmlBySlug;
+  const configuredName = "Configured Academy";
+
+  siteConfig.SITE.name = configuredName;
+  blogModule.getPostHtmlBySlug = async () => ({
+    ...post,
+    authorName: undefined,
+    html: "<p>Rendered guide content.</p>",
+    toc: [],
+  });
+
+  try {
+    const markup = render(await detailPage.default({ params: { slug: post.slug } }));
+    const postingScript = markup.match(
+      /<script[^>]*id="blogposting-jsonld"[^>]*>([\s\S]*?)<\/script>/,
+    );
+    assert.ok(postingScript);
+    const posting = JSON.parse(postingScript[1]);
+    assert.deepEqual(posting.author, {
+      "@type": "Organization",
+      name: configuredName,
+      url: "https://dooncodingacademy.in",
+    });
+  } finally {
+    siteConfig.SITE.name = originalSiteName;
+    blogModule.getPostHtmlBySlug = originalGetPostHtmlBySlug;
+  }
+});
+
 test("guide detail uses only later editorial update dates in rendered text and BlogPosting schema", async () => {
   const slug = "best-full-stack-course-dehradun-2025";
   const publishedPost = blogModule.getPostBySlug(slug);

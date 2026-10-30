@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     description: DESC,
     url: `${SITE.url}/online-courses/data-science`,
     type: "website",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
   },
   twitter: {
     card: "summary_large_image",

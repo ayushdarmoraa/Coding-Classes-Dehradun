@@ -431,6 +431,13 @@ test("Outcomes title uses the root layout template exactly once", () => {
     "@/lib/courses": { getCourses: async () => [] },
     "@/lib/pricing": { formatINR: () => "" },
     "@/lib/lab/analytics-metadata": { PUBLISHED_LAB_ANALYTICS_METADATA: [] },
+    "@/lib/site-config": {
+      SITE: {
+        url: "https://dooncodingacademy.in",
+        name: "Doon Coding Academy",
+        description: "Leading coding institute in Dehradun.",
+      },
+    },
   });
 
   const pageTitle = page.generateMetadata().title;
@@ -472,6 +479,13 @@ test("existing testimonial empty state and JSON-LD consent gate remain intact", 
   const testimonialPage = loadTypeScript("src/app/testimonials/page.tsx", {
     "@/lib/testimonials": testimonialModule,
     "@/lib/schema": schemaModule,
+    "@/lib/site-config": {
+      SITE: {
+        url: "https://dooncodingacademy.in",
+        name: "Doon Coding Academy",
+        description: "Leading coding institute in Dehradun.",
+      },
+    },
     "next/script": { __esModule: true, default: () => null },
     "next/link": {
       __esModule: true,

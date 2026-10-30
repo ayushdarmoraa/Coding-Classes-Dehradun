@@ -25,7 +25,7 @@ export const metadata: Metadata = {
       "Explore the online Python curriculum, duration, and fees.",
     url: CANONICAL,
     type: "website",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
   },
   twitter: {
     card: "summary_large_image",

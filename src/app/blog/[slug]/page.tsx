@@ -66,7 +66,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
         description,
         url,
         type: "article",
-        siteName: "Doon Coding Academy",
+        siteName: SITE.name,
       },
       twitter: {
         card: "summary",
@@ -115,7 +115,7 @@ export default async function BlogPostPage({ params, searchParams }: { params: {
   })();
   const authorNode = post.authorName
     ? { "@type": "Person", name: post.authorName, url: post.authorUrl || base }
-    : { "@type": "Organization", name: "Doon Coding Academy", url: base };
+    : { "@type": "Organization", name: SITE.name, url: base };
 
   const blogPostingJsonLd = {
     // Stable org id for cross-entity linking (matches layout.tsx @id)

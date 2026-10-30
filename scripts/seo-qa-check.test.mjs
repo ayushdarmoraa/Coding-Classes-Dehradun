@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
@@ -8,6 +9,10 @@ import {
   getPublishedGuideRoutes,
   PRODUCTION_ORIGIN,
 } from "./seo-qa-check.js";
+
+function appSource(relativePath) {
+  return readFileSync(new URL(`../src/app/${relativePath}`, import.meta.url), "utf8");
+}
 
 function script(data) {
   return `<script type="application/ld+json">${JSON.stringify(data)}</script>`;
@@ -22,6 +27,77 @@ function page(route, schemas = [], body = "<main><h1>Page title</h1></main>") {
     ...schemas.map(script),
   ].join("");
 }
+
+test("public site metadata, routes, feeds, and robots use centralized site configuration", () => {
+  const layout = appSource("layout.tsx");
+  assert.match(layout, /import \{ SITE \} from "@\/lib\/site-config"/);
+  assert.doesNotMatch(layout, /NEXT_PUBLIC_SITE_(?:URL|NAME|DESCRIPTION)/);
+  assert.match(layout, /metadataBase: new URL\(SITE\.url\)/);
+  assert.match(layout, /default: SITE\.name/);
+  assert.match(layout, /description: SITE\.description/);
+  assert.match(appSource("online-courses/page.tsx"), /name: "Home", item: SITE\.url/);
+
+  const urlConsumers = [
+    "about/page.tsx",
+    "contact/page.tsx",
+    "faq/page.tsx",
+    "testimonials/page.tsx",
+    "robots.ts",
+    "blog/atom/route.ts",
+    "blog/rss/route.ts",
+    "blog/author/[name]/page.tsx",
+    "blog/how-to/page.tsx",
+    "blog/category/[category]/page.tsx",
+    "blog/tag/[tag]/page.tsx",
+    "blog/series/[series]/page.tsx",
+    "blog/pinned/page.tsx",
+    "blog/search/route.ts",
+    "blog/search.json/route.ts",
+    "locations/page.tsx",
+    "locations/dehradun/page.tsx",
+    "locations/bangalore/page.tsx",
+    "locations/mumbai/page.tsx",
+    "locations/noida/page.tsx",
+    "online-courses/page.tsx",
+    "vs/scaler/page.tsx",
+  ];
+
+  for (const relativePath of urlConsumers) {
+    const source = appSource(relativePath);
+    assert.match(source, /import \{ SITE \} from "@\/lib\/site-config"/, relativePath);
+    assert.doesNotMatch(
+      source,
+      /NEXT_PUBLIC_SITE_URL|https:\/\/dooncodingacademy\.in|http:\/\/localhost:3000/,
+      relativePath,
+    );
+  }
+
+  const brandConsumers = [
+    "blog/page.tsx",
+    "blog/[slug]/page.tsx",
+    "courses/page.tsx",
+    "courses/[slug]/page.tsx",
+    "locations/page.tsx",
+    "locations/dehradun/page.tsx",
+    "locations/bangalore/page.tsx",
+    "locations/mumbai/page.tsx",
+    "locations/noida/page.tsx",
+    "online-courses/page.tsx",
+    "online-courses/full-stack/page.tsx",
+    "online-courses/data-science/page.tsx",
+    "online-courses/java/page.tsx",
+    "online-courses/python/page.tsx",
+    "testimonials/page.tsx",
+    "vs/scaler/page.tsx",
+    "vs/coding-ninjas/page.tsx",
+  ];
+
+  for (const relativePath of brandConsumers) {
+    const source = appSource(relativePath);
+    assert.match(source, /import \{ SITE \} from "@\/lib\/site-config"/, relativePath);
+    assert.doesNotMatch(source, /siteName:\s*"Doon Coding Academy"/, relativePath);
+  }
+});
 
 test("validates canonical, main heading, and nested Course JSON-LD in rendered HTML", () => {
   const html = page("/courses/full-stack", [

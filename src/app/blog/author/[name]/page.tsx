@@ -3,6 +3,7 @@ import Link from "next/link";
 import Script from "next/script";
 import FeedLinks from "@/components/seo/FeedLinks";
 import { getAuthorPosts, listAuthors } from "@/lib/blog";
+import { SITE } from "@/lib/site-config";
 
 type Params = { name: string };
 
@@ -12,7 +13,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const name = decodeURIComponent(params.name);
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = SITE.url;
   const url = `${base}/blog/author/${encodeURIComponent(name)}`;
   return {
     title: `${name} (Author) | Doon Coding Academy`,
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default function AuthorPage({ params }: { params: Params }) {
   const name = decodeURIComponent(params.name);
   const posts = getAuthorPosts(name);
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = SITE.url;
 
   const itemListSchema = {
     "@context": "https://schema.org",

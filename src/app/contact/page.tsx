@@ -6,9 +6,9 @@ import {
   enquiryLeadContextSchema,
   type EnquiryLeadContext,
 } from "@/lib/enquiry-schema";
+import { SITE } from "@/lib/site-config";
 
-const RAW_BASE = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
-const BASE = RAW_BASE.replace(/^http:\/\//, "https://");
+const BASE = SITE.url;
 
 export const metadata: Metadata = {
   title: "Contact Us - Doon Coding Academy",

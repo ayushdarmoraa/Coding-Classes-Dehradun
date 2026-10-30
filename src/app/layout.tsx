@@ -11,6 +11,7 @@ import MotionProvider from "@/components/motion/MotionProvider";
 import FloatingWhatsApp from "@/components/layout/FloatingWhatsApp";
 import StickyCtaBar from "@/components/layout/StickyCtaBar";
 import RevealOnScroll from "@/components/motion/RevealOnScroll";
+import { SITE } from "@/lib/site-config";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -34,35 +35,28 @@ const PUBLISHED_LAB_PATHS = PUBLISHED_LAB_ANALYTICS_METADATA.map(
 
 // Using system fonts for maximum performance
 
-// Site-wide metadata: force https + non-www canonical via metadataBase, standardize brand
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://dooncodingacademy.in").replace(/\/$/, "").replace(/^http:\/\//, "https://").replace(/^https:\/\/www\./, "https://");
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy";
-const SITE_DESC =
-  process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
-  "Leading coding institute in Dehradun – Full Stack with Gen AI, Data Science, Python, Java.";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
+  metadataBase: new URL(SITE.url),
   title: {
-    default: SITE_NAME,
-    template: `%s | ${SITE_NAME}`,
+    default: SITE.name,
+    template: `%s | ${SITE.name}`,
   },
-  description: SITE_DESC,
+  description: SITE.description,
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    url: SITE_URL,
-    siteName: SITE_NAME,
-    title: SITE_NAME,
-    description: SITE_DESC,
+    url: SITE.url,
+    siteName: SITE.name,
+    title: SITE.name,
+    description: SITE.description,
     type: "website",
     locale: "en_IN",
   },
   twitter: {
     card: "summary_large_image",
-    title: SITE_NAME,
-    description: SITE_DESC,
+    title: SITE.name,
+    description: SITE.description,
   },
   verification: process.env.NEXT_PUBLIC_GSC_VERIFICATION
     ? { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION }
@@ -250,12 +244,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              "@id": `${SITE_URL.replace(/\/$/, "")}/#website`,
-              name: process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy",
-              url: SITE_URL,
+              "@id": `${SITE.url}/#website`,
+              name: SITE.name,
+              url: SITE.url,
               potentialAction: {
                 "@type": "SearchAction",
-                target: `${SITE_URL.replace(/\/$/, "")}/blog?q={search_term_string}`,
+                target: `${SITE.url}/blog?q={search_term_string}`,
                 "query-input": "required name=search_term_string",
               },
             }),
@@ -271,9 +265,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "EducationalOrganization",
-              "@id": `${SITE_URL.replace(/\/$/, "")}/#organization`,
-              name: process.env.NEXT_PUBLIC_SITE_NAME || "Doon Coding Academy",
-              url: SITE_URL,
+              "@id": `${SITE.url}/#organization`,
+              name: SITE.name,
+              url: SITE.url,
               email: "dooncodingacademy@gmail.com",
               foundingDate: "2019-01-01",
               // Social profiles (env-gated, filtered for presence)
@@ -338,7 +332,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify((() => {
-              const base = SITE_URL.replace(/\/$/, "");
+              const base = SITE.url;
               const coursePrices = getCourses().map((course) => course.pricing.packageRate);
               const sameAs = [
                 process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,

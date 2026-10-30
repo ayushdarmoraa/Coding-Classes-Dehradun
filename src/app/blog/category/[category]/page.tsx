@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import { filterPosts, listCategories, paginate } from "@/lib/blog";
+import { SITE } from "@/lib/site-config";
 
 type Params = { category: string };
 
@@ -12,7 +13,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const category = decodeURIComponent(params.category);
-  const base = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = SITE.url;
   const url = `${base}/blog/category/${encodeURIComponent(category)}`;
   return {
     title: `${category} Articles | Doon Coding Academy`,
@@ -125,7 +126,7 @@ export default function CategoryPage({
               itemListElement: items.map((p, i) => ({
                 "@type": "ListItem",
                 position: i + 1,
-                url: `${(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "")}/blog/${p.slug}`,
+                url: `${SITE.url}/blog/${p.slug}`,
                 name: p.title,
               })),
             }),

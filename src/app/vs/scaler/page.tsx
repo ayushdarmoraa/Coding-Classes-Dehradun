@@ -3,8 +3,9 @@ import Link from "next/link";
 import Button from "@/components/ui/Button";
 import { getCourseBySlug } from "@/lib/courses";
 import { formatCoursePrice } from "@/lib/pricing";
+import { SITE } from "@/lib/site-config";
 
-const APEX = "https://dooncodingacademy.in";
+const APEX = SITE.url;
 
 export const metadata: Metadata = {
   title: "Doon Coding Academy vs Scaler (2025)",
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
       "Compare curriculum, fees, format, batch size, mentor ratio and placement support — get the facts.",
     url: `${APEX}/vs/scaler`,
     type: "article",
-    siteName: "Doon Coding Academy",
+    siteName: SITE.name,
   },
   twitter: {
     card: "summary_large_image",
