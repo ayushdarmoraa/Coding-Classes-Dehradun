@@ -38,12 +38,12 @@ export default function OutcomesContent({
           id="outcomes-title"
           className="text-3xl font-bold tracking-tight md:text-4xl"
         >
-          Outcomes and measurement methodology
+          Learner stories
         </h1>
         <p className="mt-4 max-w-3xl text-gray-700">
-          Read how each result was measured, which learners it covers, where its
-          evidence comes from, and what limitations apply. Learner stories appear
-          only with verified publication permission.
+          Read learner feedback shared with publication permission. Any reported
+          outcome metrics include their cohort, measurement method, evidence,
+          and limitations.
         </p>
       </header>
 
