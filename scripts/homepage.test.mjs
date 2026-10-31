@@ -149,6 +149,12 @@ function routeExists(href) {
       getAllBlogPosts().some((post) => `/blog/${post.slug}` === href)
     );
   }
+  if (href.startsWith("/projects/")) {
+    return (
+      existsSync(path.join(repositoryRoot, "src/app/projects/[slug]/page.tsx")) &&
+      projects.some((project) => `/projects/${project.slug}` === href)
+    );
+  }
 
   return existsSync(
     path.join(repositoryRoot, "src/app", href.slice(1), "page.tsx"),
