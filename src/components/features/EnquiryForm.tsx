@@ -94,6 +94,37 @@ const fieldNames = new Set([
   'relatedCourse',
 ]);
 
+export function createWhatsAppEnquiryUrl(
+  formData: Pick<FormData, 'name' | 'email' | 'phone' | 'course' | 'message'>,
+) {
+  const selectedCourse =
+    courseOptions.find((option) => option.value === formData.course)?.label ||
+    'Not selected';
+  const message = [
+    'Hi, I would like to enquire about a course at Doon Coding Academy.',
+    '',
+    `Full Name: ${formData.name.trim()}`,
+    `Email Address: ${formData.email.trim()}`,
+    `Phone Number: ${formData.phone.trim() || 'Not provided'}`,
+    `Course of Interest: ${selectedCourse}`,
+    '',
+    'Message:',
+    formData.message.trim(),
+  ].join('\n');
+
+  return `https://wa.me/917037905464?text=${encodeURIComponent(message)}`;
+}
+
+export function resolveWhatsAppFormData(
+  formData: FormData,
+  submittedFormData: FormData | null,
+  submitStatus: 'idle' | 'success' | 'error',
+) {
+  return submitStatus === 'success' && submittedFormData
+    ? submittedFormData
+    : formData;
+}
+
 const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
   leadContext,
 }) => {
@@ -110,6 +141,7 @@ const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [submitMessage, setSubmitMessage] = useState('');
+  const [submittedFormData, setSubmittedFormData] = useState<FormData | null>(null);
   const statusRef = useRef<HTMLDivElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
   const focusFirstErrorRef = useRef(false);
@@ -134,6 +166,7 @@ const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    setSubmitStatus('idle');
     emitStartOnce();
     
     // Clear error when user starts typing
@@ -161,6 +194,42 @@ const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
 
     setErrors(newErrors);
     return newErrors;
+  };
+
+  const handleWhatsAppClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    emitStartOnce();
+    if (submitStatus === 'success' && submittedFormData) {
+      trackLeadClick('whatsapp', {
+        page_type: ctx.page_type,
+        course_slug: ctx.course_slug || '(none)',
+        city: ctx.city,
+        page_path: pathname,
+      });
+      return;
+    }
+
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      event.preventDefault();
+      focusFirstErrorRef.current = true;
+      trackForm('error', {
+        page_type: ctx.page_type,
+        course_slug: ctx.course_slug || '(none)',
+        city: ctx.city,
+        page_path: pathname,
+        error_origin: 'validation',
+        field_errors: Object.keys(validationErrors),
+        has_message: Boolean(formData.message.trim()),
+      });
+      return;
+    }
+
+    trackLeadClick('whatsapp', {
+      page_type: ctx.page_type,
+      course_slug: ctx.course_slug || '(none)',
+      city: ctx.city,
+      page_path: pathname,
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -200,6 +269,7 @@ const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
       const result = await response.json();
       
       if (response.ok && result.success) {
+        setSubmittedFormData({ ...formData });
         setSubmitStatus('success');
         setSubmitMessage(result.message || 'Thank you! We’ve received your enquiry and will get back shortly.');
   trackForm('submit', {
@@ -402,11 +472,17 @@ const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
             type="button"
             variant="secondary"
             size="lg"
-            href="https://wa.me/917037905464?text=Hi, I'm interested in your coding courses"
+            href={createWhatsAppEnquiryUrl(
+              resolveWhatsAppFormData(
+                formData,
+                submittedFormData,
+                submitStatus,
+              ),
+            )}
             className="flex-1"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => trackLeadClick('whatsapp', { page_type: ctx.page_type, course_slug: ctx.course_slug || '(none)', city: ctx.city, page_path: pathname })}
+            onClick={handleWhatsAppClick}
           >
             WhatsApp Us
           </Button>
