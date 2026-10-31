@@ -8,23 +8,23 @@ import { SITE } from "@/lib/site-config";
 const APEX = SITE.url;
 
 export const metadata: Metadata = {
-  title: "Doon Coding Academy vs Scaler (2025)",
+  title: "Doon Coding Academy vs Scaler",
   description:
-    "Transparent comparison of DCA vs Scaler: curriculum depth, fees, format, batch size, mentor ratio and placement support — plus who should pick which.",
+    "Compare Doon Coding Academy's published Full-Stack course details with current Scaler program information from its official site.",
   alternates: { canonical: `${APEX}/vs/scaler` },
   openGraph: {
-    title: "Doon Coding Academy vs Scaler (2025)",
+    title: "Doon Coding Academy vs Scaler",
     description:
-      "Compare curriculum, fees, format, batch size, mentor ratio and placement support — get the facts.",
+      "Review DCA's current Full-Stack course details and verify Scaler program information with the provider.",
     url: `${APEX}/vs/scaler`,
     type: "article",
     siteName: SITE.name,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Doon Coding Academy vs Scaler (2025)",
+    title: "Doon Coding Academy vs Scaler",
     description:
-      "Compare curriculum, fees, format, batch size, mentor ratio and placement support.",
+      "Compare current course details and check each provider's official program information.",
   },
 };
 
@@ -33,16 +33,44 @@ export default function Page() {
   return (
     <main className="max-w-5xl mx-auto px-4 py-12">
       <h1 className="text-3xl md:text-4xl font-bold mb-4">
-        Doon Coding Academy vs Scaler (2025)
+        Doon Coding Academy vs Scaler
       </h1>
       <p className="text-lg text-gray-700 mb-8">
-        Choosing between platforms? Here’s a practical, outcome-focused comparison to help you decide.
-        To review the current Full-Stack curriculum and online-course details, see{" "}
+        Compare DCA&apos;s published Full-Stack course details with information
+        available directly from Scaler. Competitor-specific terms are not
+        independently verified here; confirm current details with each provider.
+        To review DCA&apos;s current Full-Stack details, see{" "}
         <Link href="/online-courses/full-stack" className="text-blue-700 hover:underline">
           DCA’s Online Full-Stack course
         </Link>. For general FAQs, see{" "}
         <Link href="/faq" className="text-blue-700 hover:underline">our FAQ</Link>.
       </p>
+      <div className="mb-8 rounded-lg bg-gray-50 p-4 text-sm text-gray-700">
+        <p>
+          <strong>Last reviewed:</strong>{" "}
+          <time dateTime="2026-10-31">31 October 2026</time>. This page is
+          published by DCA, which offers the compared course; it is not an
+          independent ranking.
+        </p>
+        <p className="mt-2 font-semibold">Sources</p>
+        <ul className="list-inside list-disc">
+          <li>
+            <Link href="/courses/full-stack" className="text-blue-700 underline">
+              DCA Full-Stack course details
+            </Link>
+          </li>
+          <li>
+            <a
+              href="https://www.scaler.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-700 underline"
+            >
+              Scaler official site
+            </a>
+          </li>
+        </ul>
+      </div>
 
       {/* Comparison Table */}
       <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
@@ -57,43 +85,43 @@ export default function Page() {
           <tbody className="divide-y divide-gray-100">
             <tr>
               <td className="px-4 py-3">Curriculum span</td>
-              <td className="px-4 py-3">Full-Stack MERN with Gen AI; fundamentals → advanced with portfolio</td>
-              <td className="px-4 py-3">Software dev / DS tracks; broader theory-first modules</td>
+              <td className="px-4 py-3">MERN + Generative AI; see the canonical course curriculum</td>
+              <td className="px-4 py-3">Review the syllabus for the specific program.</td>
             </tr>
             <tr>
               <td className="px-4 py-3">Format</td>
               <td className="px-4 py-3">See current online-course details for delivery information</td>
-              <td className="px-4 py-3">Primarily online; schedule varies by track</td>
+              <td className="px-4 py-3">Check the selected program&apos;s current official details.</td>
             </tr>
             <tr>
               <td className="px-4 py-3">Batch size</td>
               <td className="px-4 py-3">Contact DCA for current class-size details</td>
-              <td className="px-4 py-3">Larger cohorts typical of national platforms</td>
+              <td className="px-4 py-3">Confirm current cohort details with the provider.</td>
             </tr>
             <tr>
               <td className="px-4 py-3">Mentor ratio</td>
               <td className="px-4 py-3">Contact DCA for current learner-support details</td>
-              <td className="px-4 py-3">Varies; 1:many mentorship</td>
+              <td className="px-4 py-3">Confirm the support model for the selected program.</td>
             </tr>
             <tr>
               <td className="px-4 py-3">Projects / portfolio</td>
               <td className="px-4 py-3">Review the course curriculum and listed outcomes</td>
-              <td className="px-4 py-3">Projects present; portfolio depth varies by learner</td>
+              <td className="px-4 py-3">Check the selected program&apos;s curriculum.</td>
             </tr>
             <tr>
               <td className="px-4 py-3">Placement support</td>
               <td className="px-4 py-3">Contact DCA for current career-support details</td>
-              <td className="px-4 py-3">Career services at scale; competitive pipelines</td>
+              <td className="px-4 py-3">Check the selected program&apos;s official support details.</td>
             </tr>
             <tr>
               <td className="px-4 py-3">Fees (indicative)</td>
               <td className="px-4 py-3">{fullStack ? formatCoursePrice(fullStack.pricing) : "See course details"} (Full-Stack)</td>
-              <td className="px-4 py-3">Typically higher for comparable tracks</td>
+              <td className="px-4 py-3">Check current pricing for the selected program.</td>
             </tr>
             <tr>
               <td className="px-4 py-3">Best for</td>
               <td className="px-4 py-3">Learners comparing the curriculum and current course details</td>
-              <td className="px-4 py-3">Learners preferring large networks and brand recognition</td>
+              <td className="px-4 py-3">Compare official program details with your learning needs.</td>
             </tr>
           </tbody>
         </table>
@@ -104,8 +132,9 @@ export default function Page() {
         <h2 className="text-xl font-semibold">Who should pick which?</h2>
         <p className="text-gray-700">
           Review DCA’s current course curriculum, fees, and delivery information alongside
-          Scaler’s official program details before choosing. Pick <strong>Scaler</strong> if you value larger communities
-          and broader brand presence.
+          Scaler&apos;s official program details before choosing. Use the linked
+          provider information to verify current syllabus, schedule, support, and
+          pricing.
         </p>
       </div>
 
@@ -120,7 +149,7 @@ export default function Page() {
             </Link>.
           </li>
           <li>
-            Ready to learn online with mentors and projects? Explore our{" "}
+            Ready to review online course details? Explore our{" "}
             <Link href="/online-courses/full-stack" className="text-blue-700 hover:underline">
               Online Full-Stack course details
             </Link>.
@@ -133,7 +162,7 @@ export default function Page() {
         <h2 id="vs-scaler-conclusion" className="text-xl font-semibold mb-3">Conclusion</h2>
         <p className="text-gray-700">
           To review the Full-Stack course curriculum and details, see our{" "}
-          <Link href="/courses/full-stack" className="text-blue-700 hover:underline">Full-Stack Bootcamp (On-Campus)</Link> is a focused, project-first path.
+          <Link href="/courses/full-stack" className="text-blue-700 hover:underline">Full-Stack Bootcamp (On-Campus)</Link>.
         </p>
         <p className="mt-2 text-sm text-gray-600">
           Prefer a visit first? <Link href="/locations/dehradun" className="underline text-blue-700">See the Dehradun campus</Link>.
@@ -190,7 +219,7 @@ export default function Page() {
               {
                 "@type": "ListItem",
                 position: 2,
-                name: "Doon Coding Academy vs Scaler (2025)",
+                name: "Doon Coding Academy vs Scaler",
                 item: `${APEX}/vs/scaler`,
               },
             ],

@@ -8,23 +8,23 @@ import { SITE } from "@/lib/site-config";
 const CANON = `${SITE.url}/vs/coding-ninjas`;
 
 export const metadata: Metadata = {
-  title: "Doon Coding Academy vs Coding Ninjas (2025)",
+  title: "Doon Coding Academy vs Coding Ninjas",
   description:
-    "A clear, honest comparison of DCA vs Coding Ninjas for Full-Stack learners in India—curriculum focus, format, batch size, mentoring, outcomes, and who each suits.",
+    "Compare Doon Coding Academy's published Full-Stack course details with current Coding Ninjas program information from its official site.",
   alternates: { canonical: CANON },
   openGraph: {
-    title: "Doon Coding Academy vs Coding Ninjas (2025)",
+    title: "Doon Coding Academy vs Coding Ninjas",
     description:
-      "Compare DCA and Coding Ninjas: format (live vs recorded), batch size, mentoring, projects, pricing approach, and who each option fits best.",
+      "Review DCA's current Full-Stack course details and verify Coding Ninjas program information with the provider.",
     url: CANON,
     type: "article",
     siteName: SITE.name,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Doon Coding Academy vs Coding Ninjas (2025)",
+    title: "Doon Coding Academy vs Coding Ninjas",
     description:
-      "Which should you pick for Full-Stack in India? See the side-by-side comparison and decide confidently.",
+      "Compare current course details and check each provider's official program information.",
   },
 };
 
@@ -34,16 +34,40 @@ export default function Page() {
     <main className="max-w-5xl mx-auto px-4 py-10">
       <header className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold">
-          Doon Coding Academy vs Coding Ninjas (2025)
+          Doon Coding Academy vs Coding Ninjas
         </h1>
         <p className="mt-3 text-lg text-gray-700">
-          Choosing a Full-Stack program? Here’s a practical, side-by-side view of{" "}
-          <strong>Doon Coding Academy (DCA)</strong> and{" "}
-          <strong>Coding Ninjas</strong> based on public program patterns and what
-          Indian learners typically look for: delivery format, batch size, mentoring,
-          projects, and career support. Details can change—always verify on the provider’s
-          site before you enroll.
+          Compare DCA&apos;s published Full-Stack course details with the program
+          information available directly from Coding Ninjas. Competitor-specific
+          terms are not independently verified here; confirm current details with
+          each provider before enrolling.
         </p>
+        <div className="mt-4 rounded-lg bg-gray-50 p-4 text-sm text-gray-700">
+          <p>
+            <strong>Last reviewed:</strong>{" "}
+            <time dateTime="2026-10-31">31 October 2026</time>. This page is
+            published by DCA, which offers the compared course; it is not an
+            independent ranking.
+          </p>
+          <p className="mt-2 font-semibold">Sources</p>
+          <ul className="list-inside list-disc">
+            <li>
+              <Link href="/courses/full-stack" className="text-blue-700 underline">
+                DCA Full-Stack course details
+              </Link>
+            </li>
+            <li>
+              <a
+                href="https://www.codingninjas.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-700 underline"
+              >
+                Coding Ninjas official site
+              </a>
+            </li>
+          </ul>
+        </div>
       </header>
 
       {/* At-a-glance comparison */}
@@ -62,27 +86,27 @@ export default function Page() {
               <tr>
                 <td>Format</td>
                 <td>See current course details for delivery information.</td>
-                <td>Varies by track; mixes live/recorded depending on program.</td>
+                <td>Check the selected program&apos;s current official details.</td>
               </tr>
               <tr>
                 <td>Focus</td>
                 <td>MERN + Gen AI; review the canonical course curriculum and outcomes.</td>
-                <td>Broad catalog across tracks; depth varies by specialization.</td>
+                <td>Review the syllabus for the specific program.</td>
               </tr>
               <tr>
                 <td>Batch Size</td>
                 <td>Contact DCA for current class-size details.</td>
-                <td>Typically larger national cohorts (varies by batch).</td>
+                <td>Confirm current cohort details with the provider.</td>
               </tr>
               <tr>
                 <td>Mentoring</td>
                 <td>Contact DCA for current learner-support details.</td>
-                <td>Mentor support available; cadence & ratio vary by course.</td>
+                <td>Confirm the support model for the selected program.</td>
               </tr>
               <tr>
                 <td>Projects</td>
                 <td>See the course curriculum and listed outcomes.</td>
-                <td>Project work included; requirements vary by track.</td>
+                <td>Check the selected program&apos;s curriculum.</td>
               </tr>
               <tr>
                 <td>Duration</td>
@@ -97,14 +121,14 @@ export default function Page() {
               <tr>
                 <td>Who it fits</td>
                 <td>Learners comparing the course curriculum and current delivery details.</td>
-                <td>Learners who prefer a large national platform’s ecosystem.</td>
+                <td>Compare official program details with your learning needs.</td>
               </tr>
             </tbody>
           </table>
         </div>
         <p className="mt-3 text-sm text-gray-500">
-          Note: Provider offerings evolve. Use this page as a starting point and verify
-          the latest details on each provider’s website.
+          Provider offerings change. Competitor details above are intentionally
+          limited to items that should be verified on the official program page.
         </p>
       </section>
 
@@ -226,7 +250,7 @@ export default function Page() {
               {
                 "@type": "ListItem",
                 position: 2,
-                name: "Doon Coding Academy vs Coding Ninjas (2025)",
+                name: "Doon Coding Academy vs Coding Ninjas",
                 item: CANON,
               },
             ],

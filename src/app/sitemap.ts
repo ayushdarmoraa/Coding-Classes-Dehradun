@@ -14,7 +14,6 @@ const VS_SLUGS = ['coding-ninjas', 'scaler'] as const
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = []
-  const now = new Date()
 
   // --- Static evergreen pages (monthly) ---
   const staticMonthly = [
@@ -31,13 +30,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const path of staticMonthly) {
     entries.push({
       url: `${BASE_URL}${path === '/' ? '/' : path}`,
-      changeFrequency: path === '/blog' ? 'weekly' : 'monthly',
+      changeFrequency: 'monthly',
       priority:
         path === '/' ? 1.0
         : path === '/courses' || path === '/online-courses' ? 0.9
         : path.startsWith('/locations') ? 0.8
         : 0.7,
-      // Optional: omit lastModified for static pages or use a build-time value if you have one
     })
   }
 
@@ -65,14 +63,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${BASE_URL}/locations`,
     changeFrequency: 'monthly',
     priority: 0.7,
-    lastModified: now,
   })
   for (const slug of ['noida', 'bangalore', 'mumbai']) {
     entries.push({
       url: `${BASE_URL}/locations/${slug}`,
       changeFrequency: 'monthly',
       priority: 0.7,
-      lastModified: now,
     })
   }
 
@@ -82,17 +78,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   })
 
-  // --- Blog posts (programmatic + lastModified via fs.stat) ---
+  // --- Blog posts (explicit editorial modification dates only) ---
   const posts = await getAllBlogPosts() // already excludes drafts per your filter
   for (const post of posts) {
     const slug = post.slug // derived from filename in lib/blog
-    const lm =
-      (await getPostLastModified(slug)) ||
-      post.lastModified ||
-      post.date // ISO string from front matter
+    const lm = (await getPostLastModified(slug)) || post.lastModified
     entries.push({
       url: `${BASE_URL}/blog/${slug}`,
-      lastModified: lm ? new Date(lm) : undefined,
+      ...(lm ? { lastModified: new Date(lm) } : {}),
       // Priority per contract
       priority: 0.7,
     })
@@ -104,8 +97,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (!isCourseModeAvailable(c, 'Online')) continue
     entries.push({
       url: `${BASE_URL}/online-courses/${c.slug}`,
-      // Fallback lastModified: omit or use new Date() if you prefer freshness signals
-      // lastModified: new Date(),
       priority: 0.9,
     })
   }
@@ -131,7 +122,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (!isCourseModeAvailable(c, 'On-Campus')) continue
     entries.push({
       url: `${BASE_URL}/courses/${c.slug}`,
-      lastModified: now,
       priority: 0.9,
     })
   }
@@ -140,7 +130,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const v of VS_SLUGS) {
     entries.push({
       url: `${BASE_URL}/vs/${v}`,
-      // lastModified: new Date(),
       priority: 0.8,
     })
   }

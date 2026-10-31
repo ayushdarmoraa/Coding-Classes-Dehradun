@@ -396,10 +396,41 @@ test("guide detail uses only later editorial update dates in rendered text and B
 test("sitemap retains every published guide URL", async () => {
   const entries = await sitemapModule.default();
   const urls = new Set(entries.map(({ url }) => new URL(url).pathname));
+  const entriesByPath = new Map(
+    entries.map((entry) => [new URL(entry.url).pathname, entry]),
+  );
 
   for (const { slug } of blogModule.getAllBlogPosts()) {
     assert.ok(urls.has(`/blog/${slug}`), `sitemap should include /blog/${slug}`);
   }
   assert.ok(urls.has("/blog"));
   assert.equal(urls.has("/projects"), false);
+
+  for (const pathname of [
+    "/locations",
+    "/locations/dehradun",
+    "/locations/noida",
+    "/locations/bangalore",
+    "/locations/mumbai",
+    "/courses/python",
+    "/vs/coding-ninjas",
+    "/vs/scaler",
+  ]) {
+    const entry = entriesByPath.get(pathname);
+    assert.ok(entry, `sitemap should preserve ${pathname}`);
+    assert.equal(
+      Object.hasOwn(entry, "lastModified"),
+      false,
+      `${pathname} should not receive a synthetic modification date`,
+    );
+  }
+
+  for (const { slug } of blogModule.getAllBlogPosts()) {
+    if (blogModule.getPostLastModified(slug)) continue;
+    assert.equal(
+      Object.hasOwn(entriesByPath.get(`/blog/${slug}`), "lastModified"),
+      false,
+      `/blog/${slug} should omit lastModified without an editorial update date`,
+    );
+  }
 });
