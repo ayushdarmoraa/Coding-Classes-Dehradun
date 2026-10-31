@@ -449,6 +449,53 @@ test("enquiry form preserves accessible feedback and removes the placeholder rev
   assert.doesNotMatch(successMarkup, /g\.page\/r\/|Leave a Google Review/);
 });
 
+test("WhatsApp enquiry link includes all submitted details in a structured message", () => {
+  const { createWhatsAppEnquiryUrl, resolveWhatsAppFormData } = loadComponent(
+    "src/components/features/EnquiryForm.tsx",
+  );
+  const submittedFormData = {
+    name: "Test Learner",
+    email: "learner@example.test",
+    phone: "+91 9876543210",
+    course: "full-stack",
+    message: "I would like to know more.",
+  };
+  const currentFormData = {
+    name: "",
+    email: "",
+    phone: "",
+    course: "",
+    message: "",
+  };
+  const resolvedData = resolveWhatsAppFormData(
+    currentFormData,
+    submittedFormData,
+    "success",
+  );
+  const url = new URL(createWhatsAppEnquiryUrl(resolvedData));
+
+  assert.equal(url.origin + url.pathname, "https://wa.me/917037905464");
+  assert.equal(
+    url.searchParams.get("text"),
+    [
+      "Hi, I would like to enquire about a course at Doon Coding Academy.",
+      "",
+      "Full Name: Test Learner",
+      "Email Address: learner@example.test",
+      "Phone Number: +91 9876543210",
+      "Course of Interest: Full-Stack Development (MERN + Gen AI)",
+      "",
+      "Message:",
+      "I would like to know more.",
+    ].join("\n"),
+  );
+  assert.equal(
+    resolveWhatsAppFormData(currentFormData, submittedFormData, "idle"),
+    currentFormData,
+    "edited form values should replace the successful submission",
+  );
+});
+
 test("historical enquiry JSON remains byte-for-byte unchanged", () => {
   assert.equal(currentHistoricalEnquiriesHash(), historicalEnquiriesHash);
 });
