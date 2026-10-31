@@ -38,12 +38,11 @@ export default function OutcomesContent({
           id="outcomes-title"
           className="text-3xl font-bold tracking-tight md:text-4xl"
         >
-          Learner stories
+          Learner outcomes and student feedback
         </h1>
         <p className="mt-4 max-w-3xl text-gray-700">
-          Read learner feedback shared with publication permission. Any reported
-          outcome metrics include their cohort, measurement method, evidence,
-          and limitations.
+          Explore reported job and internship outcomes and learner feedback
+          shared with publication permission.
         </p>
       </header>
 
@@ -71,66 +70,78 @@ export default function OutcomesContent({
                 >
                   <h3 className="text-xl font-semibold">{metric.title}</h3>
                   <p className="mt-3 text-gray-800">{metric.publicStatement}</p>
-                  <dl className="mt-5 space-y-3 text-sm text-gray-700">
-                    <div>
-                      <dt className="font-semibold">How it is measured</dt>
-                      <dd>{metric.definition}</dd>
+                  {metric.kind === "placement" ? (
+                    <div className="mt-5 space-y-3 text-sm text-gray-700">
+                      <p>
+                        Across DCA&apos;s on-campus and online courses, this
+                        includes opportunities supported by DCA and independently
+                        sourced by learners.
+                      </p>
+                      <p>{metric.sourceLabel}</p>
                     </div>
-                    {metric.placementDefinition && (
+                  ) : (
+                    <dl className="mt-5 space-y-3 text-sm text-gray-700">
                       <div>
-                        <dt className="font-semibold">Placement definition</dt>
-                        <dd>{metric.placementDefinition}</dd>
+                        <dt className="font-semibold">How it is measured</dt>
+                        <dd>{metric.definition}</dd>
                       </div>
-                    )}
-                    <div>
-                      <dt className="font-semibold">Numerator / denominator</dt>
-                      <dd>
-                        {metric.numerator.toLocaleString("en-IN")} /{" "}
-                        {metric.denominator.toLocaleString("en-IN")}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="font-semibold">Eligible cohort</dt>
-                      <dd>{metric.eligibleCohort}</dd>
-                    </div>
-                    <div>
-                      <dt className="font-semibold">Measurement period</dt>
-                      <dd>
-                        <time dateTime={metric.periodStart}>
-                          {metric.periodStart}
-                        </time>
-                        {" – "}
-                        <time dateTime={metric.periodEnd}>
-                          {metric.periodEnd}
-                        </time>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="font-semibold">Sample size</dt>
-                      <dd>{metric.sampleSize.toLocaleString("en-IN")}</dd>
-                    </div>
-                    <div>
-                      <dt className="font-semibold">Exclusions</dt>
-                      <dd>{metric.exclusions.join("; ")}</dd>
-                    </div>
-                    <div>
-                      <dt className="font-semibold">Limitations</dt>
-                      <dd>{metric.limitations}</dd>
-                    </div>
-                    <div>
-                      <dt className="font-semibold">Evidence source</dt>
-                      <dd>{metric.sourceLabel}</dd>
-                    </div>
-                    {metric.kind === "project-completion" && (
                       <div>
-                        <dt className="font-semibold">Project permission</dt>
+                        <dt className="font-semibold">Numerator / denominator</dt>
                         <dd>
-                          Publication permission for the reported project evidence
-                          was verified.
+                          {metric.numerator.toLocaleString("en-IN")} /{" "}
+                          {metric.denominator.toLocaleString("en-IN")}
                         </dd>
                       </div>
-                    )}
-                  </dl>
+                      <div>
+                        <dt className="font-semibold">Eligible cohort</dt>
+                        <dd>{metric.eligibleCohort}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-semibold">Measurement period</dt>
+                        <dd>
+                          {metric.measurementPeriod}
+                          {metric.periodStart && metric.periodEnd && (
+                            <>
+                              {" ("}
+                              <time dateTime={metric.periodStart}>
+                                {metric.periodStart}
+                              </time>
+                              {" – "}
+                              <time dateTime={metric.periodEnd}>
+                                {metric.periodEnd}
+                              </time>
+                              {")"}
+                            </>
+                          )}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="font-semibold">Sample size</dt>
+                        <dd>{metric.sampleSize.toLocaleString("en-IN")}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-semibold">Exclusions</dt>
+                        <dd>{metric.exclusions.join("; ")}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-semibold">Limitations</dt>
+                        <dd>{metric.limitations}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-semibold">Evidence source</dt>
+                        <dd>{metric.sourceLabel}</dd>
+                      </div>
+                      {metric.kind === "project-completion" && (
+                        <div>
+                          <dt className="font-semibold">Project permission</dt>
+                          <dd>
+                            Publication permission for the reported project
+                            evidence was verified.
+                          </dd>
+                        </div>
+                      )}
+                    </dl>
+                  )}
                 </article>
               ))}
             </div>
