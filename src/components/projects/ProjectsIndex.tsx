@@ -35,12 +35,6 @@ export default function ProjectsIndex({
           project is described using its provided purpose, technologies, and
           learning links.
         </p>
-        {localPreview && (
-          <p className="mt-4 max-w-3xl rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
-            Local preview only. Changes are not live on the public website
-            until merged and deployed.
-          </p>
-        )}
       </header>
 
       <section
