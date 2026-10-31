@@ -102,8 +102,8 @@ test("public site metadata, routes, feeds, and robots use centralized site confi
 test("global organization schemas retain the owner-confirmed 2019 founding date", () => {
   const layout = appSource("layout.tsx");
   assert.deepEqual(
-    layout.match(/foundingDate:\s*"2019(?:-01-01)?"/g),
-    ['foundingDate: "2019-01-01"', 'foundingDate: "2019"'],
+    layout.match(/foundingDate:\s*"2019"/g),
+    ['foundingDate: "2019"', 'foundingDate: "2019"'],
   );
 });
 

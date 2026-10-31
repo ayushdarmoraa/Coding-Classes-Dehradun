@@ -269,7 +269,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               name: SITE.name,
               url: SITE.url,
               email: "dooncodingacademy@gmail.com",
-              foundingDate: "2019-01-01",
+              foundingDate: "2019",
               // Social profiles (env-gated, filtered for presence)
               sameAs: [
                 process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,
