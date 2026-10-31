@@ -60,6 +60,7 @@ function metric(overrides = {}) {
     numerator: 2,
     denominator: 4,
     eligibleCohort: "Test-only cohort",
+    measurementPeriod: "Test-only measurement period",
     periodStart: "2025-01-01",
     periodEnd: "2025-03-31",
     sampleSize: 4,
@@ -91,6 +92,22 @@ function testimonial(overrides = {}) {
 test("owner-approved WhatsApp testimonials are publishable and no demo data is used", () => {
   const content = outcomes.getPublishedOutcomeContent();
   assert.deepEqual(
+    content.metrics.map(({ numerator, denominator, kind, measurementPeriod }) => ({
+      numerator,
+      denominator,
+      kind,
+      measurementPeriod,
+    })),
+    [
+      {
+        numerator: 450,
+        denominator: 500,
+        kind: "placement",
+        measurementPeriod: "Since DCA began through 31 October 2026",
+      },
+    ],
+  );
+  assert.deepEqual(
     content.stories.map(({ attribution, quote }) => [attribution, quote]),
     [
       [
@@ -107,13 +124,27 @@ test("owner-approved WhatsApp testimonials are publishable and no demo data is u
       ],
     ],
   );
-  assert.equal(content.metrics.length, 0);
+  assert.equal(content.metrics[0].placementDefinition.includes("six months"), true);
+  assert.doesNotMatch(content.metrics[0].publicStatement, /\b407\b|\b43\b/);
   assert.ok(outcomes.hasPublishedOutcomeContent());
   assert.deepEqual(getPublishedOutcomeRoutes(), ["/outcomes"]);
   for (const story of content.stories) {
     assert.equal(story.sourceLabel, "WhatsApp");
     assert.match(story.quote, /\w/);
   }
+
+  const OutcomesContent = loadTypeScript("src/components/outcomes/OutcomesContent.tsx", {
+    "@/lib/outcomes": outcomes,
+  }).default;
+  const markup = renderToStaticMarkup(
+    React.createElement(OutcomesContent, content),
+  );
+  assert.match(markup, /450 of 500 learners/);
+  assert.match(markup, /job or internship within six months/);
+  assert.match(markup, /on-campus and online courses/);
+  assert.match(markup, /supported by DCA and independently sourced/);
+  assert.match(markup, /verified by the DCA owner through 31 October 2026/);
+  assert.doesNotMatch(markup, /\b407\b|\b43\b|Since DCA began/);
 });
 
 test("empty Outcomes remain noindex and unavailable in development", () => {
@@ -155,6 +186,19 @@ test("empty Outcomes remain noindex and unavailable in development", () => {
 
 test("metric validation requires coherent counts and a valid measurement period", () => {
   assert.doesNotThrow(() => outcomes.validateOutcomeEvidence([metric()]));
+  assert.doesNotThrow(() =>
+    outcomes.validateOutcomeEvidence([
+      metric({
+        kind: "placement",
+        numerator: 450,
+        denominator: 500,
+        periodStart: undefined,
+        periodEnd: undefined,
+        measurementPeriod: "Since DCA began through 31 October 2026",
+        placementDefinition: "A job or internship within six months after course completion.",
+      }),
+    ]),
+  );
   assert.throws(
     () => outcomes.validateOutcomeEvidence([metric({ numerator: 5 })]),
     /numerator/i,
@@ -436,7 +480,7 @@ test("approved evidence enables canonical metadata and renders the page", () => 
           outcomes.buildOutcomeItemListSchema(approvedContent),
         )}</script>
       </head>
-      <body><main><h1>Learner stories</h1></main></body>
+      <body><main><h1>Learner outcomes and student feedback</h1></main></body>
     </html>
   `;
   assert.deepEqual(
@@ -491,11 +535,11 @@ test("Outcomes title uses the root layout template exactly once", () => {
   const pageTitle = page.generateMetadata().title;
   const titleTemplate = rootLayout.metadata.title.template;
 
-  assert.equal(pageTitle, "Learner Stories");
+  assert.equal(pageTitle, "Learner Outcomes");
   assert.equal(titleTemplate, "%s | Doon Coding Academy");
   assert.equal(
     titleTemplate.replace("%s", pageTitle),
-    "Learner Stories | Doon Coding Academy",
+    "Learner Outcomes | Doon Coding Academy",
   );
 });
 
@@ -507,7 +551,7 @@ test("SEO QA requires visible approved evidence and matching ItemList schema", (
         <meta name="description" content="Verified outcomes are presented with clear cohort definitions, source checks, measurement periods, and limitations.">
         <link rel="canonical" href="https://dooncodingacademy.in/outcomes">
       </head>
-      <body><main><h1>Learner stories</h1></main></body>
+      <body><main><h1>Learner outcomes and student feedback</h1></main></body>
     </html>
   `;
   assert.ok(

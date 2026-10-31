@@ -7,9 +7,9 @@ import {
 } from "@/lib/outcomes";
 import { SITE } from "@/lib/site-config";
 
-const title = "Learner Stories";
+const title = "Learner Outcomes";
 const description =
-  "Read verified learner feedback shared with publication permission by Doon Coding Academy students.";
+  "Explore DCA-reported learner job and internship outcomes alongside student feedback shared with publication permission.";
 
 export function generateMetadata(): Metadata {
   if (!hasPublishedOutcomeContent()) {

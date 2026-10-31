@@ -40,8 +40,9 @@ const outcomeMetricSchema = evidenceSchema
     numerator: z.number().int().nonnegative(),
     denominator: z.number().int().positive(),
     eligibleCohort: z.string().trim().min(1),
-    periodStart: dateSchema,
-    periodEnd: dateSchema,
+    measurementPeriod: z.string().trim().min(1),
+    periodStart: dateSchema.optional(),
+    periodEnd: dateSchema.optional(),
     sampleSize: z.number().int().positive(),
     exclusions: z.array(z.string().trim().min(1)).min(1),
     limitations: z.string().trim().min(1),
@@ -53,10 +54,24 @@ const outcomeMetricSchema = evidenceSchema
     message: "Numerator cannot exceed denominator",
     path: ["numerator"],
   })
-  .refine((metric) => metric.periodStart <= metric.periodEnd, {
-    message: "Measurement period end must not precede its start",
-    path: ["periodEnd"],
-  })
+  .refine(
+    (metric) =>
+      (metric.periodStart === undefined) === (metric.periodEnd === undefined),
+    {
+      message: "Provide both measurement period dates or neither",
+      path: ["periodEnd"],
+    },
+  )
+  .refine(
+    (metric) =>
+      metric.periodStart === undefined ||
+      metric.periodEnd === undefined ||
+      metric.periodStart <= metric.periodEnd,
+    {
+      message: "Measurement period end must not precede its start",
+      path: ["periodEnd"],
+    },
+  )
   .refine(
     (metric) =>
       !metric.published ||
@@ -95,7 +110,39 @@ export interface PublishedOutcomeContent {
   stories: OutcomeStory[];
 }
 
-export const OUTCOME_METRICS: readonly OutcomeMetric[] = [];
+export const OUTCOME_METRICS: readonly OutcomeMetric[] = [
+  {
+    kind: "placement",
+    slug: "course-completion-job-or-internship-outcomes",
+    title: "450 of 500 learners",
+    publicStatement:
+      "secured a job or internship within six months of completing their course.",
+    sourceLabel: "Figures verified by the DCA owner through 31 October 2026.",
+    definition:
+      "Counts learners who completed an on-campus or online DCA course and secured a job or internship within six months after course completion.",
+    placementDefinition:
+      "A job or internship secured within six months after completing a course; opportunities before course completion are not counted.",
+    numerator: 450,
+    denominator: 500,
+    eligibleCohort:
+      "Learners who completed a DCA course, on-campus or online, since the academy began.",
+    measurementPeriod: "Since DCA began through 31 October 2026",
+    sampleSize: 500,
+    exclusions: ["No additional exclusions were provided."],
+    limitations:
+      "Includes opportunities supported by DCA and independently sourced by learners; source counts are not reported.",
+    sourceEvidenceReference:
+      "Aggregate figures confirmed by the DCA owner in the 31 October 2026 conversation.",
+    sourceVerified: true,
+    claimVerified: true,
+    verificationOwner: "Doon Coding Academy owner",
+    verifiedAt: "2026-10-31",
+    businessApprovalReference:
+      "Owner approval of the Outcomes preview in the 31 October 2026 conversation.",
+    businessApproved: true,
+    published: true,
+  },
+];
 
 export function validateOutcomeEvidence(
   metrics: readonly unknown[],
