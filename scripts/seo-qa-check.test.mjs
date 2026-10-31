@@ -99,6 +99,11 @@ test("public site metadata, routes, feeds, and robots use centralized site confi
   }
 });
 
+test("global organization schema does not invent an academy founding date", () => {
+  const layout = appSource("layout.tsx");
+  assert.doesNotMatch(layout, /foundingDate\s*:/);
+});
+
 test("validates canonical, main heading, and nested Course JSON-LD in rendered HTML", () => {
   const html = page("/courses/full-stack", [
     {

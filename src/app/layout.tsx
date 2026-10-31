@@ -269,7 +269,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               name: SITE.name,
               url: SITE.url,
               email: "dooncodingacademy@gmail.com",
-              foundingDate: "2019-01-01",
               // Social profiles (env-gated, filtered for presence)
               sameAs: [
                 process.env.NEXT_PUBLIC_FACEBOOK_URL || undefined,
@@ -388,7 +387,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     closes: "18:30"
                   }
                 ],
-                foundingDate: "2019",
                 geo: {
                   "@type": "GeoCoordinates",
                   latitude: 30.43859,
