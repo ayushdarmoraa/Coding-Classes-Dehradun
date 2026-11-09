@@ -451,8 +451,8 @@ test("enquiry form preserves accessible feedback and removes the placeholder rev
   assert.doesNotMatch(successMarkup, /g\.page\/r\/|Leave a Google Review/);
 });
 
-test("WhatsApp enquiry message includes all submitted details", () => {
-  const { createWhatsAppEnquiryUrl } = loadComponent(
+test("WhatsApp enquiry link includes all submitted details in a structured message", () => {
+  const { createWhatsAppEnquiryUrl, resolveWhatsAppFormData } = loadComponent(
     "src/components/features/EnquiryForm.tsx",
   );
   const submittedFormData = {
@@ -462,7 +462,19 @@ test("WhatsApp enquiry message includes all submitted details", () => {
     course: "full-stack",
     message: "I would like to know more.",
   };
-  const url = new URL(createWhatsAppEnquiryUrl(submittedFormData));
+  const currentFormData = {
+    name: "",
+    email: "",
+    phone: "",
+    course: "",
+    message: "",
+  };
+  const resolvedData = resolveWhatsAppFormData(
+    currentFormData,
+    submittedFormData,
+    "success",
+  );
+  const url = new URL(createWhatsAppEnquiryUrl(resolvedData));
 
   assert.equal(url.origin + url.pathname, "https://wa.me/917037905464");
   assert.equal(
@@ -478,6 +490,11 @@ test("WhatsApp enquiry message includes all submitted details", () => {
       "Message:",
       "I would like to know more.",
     ].join("\n"),
+  );
+  assert.equal(
+    resolveWhatsAppFormData(currentFormData, submittedFormData, "idle"),
+    currentFormData,
+    "edited form values should replace the successful submission",
   );
 });
 

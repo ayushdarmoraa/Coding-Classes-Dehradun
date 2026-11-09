@@ -491,6 +491,7 @@ test("project pages use publication gating and stay out of public navigation and
     path.join(repositoryRoot, "src/components/projects/ProjectsIndex.tsx"),
     "utf8",
   );
+  assert.doesNotMatch(projectIndex, /Local preview only|not live on the public website/);
   assert.match(
     projectIndex,
     /showPendingRepository=\{localPreview \|\| !project\.repositoryUrl\}/,

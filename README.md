@@ -44,6 +44,8 @@ Additional utilities and data live under `src/lib`.
 
 This site is designed to be deployed on **Vercel**. Commit changes to the `main` branch, and Vercel will handle the build and deployment process automatically.
 
+<!-- Making the repository public does not deploy the site; production deployment follows changes merged to main. -->
+
 ## SEO QA (pre-merge) checks
 
 We run a lightweight SEO QA script on PRs to detect basic issues early:

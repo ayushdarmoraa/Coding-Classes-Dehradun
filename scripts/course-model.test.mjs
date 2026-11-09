@@ -679,6 +679,17 @@ test("course display consumers use structured canonical facts", async () => {
       /live \+ projects|recordings|weekly mentor hours|project reviews|small cohorts|small-batch|mentor-led|placement prep|mock interviews|referrals|live mentor feedback|practice interviews/i,
     );
   }
+  const comparisonPages = comparisonAndLocationPages.slice(0, 2);
+  for (const source of comparisonPages) {
+    assert.match(source, /dateTime="2026-10-31"/);
+    assert.match(source, /not an\s+independent ranking/);
+    assert.match(source, /official site/);
+    assert.match(source, /not\s+independently verified/);
+    assert.doesNotMatch(
+      source,
+      /typically larger|larger cohorts|1:many|typically higher|career services at scale|theory-first|project-first|fundamentals → advanced with portfolio/i,
+    );
+  }
   const courseDetail = await readFile(
     path.resolve(repositoryRoot, "src/app/courses/[slug]/page.tsx"),
     "utf8",

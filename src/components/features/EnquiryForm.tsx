@@ -115,6 +115,16 @@ export function createWhatsAppEnquiryUrl(
   return `https://wa.me/917037905464?text=${encodeURIComponent(message)}`;
 }
 
+export function resolveWhatsAppFormData(
+  formData: FormData,
+  submittedFormData: FormData | null,
+  submitStatus: 'idle' | 'success' | 'error',
+) {
+  return submitStatus === 'success' && submittedFormData
+    ? submittedFormData
+    : formData;
+}
+
 const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
   leadContext,
 }) => {
@@ -196,7 +206,13 @@ const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
         page_path: pathname,
       });
       window.open(
-        createWhatsAppEnquiryUrl(submittedFormData),
+        createWhatsAppEnquiryUrl(
+          resolveWhatsAppFormData(
+            formData,
+            submittedFormData,
+            submitStatus,
+          ),
+        ),
         '_blank',
         'noopener,noreferrer',
       );
@@ -226,7 +242,13 @@ const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
       page_path: pathname,
     });
     window.open(
-      createWhatsAppEnquiryUrl(formData),
+      createWhatsAppEnquiryUrl(
+        resolveWhatsAppFormData(
+          formData,
+          submittedFormData,
+          submitStatus,
+        ),
+      ),
       '_blank',
       'noopener,noreferrer',
     );
