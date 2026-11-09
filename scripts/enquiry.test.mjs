@@ -429,6 +429,8 @@ test("enquiry form preserves accessible feedback and removes the placeholder rev
   assert.match(markup, /maxLength="254"/);
   assert.match(markup, /maxLength="30"/);
   assert.match(markup, /maxLength="2000"/);
+  assert.match(markup, /<button[^>]*>WhatsApp Us<\/button>/);
+  assert.doesNotMatch(markup, /wa\.me/);
   assert.doesNotMatch(markup, /g\.page\/r\/|Leave a Google Review/);
   const successMarkup = renderToStaticMarkup(
     React.createElement(EnquiryFormModule.EnquirySuccessNotice, {
@@ -447,6 +449,36 @@ test("enquiry form preserves accessible feedback and removes the placeholder rev
   assert.match(errorMarkup, /role="alert" aria-live="assertive"/);
   assert.match(errorMarkup, /Unable to send enquiry\. Please try again\./);
   assert.doesNotMatch(successMarkup, /g\.page\/r\/|Leave a Google Review/);
+});
+
+test("WhatsApp enquiry message includes all submitted details", () => {
+  const { createWhatsAppEnquiryUrl } = loadComponent(
+    "src/components/features/EnquiryForm.tsx",
+  );
+  const submittedFormData = {
+    name: "Test Learner",
+    email: "learner@example.test",
+    phone: "+91 9876543210",
+    course: "full-stack",
+    message: "I would like to know more.",
+  };
+  const url = new URL(createWhatsAppEnquiryUrl(submittedFormData));
+
+  assert.equal(url.origin + url.pathname, "https://wa.me/917037905464");
+  assert.equal(
+    url.searchParams.get("text"),
+    [
+      "Hi, I would like to enquire about a course at Doon Coding Academy.",
+      "",
+      "Full Name: Test Learner",
+      "Email Address: learner@example.test",
+      "Phone Number: +91 9876543210",
+      "Course of Interest: Full-Stack Development (MERN + Gen AI)",
+      "",
+      "Message:",
+      "I would like to know more.",
+    ].join("\n"),
+  );
 });
 
 test("historical enquiry JSON remains byte-for-byte unchanged", () => {
