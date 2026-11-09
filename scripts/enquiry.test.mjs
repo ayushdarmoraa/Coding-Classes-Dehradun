@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -15,14 +14,11 @@ let sendMail = async () => ({ messageId: "test-message" });
 let mailOptions = [];
 const analyticsEvents = [];
 let requestNumber = 0;
-const historicalEnquiriesPath = path.join(
+const legacyEnquiriesPath = path.join(
   repositoryRoot,
   "data",
   "enquiries.json",
 );
-const historicalEnquiriesHash = createHash("sha256")
-  .update(readFileSync(historicalEnquiriesPath))
-  .digest("hex");
 
 function nativeRequire(specifier, parentFilename) {
   if (specifier === "next/server") {
@@ -165,12 +161,6 @@ function requestFor(payload, ip) {
   });
 }
 
-function currentHistoricalEnquiriesHash() {
-  return createHash("sha256")
-    .update(readFileSync(historicalEnquiriesPath))
-    .digest("hex");
-}
-
 test("shared enquiry schema accepts documented field limits and rejects oversized values", () => {
   const maximumEmail =
     `${"a".repeat(64)}@${"b".repeat(63)}.${"c".repeat(63)}.${"d".repeat(61)}`;
@@ -238,7 +228,7 @@ test("enquiry API sends a valid enquiry through SMTP without persisting it local
   assert.equal(mailOptions[0].to, process.env.CONTACT_EMAIL || "dooncodingacademy@gmail.com");
   assert.equal(mailOptions[0].subject, "New website enquiry");
   assert.equal("replyTo" in mailOptions[0], false);
-  assert.equal(currentHistoricalEnquiriesHash(), historicalEnquiriesHash);
+  assert.equal(existsSync(legacyEnquiriesPath), false);
 });
 
 test("enquiry API returns a generic error and redacted diagnostics when SMTP fails", async () => {
@@ -498,8 +488,8 @@ test("WhatsApp enquiry link includes all submitted details in a structured messa
   );
 });
 
-test("historical enquiry JSON remains byte-for-byte unchanged", () => {
-  assert.equal(currentHistoricalEnquiriesHash(), historicalEnquiriesHash);
+test("legacy enquiry JSON is absent from the repository", () => {
+  assert.equal(existsSync(legacyEnquiriesPath), false);
 });
 
 test("enquiry form controls have associated labels and accessible field errors", () => {
