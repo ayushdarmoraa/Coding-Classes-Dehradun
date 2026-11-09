@@ -429,6 +429,8 @@ test("enquiry form preserves accessible feedback and removes the placeholder rev
   assert.match(markup, /maxLength="254"/);
   assert.match(markup, /maxLength="30"/);
   assert.match(markup, /maxLength="2000"/);
+  assert.match(markup, /<button[^>]*>WhatsApp Us<\/button>/);
+  assert.doesNotMatch(markup, /wa\.me/);
   assert.doesNotMatch(markup, /g\.page\/r\/|Leave a Google Review/);
   const successMarkup = renderToStaticMarkup(
     React.createElement(EnquiryFormModule.EnquirySuccessNotice, {
