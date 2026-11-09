@@ -205,6 +205,17 @@ const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
         city: ctx.city,
         page_path: pathname,
       });
+      window.open(
+        createWhatsAppEnquiryUrl(
+          resolveWhatsAppFormData(
+            formData,
+            submittedFormData,
+            submitStatus,
+          ),
+        ),
+        '_blank',
+        'noopener,noreferrer',
+      );
       return;
     }
 
@@ -230,6 +241,17 @@ const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
       city: ctx.city,
       page_path: pathname,
     });
+    window.open(
+      createWhatsAppEnquiryUrl(
+        resolveWhatsAppFormData(
+          formData,
+          submittedFormData,
+          submitStatus,
+        ),
+      ),
+      '_blank',
+      'noopener,noreferrer',
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -472,16 +494,7 @@ const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
             type="button"
             variant="secondary"
             size="lg"
-            href={createWhatsAppEnquiryUrl(
-              resolveWhatsAppFormData(
-                formData,
-                submittedFormData,
-                submitStatus,
-              ),
-            )}
             className="flex-1"
-            target="_blank"
-            rel="noopener noreferrer"
             onClick={handleWhatsAppClick}
           >
             WhatsApp Us
