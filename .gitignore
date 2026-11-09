@@ -1,10 +1,15 @@
 node_modules
 .next
 out
-.env.local
+.env
+.env.*
+!.env.example
 *.log
 dist
 
 # Local backup files
 *.bak
 .vercel
+
+# Local enquiry data
+data/enquiries.json
