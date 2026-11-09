@@ -154,15 +154,27 @@ function findElements(node, predicate, matches = []) {
   return matches;
 }
 
-function getDelegatedClickHandler(pathname) {
+function getInlineScriptBody(id) {
   const layout = readFileSync(
     path.resolve(repositoryRoot, "src/app/layout.tsx"),
     "utf8",
   );
+  const escapedId = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const script = layout.match(
-    /<Script id="ga4-delegated-clicks"[^>]*>\s*\{\s*`([\s\S]*?)`\s*\}\s*<\/Script>/,
+    new RegExp(
+      `<Script id="${escapedId}"[^>]*>\\s*\\{\\s*\`([\\s\\S]*?)\`\\s*\\}\\s*<\\/Script>`,
+    ),
   );
-  assert.ok(script, "missing delegated click handler script");
+  assert.ok(script, `missing inline script ${id}`);
+
+  const templateBody = script[1]
+    .replaceAll("${process.env.NEXT_PUBLIC_GA_ID}", "G-TEST")
+    .replaceAll("${JSON.stringify(PUBLISHED_LAB_PATHS)}", "[]");
+  return new Function(`return \`${templateBody}\`;`)();
+}
+
+function getDelegatedClickHandler(pathname) {
+  const scriptBody = getInlineScriptBody("ga4-delegated-clicks");
 
   const delegatedEvents = [];
   const listeners = new Map();
@@ -173,10 +185,6 @@ function getDelegatedClickHandler(pathname) {
     addEventListener: (name, handler) => listeners.set(name, handler),
     removeEventListener: (name) => listeners.delete(name),
   };
-  const scriptBody = script[1].replace(
-    "${JSON.stringify(PUBLISHED_LAB_PATHS)}",
-    "[]",
-  );
   runInNewContext(scriptBody, {
     document,
     location: { pathname },
@@ -186,6 +194,15 @@ function getDelegatedClickHandler(pathname) {
   assert.equal(typeof handler, "function");
   return { delegatedEvents, handler };
 }
+
+test("GA inline scripts parse after template interpolation", () => {
+  for (const id of ["ga4-loader", "ga4-delegated-clicks"]) {
+    assert.doesNotThrow(
+      () => new Function(getInlineScriptBody(id)),
+      `${id} must be valid emitted browser JavaScript`,
+    );
+  }
+});
 
 function makeClickableAnchor(attributes, textContent = "Talk to a Mentor") {
   const anchor = {

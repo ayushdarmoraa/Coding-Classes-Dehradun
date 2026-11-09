@@ -97,7 +97,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     } catch(_) {}
                   }
                   if ('requestIdleCallback' in window) {
-                    try { (window as any).requestIdleCallback(loadGA, { timeout: 4000 }); } catch (_) { setTimeout(loadGA, 3000); }
+                    try { window.requestIdleCallback(loadGA, { timeout: 4000 }); } catch (_) { setTimeout(loadGA, 3000); }
                   } else {
                     setTimeout(loadGA, 3000);
                   }
@@ -129,7 +129,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
                   function pageTypeFromPath(path) {
                     if (path === '/' || path === '') return 'home';
-                    var normalizedLabPath = path.replace(/\/+$/, '') || '/';
+                    var normalizedLabPath = path;
+                    while (normalizedLabPath.length > 1 && normalizedLabPath.endsWith('/')) {
+                      normalizedLabPath = normalizedLabPath.slice(0, -1);
+                    }
+                    normalizedLabPath = normalizedLabPath || '/';
                     if (normalizedLabPath === '/lab') return 'lab_index';
                     if (publishedLabPaths.indexOf(normalizedLabPath) !== -1) return 'lab_challenge';
                     if (path.startsWith('/online-courses/')) return 'online_course';
@@ -147,8 +151,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
                   function courseSlugFromPath(path) {
                     // /courses/[slug] OR /online-courses/[slug]
-                    var m = path.match(/^\/(?:online-courses|courses)\/([^\/]+)/);
-                    return m ? m[1] : undefined;
+                    var segments = path.split('/');
+                    if (segments[1] !== 'online-courses' && segments[1] !== 'courses') {
+                      return undefined;
+                    }
+                    return segments[2] || undefined;
                   }
 
                   function cityFromPath(path) {
