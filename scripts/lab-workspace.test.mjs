@@ -603,12 +603,31 @@ test("Lab route classifiers distinguish index and mission routes without changin
   assert.equal(analytics.derivePageContext("/other").page_type, "generic");
 
   const layout = readFileSync(path.resolve(root, "src/app/layout.tsx"), "utf8");
-  const classifier = layout.match(/function pageTypeFromPath\(path\)\s*\{[\s\S]*?\n\s*\}/);
-  assert.ok(classifier, "expected the delegated-click page classifier in layout");
-  const pageTypeFromPath = new Function(
-    "publishedLabPaths",
-    `${classifier[0]}; return pageTypeFromPath;`,
-  )(publishedPaths);
+  const script = layout.match(
+    /<Script id="ga4-delegated-clicks"[^>]*>\s*\{\s*`([\s\S]*?)`\s*\}\s*<\/Script>/,
+  );
+  assert.ok(script, "expected the delegated-click script in layout");
+  const emittedScript = new Function(
+    `return \`${script[1].replace(
+      "${JSON.stringify(PUBLISHED_LAB_PATHS)}",
+      JSON.stringify(publishedPaths),
+    )}\`;`,
+  )();
+  const instrumentedScript = emittedScript.replace(
+    /\}\)\(\);\s*$/,
+    "window.__pageTypeFromPath = pageTypeFromPath;\n})();",
+  );
+  assert.notEqual(instrumentedScript, emittedScript);
+  const window = {};
+  runInNewContext(instrumentedScript, {
+    document: {
+      addEventListener() {},
+      removeEventListener() {},
+    },
+    location: { pathname: "/" },
+    window,
+  });
+  const pageTypeFromPath = window.__pageTypeFromPath;
   assert.equal(pageTypeFromPath("/"), "home");
   assert.equal(pageTypeFromPath("/lab"), "lab_index");
   assert.equal(pageTypeFromPath("/lab/"), "lab_index");
