@@ -1,7 +1,8 @@
 "use client";
 import Link, { LinkProps } from 'next/link';
 import React from 'react';
-import { track } from '@/lib/analytics';
+import { sanitizeAnalyticsParams, track } from '@/lib/analytics';
+import { useAnalyticsRouteRegistry } from './AnalyticsRouteRegistryProvider';
 
 interface TrackedLinkProps extends LinkProps {
   children: React.ReactNode;
@@ -21,15 +22,19 @@ export const TrackedLink: React.FC<TrackedLinkProps> = ({
   rel,
   ...linkProps
 }) => {
+  const routes = useAnalyticsRouteRegistry();
+  const safeParams = sanitizeAnalyticsParams(event, eventParams || {}, routes);
+  const safeEvent = safeParams ? event : undefined;
   const handleClick = () => {
-    try { track(event, eventParams || {}); } catch { /* swallow */ }
+    if (!safeParams) return;
+    try { track(event, safeParams); } catch { /* swallow */ }
   };
   return (
     <Link
       {...linkProps}
       className={className}
-      data-event={event}
-      data-event-params={JSON.stringify(eventParams || {})}
+      data-event={safeEvent}
+      data-event-params={safeParams ? JSON.stringify(safeParams) : undefined}
       onClick={handleClick}
       target={target}
       rel={rel}

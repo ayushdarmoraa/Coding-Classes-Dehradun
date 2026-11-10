@@ -4,8 +4,11 @@ import HeaderClient from "@/components/layout/HeaderClient";
 import Footer from "@/components/layout/Footer";
 import Script from "next/script";
 import { getCourses } from "@/lib/courses";
+import { getAllBlogPosts } from "@/lib/blog";
 import { formatINR } from "@/lib/pricing";
 import { PUBLISHED_LAB_ANALYTICS_METADATA } from "@/lib/lab/analytics-metadata";
+import { AnalyticsRouteRegistryProvider } from "@/components/analytics/AnalyticsRouteRegistryProvider";
+import GaPageViewTracker from "@/components/analytics/GaPageViewTracker";
 import { Figtree, JetBrains_Mono, Outfit } from "next/font/google";
 import MotionProvider from "@/components/motion/MotionProvider";
 import FloatingWhatsApp from "@/components/layout/FloatingWhatsApp";
@@ -32,6 +35,63 @@ const jetBrainsMono = JetBrains_Mono({
 const PUBLISHED_LAB_PATHS = PUBLISHED_LAB_ANALYTICS_METADATA.map(
   ({ track, slug }) => `/lab/${track}/${slug}`,
 );
+const SAFE_ANALYTICS_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const ANALYTICS_CITY_SLUGS = ["dehradun", "bangalore", "mumbai", "noida"];
+const ANALYTICS_COURSE_SLUGS = getCourses()
+  .map(({ slug }) => slug)
+  .filter((slug) => SAFE_ANALYTICS_SLUG.test(slug));
+const ANALYTICS_GUIDE_SLUGS = getAllBlogPosts()
+  .map(({ slug }) => slug)
+  .filter((slug) => SAFE_ANALYTICS_SLUG.test(slug));
+const ANALYTICS_CANONICAL_PATHS = [
+  "/",
+  "/about",
+  "/courses",
+  "/online-courses",
+  "/lab",
+  "/faq",
+  "/contact",
+  "/testimonials",
+  "/locations",
+  "/projects",
+  "/outcomes",
+  "/blog",
+  "/vs/coding-ninjas",
+  "/vs/scaler",
+  ...ANALYTICS_CITY_SLUGS.map((slug) => `/locations/${slug}`),
+  ...ANALYTICS_COURSE_SLUGS.flatMap((slug) => [
+    `/courses/${slug}`,
+    `/online-courses/${slug}`,
+  ]),
+  ...ANALYTICS_GUIDE_SLUGS.map((slug) => `/blog/${slug}`),
+  ...PUBLISHED_LAB_PATHS,
+];
+const ANALYTICS_ROUTE_REGISTRY = {
+  courseSlugs: ANALYTICS_COURSE_SLUGS,
+  guideSlugs: ANALYTICS_GUIDE_SLUGS,
+  challengeSlugs: PUBLISHED_LAB_ANALYTICS_METADATA.map(({ slug }) => slug),
+  challengeIds: PUBLISHED_LAB_ANALYTICS_METADATA.map(({ id }) => id),
+  labTracks: PUBLISHED_LAB_ANALYTICS_METADATA.map(({ track }) => track),
+  citySlugs: ANALYTICS_CITY_SLUGS,
+  canonicalPaths: ANALYTICS_CANONICAL_PATHS,
+  siteUrl: new URL(SITE.url).origin,
+};
+const ANALYTICS_ROUTE_REGISTRY_JSON = JSON.stringify(
+  ANALYTICS_ROUTE_REGISTRY,
+).replace(/</g, "\\u003c");
+const ANALYTICS_ROOT_LOCATION = JSON.stringify(`${new URL(SITE.url).origin}/`);
+const ANALYTICS_ROUTE_REGISTRY_SCRIPT = `
+  (function () {
+    var routes = ${ANALYTICS_ROUTE_REGISTRY_JSON};
+    Object.keys(routes).forEach(function (key) {
+      Object.freeze(routes[key]);
+    });
+    Object.defineProperty(window, "__DCA_ANALYTICS_ROUTES__", {
+      value: Object.freeze(routes),
+      configurable: false
+    });
+  })();
+`;
 
 // Using system fonts for maximum performance
 
@@ -72,14 +132,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
       </head>
       <body className="font-sans">
-        <MotionProvider>
-          <HeaderClient />
-          {children}
-          <Footer />
-          <FloatingWhatsApp />
-          <StickyCtaBar />
-          <RevealOnScroll />
-        </MotionProvider>
+        <Script
+          id="analytics-route-registry"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: ANALYTICS_ROUTE_REGISTRY_SCRIPT }}
+        />
+        <AnalyticsRouteRegistryProvider routes={ANALYTICS_ROUTE_REGISTRY}>
+          {process.env.NEXT_PUBLIC_GA_ID ? (
+            <GaPageViewTracker
+              measurementId={process.env.NEXT_PUBLIC_GA_ID}
+              routes={ANALYTICS_ROUTE_REGISTRY}
+            />
+          ) : null}
+          <MotionProvider>
+            <HeaderClient />
+            {children}
+            <Footer />
+            <FloatingWhatsApp />
+            <StickyCtaBar />
+            <RevealOnScroll />
+          </MotionProvider>
+        </AnalyticsRouteRegistryProvider>
 
         {/* GA4 (gated by env var; no-op if env is missing) */}
         {process.env.NEXT_PUBLIC_GA_ID ? (
@@ -107,14 +180,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Script id="ga4-init" strategy="afterInteractive">
               {`
                 window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                // Initialize GA slightly later to align with loader timing
-                setTimeout(function(){
-                  try {
-                    gtag('js', new Date());
-                    gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', { anonymize_ip: true, transport_type: 'beacon' });
-                  } catch(_) {}
-                }, 3200);
+                window.gtag = function(){ window.dataLayer.push(arguments); };
+                window.gtag('js', new Date());
+                window.gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
+                  anonymize_ip: true,
+                  transport_type: 'beacon',
+                  send_page_view: false,
+                  page_location: ${ANALYTICS_ROOT_LOCATION},
+                  page_path: '/',
+                  page_referrer: ''
+                });
+                window.__DCA_GA_READY__ = true;
+                window.dispatchEvent(new Event('dca:ga-ready'));
               `}
             </Script>
 
@@ -128,6 +205,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   }
 
                   function pageTypeFromPath(path) {
+                    while (path.length > 1 && path.endsWith('/')) {
+                      path = path.slice(0, -1);
+                    }
+                    if (canonicalPaths.indexOf(path) === -1) return 'generic';
                     if (path === '/' || path === '') return 'home';
                     var normalizedLabPath = path;
                     while (normalizedLabPath.length > 1 && normalizedLabPath.endsWith('/')) {
@@ -136,18 +217,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     normalizedLabPath = normalizedLabPath || '/';
                     if (normalizedLabPath === '/lab') return 'lab_index';
                     if (publishedLabPaths.indexOf(normalizedLabPath) !== -1) return 'lab_challenge';
-                    if (path.startsWith('/online-courses/')) return 'online_course';
+                    if (path.startsWith('/online-courses/') && courseSlugFromPath(path)) return 'online_course';
                     if (path === '/online-courses') return 'online_course';
-                    if (path.startsWith('/courses/')) return 'course';
+                    if (path.startsWith('/courses/') && courseSlugFromPath(path)) return 'course';
                     if (path === '/courses') return 'course';
-                    if (path.startsWith('/blog/')) return 'blog';
+                    if (path.startsWith('/blog/') && publishedGuideSlugs.indexOf(path.split('/')[2]) !== -1) return 'blog';
                     if (path === '/blog') return 'blog';
-                    if (path.startsWith('/vs/')) return 'vs';
-                    if (path.startsWith('/locations/')) return 'locations';
+                    if (path === '/vs/coding-ninjas' || path === '/vs/scaler') return 'vs';
+                    var citySlug = path.split('/')[2];
+                    if (path === '/locations' || (publishedCitySlugs.indexOf(citySlug) !== -1 && path === '/locations/' + citySlug)) return 'locations';
                     return 'home';
                   }
 
                   var publishedLabPaths = ${JSON.stringify(PUBLISHED_LAB_PATHS)};
+                  var publishedCourseSlugs = ${JSON.stringify(ANALYTICS_COURSE_SLUGS)};
+                  var publishedGuideSlugs = ${JSON.stringify(ANALYTICS_GUIDE_SLUGS)};
+                  var publishedCitySlugs = ${JSON.stringify(ANALYTICS_CITY_SLUGS)};
+                  var canonicalPaths = ${JSON.stringify(ANALYTICS_CANONICAL_PATHS)};
 
                   function courseSlugFromPath(path) {
                     // /courses/[slug] OR /online-courses/[slug]
@@ -155,13 +241,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     if (segments[1] !== 'online-courses' && segments[1] !== 'courses') {
                       return undefined;
                     }
-                    return segments[2] || undefined;
+                    return publishedCourseSlugs.indexOf(segments[2]) !== -1
+                      ? segments[2]
+                      : undefined;
                   }
 
                   function cityFromPath(path) {
                     // Dehradun for onsite pages and the location page
-                    if (path.startsWith('/locations/dehradun')) return 'Dehradun';
-                    if (path.startsWith('/courses/')) return 'Dehradun'; // onsite courses
+                    var citySlug = path.split('/')[2];
+                    if (publishedCitySlugs.indexOf(citySlug) !== -1 && path === '/locations/dehradun') return 'Dehradun';
+                    if (path.startsWith('/courses/') && courseSlugFromPath(path)) return 'Dehradun';
                     return undefined; // online and others
                   }
 
@@ -188,6 +277,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
                   function paramsBase() {
                     var path = (location && location.pathname) || '/';
+                    while (path.length > 1 && path.endsWith('/')) {
+                      path = path.slice(0, -1);
+                    }
+                    if (canonicalPaths.indexOf(path) === -1) {
+                      return { page_type: 'generic' };
+                    }
                     return {
                       page_type: pageTypeFromPath(path),
                       course_slug: courseSlugFromPath(path),

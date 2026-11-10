@@ -1,7 +1,8 @@
 "use client";
 import React from 'react';
-import { track } from '@/lib/analytics';
+import { sanitizeAnalyticsParams, track } from '@/lib/analytics';
 import Link from 'next/link';
+import { useAnalyticsRouteRegistry } from '@/components/analytics/AnalyticsRouteRegistryProvider';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost';
@@ -42,10 +43,15 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
+  const routes = useAnalyticsRouteRegistry();
+  const safeEventParams = event
+    ? sanitizeAnalyticsParams(event, eventParams || {}, routes)
+    : undefined;
+  const safeEvent = safeEventParams ? event : undefined;
 
   const handleClick = (e: React.MouseEvent<HTMLElement>) => {
-    if (event) {
-      try { track(event, eventParams || {}); } catch { /* no-op */ }
+    if (event && safeEventParams) {
+      try { track(event, safeEventParams); } catch { /* no-op */ }
     }
     if (onClick) onClick(e as React.MouseEvent<HTMLButtonElement>);
   };
@@ -58,8 +64,10 @@ const Button: React.FC<ButtonProps> = ({
           className={classes}
           target={target}
           rel={rel}
-          data-event={event}
-          data-event-params={event ? JSON.stringify(eventParams || {}) : undefined}
+          data-event={safeEvent}
+          data-event-params={
+            safeEventParams ? JSON.stringify(safeEventParams) : undefined
+          }
           onClick={handleClick}
         >
           {children}
@@ -78,8 +86,10 @@ const Button: React.FC<ButtonProps> = ({
         className={classes}
         target={target}
         rel={rel}
-        data-event={event}
-        data-event-params={event ? JSON.stringify(eventParams || {}) : undefined}
+        data-event={safeEvent}
+        data-event-params={
+          safeEventParams ? JSON.stringify(safeEventParams) : undefined
+        }
         onClick={handleClick}
       >
         {children}

@@ -90,6 +90,10 @@ const siteConfigModule = loadTypeScript("src/lib/site-config.ts");
 const buttonModule = loadTypeScript("src/components/ui/Button.tsx", {
   "@/lib/analytics": {
     track: (event, params) => trackedEvents.push({ event, params }),
+    sanitizeAnalyticsParams: (_event, params) => params,
+  },
+  "@/components/analytics/AnalyticsRouteRegistryProvider": {
+    useAnalyticsRouteRegistry: () => undefined,
   },
 });
 const courses = coursesModule.getCourses();
@@ -169,7 +173,44 @@ function getInlineScriptBody(id) {
 
   const templateBody = script[1]
     .replaceAll("${process.env.NEXT_PUBLIC_GA_ID}", "G-TEST")
-    .replaceAll("${JSON.stringify(PUBLISHED_LAB_PATHS)}", "[]");
+    .replaceAll(
+      "${ANALYTICS_ROOT_LOCATION}",
+      JSON.stringify("https://dooncodingacademy.in/"),
+    )
+    .replaceAll(
+      "${JSON.stringify(PUBLISHED_LAB_PATHS)}",
+      JSON.stringify(["/lab/javascript/discount-calculation-bug"]),
+    )
+    .replaceAll(
+      "${JSON.stringify(ANALYTICS_COURSE_SLUGS)}",
+      JSON.stringify(["full-stack", "data-science", "python", "java"]),
+    )
+    .replaceAll(
+      "${JSON.stringify(ANALYTICS_GUIDE_SLUGS)}",
+      JSON.stringify(["published-guide"]),
+    )
+    .replaceAll(
+      "${JSON.stringify(ANALYTICS_CITY_SLUGS)}",
+      JSON.stringify(["dehradun", "bangalore", "mumbai", "noida"]),
+    )
+    .replaceAll(
+      "${JSON.stringify(ANALYTICS_CANONICAL_PATHS)}",
+      JSON.stringify([
+        "/",
+        "/contact",
+        "/courses",
+        "/courses/python",
+        "/online-courses",
+        "/online-courses/python",
+        "/blog",
+        "/blog/published-guide",
+        "/lab",
+        "/lab/javascript/discount-calculation-bug",
+        "/locations",
+        "/locations/dehradun",
+        "/vs/scaler",
+      ]),
+    );
   return new Function(`return \`${templateBody}\`;`)();
 }
 
@@ -196,12 +237,206 @@ function getDelegatedClickHandler(pathname) {
 }
 
 test("GA inline scripts parse after template interpolation", () => {
-  for (const id of ["ga4-loader", "ga4-delegated-clicks"]) {
+  for (const id of ["ga4-loader", "ga4-init", "ga4-delegated-clicks"]) {
     assert.doesNotThrow(
       () => new Function(getInlineScriptBody(id)),
       `${id} must be valid emitted browser JavaScript`,
     );
   }
+});
+
+test("GA initialization disables automatic views and starts with a safe canonical URL", () => {
+  const dispatchedEvents = [];
+  const window = {
+    dataLayer: [],
+    dispatchEvent: (event) => dispatchedEvents.push(event.type),
+  };
+  runInNewContext(getInlineScriptBody("ga4-init"), {
+    window,
+    Event,
+  });
+
+  assert.equal(typeof window.gtag, "function");
+  assert.equal(window.__DCA_GA_READY__, true);
+  assert.deepEqual(dispatchedEvents, ["dca:ga-ready"]);
+  const command = window.dataLayer.find(
+    (entry) => entry && entry[0] === "config",
+  );
+  assert.ok(command);
+  assert.equal(command[1], "G-TEST");
+  assert.deepEqual(JSON.parse(JSON.stringify(command[2])), {
+    anonymize_ip: true,
+    transport_type: "beacon",
+    send_page_view: false,
+    page_location: "https://dooncodingacademy.in/",
+    page_path: "/",
+    page_referrer: "",
+  });
+  assert.equal(
+    window.dataLayer.some((entry) => entry && entry[0] === "event"),
+    false,
+    "GA initialization must not enqueue an automatic page_view",
+  );
+});
+
+test("page views use canonical locations for initial and SPA routes only", () => {
+  const { createCanonicalPageViewTracker } = loadTypeScript(
+    "src/lib/analytics.ts",
+  );
+  const { track } = loadTypeScript("src/lib/analytics.ts");
+  const calls = [];
+  const previousWindow = globalThis.window;
+  const routes = {
+    siteUrl: "https://dooncodingacademy.in",
+    courseSlugs: ["python"],
+    guideSlugs: ["published-guide"],
+    challengeSlugs: ["discount-calculation-bug"],
+    challengeIds: ["discount-calculation-bug"],
+    labTracks: ["javascript"],
+    citySlugs: ["dehradun"],
+    canonicalPaths: [
+      "/",
+      "/courses/python",
+      "/blog/published-guide",
+      "/lab/javascript/discount-calculation-bug",
+    ],
+  };
+  globalThis.window = {
+    gtag: (...args) => calls.push(args),
+    __DCA_ANALYTICS_ROUTES__: routes,
+  };
+
+  try {
+    const trackPageView = createCanonicalPageViewTracker("G-TEST", routes);
+    trackPageView("/courses/python");
+    trackPageView("/courses/python");
+    trackPageView("/blog/published-guide");
+    const callsBeforeUnsafeEvent = calls.length;
+    track("page_view", {
+      page_location:
+        "https://dooncodingacademy.in/courses/python?email=learner%40example.test",
+      page_path: "/courses/python",
+      page_referrer: "",
+    });
+    assert.equal(calls.length, callsBeforeUnsafeEvent);
+
+    assert.deepEqual(calls, [
+      [
+        "config",
+        "G-TEST",
+        {
+          send_page_view: false,
+          page_location: "https://dooncodingacademy.in/courses/python",
+          page_path: "/courses/python",
+          page_referrer: "",
+        },
+      ],
+      [
+        "event",
+        "page_view",
+        {
+          page_location: "https://dooncodingacademy.in/courses/python",
+          page_path: "/courses/python",
+          page_referrer: "",
+        },
+      ],
+      [
+        "config",
+        "G-TEST",
+        {
+          send_page_view: false,
+          page_location: "https://dooncodingacademy.in/blog/published-guide",
+          page_path: "/blog/published-guide",
+          page_referrer: "",
+        },
+      ],
+      [
+        "event",
+        "page_view",
+        {
+          page_location: "https://dooncodingacademy.in/blog/published-guide",
+          page_path: "/blog/published-guide",
+          page_referrer: "",
+        },
+      ],
+    ]);
+
+    for (const unsafePath of [
+      "/courses/python?email=learner%40example.test",
+      "/courses/python#learner",
+      "/courses/%70ython",
+      "/courses/learner@example.test",
+      "/unregistered-route",
+    ]) {
+      trackPageView(unsafePath);
+    }
+
+    assert.equal(
+      calls.filter(([, name]) => name === "page_view").length,
+      2,
+      "unsafe routes must not emit page_view events",
+    );
+    for (const [, command, params] of calls) {
+      if (command === "config" || command === "page_view") {
+        assert.doesNotMatch(
+          JSON.stringify(params),
+          /learner|example\.test|%70ython|#|private/i,
+        );
+        if (params.page_location) {
+          assert.match(
+            params.page_location,
+            /^https:\/\/dooncodingacademy\.in\/(?:courses\/python|blog\/published-guide|\/)?$/,
+          );
+        }
+      }
+    }
+  } finally {
+    if (previousWindow === undefined) delete globalThis.window;
+    else globalThis.window = previousWindow;
+  }
+});
+
+test("TrackedLink serializes only allowlisted analytics parameters", () => {
+  const analyticsModule = loadTypeScript("src/lib/analytics.ts");
+  const routes = {
+    courseSlugs: ["full-stack", "data-science", "python", "java"],
+    guideSlugs: ["published-guide"],
+    challengeSlugs: ["discount-calculation-bug"],
+    challengeIds: ["discount-calculation-bug"],
+    labTracks: ["javascript"],
+    citySlugs: ["dehradun", "bangalore", "mumbai", "noida"],
+    canonicalPaths: ["/contact", "/blog/published-guide"],
+  };
+  const TrackedLink = loadTypeScript(
+    "src/components/analytics/TrackedLink.tsx",
+    {
+      "@/lib/analytics": analyticsModule,
+      "./AnalyticsRouteRegistryProvider": {
+        useAnalyticsRouteRegistry: () => routes,
+      },
+    },
+  ).default;
+  const element = TrackedLink({
+    href: "/blog/published-guide",
+    event: "cta_home_read_guide",
+    eventParams: {
+      guide_slug: "published-guide",
+      email: "learner@example.test",
+      url: "https://wa.me/123?text=private",
+      name: "Test Learner",
+    },
+    children: "Read guide",
+  });
+
+  assert.equal(element.props["data-event"], "cta_home_read_guide");
+  assert.deepEqual(
+    JSON.parse(element.props["data-event-params"]),
+    { guide_slug: "published-guide" },
+  );
+  assert.doesNotMatch(
+    element.props["data-event-params"],
+    /learner|example\.test|wa\.me|private|Test Learner/i,
+  );
 });
 
 function makeClickableAnchor(attributes, textContent = "Talk to a Mentor") {
@@ -420,4 +655,80 @@ test("unmarked contact links retain delegated online-route event parameters", ()
   assert.equal(delegatedEvents[0][2].page_type, "online_course");
   assert.equal(delegatedEvents[0][2].course_slug, "python");
   assert.equal(delegatedEvents[0][2].city, undefined);
+});
+
+test("delegated tracking omits unknown and PII-like route-derived values", () => {
+  for (const pathname of [
+    "/courses/unknown-course",
+    "/courses/learner@example.test",
+    "/courses/%70ython",
+    "/courses/python?email=learner%40example.test",
+    "/blog/learner@example.test",
+    "/locations/learner-name",
+  ]) {
+    const { delegatedEvents, handler } = getDelegatedClickHandler(pathname);
+    handler({
+      target: makeClickableAnchor({ href: "tel:+15550100" }),
+    });
+
+    assert.equal(delegatedEvents.length, 1, pathname);
+    assert.equal(delegatedEvents[0][1], "lead_contact_click", pathname);
+    assert.equal(delegatedEvents[0][2].channel, "phone", pathname);
+    assert.equal(delegatedEvents[0][2].page_type, "generic", pathname);
+    assert.equal(delegatedEvents[0][2].course_slug, undefined, pathname);
+    assert.equal(delegatedEvents[0][2].city, undefined, pathname);
+    assert.doesNotMatch(JSON.stringify(delegatedEvents), /learner|example\.test|%70ython/i);
+  }
+});
+
+test("delegated contact and CTA events never include link destinations", () => {
+  const destinations = [
+    [
+      "https://api.whatsapp.com/send?phone=15550100&text=Test%20Learner",
+      "lead_contact_click",
+      "whatsapp",
+      "Chat on WhatsApp",
+    ],
+    ["tel:+15550100", "lead_contact_click", "phone", "Call us"],
+    [
+      "https://www.google.com/maps/dir/?query=Test%20Learner",
+      "lead_contact_click",
+      "directions",
+      "Get directions",
+    ],
+    [
+      "mailto:learner@example.test?subject=Private%20enquiry",
+      undefined,
+      undefined,
+      "Email us",
+    ],
+    [
+      "https://external.example.test/path?email=learner%40example.test",
+      "cta_enroll_click",
+      undefined,
+      "Enroll now",
+    ],
+  ];
+
+  for (const [href, expectedEvent, expectedChannel, label] of destinations) {
+    const { delegatedEvents, handler } =
+      getDelegatedClickHandler("/courses/python");
+    handler({ target: makeClickableAnchor({ href }, label) });
+
+    if (!expectedEvent) {
+      assert.deepEqual(delegatedEvents, [], label);
+      continue;
+    }
+
+    assert.equal(delegatedEvents.length, 1, label);
+    assert.equal(delegatedEvents[0][1], expectedEvent, label);
+    if (expectedChannel) {
+      assert.equal(delegatedEvents[0][2].channel, expectedChannel, label);
+    }
+    assert.doesNotMatch(
+      JSON.stringify(delegatedEvents),
+      /api\.whatsapp|wa\.me|15550100|Test%20Learner|learner@example\.test|Private%20enquiry|external\.example\.test|email=|query=/i,
+      label,
+    );
+  }
 });

@@ -555,7 +555,35 @@ test("Lab analytics preserve event contracts and exclude learner code and result
   assert.equal(JSON.stringify(captured).includes("results"), false);
 });
 
-test("Lab route classifiers distinguish index and mission routes without changing existing labels", () => {
+test("Lab route classifiers distinguish index and mission routes without changing existing labels", (t) => {
+  const originalWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    value: {
+      __DCA_ANALYTICS_ROUTES__: {
+        courseSlugs: ["full-stack", "data-science", "python", "java"],
+        guideSlugs: ["example"],
+        challengeSlugs: ["discount-calculation-bug"],
+        challengeIds: ["discount-calculation-bug"],
+        labTracks: ["javascript"],
+        citySlugs: ["dehradun", "bangalore", "mumbai", "noida"],
+        canonicalPaths: [
+          "/",
+          "/contact",
+          "/courses/python",
+          "/online-courses/python",
+          "/blog/example",
+          "/vs/scaler",
+          "/lab",
+          "/lab/javascript/discount-calculation-bug",
+        ],
+      },
+    },
+  });
+  t.after(() => {
+    if (originalWindow) Object.defineProperty(globalThis, "window", originalWindow);
+    else delete globalThis.window;
+  });
   const publishedPaths = challenges
     .getPublishedChallenges()
     .map(challengeUtils.getChallengePath);
@@ -607,12 +635,36 @@ test("Lab route classifiers distinguish index and mission routes without changin
     /<Script id="ga4-delegated-clicks"[^>]*>\s*\{\s*`([\s\S]*?)`\s*\}\s*<\/Script>/,
   );
   assert.ok(script, "expected the delegated-click script in layout");
-  const emittedScript = new Function(
-    `return \`${script[1].replace(
-      "${JSON.stringify(PUBLISHED_LAB_PATHS)}",
-      JSON.stringify(publishedPaths),
-    )}\`;`,
-  )();
+  const emittedTemplate = script[1]
+    .replace("${JSON.stringify(PUBLISHED_LAB_PATHS)}", JSON.stringify(publishedPaths))
+    .replace(
+      "${JSON.stringify(ANALYTICS_COURSE_SLUGS)}",
+      JSON.stringify(["full-stack", "data-science", "python", "java"]),
+    )
+    .replace("${JSON.stringify(ANALYTICS_GUIDE_SLUGS)}", JSON.stringify(["example"]))
+    .replace(
+      "${JSON.stringify(ANALYTICS_CITY_SLUGS)}",
+      JSON.stringify(["dehradun", "bangalore", "mumbai", "noida"]),
+    )
+    .replace(
+      "${JSON.stringify(ANALYTICS_CANONICAL_PATHS)}",
+      JSON.stringify([
+        "/",
+        "/contact",
+        "/courses",
+        "/courses/python",
+        "/online-courses",
+        "/online-courses/python",
+        "/blog",
+        "/blog/example",
+        "/lab",
+        ...publishedPaths,
+        "/locations",
+        "/locations/dehradun",
+        "/vs/scaler",
+      ]),
+    );
+  const emittedScript = new Function(`return \`${emittedTemplate}\`;`)();
   const instrumentedScript = emittedScript.replace(
     /\}\)\(\);\s*$/,
     "window.__pageTypeFromPath = pageTypeFromPath;\n})();",
@@ -637,8 +689,8 @@ test("Lab route classifiers distinguish index and mission routes without changin
     "lab_challenge",
   );
   assert.equal(pageTypeFromPath("/lab/javascript/discount-calculation-bug/"), "lab_challenge");
-  assert.equal(pageTypeFromPath("/lab/javascript/not-published"), "home");
-  assert.equal(pageTypeFromPath(draftPath), "home");
+  assert.equal(pageTypeFromPath("/lab/javascript/not-published"), "generic");
+  assert.equal(pageTypeFromPath(draftPath), "generic");
   assert.equal(pageTypeFromPath("/courses/python"), "course");
   assert.equal(pageTypeFromPath("/courses"), "course");
   assert.equal(pageTypeFromPath("/online-courses/python"), "online_course");
@@ -649,7 +701,7 @@ test("Lab route classifiers distinguish index and mission routes without changin
   assert.equal(pageTypeFromPath("/locations/dehradun/"), "locations");
   assert.equal(pageTypeFromPath("/vs/scaler"), "vs");
   assert.equal(pageTypeFromPath("/contact"), "home");
-  assert.equal(pageTypeFromPath("/unrecognized"), "home");
+  assert.equal(pageTypeFromPath("/unrecognized"), "generic");
 });
 
 test("new Lab analytics helpers emit only their explicit safe event contracts", () => {
