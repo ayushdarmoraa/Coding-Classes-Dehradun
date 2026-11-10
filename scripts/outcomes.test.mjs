@@ -512,6 +512,14 @@ test("Outcomes title uses the root layout template exactly once", () => {
     "@/components/layout/Footer": { __esModule: true, default: () => null },
     "@/components/layout/FloatingWhatsApp": { __esModule: true, default: () => null },
     "@/components/layout/StickyCtaBar": { __esModule: true, default: () => null },
+    "@/components/analytics/AnalyticsRouteRegistryProvider": {
+      __esModule: true,
+      AnalyticsRouteRegistryProvider: ({ children }) => children,
+    },
+    "@/components/analytics/GaPageViewTracker": {
+      __esModule: true,
+      default: () => null,
+    },
     "@/components/motion/MotionProvider": { __esModule: true, default: ({ children }) => children },
     "@/components/motion/RevealOnScroll": { __esModule: true, default: () => null },
     "next/font/google": {
@@ -520,7 +528,8 @@ test("Outcomes title uses the root layout template exactly once", () => {
       Outfit: () => ({ variable: "font-outfit" }),
     },
     "next/script": { __esModule: true, default: () => null },
-    "@/lib/courses": { getCourses: async () => [] },
+    "@/lib/courses": { getCourses: () => [] },
+    "@/lib/blog": { getAllBlogPosts: () => [] },
     "@/lib/pricing": { formatINR: () => "" },
     "@/lib/lab/analytics-metadata": { PUBLISHED_LAB_ANALYTICS_METADATA: [] },
     "@/lib/site-config": {

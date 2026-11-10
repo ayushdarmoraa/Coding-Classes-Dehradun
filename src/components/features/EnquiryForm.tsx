@@ -5,7 +5,11 @@ import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import Select from '@/components/ui/Select';
 import Card from '@/components/ui/Card';
-import { derivePageContext, trackLeadClick, trackForm } from '@/lib/analytics';
+import {
+  derivePageContext,
+  trackForm,
+  trackWhatsAppEnquiryClick,
+} from '@/lib/analytics';
 import {
   enquirySchema,
   type EnquiryLeadContext,
@@ -199,12 +203,7 @@ const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
   const handleWhatsAppClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     emitStartOnce();
     if (submitStatus === 'success' && submittedFormData) {
-      trackLeadClick('whatsapp', {
-        page_type: ctx.page_type,
-        course_slug: ctx.course_slug || '(none)',
-        city: ctx.city,
-        page_path: pathname,
-      });
+      trackWhatsAppEnquiryClick(pathname);
       window.open(
         createWhatsAppEnquiryUrl(
           resolveWhatsAppFormData(
@@ -235,12 +234,7 @@ const EnquiryForm: React.FC<{ leadContext?: EnquiryLeadContext }> = ({
       return;
     }
 
-    trackLeadClick('whatsapp', {
-      page_type: ctx.page_type,
-      course_slug: ctx.course_slug || '(none)',
-      city: ctx.city,
-      page_path: pathname,
-    });
+    trackWhatsAppEnquiryClick(pathname);
     window.open(
       createWhatsAppEnquiryUrl(
         resolveWhatsAppFormData(
