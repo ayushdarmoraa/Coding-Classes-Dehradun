@@ -1,6 +1,8 @@
 import Link from "next/link";
 import TrackedLink from "@/components/analytics/TrackedLink";
+import TechSphere from "@/components/motion/TechSphere";
 import HeroSphereParallax from "@/components/motion/HeroSphereParallax";
+import { techSphereItems } from "@/components/home/techSphereItems";
 import { getCourses } from "@/lib/courses";
 import { MISSION_TESTS } from "@/lib/lab/mission";
 import { formatINR } from "@/lib/pricing";
@@ -127,7 +129,7 @@ export default function HomeHero() {
         </div>
 
         {/* Second row */}
-        <div className="mt-4 max-w-2xl lg:-mt-2">
+        <div className="mt-4 grid items-center gap-4 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:-mt-2 lg:gap-6">
           <article className="hero-card-scale-1 float flex flex-col rounded-dca-md bg-navy-grad p-5 text-white shadow-soft-blue sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <h2 className="text-xl font-bold text-white sm:text-2xl">Explore courses</h2>
@@ -157,6 +159,17 @@ export default function HomeHero() {
               Explore Courses
             </Link>
           </article>
+          <div className="flex items-center justify-center">
+            <div className="md:hidden">
+              <TechSphere items={techSphereItems} size={260} />
+            </div>
+            <div className="hidden md:block lg:hidden">
+              <TechSphere items={techSphereItems} size={300} />
+            </div>
+            <div className="hidden lg:block">
+              <TechSphere items={techSphereItems} size={400} />
+            </div>
+          </div>
         </div>
       </div>
     </section>
