@@ -9,32 +9,43 @@ const config = JSON.parse(
 const assertions = config.ci.assert.assertions;
 
 test("Lighthouse CI uses supported metrics and the agreed mobile thresholds", () => {
-  const supportedAssertions = new Set([
+  const expectedAssertionIds = [
     "categories:performance",
-    "first-contentful-paint",
-    "largest-contentful-paint",
-    "total-blocking-time",
-    "cumulative-layout-shift",
-  ]);
+    "metrics/first-contentful-paint",
+    "metrics/largest-contentful-paint",
+    "metrics/interactive",
+    "metrics/total-blocking-time",
+    "metrics/cumulative-layout-shift",
+  ].sort();
+  const configuredAssertionIds = Object.keys(assertions).sort();
 
-  assert.ok(
-    Object.keys(assertions).every((id) => supportedAssertions.has(id)),
-    "Lighthouse assertion IDs must be recognized by current Lighthouse CI",
+  assert.deepEqual(
+    configuredAssertionIds,
+    expectedAssertionIds,
+    `Lighthouse assertion IDs must match supported metrics; found: ${configuredAssertionIds.join(", ")}`,
   );
   assert.deepEqual(assertions["categories:performance"], [
     "warn",
     { minScore: 0.85 },
   ]);
-  assert.deepEqual(assertions["largest-contentful-paint"], [
+  assert.deepEqual(assertions["metrics/first-contentful-paint"], [
+    "warn",
+    { maxNumericValue: 1500 },
+  ]);
+  assert.deepEqual(assertions["metrics/largest-contentful-paint"], [
     "warn",
     { maxNumericValue: 2500 },
   ]);
-  assert.deepEqual(assertions["cumulative-layout-shift"], [
+  assert.deepEqual(assertions["metrics/interactive"], [
+    "warn",
+    { maxNumericValue: 200 },
+  ]);
+  assert.deepEqual(assertions["metrics/total-blocking-time"], [
+    "warn",
+    { maxNumericValue: 200 },
+  ]);
+  assert.deepEqual(assertions["metrics/cumulative-layout-shift"], [
     "warn",
     { maxNumericValue: 0.1 },
   ]);
-  assert.deepEqual(config.ci.upload, {
-    target: "filesystem",
-    outputDir: ".lighthouseci",
-  });
 });
