@@ -31,7 +31,7 @@ const BASE = SITE.url;
           {
             "@type": "Question",
             "name": "Do you provide placement support and career services?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Yes. We offer interview prep, resume reviews, and referrals." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Contact the academy to confirm whether internship or placement support is currently available." }
           },
           {
             "@type": "Question",
@@ -156,7 +156,7 @@ export default function FAQPage() {
         acceptedAnswer: {
           "@type": "Answer",
           text:
-            "We help you catch up via summaries and extra practice time. Let us know early so we can support you.",
+            "Contact the academy to ask what catch-up options are currently available for your course.",
         },
       },
       {
@@ -174,7 +174,7 @@ export default function FAQPage() {
         acceptedAnswer: {
           "@type": "Answer",
           text:
-            "Message us on WhatsApp (+91 7037905464) or use the Contact page to schedule a quick call.",
+            "Message the academy on WhatsApp (+91 7037905464) or use the Contact page to ask about current counselling or demo availability.",
         },
       },
     ],
@@ -293,7 +293,7 @@ export default function FAQPage() {
               What if I miss a class?
             </summary>
             <div className="px-5 pb-5 pt-0 text-gray-700">
-              We provide guidance to catch up via summaries and extra practice time. Reach out early so we can help you stay on track.
+              Contact the academy to ask what catch-up options are currently available for your course.
             </div>
           </details>
 
@@ -321,7 +321,7 @@ export default function FAQPage() {
               <a href="/contact" className="text-blue-700 font-semibold hover:underline">
                 Contact
               </a>{" "}
-              page to schedule a quick call.
+              page to ask about current counselling or demo availability.
             </div>
           </details>
         </div>

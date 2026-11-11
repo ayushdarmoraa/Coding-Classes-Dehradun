@@ -120,8 +120,7 @@ export default function AboutPage() {
               <div className="rounded-2xl p-5 ring-1 ring-gray-200">
                 <h3 className="font-semibold">Local & Personal</h3>
                 <p className="mt-2 text-gray-700">
-                  In-person doubt resolution and mentorship at our Herbertpur (Dehradun district) campus—plus
-                  accountability, reviews, and guidance tailored to your pace.
+                  The campus is in Herbertpur (Dehradun district). Contact DCA to confirm current class arrangements and available learner support.
                 </p>
               </div>
               <div className="rounded-2xl p-5 ring-1 ring-gray-200">

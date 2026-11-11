@@ -9,10 +9,17 @@ export const NAV_LINKS: readonly NavLink[] = [
   { href: "/courses", label: "Courses" },
   { href: "/lab", label: "DCA Lab" },
   { href: "/blog", label: "Guides" },
+  { href: "/projects", label: "Projects" },
   ...(hasPublishedOutcomeContent() ? [{ href: "/outcomes", label: "Outcomes" }] : []),
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ] as const;
+
+export function getNavLinks(projectsAvailable: boolean): readonly NavLink[] {
+  return projectsAvailable
+    ? NAV_LINKS
+    : NAV_LINKS.filter(({ href }) => href !== "/projects");
+}
 
 export const COURSE_LINKS: readonly CourseLink[] = [
   { href: "/courses/full-stack", label: "Full-Stack with Gen AI" },

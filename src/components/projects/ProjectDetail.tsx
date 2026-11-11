@@ -14,13 +14,9 @@ import ProjectScreenshot from "./ProjectScreenshot";
 
 type Props = {
   project: Project;
-  showPendingRepository?: boolean;
 };
 
-export default function ProjectDetail({
-  project,
-  showPendingRepository = false,
-}: Props) {
+export default function ProjectDetail({ project }: Props) {
   const projectPath = getProjectPath(project);
   const breadcrumbs = [
     { label: "Home", href: "/" },
@@ -111,20 +107,19 @@ export default function ProjectDetail({
               </h2>
               <p className="mt-2 leading-7 text-gray-700">{project.solution}</p>
             </section>
-            <section aria-labelledby="project-features-heading">
-              <h2 id="project-features-heading" className="text-2xl font-bold">
-                Features
-              </h2>
-              <ul className="mt-3 list-disc space-y-2 pl-6 leading-7 text-gray-700">
-                {project.features.length > 0 ? (
-                  project.features.map((feature) => (
+            {project.features.length > 0 && (
+              <section aria-labelledby="project-features-heading">
+                <h2 id="project-features-heading" className="text-2xl font-bold">
+                  Features
+                </h2>
+                <ul className="mt-3 list-disc space-y-2 pl-6 leading-7 text-gray-700">
+                  {project.features.map((feature) => (
                     <li key={feature}>{feature}</li>
                   ))
-                ) : (
-                  <li>Confirmed features to be added.</li>
-                )}
-              </ul>
-            </section>
+                  }
+                </ul>
+              </section>
+            )}
             {project.technicalApproach && (
               <section aria-labelledby="project-approach-heading">
                 <h2 id="project-approach-heading" className="text-2xl font-bold">
@@ -172,7 +167,7 @@ export default function ProjectDetail({
               >
                 Technologies
               </h2>
-              {project.technologies.length > 0 ? (
+              {project.technologies.length > 0 && (
                 <ul className="mt-3 flex flex-wrap gap-2">
                   {project.technologies.map((technology) => (
                     <li
@@ -183,14 +178,10 @@ export default function ProjectDetail({
                     </li>
                   ))}
                 </ul>
-              ) : (
-                <p className="mt-3 text-sm text-gray-600">To be confirmed.</p>
               )}
             </section>
 
-            {(project.demoUrl ||
-              project.repositoryUrl ||
-              showPendingRepository) && (
+            {(project.demoUrl || project.repositoryUrl) && (
               <section
                 className="mt-6 border-t border-gray-200 pt-5"
                 aria-labelledby="project-links-heading"
@@ -221,11 +212,6 @@ export default function ProjectDetail({
                       >
                         View source repository (opens in a new tab)
                       </a>
-                    </li>
-                  )}
-                  {showPendingRepository && !project.repositoryUrl && (
-                    <li className="text-sm text-gray-600">
-                      GitHub repository link pending
                     </li>
                   )}
                 </ul>

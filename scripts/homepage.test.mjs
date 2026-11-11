@@ -169,6 +169,28 @@ test("homepage presents one clear value proposition and valid primary actions", 
   assert.match(markup, /href="\/contact"[^>]*>Talk to a Mentor/);
 });
 
+test("homepage places the static mission preview beside the hero copy", () => {
+  const heroStart = markup.indexOf('aria-labelledby="home-hero-heading"');
+  const heroEnd = markup.indexOf('id="intent-heading"');
+  const heroMarkup = markup.slice(heroStart, heroEnd);
+
+  assert.ok(heroStart >= 0);
+  assert.ok(heroEnd > heroStart);
+  assert.match(heroMarkup, /lg:grid-cols-2/);
+  assert.match(heroMarkup, /aria-labelledby="mission-preview-heading"/);
+  assert.equal((markup.match(/aria-labelledby="mission-preview-heading"/g) ?? []).length, 1);
+  assert.match(heroMarkup, /class="relative z-10 flex items-center justify-center"/);
+  assert.match(
+    readFileSync(
+      path.join(repositoryRoot, "src/components/motion/HeroSphereParallax.tsx"),
+      "utf8",
+    ),
+    /useReducedMotion/,
+  );
+  assert.match(heroMarkup, /hero-card-scale-2 float/);
+  assert.match(heroMarkup, /home-hero-heading[\s\S]*hero-stagger-2/);
+});
+
 test("homepage follows the approved section order without appended legacy content", () => {
   const sectionOrder = [
     "home-hero-heading",
@@ -220,6 +242,41 @@ test("homepage course previews render every canonical course and route", () => {
   }
 });
 
+test("homepage hero scopes confirmed modes to each course and keeps temporary modes unconfirmed", () => {
+  const heroStart = markup.indexOf('aria-labelledby="home-hero-heading"');
+  const heroEnd = markup.indexOf('id="intent-heading"');
+  const heroMarkup = markup.slice(heroStart, heroEnd);
+
+  for (const course of courses) {
+    const courseLabel = `aria-label="${escapeHtml(course.shortTitle)} delivery options"`;
+    const courseStart = heroMarkup.indexOf(courseLabel);
+    assert.ok(courseStart >= 0, `Missing scoped delivery options for ${course.shortTitle}`);
+    const nextCourseStart = courses
+      .map(({ shortTitle }) =>
+        heroMarkup.indexOf(`aria-label="${escapeHtml(shortTitle)} delivery options"`, courseStart + 1),
+      )
+      .filter((position) => position >= 0)
+      .sort((left, right) => left - right)[0];
+    const courseMarkup = heroMarkup.slice(
+      courseStart,
+      nextCourseStart ?? heroMarkup.length,
+    );
+
+    if (course.modeStatus === "confirmed") {
+      assert.ok(
+        courseMarkup.includes(`Confirmed modes: ${course.modes.join(", ")}`),
+        `Confirmed modes are not scoped to ${course.shortTitle}`,
+      );
+    } else {
+      assert.equal(course.modeStatus, "temporary");
+      assert.match(courseMarkup, /Delivery availability not confirmed/);
+      for (const mode of course.modes) {
+        assert.equal(courseMarkup.includes(mode), false);
+      }
+    }
+  }
+});
+
 test("homepage lab preview uses the available mission and links to working Lab routes", () => {
   const mission = loadLocalModule(
     path.join(repositoryRoot, "src/lib/lab/mission.ts"),
@@ -243,6 +300,14 @@ test("homepage lab preview uses the available mission and links to working Lab r
     "discount-calculation-bug",
   );
   assert.equal(mission.MISSION_TESTS[0].expected, 720);
+});
+
+test("homepage projects intent appears only when published project records are available", () => {
+  const projectIntent = markup.indexOf(">Explore Projects<");
+  assert.equal(projectIntent >= 0, projects.length > 0);
+  if (projects.length > 0) {
+    assert.match(markup, /href="\/projects"[^>]*>[\s\S]*?Explore Projects/);
+  }
 });
 
 test("homepage guides come from the published guide listing", () => {

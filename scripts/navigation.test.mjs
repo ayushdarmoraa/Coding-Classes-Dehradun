@@ -11,6 +11,7 @@ const require = createRequire(import.meta.url);
 const source = readFileSync(path.resolve(repositoryRoot, "src/lib/nav.ts"), "utf8");
 const footer = readFileSync(path.resolve(repositoryRoot, "src/components/layout/Footer.tsx"), "utf8");
 const header = readFileSync(path.resolve(repositoryRoot, "src/components/layout/Header.tsx"), "utf8");
+const rootLayout = readFileSync(path.resolve(repositoryRoot, "src/app/layout.tsx"), "utf8");
 const compiled = ts.transpileModule(source, {
   compilerOptions: {
     module: ts.ModuleKind.CommonJS,
@@ -23,6 +24,23 @@ const localRequire = (specifier) =>
     ? { hasPublishedOutcomeContent: () => false }
     : require(specifier);
 new Function("require", "module", "exports", compiled)(localRequire, navModule, navModule.exports);
+const projectsSource = readFileSync(
+  path.resolve(repositoryRoot, "src/lib/projects.ts"),
+  "utf8",
+);
+const compiledProjects = ts.transpileModule(projectsSource, {
+  compilerOptions: {
+    esModuleInterop: true,
+    module: ts.ModuleKind.CommonJS,
+    target: ts.ScriptTarget.ES2020,
+  },
+}).outputText;
+const projectsModule = { exports: {} };
+new Function("require", "module", "exports", compiledProjects)(
+  require,
+  projectsModule,
+  projectsModule.exports,
+);
 
 test("primary navigation matches the approved product destinations", () => {
   assert.deepEqual(
@@ -32,10 +50,30 @@ test("primary navigation matches the approved product destinations", () => {
       ["Courses", "/courses"],
       ["DCA Lab", "/lab"],
       ["Guides", "/blog"],
+      ["Projects", "/projects"],
       ["About", "/about"],
       ["Contact", "/contact"],
     ],
   );
+});
+
+test("Projects navigation stays hidden until the publication gate passes", () => {
+  const projectsAvailable =
+    projectsModule.exports.getPublishedProjects().length > 0;
+  assert.equal(projectsAvailable, false);
+  assert.equal(
+    navModule.exports.getNavLinks(projectsAvailable).some(
+      ({ href }) => href === "/projects",
+    ),
+    false,
+  );
+  assert.equal(
+    navModule.exports.getNavLinks(true).some(({ href }) => href === "/projects"),
+    true,
+  );
+  assert.match(header, /getNavLinks\(projectsAvailable\)/);
+  assert.match(rootLayout, /getPublishedProjects\(\)\.length > 0/);
+  assert.match(rootLayout, /<HeaderClient projectsAvailable=\{projectsAvailable\} \/>/);
 });
 
 test("course navigation preserves delivery hubs and individual course routes", () => {
@@ -85,6 +123,7 @@ test("navigation destinations resolve to existing routes", () => {
     "/online-courses",
     "/lab",
     "/blog",
+    "/projects",
     "/faq",
     "/about",
     "/locations/dehradun",
@@ -125,11 +164,15 @@ test("footer uses the planned groups and only configured or existing destination
     "/online-courses",
     "/lab",
     "/blog",
+    "/projects",
     "/faq",
     "/about",
     "/locations/dehradun",
     "/contact",
   ]) {
+    if (href === "/projects") {
+      assert.match(footer, /projectsAvailable &&/);
+    }
     assert.ok(footer.includes(`href="${href}"`), `Missing footer destination: ${href}`);
   }
   assert.doesNotMatch(footer, /facebook\.com|instagram\.com/);

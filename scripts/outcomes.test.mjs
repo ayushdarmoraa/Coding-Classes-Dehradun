@@ -532,6 +532,7 @@ test("Outcomes title uses the root layout template exactly once", () => {
     "@/lib/blog": { getAllBlogPosts: () => [] },
     "@/lib/pricing": { formatINR: () => "" },
     "@/lib/lab/analytics-metadata": { PUBLISHED_LAB_ANALYTICS_METADATA: [] },
+    "@/lib/projects": { getPublishedProjects: () => [] },
     "@/lib/site-config": {
       SITE: {
         url: "https://dooncodingacademy.in",

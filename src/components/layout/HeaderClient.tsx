@@ -4,7 +4,11 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Header from "./Header";
 
-export default function HeaderClient() {
+export default function HeaderClient({
+  projectsAvailable,
+}: {
+  projectsAvailable: boolean;
+}) {
   const pathname = usePathname() || "/";
   const [compact, setCompact] = useState(false);
 
@@ -27,5 +31,12 @@ export default function HeaderClient() {
     };
   }, []);
 
-  return <Header key={pathname} currentPath={pathname} compact={compact} />;
+  return (
+    <Header
+      key={pathname}
+      currentPath={pathname}
+      compact={compact}
+      projectsAvailable={projectsAvailable}
+    />
+  );
 }

@@ -216,7 +216,7 @@ export default function ContactPage({ searchParams = {} }: ContactPageProps) {
                   Do you provide placement assistance?
                 </h3>
                 <p className="text-gray-600 text-sm mb-4">
-                  Yes, we provide comprehensive placement assistance including resume building, interview preparation, and job referrals.
+                  Contact us to confirm whether internship or placement support is currently available.
                 </p>
               </div>
               
@@ -225,14 +225,14 @@ export default function ContactPage({ searchParams = {} }: ContactPageProps) {
                   Can I pay in installments?
                 </h3>
                 <p className="text-gray-600 text-sm mb-4">
-                  Course pricing includes monthly rates and package rates. Please refer to each course page for its current pricing.
+                  Course pages list pricing options. Contact us to confirm the current payment terms for a course.
                 </p>
                 
                 <h3 className="font-semibold text-gray-900 mb-2">
                   What if I miss a class?
                 </h3>
                 <p className="text-gray-600 text-sm mb-4">
-                  We provide recorded sessions and makeup classes to ensure you don&#39;t miss any important content.
+                  Contact us to ask what catch-up options are currently available for your course.
                 </p>
               </div>
             </div>

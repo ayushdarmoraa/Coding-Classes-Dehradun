@@ -6,12 +6,9 @@ import {
 } from "@/lib/projects";
 import ProjectScreenshot from "./ProjectScreenshot";
 
-type Props = { project: Project; showPendingRepository?: boolean };
+type Props = { project: Project };
 
-export default function ProjectCard({
-  project,
-  showPendingRepository = false,
-}: Props) {
+export default function ProjectCard({ project }: Props) {
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-gray-200 transition-shadow hover:shadow-md">
       <Link
@@ -68,9 +65,6 @@ export default function ProjectCard({
             >
               Live demo
             </a>
-          )}
-          {showPendingRepository && !project.repositoryUrl && (
-            <span className="text-sm text-gray-600">GitHub: link pending</span>
           )}
         </div>
       </div>

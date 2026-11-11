@@ -1,5 +1,20 @@
 # Project screenshots
 
+Unverified project images are stored outside `public` under
+`src/unpublished-project-assets/<slug>/` and are not served by the site. Move
+an image into `public/projects/<slug>/` only after confirming permission to
+publish the asset and recording the matching `assetPublicationPermission` in
+`src/lib/projects.ts`:
+
+- `personal-project-owner-verified` for a personal project
+- `internship-organization-verified` for an internship project
+- `other-rightsholder-verified` for other origins
+
+This permission is separate from consent for identifiable contributors.
+Student projects require both verified contributor consent and permission to
+publish their assets. Use `unverified` and keep the project unpublished when
+the applicable permission is unknown.
+
 Store approved, genuine project screenshots in a folder named for the project
 slug, for example:
 
@@ -23,6 +38,6 @@ from the plan.
 
 The public routes and sitemap remain gated until at least three projects are
 explicitly marked `published`, have the required factual content and origin,
-pass applicable contributor-consent checks, and reference existing local
-screenshot files. This decision does not permit inventing projects or
-publishing work without authorization.
+pass applicable contributor-consent and asset-publication-permission checks,
+and reference existing local screenshot files. This decision does not permit
+inventing projects or publishing work without authorization.

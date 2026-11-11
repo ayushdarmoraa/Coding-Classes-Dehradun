@@ -16,6 +16,12 @@ const httpsUrlSchema = z
   .string()
   .url()
   .refine((value) => new URL(value).protocol === "https:");
+const assetPublicationPermissionSchema = z.enum([
+  "unverified",
+  "personal-project-owner-verified",
+  "internship-organization-verified",
+  "other-rightsholder-verified",
+]);
 
 export const projectSchema = z.object({
   slug: routeSegmentSchema,
@@ -29,6 +35,7 @@ export const projectSchema = z.object({
     "internship-project",
   ]),
   published: z.boolean(),
+  assetPublicationPermission: assetPublicationPermissionSchema,
   category: z.string().trim().min(1).max(60),
   tags: z.array(z.string().trim().min(1).max(40)).min(1),
   problem: z.string().trim().min(1).max(1000),
@@ -86,6 +93,17 @@ export const projectSchema = z.object({
       path: ["contributors"],
     });
   }
+  if (
+    project.published &&
+    !hasVerifiedAssetPublicationPermission(project)
+  ) {
+    context.addIssue({
+      code: "custom",
+      message:
+        "Project assets require publication permission appropriate to their origin",
+      path: ["assetPublicationPermission"],
+    });
+  }
 });
 
 export type Project = z.infer<typeof projectSchema>;
@@ -98,7 +116,8 @@ const projectRecords: unknown[] = [
     summary:
       "A full-stack e-commerce web application designed to provide users with an online shopping experience, including product discovery and shopping workflows.",
     origin: "personal-project",
-    published: true,
+    published: false,
+    assetPublicationPermission: "unverified",
     category: "Full-Stack Web Development",
     tags: ["Full-Stack Web Development"],
     problem: "Provides an online platform for users to explore and purchase products.",
@@ -128,7 +147,8 @@ const projectRecords: unknown[] = [
     summary:
       "An AI-powered resume-building application intended to help users create and improve professional resumes.",
     origin: "personal-project",
-    published: true,
+    published: false,
+    assetPublicationPermission: "unverified",
     category: "AI-Powered Web Application",
     tags: ["AI-Powered Web Application"],
     problem:
@@ -160,7 +180,8 @@ const projectRecords: unknown[] = [
     summary:
       "A MERN-stack productivity application designed to help teams manage standup updates, collaborate in real time, and understand team productivity.",
     origin: "internship-project",
-    published: true,
+    published: false,
+    assetPublicationPermission: "unverified",
     category: "Full-Stack Productivity Application",
     tags: ["Full-Stack Productivity Application"],
     problem:
@@ -295,6 +316,25 @@ export function resolveProjectScreenshotPath(
     : undefined;
 }
 
+function hasVerifiedAssetPublicationPermission(project: Project): boolean {
+  switch (project.origin) {
+    case "personal-project":
+      return (
+        project.assetPublicationPermission ===
+        "personal-project-owner-verified"
+      );
+    case "internship-project":
+      return (
+        project.assetPublicationPermission ===
+        "internship-organization-verified"
+      );
+    default:
+      return (
+        project.assetPublicationPermission === "other-rightsholder-verified"
+      );
+  }
+}
+
 function hasPublishableContent(
   project: Project,
   screenshotIsPresent: (
@@ -304,6 +344,7 @@ function hasPublishableContent(
 ): boolean {
   return (
     project.published &&
+    hasVerifiedAssetPublicationPermission(project) &&
     project.summary.length > 0 &&
     project.problem.length > 0 &&
     project.solution.length > 0 &&
@@ -349,7 +390,11 @@ export function getProjectsForEnvironment(
   records: readonly Project[] = PROJECTS,
 ): Project[] {
   return nodeEnvironment === "development"
-    ? records.filter(hasVerifiedContributorConsent)
+    ? records.filter(
+        (project) =>
+          hasVerifiedContributorConsent(project) &&
+          hasVerifiedAssetPublicationPermission(project),
+      )
     : getPublishedProjects(records);
 }
 
@@ -409,6 +454,7 @@ export function getProjectOriginLabel(
     student: "Student Project",
     "instructor-demo": "Instructor Demo",
     "dca-demo": "DCA Lab Demo",
+    "personal-project": "Personal Project",
     "internship-project": "Internship Project",
   };
   return labels[origin];
