@@ -109,6 +109,9 @@ const { getAllBlogPosts } = loadLocalModule(
 const { getPublishedProjects } = loadLocalModule(
   path.join(repositoryRoot, "src/lib/projects.ts"),
 );
+const { techSphereItems } = loadLocalModule(
+  path.join(repositoryRoot, "src/components/home/techSphereItems.ts"),
+);
 const { testimonials } = loadLocalModule(
   path.join(repositoryRoot, "src/lib/testimonials.ts"),
 );
@@ -189,6 +192,22 @@ test("homepage places the static mission preview beside the hero copy", () => {
   );
   assert.match(heroMarkup, /hero-card-scale-2 float/);
   assert.match(heroMarkup, /home-hero-heading[\s\S]*hero-stagger-2/);
+});
+
+test("homepage keeps the animated technology sphere alongside the Lab preview", () => {
+  const heroStart = markup.indexOf('aria-labelledby="home-hero-heading"');
+  const heroEnd = markup.indexOf('id="intent-heading"');
+  const heroMarkup = markup.slice(heroStart, heroEnd);
+
+  assert.match(heroMarkup, /aria-labelledby="mission-preview-heading"/);
+  assert.match(heroMarkup, /md:grid-cols-\[minmax\(0,1\.3fr\)_minmax\(0,1fr\)\]/);
+  for (const { src } of techSphereItems) {
+    assert.ok(src, "Technology sphere items must have an icon source");
+    assert.ok(
+      heroMarkup.includes(`src="${src}"`),
+      `Missing technology sphere icon: ${src}`,
+    );
+  }
 });
 
 test("homepage follows the approved section order without appended legacy content", () => {
