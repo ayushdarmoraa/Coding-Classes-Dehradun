@@ -4,16 +4,16 @@ import LocationTabs, { type LocationTile } from "@/components/features/LocationT
 import { SITE } from "@/lib/site-config";
 
 export const metadata = {
-  title: "Locations – Learn Online or Visit Dehradun | Doon Coding Academy (DCA)",
+  title: "Locations – Dehradun Campus & Course Options | Doon Coding Academy (DCA)",
   description:
-    "Choose your path with Doon Coding Academy (DCA): visit our Dehradun campus for on-campus classes or join our live online cohorts from cities like Noida and Bangalore.",
+    "Find Doon Coding Academy’s Dehradun campus and review course details. Contact us to confirm current delivery options by course.",
   alternates: {
     canonical: `${SITE.url}/locations`,
   },
   openGraph: {
-    title: "Locations – Learn Online or Visit Dehradun | Doon Coding Academy (DCA)",
+    title: "Locations – Dehradun Campus & Course Options | Doon Coding Academy (DCA)",
     description:
-      "Explore Doon Coding Academy (DCA) locations and online cohorts. On-campus in Dehradun, live online from anywhere in India including Noida and Bangalore.",
+      "Explore Doon Coding Academy’s Dehradun campus and course information for learners in other cities. Confirm delivery availability with the academy.",
     url: `${SITE.url}/locations`,
     type: "website",
     siteName: SITE.name,
@@ -45,7 +45,7 @@ export default function LocationsIndexPage() {
       badge: "Online",
       href: "/locations/noida",
       blurb:
-        "Based in Noida? Join our live online cohorts with mentor support, recordings, and projects. Learn from anywhere.",
+        "Review course details and contact DCA to confirm current online delivery and support options.",
       primaryHref: "/online-courses",
       primaryText: "Explore Online Courses",
       secondaryHref: "/blog/live-vs-recorded-coding-classes-india",
@@ -56,7 +56,7 @@ export default function LocationsIndexPage() {
       badge: "Online",
       href: "/locations/bangalore",
       blurb:
-        "In India’s tech capital? Explore live online course options and interview preparation.",
+        "Review course details and contact DCA to confirm current online delivery and support options.",
       primaryHref: "/online-courses",
       primaryText: "Explore Online Courses",
       secondaryHref: "/blog/live-vs-recorded-coding-classes-india",
@@ -74,20 +74,13 @@ export default function LocationsIndexPage() {
       <main className="container py-14 sm:py-20">
         {/* Hero */}
         <header className="mb-10 rounded-dca-lg border border-brand-soft bg-gradient-to-br from-white to-bg-grid p-6 shadow-soft-blue sm:p-10">
-          <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Our Locations &amp; Online Cohorts</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Our Locations &amp; Course Options</h1>
           <p className="mt-3 max-w-4xl text-lg leading-7 text-ink-2">
-            Learn on-campus in <strong>Dehradun</strong> or join our {""}
-            <Link href="/online-courses" className="font-semibold text-brand-dark hover:underline">
-              live online courses
-            </Link>{" "}
-            from cities like Noida and Bangalore. Not sure which to pick? Start with {""}
-            <Link
-              href="/blog/live-vs-recorded-coding-classes-india"
-              className="font-semibold text-brand-dark hover:underline"
-            >
-              Live vs Recorded
+            Visit our campus in <strong>Dehradun</strong> or browse the{" "}
+            <Link href="/courses" className="font-semibold text-brand-dark hover:underline">
+              course catalog
             </Link>
-            .
+            . If you are considering online study from another city, contact DCA to confirm availability for your chosen course.
           </p>
         </header>
 

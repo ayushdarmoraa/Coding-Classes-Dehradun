@@ -18,11 +18,11 @@ const SERVICE_AREAS_MUMBAI = [
 const LOCAL_FAQ_MUMBAI = [
   {
     q: "Do you offer offline classes in Mumbai?",
-    a: "We primarily run on-campus batches in Dehradun and offer live online classes across India, including Mumbai. Many Mumbai learners join our online cohorts.",
+    a: "Our physical campus is in Dehradun. Contact DCA to confirm whether online delivery is currently available for your chosen course.",
   },
   {
     q: "Are class timings suitable for working professionals?",
-    a: "Yes. We offer evening and weekend options for online cohorts. Check the Courses page or contact us for the current schedule.",
+    a: "Contact DCA for current schedule and batch information.",
   },
   {
     q: "What is the batch size and support?",
@@ -30,21 +30,21 @@ const LOCAL_FAQ_MUMBAI = [
   },
   {
     q: "Can I switch from online to on-campus later?",
-    a: "Yes, subject to seat availability in the Dehradun campus. Talk to us to plan the transition.",
+    a: "Contact DCA to confirm whether the course is available on campus and whether a change in delivery mode is possible.",
   },
 ];
 
 export const metadata: Metadata = {
-  title: "Coding Classes in Mumbai (Online) – Doon Coding Academy",
+  title: "Coding Classes in Mumbai – Doon Coding Academy",
   description:
-    "Learn coding from Mumbai with DCA’s live online cohorts—mentor-led sessions, hands-on projects, and placement support. Our physical campus is in Dehradun.",
+    "Review Doon Coding Academy course details for Mumbai learners and contact us to confirm current online delivery and support options. Our campus is in Dehradun.",
   alternates: {
     canonical: `${SITE.url}/locations/mumbai`,
   },
   openGraph: {
-    title: "Coding Classes in Mumbai (Online) – Doon Coding Academy",
+    title: "Coding Classes in Mumbai – Doon Coding Academy",
     description:
-      "Live online cohorts for learners in Mumbai. Mentor support, projects, and career guidance. Visit our Dehradun campus if you’re nearby.",
+      "Review course details for Mumbai learners and confirm delivery options with the academy. Visit the Dehradun campus if you’re nearby.",
     url: `${SITE.url}/locations/mumbai`,
     type: "website",
     siteName: SITE.name,
@@ -70,19 +70,17 @@ export default function Page() {
         {/* Hero */}
         <header className="cd-hero mb-8 rounded-dca-lg p-6 sm:p-9">
           <h1 className="mt-3 text-3xl font-bold text-ink sm:text-4xl">
-            Coding Classes in Mumbai – Learn Online with Live Mentors
+            Coding Course Options for Mumbai Learners
           </h1>
           <p className="mt-3 text-gray-700">
-            In Mumbai and want job-ready coding skills? Join {""}
-            <strong>live online cohorts</strong> from Doon Coding Academy (DCA):
-            mentor-led sessions, hands-on projects, and career guidance. Our {""}
+            Review course details from Doon Coding Academy (DCA) and contact us to confirm current delivery and support options. Our {""}
             <Link
               href="/locations/dehradun"
               className="text-blue-700 hover:underline"
             >
               physical campus is in Dehradun
             </Link>
-            ; Mumbai learners study online.
+            ; delivery availability varies by course.
           </p>
         </header>
         <div className="mt-4 flex flex-wrap gap-3">
@@ -110,7 +108,7 @@ export default function Page() {
         <section className="mt-8">
           <h2 className="text-xl md:text-2xl font-semibold">Service Areas</h2>
           <p className="mt-2 text-gray-700">
-            We serve learners across {SERVICE_AREAS_MUMBAI.slice(0, -1).join(", ")} and {SERVICE_AREAS_MUMBAI.at(-1)} via our live online programs. {" "}
+            Learners across {SERVICE_AREAS_MUMBAI.slice(0, -1).join(", ")} and {SERVICE_AREAS_MUMBAI.at(-1)} can review course details and ask DCA about current delivery options. {" "}
             Explore detailed curricula: {" "}
             <Link href="/courses/full-stack" className="underline">Full-Stack</Link>,{" "}
             <Link href="/courses/data-science" className="underline">Data Science</Link>,{" "}
@@ -136,15 +134,13 @@ export default function Page() {
         <section className="space-y-3 mb-10">
           <h2 className="text-2xl font-semibold">Why learners in Mumbai pick DCA</h2>
           <ul className="list-disc pl-6 space-y-2">
-            <li>Live, interactive classes + recordings for revision</li>
-            <li>Contact us for current class-size and support details</li>
-            <li>Project-first curriculum and portfolio building</li>
-            <li>Career support: resume, mock interviews, referrals</li>
+            <li>Review the published curriculum and course details</li>
+            <li>Contact DCA to confirm current delivery, schedule, and learner support</li>
+            <li>Ask which practical work is currently included in your chosen course</li>
+            <li>Contact DCA for current information about internship or placement support</li>
           </ul>
           <p className="text-gray-700">
-            Mumbai’s tech, finance, and media ecosystem rewards practical skills:
-            Git, deployments, data handling, and teamwork. We focus on building &
-            shipping, so you can interview with confidence.
+            Review course curricula and published outcomes directly. Course pages do not guarantee interviews, employment, or placement.
           </p>
         </section>
 
@@ -159,16 +155,16 @@ export default function Page() {
               >
                 Online Full-Stack (MERN)
               </Link>{" "}
-              – live cohort, projects, placements
+              – review the published curriculum and outcomes
             </li>
             <li>
               <Link
-                href="/online-courses/data-science"
+                href="/courses/data-science"
                 className="text-blue-700 hover:underline"
               >
-                Online Data Science
+                Data Science &amp; AI
               </Link>{" "}
-              – Python, ML, analytics workflows
+              – review the curriculum and contact DCA to confirm availability
             </li>
             <li>
               <Link
@@ -177,7 +173,7 @@ export default function Page() {
               >
                 Online Python
               </Link>{" "}
-              – foundations for development & data
+              – review the published curriculum
             </li>
           </ul>
           <p className="mt-3">
@@ -247,8 +243,7 @@ export default function Page() {
             <div>
               <h3 className="font-semibold">Is there a DCA center in Mumbai?</h3>
               <p className="text-gray-700">
-                No. We serve Mumbai learners via <strong>live online</strong>{" "}
-                cohorts. Our only physical campus is in Dehradun.
+                No. Our physical campus is in Dehradun. Contact DCA to confirm current delivery options for each course.
                 {" "}
                 <Link href="/locations/dehradun" className="underline text-blue-700">See campus details</Link>.
               </p>
@@ -256,8 +251,7 @@ export default function Page() {
             <div>
               <h3 className="font-semibold">What’s the class schedule?</h3>
               <p className="text-gray-700">
-                Evening slots on weekdays plus weekend mentor hours. Recordings
-                are provided for revision.
+                Contact DCA to confirm current batch schedules and whether recordings are available.
               </p>
             </div>
             <div>
@@ -265,8 +259,7 @@ export default function Page() {
                 Do you provide placement support for Mumbai learners?
               </h3>
               <p className="text-gray-700">
-                Yes. You’ll get project reviews, resume prep, mock interviews,
-                and targeted guidance for Mumbai roles.
+                Contact DCA to confirm whether internship or placement support is currently available.
               </p>
             </div>
           </div>
@@ -295,13 +288,6 @@ export default function Page() {
           <div className="flex flex-wrap gap-3 items-center">
             <Link href="/online-courses" className="text-blue-700 hover:underline">
               Explore Online Courses
-            </Link>
-            <span className="text-gray-400">•</span>
-            <Link
-              href="/blog/live-vs-recorded-coding-classes-india"
-              className="text-blue-700 hover:underline"
-            >
-              Live vs Recorded: Which is right for you?
             </Link>
             <span className="text-gray-400">•</span>
             <Link

@@ -17,33 +17,33 @@ const SERVICE_AREAS_NOIDA = [
 const LOCAL_FAQ_NOIDA = [
   {
     q: "Do you provide offline classes in Noida?",
-    a: "Currently, our physical campus operates in Dehradun. Learners from Noida can join our live online classes with the same curriculum and mentorship.",
+    a: "Our physical campus is in Dehradun. Contact DCA to confirm whether online delivery is currently available for your chosen course.",
   },
   {
     q: "Are the online courses interactive?",
-    a: "Yes. Our online classes include live coding, Q&A, and 1:1 mentor support to ensure the same experience as offline training.",
+    a: "Contact DCA to confirm the current online format and any learner support for the course you are considering.",
   },
   {
     q: "What are the batch timings?",
-    a: "We offer evening and weekend batches to accommodate college students and working professionals from Noida and NCR.",
+    a: "Contact DCA for current schedule and batch information.",
   },
   {
     q: "Is placement support available for Noida students?",
-    a: "Yes. All students, whether studying online or on-campus, receive career guidance and placement assistance.",
+    a: "Contact DCA to confirm whether internship or placement support is currently available.",
   },
 ];
 
 export const metadata: Metadata = {
-  title: "Coding Classes in Noida (Online) – Doon Coding Academy",
+  title: "Coding Classes in Noida – Doon Coding Academy",
   description:
-    "Learn coding from Noida with DCA’s live online cohorts—mentor-led sessions, projects, and placement support. Our physical campus is in Dehradun.",
+    "Review Doon Coding Academy course details for Noida learners and contact us to confirm current online delivery and support options. Our campus is in Dehradun.",
   alternates: {
     canonical: `${SITE.url}/locations/noida`,
   },
   openGraph: {
-    title: "Coding Classes in Noida (Online) – Doon Coding Academy",
+    title: "Coding Classes in Noida – Doon Coding Academy",
     description:
-      "Live online cohorts for learners in Noida. Mentor support, projects, and career guidance. Visit our Dehradun campus if you’re nearby.",
+      "Review course details for Noida learners and confirm delivery options with the academy. Visit the Dehradun campus if you’re nearby.",
     url: `${SITE.url}/locations/noida`,
     type: "website",
     siteName: SITE.name,
@@ -69,12 +69,10 @@ export default function Page() {
         {/* Hero */}
         <header className="cd-hero mb-8 rounded-dca-lg p-6 sm:p-9">
           <h1 className="mt-3 text-3xl font-bold text-ink sm:text-4xl">
-            Coding Classes in Noida – Learn Online with Live Mentors
+            Coding Course Options for Noida Learners
           </h1>
           <p className="mt-3 text-gray-700">
-            Based in Noida and want job-ready coding skills? Join{" "}
-            <strong>live online cohorts</strong> from Doon Coding Academy (DCA):
-            mentor-led sessions, hands-on projects, and career guidance. Our
+            Based in Noida? Review the course details from Doon Coding Academy (DCA) and contact us to confirm current delivery and support options. Our
             <span className="whitespace-nowrap"> </span>
             <Link
               href="/locations/dehradun"
@@ -82,7 +80,7 @@ export default function Page() {
             >
               physical campus is in Dehradun
             </Link>
-            ; Noida learners study online.
+            ; contact us to confirm delivery availability by course.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Button
@@ -110,7 +108,7 @@ export default function Page() {
         <section className="mt-8">
           <h2 className="text-xl md:text-2xl font-semibold">Service Areas</h2>
           <p className="mt-2 text-gray-700">
-            We serve learners across {SERVICE_AREAS_NOIDA.slice(0, -1).join(", ")} and {SERVICE_AREAS_NOIDA.at(-1)} through our online live programs. {" "}
+            Learners across {SERVICE_AREAS_NOIDA.slice(0, -1).join(", ")} and {SERVICE_AREAS_NOIDA.at(-1)} can review course details and ask DCA about current delivery options. {" "}
             Check out our detailed courses: {" "}
             <Link href="/courses/full-stack" className="underline">Full-Stack</Link>,{" "}
             <Link href="/courses/data-science" className="underline">Data Science</Link>,{" "}
@@ -136,10 +134,10 @@ export default function Page() {
         <section className="space-y-3 mb-10">
           <h2 className="text-2xl font-semibold">Why learners in Noida pick DCA</h2>
           <ul className="list-disc pl-6 space-y-2">
-            <li>Live, interactive classes + recordings for revision</li>
-            <li>Contact us for current class-size and support details</li>
-            <li>Project-first curriculum with portfolio outcomes</li>
-            <li>Career support: resume, mock interviews, referrals</li>
+            <li>Review the published curriculum and course details</li>
+            <li>Contact DCA to confirm current delivery, schedule, and learner support</li>
+            <li>Ask which practical work is currently included in your chosen course</li>
+            <li>Contact DCA for current information about internship or placement support</li>
           </ul>
           <p className="text-gray-700">
             Noida has a strong tech job market across startups and IT services.
@@ -158,16 +156,16 @@ export default function Page() {
               >
                 Online Full-Stack (MERN)
               </Link>{" "}
-              – live cohort, projects, placements
+              – review the published curriculum and outcomes
             </li>
             <li>
               <Link
-                href="/online-courses/data-science"
+                href="/courses/data-science"
                 className="text-blue-700 hover:underline"
               >
-                Online Data Science
+                Data Science &amp; AI course details
               </Link>{" "}
-              – Python, ML, analytics workflows
+              – review the curriculum and confirm delivery availability
             </li>
             <li>
               <Link
@@ -176,7 +174,7 @@ export default function Page() {
               >
                 Online Python
               </Link>{" "}
-              – foundations for development & data
+              – review the published curriculum
             </li>
           </ul>
           <p className="mt-3">
@@ -233,11 +231,10 @@ export default function Page() {
             The Delhi-NCR corridor (Noida, Greater Noida, Delhi, Gurgaon) has a
             dense mix of SaaS startups, IT services, and product teams. Employers
             expect practical skills, Git discipline, and deployment know-how.
-            Our cohorts focus on building &amp; shipping real projects so you can
-            interview with confidence.
+            Review course curricula and published outcomes directly. Course pages do not guarantee interviews, employment, or placement.
           </p>
           <p className="text-gray-700 mt-3 text-sm">
-            Interested in placements? See the <Link href="/faq" className="underline text-blue-700">FAQ</Link>.
+            Contact DCA to confirm whether internship or placement support is currently available.
           </p>
         </section>
 
@@ -248,8 +245,7 @@ export default function Page() {
             <div>
               <h3 className="font-semibold">Is there a DCA center in Noida?</h3>
               <p className="text-gray-700">
-                No. We serve Noida learners via <strong>live online</strong>{" "}
-                cohorts. Our only physical campus is in Dehradun.
+                No. Our physical campus is in Dehradun. Contact DCA to confirm current delivery options for each course.
                 {" "}
                 <Link href="/locations/dehradun" className="underline text-blue-700">See campus details</Link>.
               </p>
@@ -257,8 +253,7 @@ export default function Page() {
             <div>
               <h3 className="font-semibold">What’s the class schedule?</h3>
               <p className="text-gray-700">
-                Evening slots on weekdays plus weekend mentor hours. Recordings
-                are provided for revision.
+                Contact DCA to confirm current batch schedules and whether recordings are available.
               </p>
             </div>
             <div>
@@ -266,8 +261,7 @@ export default function Page() {
                 Do you provide placement support for Noida learners?
               </h3>
               <p className="text-gray-700">
-                Yes. You’ll get project reviews, resume prep, mock interviews,
-                and guidance on targeting NCR roles.
+                Contact DCA to confirm whether internship or placement support is currently available.
               </p>
             </div>
           </div>

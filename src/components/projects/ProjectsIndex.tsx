@@ -10,13 +10,11 @@ import {
 type Props = {
   projects: Project[];
   selectedTag?: string;
-  localPreview?: boolean;
 };
 
 export default function ProjectsIndex({
   projects,
   selectedTag,
-  localPreview = false,
 }: Props) {
   const tags = getProjectTags(projects);
   const filteredProjects = getProjectsByTag(selectedTag, projects);
@@ -51,7 +49,6 @@ export default function ProjectsIndex({
               <li key={project.slug}>
                 <ProjectCard
                   project={project}
-                  showPendingRepository={localPreview || !project.repositoryUrl}
                 />
               </li>
             ))}

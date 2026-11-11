@@ -161,6 +161,95 @@ test("published guide listing keeps existing slugs and excludes sample posts", (
   assert.equal(render(React.createElement(blogPage.default)).includes('href="/blog/how-to"'), false);
 });
 
+test("course guides use published facts and keep unconfirmed Data Science delivery neutral", () => {
+  const read = (relativePath) =>
+    readFileSync(path.resolve(repositoryRoot, relativePath), "utf8");
+  const courses = read("src/lib/courses.ts");
+  const dataScienceGuide = read(
+    "src/content/blog/data-science-course-dehradun-2025.mdx",
+  );
+  const onlineDataScienceGuide = read(
+    "src/content/blog/best-online-data-science-courses-india.mdx",
+  );
+  const cityPages = [
+    "src/app/locations/noida/page.tsx",
+    "src/app/locations/bangalore/page.tsx",
+    "src/app/locations/mumbai/page.tsx",
+  ].map(read);
+
+  assert.match(courses, /slug: "data-science"[\s\S]*?modeStatus: "temporary"/);
+  assert.match(
+    dataScienceGuide,
+    /does not confirm current on-campus, online, or hybrid availability/i,
+  );
+  assert.match(onlineDataScienceGuide, /current delivery mode is \*\*not confirmed\*\*/);
+  assert.doesNotMatch(
+    cityPages.join("\n"),
+    /href="\/online-courses\/data-science"|learners study online|live online cohorts/i,
+  );
+  assert.match(
+    read("src/content/blog/coding-classes-dehradun-complete-guide-2025.mdx"),
+    /Data Science & AI \| 6 months \| ₹30,000 \| Not confirmed/i,
+  );
+});
+
+test("coding-jobs guide avoids unsupported market claims and matches visible FAQs to schema", async () => {
+  const post = blogModule.getPostBySlug("coding-jobs-in-dehradun-2025");
+
+  assert.ok(post);
+  assert.match(post.title, /Coding Jobs in Dehradun/);
+  const metadata = await detailPage.generateMetadata({
+    params: { slug: "coding-jobs-in-dehradun-2025" },
+  });
+  assert.equal(
+    metadata.alternates.canonical,
+    "https://dooncodingacademy.in/blog/coding-jobs-in-dehradun-2025",
+  );
+  assert.doesNotMatch(
+    post.content,
+    /₹\s*[\d,]+|LPA|currently in demand|highest demand|many companies hire remotely/i,
+  );
+  assert.match(post.content, /not a claim about current demand or vacancies/i);
+  assert.match(post.content, /no verified, current compensation source/i);
+  assert.equal(post.faqs?.length, 4);
+  for (const { q, a } of post.faqs ?? []) {
+    assert.ok(post.content.includes(q), `Visible guide is missing FAQ: ${q}`);
+    assert.ok(post.content.includes(a), `Visible guide is missing FAQ answer: ${q}`);
+  }
+});
+
+test("rewritten learning guides retain roadmaps, practice ideas, study, and beginner guidance", () => {
+  const onlineDataScience = blogModule.getPostBySlug(
+    "best-online-data-science-courses-india",
+  );
+  const fullStackRoadmap = blogModule.getPostBySlug(
+    "learn-full-stack-online-roadmap-india-2025",
+  );
+  const completeGuide = blogModule.getPostBySlug(
+    "coding-classes-dehradun-complete-guide-2025",
+  );
+
+  assert.ok(onlineDataScience);
+  assert.ok(fullStackRoadmap);
+  assert.ok(completeGuide);
+  assert.match(onlineDataScience.content, /A practical self-study roadmap/);
+  assert.match(onlineDataScience.content, /Portfolio project ideas/);
+  assert.match(onlineDataScience.content, /public dataset/);
+  assert.match(onlineDataScience.content, /no fixed timeline/i);
+  assert.match(fullStackRoadmap.content, /A flexible study plan/);
+  assert.match(fullStackRoadmap.content, /Independent project ideas/);
+  assert.match(fullStackRoadmap.content, /not a promise that the projects are included/i);
+  assert.match(completeGuide.content, /A beginner's coding roadmap/);
+  assert.match(completeGuide.content, /A flexible weekly study plan/);
+  assert.match(completeGuide.content, /Practice project ideas/);
+  assert.match(completeGuide.content, /I am a beginner\. How should I start\?/);
+  assert.match(completeGuide.content, /Do I need a laptop to learn coding\?/);
+  assert.doesNotMatch(
+    completeGuide.content,
+    /we offer both|with recordings, notes, and personal doubt-support|typically as a junior\/full-stack intern/i,
+  );
+});
+
 test("rendered guide content does not expose raw YAML frontmatter", async () => {
   const post = await blogModule.getPostHtmlBySlug(
     "best-full-stack-course-dehradun-2025",

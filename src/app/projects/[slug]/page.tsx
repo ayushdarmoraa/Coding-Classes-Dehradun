@@ -46,10 +46,5 @@ export function generateMetadata({ params }: Props): Metadata {
 export default function ProjectPage({ params }: Props) {
   const project = getProjectForEnvironment(params.slug);
   if (!project) notFound();
-  return (
-    <ProjectDetail
-      project={project}
-      showPendingRepository={!project.repositoryUrl}
-    />
-  );
+  return <ProjectDetail project={project} />;
 }

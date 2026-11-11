@@ -1,8 +1,6 @@
 import Link from "next/link";
 import TrackedLink from "@/components/analytics/TrackedLink";
-import TechSphere from "@/components/motion/TechSphere";
 import HeroSphereParallax from "@/components/motion/HeroSphereParallax";
-import { techSphereItems } from "@/components/home/techSphereItems";
 import { getCourses } from "@/lib/courses";
 import { MISSION_TESTS } from "@/lib/lab/mission";
 import { formatINR } from "@/lib/pricing";
@@ -72,53 +70,11 @@ export default function HomeHero() {
           </div>
 
           <HeroSphereParallax>
-            <div
-              className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-[radial-gradient(circle_at_center,rgba(47,123,240,0.18),rgba(75,63,216,0.12),transparent_70%)] blur-2xl"
-              aria-hidden="true"
-            />
-            <div className="hidden lg:flex justify-center">
-              <TechSphere items={techSphereItems} size={520} />
-            </div>
-            <div className="flex lg:hidden justify-center">
-              <TechSphere items={techSphereItems} size={300} />
-            </div>
-          </HeroSphereParallax>
-        </div>
-
-        {/* Second row */}
-        <div className="mt-4 grid items-stretch gap-6 md:grid-cols-2 lg:-mt-2">
-          <article className="hero-card-scale-1 float flex flex-col rounded-dca-md bg-navy-grad p-5 text-white shadow-soft-blue sm:p-7">
-            <div className="flex items-start justify-between gap-4">
-              <h2 className="text-xl font-bold text-white sm:text-2xl">Explore courses</h2>
-              <span aria-hidden="true" className="text-2xl text-white/70">&lt;/&gt;</span>
-            </div>
-            <div className="mt-5 flex flex-wrap gap-2">
-              {featuredCourses.map((course) => (
-                <span key={course.id} className="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-sm text-white">
-                  {course.shortTitle}
-                </span>
-              ))}
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {featuredCourses[0]?.modes.map((mode) => (
-                <span key={mode} className="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-sm text-white">
-                  {mode}
-                </span>
-              ))}
-            </div>
-            <Link
-              href="/courses"
-              className="btn-shine mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 py-3 font-semibold text-brand-dark transition-colors hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1a38] mt-auto"
+            <article
+              aria-labelledby="mission-preview-heading"
+              className="hero-card-scale-2 float flex w-full flex-col rounded-dca-md bg-violet-grad p-5 text-white shadow-soft-blue sm:p-7"
+              style={{ animationDelay: "-3s" }}
             >
-              Explore Courses
-            </Link>
-          </article>
-
-          <article
-            aria-labelledby="mission-preview-heading"
-            className="hero-card-scale-2 float flex flex-col rounded-dca-md bg-violet-grad p-5 text-white shadow-soft-blue sm:p-7"
-            style={{ animationDelay: '-3s' }}
-          >
             <div className="flex items-center justify-between gap-4 border-b border-white/15 pb-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/80">
@@ -166,6 +122,40 @@ export default function HomeHero() {
             >
               Start Mission
             </TrackedLink>
+            </article>
+          </HeroSphereParallax>
+        </div>
+
+        {/* Second row */}
+        <div className="mt-4 max-w-2xl lg:-mt-2">
+          <article className="hero-card-scale-1 float flex flex-col rounded-dca-md bg-navy-grad p-5 text-white shadow-soft-blue sm:p-7">
+            <div className="flex items-start justify-between gap-4">
+              <h2 className="text-xl font-bold text-white sm:text-2xl">Explore courses</h2>
+              <span aria-hidden="true" className="text-2xl text-white/70">&lt;/&gt;</span>
+            </div>
+            <div className="mt-5 grid gap-2 sm:grid-cols-2">
+              {featuredCourses.map((course) => (
+                <div
+                  key={course.id}
+                  role="group"
+                  aria-label={`${course.shortTitle} delivery options`}
+                  className="rounded-xl border border-white/20 bg-white/10 px-3 py-2"
+                >
+                  <p className="text-sm font-semibold text-white">{course.shortTitle}</p>
+                  <p className="mt-1 text-xs leading-5 text-white/80">
+                    {course.modeStatus === "confirmed"
+                      ? `Confirmed modes: ${course.modes.join(", ")}`
+                      : "Delivery availability not confirmed"}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <Link
+              href="/courses"
+              className="btn-shine mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 py-3 font-semibold text-brand-dark transition-colors hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1a38] mt-auto"
+            >
+              Explore Courses
+            </Link>
           </article>
         </div>
       </div>

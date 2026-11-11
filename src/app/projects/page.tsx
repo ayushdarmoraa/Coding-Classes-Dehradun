@@ -38,7 +38,6 @@ export default function ProjectsPage({ searchParams }: Props) {
     <ProjectsIndex
       projects={projects}
       selectedTag={selectedTag}
-      localPreview={process.env.NODE_ENV === "development"}
     />
   );
 }

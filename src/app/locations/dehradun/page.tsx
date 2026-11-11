@@ -31,19 +31,19 @@ const LOCAL_FAQ = [
   },
   {
     q: "What are the class timings?",
-    a: "Weekday and weekend options are available. See the Courses page or contact us for the current schedule.",
+    a: "Contact us to confirm current class schedules and batch availability.",
   },
 ];
 
 export const metadata: Metadata = {
   title: "Coding Classes in Dehradun | Doon Coding Academy",
   description:
-    "Explore Full-Stack, Data Science, Python, and Java courses at Doon Coding Academy in Herbertpur, Dehradun.",
+    "Explore course details and confirmed on-campus options at Doon Coding Academy in Herbertpur, Dehradun.",
   alternates: { canonical: `${SITE.url}/locations/dehradun` },
   openGraph: {
     title: "Coding Classes in Dehradun | Doon Coding Academy",
     description:
-      "Explore Full-Stack, Data Science, Python, and Java courses at Doon Coding Academy in Herbertpur, Dehradun.",
+      "Explore course details and confirmed on-campus options at Doon Coding Academy in Herbertpur, Dehradun.",
     url: `${SITE.url}/locations/dehradun`,
     type: "website",
     siteName: SITE.name,
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Coding Classes in Dehradun | Doon Coding Academy",
     description:
-      "Explore Full-Stack, Data Science, Python, and Java courses at Doon Coding Academy in Herbertpur, Dehradun.",
+      "Explore course details and confirmed on-campus options at Doon Coding Academy in Herbertpur, Dehradun.",
   },
 };
 
@@ -65,7 +65,7 @@ const localFeatures = [
   {
     icon: "📚",
     title: "Course Options",
-    description: "Explore Full-Stack, Data Science, Python, and Java courses."
+    description: "Review course details and confirm current delivery availability."
   },
   {
     icon: "🏫",
@@ -109,7 +109,7 @@ export default function DehradunLocationPage() {
             </h1>
             
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto text-blue-100">
-              Explore Full-Stack, Data Science, Python, and Java courses at our Herbertpur campus.
+              Review course details and see which programs currently confirm on-campus delivery at our Herbertpur campus.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -294,8 +294,8 @@ export default function DehradunLocationPage() {
           </h2>
 
           <p className="text-lg text-gray-700 mb-5">
-            At Doon Coding Academy near DR School in Herbertpur, explore Full-Stack, Data Science, Python, and Java course
-            options and campus details. On-campus courses are available in Dehradun.
+            At Doon Coding Academy near DR School in Herbertpur, explore course details and programs with confirmed
+            on-campus delivery. Contact us to confirm availability for other courses.
           </p>
 
           <section className="mt-8">

@@ -7,6 +7,7 @@ import { getCourses } from "@/lib/courses";
 import { getAllBlogPosts } from "@/lib/blog";
 import { formatINR } from "@/lib/pricing";
 import { PUBLISHED_LAB_ANALYTICS_METADATA } from "@/lib/lab/analytics-metadata";
+import { getPublishedProjects } from "@/lib/projects";
 import { AnalyticsRouteRegistryProvider } from "@/components/analytics/AnalyticsRouteRegistryProvider";
 import GaPageViewTracker from "@/components/analytics/GaPageViewTracker";
 import { Figtree, JetBrains_Mono, Outfit } from "next/font/google";
@@ -124,6 +125,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const projectsAvailable = getPublishedProjects().length > 0;
+
   return (
     <html
       lang="en"
@@ -145,7 +148,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             />
           ) : null}
           <MotionProvider>
-            <HeaderClient />
+            <HeaderClient projectsAvailable={projectsAvailable} />
             {children}
             <Footer />
             <FloatingWhatsApp />

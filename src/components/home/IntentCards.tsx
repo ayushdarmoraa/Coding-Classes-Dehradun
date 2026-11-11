@@ -2,6 +2,7 @@ import TrackedLink from "@/components/analytics/TrackedLink";
 import Carousel from "@/components/ui/Carousel";
 import SectionHeader from "@/components/motion/SectionHeader";
 import GrowReveal from "@/components/motion/GrowReveal";
+import { getPublishedProjects } from "@/lib/projects";
 
 const intents = [
   {
@@ -32,6 +33,18 @@ const intents = [
     href: "/contact",
     action: "Contact DCA",
   },
+  ...(getPublishedProjects().length > 0
+    ? [
+        {
+          number: "05",
+          title: "Explore Projects",
+          description:
+            "Review published project examples, technologies, and the ideas behind each build.",
+          href: "/projects",
+          action: "Browse Projects",
+        },
+      ]
+    : []),
 ];
 
 export default function IntentCards() {

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import {
+  existsSync,
   mkdtempSync,
   mkdirSync,
   readFileSync,
@@ -48,12 +49,21 @@ const {
 } = projectModule.exports;
 
 function makeProject(slug, overrides = {}) {
+  const origin = overrides.origin ?? "personal-project";
+  const assetPublicationPermission =
+    overrides.assetPublicationPermission ??
+    (origin === "personal-project"
+      ? "personal-project-owner-verified"
+      : origin === "internship-project"
+        ? "internship-organization-verified"
+        : "other-rightsholder-verified");
   return {
     slug,
     title: `Project ${slug}`,
     summary: "A verified project summary.",
-    origin: "personal-project",
+    origin,
     published: true,
+    assetPublicationPermission,
     category: "Web application",
     tags: ["React", "Testing"],
     problem: "A verified problem statement.",
@@ -118,7 +128,11 @@ test("registry contains the three supplied projects without inventing missing de
   );
   assert.deepEqual(
     PROJECTS.map(({ published }) => published),
-    [true, true, true],
+    [false, false, false],
+  );
+  assert.deepEqual(
+    PROJECTS.map(({ assetPublicationPermission }) => assetPublicationPermission),
+    ["unverified", "unverified", "unverified"],
   );
   assert.deepEqual(PROJECTS[0].technologies, [
     "MongoDB",
@@ -175,35 +189,38 @@ test("registry contains the three supplied projects without inventing missing de
     "Weekly productivity summaries.",
     "Team standup and update management.",
   ]);
-  assert.equal(getProjectOriginLabel("personal-project"), undefined);
+  assert.equal(getProjectOriginLabel("personal-project"), "Personal Project");
   assert.equal(getProjectOriginLabel("internship-project"), "Internship Project");
   assert.equal(PROJECTS[0].seo.title, "E-Commerce Website");
   assert.equal(PROJECTS[1].seo.title, "AI Resume Builder");
   assert.equal(MIN_PUBLISHED_PROJECTS, 3);
+  assert.deepEqual(getPublishedProjects(), []);
+  assert.equal(getPublishedProjectBySlug("e-commerce-website"), undefined);
   assert.deepEqual(
-    getPublishedProjects().map(({ slug }) => slug),
-    ["e-commerce-website", "ai-resume-builder", "standupsync"],
+    getProjectsForEnvironment("development"),
+    [],
   );
-  assert.equal(
-    getPublishedProjectBySlug("e-commerce-website")?.slug,
-    "e-commerce-website",
-  );
-  assert.deepEqual(
-    getProjectsForEnvironment("development").map(({ slug }) => slug),
-    ["e-commerce-website", "ai-resume-builder", "standupsync"],
-  );
-  assert.equal(
-    getProjectForEnvironment("standupsync", "development")?.origin,
-    "internship-project",
-  );
-  assert.deepEqual(
-    getProjectsForEnvironment("production").map(({ slug }) => slug),
-    ["e-commerce-website", "ai-resume-builder", "standupsync"],
-  );
-  assert.equal(
-    getProjectForEnvironment("standupsync", "production")?.origin,
-    "internship-project",
-  );
+  assert.equal(getProjectForEnvironment("standupsync", "development"), undefined);
+  assert.deepEqual(getProjectsForEnvironment("production"), []);
+  assert.equal(getProjectForEnvironment("standupsync", "production"), undefined);
+  for (const project of PROJECTS) {
+    for (const screenshot of project.screenshots) {
+      const publicPath = path.join(
+        repositoryRoot,
+        "public",
+        screenshot.src.slice(1),
+      );
+      const unpublishedPath = path.join(
+        repositoryRoot,
+        "src",
+        "unpublished-project-assets",
+        project.slug,
+        path.basename(screenshot.src),
+      );
+      assert.equal(existsSync(publicPath), false);
+      assert.equal(existsSync(unpublishedPath), true);
+    }
+  }
   const unconsentedStudentDraft = makeProject("unconsented-student-draft", {
     origin: "student",
     published: false,
@@ -264,6 +281,28 @@ test("registry rejects duplicate slugs, unsafe screenshot paths, and invalid stu
       `should reject screenshot path: ${screenshotSrc}`,
     );
   }
+});
+
+test("personal and internship assets require origin-specific permission distinct from contributor consent", () => {
+  const wrongPersonalPermission = makeProject("personal-rights", {
+    assetPublicationPermission: "internship-organization-verified",
+  });
+  const wrongInternshipPermission = makeProject("internship-rights", {
+    origin: "internship-project",
+    assetPublicationPermission: "personal-project-owner-verified",
+  });
+
+  assert.throws(() => validateProjects([wrongPersonalPermission]));
+  assert.throws(() => validateProjects([wrongInternshipPermission]));
+  assert.throws(() =>
+    validateProjects([
+      makeProject("student-consent", {
+        origin: "student",
+        assetPublicationPermission: "other-rightsholder-verified",
+        contributors: [{ name: "Learner", consentVerified: false }],
+      }),
+    ]),
+  );
 });
 
 test("screenshot paths resolve only inside their own project directory", () => {
@@ -340,6 +379,38 @@ test("published routes require three complete projects and existing screenshots 
       getPublishedProjects(records, publicDirectory).map(({ slug }) => slug),
       ["one", "two", "three"],
     );
+  });
+
+  test("publication gate excludes projects without permission for personal or internship assets", () => {
+    assert.equal(MIN_PUBLISHED_PROJECTS, 3);
+    const records = [
+      makeProject("personal-unverified", {
+        assetPublicationPermission: "unverified",
+      }),
+      makeProject("internship-unverified", {
+        origin: "internship-project",
+        assetPublicationPermission: "unverified",
+      }),
+      makeProject("personal-verified"),
+      makeProject("internship-verified", {
+        origin: "internship-project",
+      }),
+      makeProject("other-verified", { origin: "dca-demo" }),
+    ];
+
+    withTemporaryPublicDirectory((publicDirectory) => {
+      for (const project of records) addScreenshot(publicDirectory, project.slug);
+      assert.deepEqual(
+        getPublishedProjects(records, publicDirectory).map(({ slug }) => slug),
+        ["personal-verified", "internship-verified", "other-verified"],
+      );
+      assert.equal(
+        getProjectsForEnvironment("development", records).some(
+          ({ slug }) => slug === "personal-unverified" || slug === "internship-unverified",
+        ),
+        false,
+      );
+    });
   });
 
   withTemporaryPublicDirectory((publicDirectory) => {
@@ -457,7 +528,7 @@ test("project tags filter safely and route paths validate slugs", () => {
   assert.throws(() => getProjectPath({ slug: "../private" }));
 });
 
-test("project pages use publication gating and stay out of public navigation and sitemap while gated", () => {
+test("project pages, navigation, and sitemap follow publication gating", () => {
   const indexPage = readFileSync(
     path.join(repositoryRoot, "src/app/projects/page.tsx"),
     "utf8",
@@ -492,19 +563,28 @@ test("project pages use publication gating and stay out of public navigation and
     "utf8",
   );
   assert.doesNotMatch(projectIndex, /Local preview only|not live on the public website/);
-  assert.match(
-    projectIndex,
-    /showPendingRepository=\{localPreview \|\| !project\.repositoryUrl\}/,
-  );
+  assert.doesNotMatch(projectIndex, /showPendingRepository/);
   assert.match(detailPage, /getProjectForEnvironment\(params\.slug\)/);
   assert.match(detailPage, /process\.env\.NODE_ENV === "development"/);
   assert.match(detailPage, /if \(!project\) notFound\(\)/);
   assert.match(detailPage, /generateStaticParams/);
   assert.match(detailPage, /canonical/);
-  assert.match(detailPage, /showPendingRepository=\{!project\.repositoryUrl\}/);
+  assert.doesNotMatch(detailPage, /showPendingRepository/);
+  const projectCard = readFileSync(
+    path.join(repositoryRoot, "src/components/projects/ProjectCard.tsx"),
+    "utf8",
+  );
+  const projectDetail = readFileSync(
+    path.join(repositoryRoot, "src/components/projects/ProjectDetail.tsx"),
+    "utf8",
+  );
+  assert.doesNotMatch(projectCard, /link pending|showPendingRepository/);
+  assert.doesNotMatch(projectDetail, /Confirmed features to be added|To be confirmed|link pending|showPendingRepository/);
+  assert.match(projectDetail, /project\.features\.length > 0 &&/);
   assert.match(sitemap, /getPublishedProjects\(\)/);
   assert.match(seoQa, /getPublishedProjectRoutes/);
-  assert.doesNotMatch(navigation, /\/projects/);
+  assert.match(navigation, /href: "\/projects", label: "Projects"/);
+  assert.match(navigation, /getNavLinks\(projectsAvailable: boolean\)/);
   assert.match(homepage, /getPublishedProjects\(\)/);
   assert.match(homepage, /projects\.length > 0/);
 });

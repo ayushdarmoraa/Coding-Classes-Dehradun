@@ -1,16 +1,22 @@
 import Link from "next/link";
-import { NAV_LINKS, COURSE_LINKS } from "@/lib/nav";
+import { getNavLinks, COURSE_LINKS } from "@/lib/nav";
 
 type HeaderProps = {
   currentPath?: string;
   compact?: boolean;
+  projectsAvailable: boolean;
 };
 
-export default function Header({ currentPath = "/", compact = false }: HeaderProps) {
+export default function Header({
+  currentPath = "/",
+  compact = false,
+  projectsAvailable,
+}: HeaderProps) {
   const isActive = (href: string) =>
     href === "/" ? currentPath === "/" : currentPath.startsWith(href);
   const isCurrent = (href: string) => currentPath === href;
   const isCourseSectionActive = isActive("/courses") || isActive("/online-courses");
+  const navLinks = getNavLinks(projectsAvailable);
 
   const courseLinks = (
     <>
@@ -75,7 +81,7 @@ export default function Header({ currentPath = "/", compact = false }: HeaderPro
 
           <nav aria-label="Main navigation">
             <ul className="hidden items-center gap-4 whitespace-nowrap text-sm xl:flex 2xl:gap-6 2xl:text-base">
-              {NAV_LINKS.map((item) =>
+              {navLinks.map((item) =>
                 item.href === "/courses" ? (
                   <li key={item.href}>
                     <details className="group relative">
@@ -153,7 +159,7 @@ export default function Header({ currentPath = "/", compact = false }: HeaderPro
               className="animate-menu-in absolute right-0 top-full z-20 mt-2 max-h-[85vh] w-[min(22rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain rounded-dca-md border border-brand-soft bg-white p-2 text-ink shadow-soft-blue"
             >
               <ul className="flex flex-col">
-                {NAV_LINKS.map((item) =>
+                {navLinks.map((item) =>
                   item.href === "/courses" ? (
                     <li key={item.href}>
                       <details>

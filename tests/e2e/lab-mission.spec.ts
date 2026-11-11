@@ -16,6 +16,14 @@ async function activateUsingEnter(page: Page, target: Locator) {
   await page.keyboard.press("Enter");
 }
 
+async function expectAvailableNavigation(navigation: Locator) {
+  for (const label of ["DCA Lab", "Guides", "About", "Contact"]) {
+    await expect(navigation.getByRole("link", { name: label })).toBeVisible();
+  }
+  await expect(navigation.getByText("Courses", { exact: true })).toBeVisible();
+  await expect(navigation.getByRole("link", { name: "Projects" })).toHaveCount(0);
+}
+
 test.beforeEach(async ({ page }) => {
   await page.route("**/*google-analytics.com/**", (route) => route.abort());
   await page.route("**/*googletagmanager.com/**", (route) => route.abort());
@@ -30,12 +38,7 @@ test("anonymous learner completes and resumes the featured mission", async ({
   const mainNavigation = page.getByRole("navigation", {
     name: "Main navigation",
   });
-  await expect(
-    mainNavigation.getByRole("link", { name: "Projects" }),
-  ).toBeVisible();
-  await expect(
-    mainNavigation.getByRole("link", { name: "Outcomes" }),
-  ).toBeVisible();
+  await expectAvailableNavigation(mainNavigation);
   await expect(page.locator(".cm-editor")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Run Tests" })).toHaveCount(0);
   const heroHeading = await page.getByRole("heading", { level: 1 }).boundingBox();
@@ -166,10 +169,5 @@ test("narrow mobile learner completes the mission using keyboard navigation", as
   const mobileNavigation = page.getByRole("navigation", {
     name: "Mobile navigation",
   });
-  await expect(
-    mobileNavigation.getByRole("link", { name: "Projects" }),
-  ).toBeVisible();
-  await expect(
-    mobileNavigation.getByRole("link", { name: "Outcomes" }),
-  ).toBeVisible();
+  await expectAvailableNavigation(mobileNavigation);
 });

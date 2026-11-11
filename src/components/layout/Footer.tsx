@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { getPublishedProjects } from "@/lib/projects";
 import { SITE } from "@/lib/site-config";
 
 export default function Footer() {
+  const projectsAvailable = getPublishedProjects().length > 0;
   const phone = SITE.phone;
   const email = SITE.email;
   const telHref = `tel:${phone.replace(/\s+/g, "")}`;
@@ -35,6 +37,9 @@ export default function Footer() {
             <h2 id="footer-resources" className="dca-footer__heading">Resources</h2>
             <ul className="mt-4 space-y-3 text-sm">
               <li><Link href="/blog" className="dca-footer__link">Guides</Link></li>
+              {projectsAvailable && (
+                <li><Link href="/projects" className="dca-footer__link">Projects</Link></li>
+              )}
               <li><Link href="/faq" className="dca-footer__link">FAQ</Link></li>
             </ul>
           </section>
