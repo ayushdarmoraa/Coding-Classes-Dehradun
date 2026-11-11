@@ -119,3 +119,69 @@ test("homepage hero remains stable at mobile widths after hydration", async ({
   expect(errors).toEqual([]);
   console.info("Homepage mobile measurements:", JSON.stringify(measurements));
 });
+
+test("homepage globe and cards do not overlap across mobile and laptop widths", async ({
+  page,
+}) => {
+  for (const width of [360, 375, 768, 1024, 1366]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+
+    const heading = page.locator("#home-hero-heading");
+    const copy = heading.locator("..");
+    const sphere = page.getByTestId("home-tech-sphere");
+    const mission = page.locator('[aria-labelledby="mission-preview-heading"]');
+    const courses = page.locator("article").filter({
+      has: page.getByRole("heading", { name: "Explore courses" }),
+    });
+
+    await expect(heading).toBeVisible();
+    await expect(sphere).toBeVisible();
+    const layout = await page.evaluate(() => {
+      const rect = (element: Element | null) => {
+        if (!element) return null;
+        const { x, y, width: elementWidth, height } = element.getBoundingClientRect();
+        return { left: x, top: y, right: x + elementWidth, bottom: y + height };
+      };
+      return {
+        viewportWidth: window.innerWidth,
+        documentWidth: document.documentElement.scrollWidth,
+        copy: rect(document.querySelector("#home-hero-heading")?.parentElement ?? null),
+        sphere: rect(document.querySelector('[data-testid="home-tech-sphere"]')),
+        mission: rect(document.querySelector('[aria-labelledby="mission-preview-heading"]')),
+        courses: rect(
+          Array.from(document.querySelectorAll("article")).find((article) =>
+            article.querySelector("h2")?.textContent?.includes("Explore courses"),
+          ) ?? null,
+        ),
+      };
+    });
+
+    expect(layout.copy).not.toBeNull();
+    expect(layout.sphere).not.toBeNull();
+    expect(layout.mission).not.toBeNull();
+    expect(layout.courses).not.toBeNull();
+    expect(layout.documentWidth).toBeLessThanOrEqual(layout.viewportWidth);
+
+    const copyBox = await copy.boundingBox();
+    const sphereBox = await sphere.boundingBox();
+    const missionBox = await mission.boundingBox();
+    const coursesBox = await courses.boundingBox();
+    expect(copyBox).not.toBeNull();
+    expect(sphereBox).not.toBeNull();
+    expect(missionBox).not.toBeNull();
+    expect(coursesBox).not.toBeNull();
+
+    if (width < 1024) {
+      expect(sphereBox!.y).toBeGreaterThanOrEqual(copyBox!.y + copyBox!.height);
+    } else {
+      expect(sphereBox!.x).toBeGreaterThanOrEqual(copyBox!.x + copyBox!.width);
+    }
+
+    if (width < 768) {
+      expect(coursesBox!.y).toBeGreaterThanOrEqual(missionBox!.y + missionBox!.height);
+    } else {
+      expect(coursesBox!.x).toBeGreaterThanOrEqual(missionBox!.x + missionBox!.width);
+    }
+  }
+});

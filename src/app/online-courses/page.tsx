@@ -36,7 +36,7 @@ export default function OnlineCoursesPage() {
       {/* Hero */}
       <section className="bg-navy-grad text-white pt-12 pb-16">
         <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight text-white">
             Online Coding Courses in India
           </h1>
           <p className="text-lg md:text-xl max-w-3xl mx-auto text-blue-100">

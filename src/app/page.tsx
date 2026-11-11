@@ -234,7 +234,7 @@ export default function HomePage() {
             </p>
             <h2
               id="home-final-cta-heading"
-              className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+              className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl"
             >
               Start learning by doing.
             </h2>
