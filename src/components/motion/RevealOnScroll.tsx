@@ -2,6 +2,15 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
+const GRID_UTILITY = /^(?:inline-)?grid(?:$|-(?:cols|rows|flow)(?:-|$))/;
+
+export function hasGridUtilityClass(className: string) {
+  return className.split(/\s+/).some((classToken) => {
+    const utility = classToken.slice(classToken.lastIndexOf(":") + 1);
+    return GRID_UTILITY.test(utility);
+  });
+}
+
 export default function RevealOnScroll() {
   const pathname = usePathname();
   useEffect(() => {
@@ -20,7 +29,8 @@ export default function RevealOnScroll() {
     };
 
     main.querySelectorAll("h2, h2 + p").forEach((el) => tag(el, 0));
-    main.querySelectorAll('[class*="grid"]').forEach((g) => {
+    main.querySelectorAll("[class]").forEach((g) => {
+      if (!hasGridUtilityClass(String((g as HTMLElement).className))) return;
       Array.from(g.children).forEach((c, i) => {
         if (/rounded/.test(String((c as HTMLElement).className))) tag(c, i, true);
       });

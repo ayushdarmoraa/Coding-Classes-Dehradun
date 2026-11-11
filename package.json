@@ -14,12 +14,14 @@
     "test:content": "node --test scripts/content-qa.test.mjs",
     "test:courses": "node --test scripts/course-model.test.mjs scripts/course-detail.test.mjs scripts/course-hub.test.mjs scripts/online-course.test.mjs",
     "test:enquiry": "node --test scripts/enquiry.test.mjs",
-    "test:lab": "node --test scripts/lab-foundation.test.mjs scripts/lab-mission.test.mjs scripts/lab-workspace.test.mjs",
+    "test:motion": "node --test scripts/reveal-on-scroll.test.mjs",
+    "test:lab": "node --test scripts/lab-foundation.test.mjs scripts/lab-mission.test.mjs scripts/lab-workspace.test.mjs scripts/lighthouse-config.test.mjs",
+    "test:lab:e2e": "playwright test --config playwright.config.ts",
     "test:pr3": "npm run test:lab && node --test scripts/navigation.test.mjs",
     "test:guides": "node --test scripts/guides.test.mjs",
     "test:projects": "node --test scripts/projects.test.mjs",
     "test:outcomes": "node --test scripts/outcomes.test.mjs",
-    "test": "npm run test:pr3 && npm run test:guides && npm run test:projects && npm run test:outcomes && npm run test:enquiry",
+    "test": "npm run test:motion && npm run test:pr3 && npm run test:guides && npm run test:projects && npm run test:outcomes && npm run test:enquiry",
     "check:analytics": "node ./scripts/check-analytics.js",
     "gsc:submit": "node scripts/gsc-submit-sitemap.mjs",
     "gsc:submit:domain": "node scripts/gsc-submit-sitemap-domain.mjs"
@@ -42,6 +44,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/node": "24.3.0",
     "@types/nodemailer": "^6.4.19",
     "@types/react": "18.3.24",
