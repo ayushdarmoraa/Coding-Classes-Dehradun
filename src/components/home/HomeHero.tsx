@@ -72,11 +72,30 @@ export default function HomeHero() {
           </div>
 
           <HeroSphereParallax>
-            <article
-              aria-labelledby="mission-preview-heading"
-              className="hero-card-scale-2 float flex w-full flex-col rounded-dca-md bg-violet-grad p-5 text-white shadow-soft-blue sm:p-7"
-              style={{ animationDelay: "-3s" }}
+            <div
+              data-testid="home-tech-sphere"
+              className="flex items-center justify-center"
             >
+              <div className="md:hidden">
+                <TechSphere items={techSphereItems} size={260} />
+              </div>
+              <div className="hidden md:block lg:hidden">
+                <TechSphere items={techSphereItems} size={300} />
+              </div>
+              <div className="hidden lg:block">
+                <TechSphere items={techSphereItems} size={400} />
+              </div>
+            </div>
+          </HeroSphereParallax>
+        </div>
+
+        {/* Second row */}
+        <div className="mt-4 grid items-stretch gap-4 md:grid-cols-2 lg:-mt-2 lg:gap-6">
+          <article
+            aria-labelledby="mission-preview-heading"
+            className="hero-card-scale-2 float flex w-full flex-col rounded-dca-md bg-violet-grad p-5 text-white shadow-soft-blue sm:p-7"
+            style={{ animationDelay: "-3s" }}
+          >
             <div className="flex items-center justify-between gap-4 border-b border-white/15 pb-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/80">
@@ -124,12 +143,7 @@ export default function HomeHero() {
             >
               Start Mission
             </TrackedLink>
-            </article>
-          </HeroSphereParallax>
-        </div>
-
-        {/* Second row */}
-        <div className="mt-4 grid items-center gap-4 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:-mt-2 lg:gap-6">
+          </article>
           <article className="hero-card-scale-1 float flex flex-col rounded-dca-md bg-navy-grad p-5 text-white shadow-soft-blue sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <h2 className="text-xl font-bold text-white sm:text-2xl">Explore courses</h2>
@@ -159,17 +173,6 @@ export default function HomeHero() {
               Explore Courses
             </Link>
           </article>
-          <div className="flex items-center justify-center">
-            <div className="md:hidden">
-              <TechSphere items={techSphereItems} size={260} />
-            </div>
-            <div className="hidden md:block lg:hidden">
-              <TechSphere items={techSphereItems} size={300} />
-            </div>
-            <div className="hidden lg:block">
-              <TechSphere items={techSphereItems} size={400} />
-            </div>
-          </div>
         </div>
       </div>
     </section>

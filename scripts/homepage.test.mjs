@@ -172,15 +172,17 @@ test("homepage presents one clear value proposition and valid primary actions", 
   assert.match(markup, /href="\/contact"[^>]*>Talk to a Mentor/);
 });
 
-test("homepage places the static mission preview beside the hero copy", () => {
+test("homepage places the animated technology sphere beside the hero copy", () => {
   const heroStart = markup.indexOf('aria-labelledby="home-hero-heading"');
   const heroEnd = markup.indexOf('id="intent-heading"');
   const heroMarkup = markup.slice(heroStart, heroEnd);
+  const heroCopyEnd = heroMarkup.indexOf("</div>");
 
   assert.ok(heroStart >= 0);
   assert.ok(heroEnd > heroStart);
   assert.match(heroMarkup, /lg:grid-cols-2/);
-  assert.match(heroMarkup, /aria-labelledby="mission-preview-heading"/);
+  assert.match(heroMarkup, /data-testid="home-tech-sphere"/);
+  assert.ok(heroMarkup.indexOf("data-testid=") > heroCopyEnd);
   assert.equal((markup.match(/aria-labelledby="mission-preview-heading"/g) ?? []).length, 1);
   assert.match(heroMarkup, /class="relative z-10 flex items-center justify-center"/);
   assert.match(
@@ -190,17 +192,17 @@ test("homepage places the static mission preview beside the hero copy", () => {
     ),
     /useReducedMotion/,
   );
-  assert.match(heroMarkup, /hero-card-scale-2 float/);
+  assert.match(markup, /md:grid-cols-2/);
+  assert.match(markup, /hero-card-scale-2 float/);
   assert.match(heroMarkup, /home-hero-heading[\s\S]*hero-stagger-2/);
 });
 
-test("homepage keeps the animated technology sphere alongside the Lab preview", () => {
+test("homepage keeps all technology sphere icons and the Lab mission preview", () => {
   const heroStart = markup.indexOf('aria-labelledby="home-hero-heading"');
   const heroEnd = markup.indexOf('id="intent-heading"');
   const heroMarkup = markup.slice(heroStart, heroEnd);
 
-  assert.match(heroMarkup, /aria-labelledby="mission-preview-heading"/);
-  assert.match(heroMarkup, /md:grid-cols-\[minmax\(0,1\.3fr\)_minmax\(0,1fr\)\]/);
+  assert.match(markup, /aria-labelledby="mission-preview-heading"/);
   for (const { src } of techSphereItems) {
     assert.ok(src, "Technology sphere items must have an icon source");
     assert.ok(
